@@ -1,0 +1,98 @@
+﻿@model Event
+@{
+    ViewData["Title"] = "Admin - Begivenhed - Annuler";
+}
+<div class="container">
+    <div class="row d-flex justify-content-between">
+        <div class="col-6">
+            <h3 class="display-4">Aflys begivenhed ?</h3>
+        </div>
+        <div class="col-6 text-right">
+            @if (User.Identity.Name == null)
+            {
+                <a class="btn btn-outline-info" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt"></i>&nbsp; Login for at tilmelde</a>
+            }
+        </div>
+    </div>
+    <br />
+    <br />
+    <form method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="row mb-3 border rounded box-shadow p-3 d-flex justify-content-between">
+            <div class="p-3 col-3">
+                <h2>
+                    @if (Model.Participants.Count == 0)
+                    {
+                        <i class="fas fa-users text-danger" title="Ingen tilmeldte"></i>
+                    }
+                    else if (Model.Participants.Count < Model.MinParticipants)
+                    {
+                        <i class="fas fa-user-friends text-warning" title="Ikke nok tilmeldte"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-user-check text-success" title="Tilmeldte OK"></i>
+                    }
+                </h2>
+                @if (Model.Divelocation != null)
+                {
+                    <span class="badge badge-pill p-2 @Model.Divelocation.DiveType.ToString().ToLower()">@Model.Divelocation.DiveType.ToString()</span>
+                }
+            </div>
+
+            <div class="col-6">
+                <h4>@Model.Title</h4>
+                <small>@Model.StartDateAndTime.ToLongDateString() kl. @Model.StartDateAndTime.ToShortTimeString()</small>
+                <br />
+                <partial name="_SeatStatusPartial" model="@Model" />
+                @*<span class="badge badge-light badge-pill p-3">
+                    @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) / 10; i++)
+                    {
+                        <i class="fas fa-users text-danger" title="10 ledige pladser"></i>
+                    }
+                    @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) % 10; i++)
+                    {
+                        <i class="fas fa-user text-danger" title="Ledig plads"></i>
+                    }
+                    @for (int i = 0; i < Model.RequiredSpots / 10; i++)
+                    {
+                        <i class="fas fa-users text-warning" title="10 påkrævede pladser"></i>
+                    }
+                    @for (int i = 0; i < Model.RequiredSpots % 10; i++)
+                    {
+                        <i class="far fa-user text-warning" title="1 påkrævet plads"></i>
+                    }
+
+                    @foreach (var user in Model.Participants)
+                    {
+                        <i class="fas fa-user-check text-success" title="Plads taget af @user.ApplicationUser.Firstname"></i>
+                    }
+                </span>*@
+                <div class="border-top mt-3 p-4">@(string.IsNullOrEmpty(Model.Details) ? "Ingen beskrivelse" : Model.Details)</div>
+            </div>
+            <div class="col-3">
+
+                <ul class="list-group">
+                    <li class="list-group-item bg-light"><h4 class="text-primary">Tilmeldte:</h4></li>
+                    @foreach (var user in Model.Participants)
+                    {
+                        <li class="list-group-item">
+                            <i class="fas fa-user-check text-success"></i>&nbsp;@user.ApplicationUser.Firstname &nbsp;@user.ApplicationUser.Lastname
+                        </li>
+                    }
+
+                </ul>
+
+            </div>
+        </div>
+        <div class="row d-flex justify-content-between">
+            <div class="col-3">
+                <a asp-action="Index" class="btn btn-outline-success form-control"><i class="fas fa-ban"></i>&nbsp;Tilbage</a>
+            </div>
+            <div class="col-3">
+                <button type="submit" class="btn btn-outline-danger form-control"><i class="fas fa-times"></i>&nbsp; Aflys begivenhed</button>
+            </div>
+        </div>
+    </form>
+</div>
+

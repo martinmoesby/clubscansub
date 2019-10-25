@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Course>
+@{
+    ViewData["Title"] = "Admin - Kurser";
+    var pageTitle = ViewBag.PageTitle;
+
+}
+<partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
+<div class="container">
+
+    <partial name="_IndexPageHeaderPartial" model="@pageTitle" />
+
+    @if (Model.Count() == 0)
+    {
+        <h4 class="text-info">Ingen Kurser</h4>
+        <p>Tryk på 'Ny' for at planlægge et nyt kursus</p>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="align-top">
+                        <label asp-for="@Model.First().Id"></label>
+                    </th>
+                    <th class="align-top">
+                        <label asp-for="@Model.First().CourseName"></label>
+                    </th>
+                    <th class="align-top">
+                        <label>Kursus start</label>
+                    </th>
+                    <th class="align-top">
+                        <label>Tilmeldte</label>
+                        <br />
+                        <small>(skrevet op / tilmeldt)</small>
+                    </th>
+                    <th class="align-top"><label>Kursus dage</label></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td class="small">@item.Id</td>
+                    <td class="small">@item.CourseName</td>
+                    <td class="small">@item.StartDateAndTime.ToString("dd-MM-yyyy")</td>
+                    <td class="small">(@item.Signups.Count / @item.Participants.Count) af @item.MinParticipants - @item.MaxParticipants</td>
+                    <td class="small">@item.CourseSessions.Count</td>
+                    <td class="small">
+                        @if (!item.IsCancelled)
+                        {
+                            <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
+                        }
+                        else
+                        {
+                            <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

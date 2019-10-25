@@ -1,0 +1,101 @@
+﻿@model Event
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-12">
+            <h5><i class="fas fa-calendar-alt"></i>&nbsp;Detaljer</h5>
+
+            <form asp-action="EditEvent" asp-controller="Home" asp-area="Admin" method="post">
+
+                <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+
+                <input type="hidden" asp-for="Divelocation.Id" />
+                <input type="hidden" asp-for="Divelocation.MinDepth" />
+                <input type="hidden" asp-for="Divelocation.MaxDepth" />
+                <input type="hidden" asp-for="FixedParticipants" />
+
+                <div class="form-group d-flex justify-content-between">
+                    <div class="form-group input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Type:</span>
+                        </div>
+                        <input type="text" class="form-control" asp-for="EventType" readonly />
+                    </div>
+
+                    <div class="form-group input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Til:</span>
+                        </div>
+                        <input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Divelocation.Name" readonly />
+                    </div>
+
+                </div>
+
+                <div class="form-group input-group col-12">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width:120px;">Titel</span>
+                    </div>
+                    <input type="text" class="form-control" asp-for="Title" id="title" autocomplete="off" />
+                </div>
+
+                <div class="form-group input-group col-12">
+                    <div class="input-group-prepend align-content-start">
+                        <span class="input-group-text" style="width:120px;">Detaljer</span>
+                    </div>
+                    <textarea class="form-control" asp-for="Details" autocomplete="off" style="height:150px;"></textarea>
+                </div>
+
+                <div class="form-group d-flex justify-content-between">
+                    <div class="input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Start:</span>
+                        </div>
+                        <input type="datetime-local" class="form-control" asp-for="StartDateAndTime" placeholder="" />
+                    </div>
+
+                    <div class="input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Slut:</span>
+                        </div>
+                        <input type="datetime-local" class="form-control" asp-for="EndDateAndTime" placeholder="" />
+                    </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-between">
+
+                    <div class="input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Min:</span>
+                        </div>
+                        <input type="number" class="form-control" asp-for="MinParticipants" />
+                    </div>
+
+                    <div class="input-group col-6">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width:120px;">Max:</span>
+                        </div>
+                        <input type="number" class="form-control" asp-for="MaxParticipants" />
+                    </div>
+                </div>
+
+                <div class="form-group input-group col-12">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width:120px;">Pris:</span>
+                    </div>
+                    <input class="form-control" asp-for="Price" />
+                </div>
+
+                <div class="form-group col-12 d-flex justify-content-between mt-3">
+                    <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿@model ClubScansub.Areas.Admin.ViewModels.CreateCourseViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+    <form method="post" asp-action="CreateCourse" asp-controller="Course" asp-area="Admin">
+        <h4 class="text-info"><i class="fas fa-chalkboard-teacher"></i>&nbsp;Opret nyt kursus</h4>
+        <div class="my-3 border rounded"></div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Kursus:</span>
+            </div>
+            <select type="text" class="form-control" asp-items="@Model.Coursetemplates" asp-for="CourseTemplateId" id="selectedcoursetypeid" onchange="selectedcoursetypeChanged()"></select>
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Titel:</span>
+            </div>
+            <input type="text" class="form-control" asp-for="Course.CourseName" id="title" autocomplete="off" />
+        </div>
+
+
+
+        <div class="form-group input-group col-9">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Start dato:</span>
+            </div>
+            <input type="date" class="form-control" asp-for="Course.StartDateAndTime" placeholder="" />
+        </div>
+
+        <p class="pl-3">Deltagere :</p>
+        
+        <div class="form-group d-flex justify-content-between">
+
+            <div class="input-group  col-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:120px;">Min.:</span>
+                </div>
+                <input type="number" class="form-control" asp-for="Course.MinParticipants" />
+            </div>
+
+            <div class="input-group mr-2 col-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:120px;">Max.:</span>
+                </div>
+                <input type="number" class="form-control" asp-for="Course.MaxParticipants" />
+            </div>
+        </div>
+
+        <div class="form-group input-group col-auto">
+
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Pris:</span>
+            </div>
+            <input type="number" class="form-control" id="courseprice" asp-for="Course.Price" />
+
+        </div>
+
+        <div class="form-group col-12 d-flex justify-content-between mt-3">
+            <button class="btn btn-outline-info" type="reset"><i class="fas fa-times"></i> &nbsp;Annuller</button>
+            <button class="btn btn-outline-success" type="submit"><i class="fas fa-check"></i> &nbsp;Opret</button>
+        </div>
+
+    </form>

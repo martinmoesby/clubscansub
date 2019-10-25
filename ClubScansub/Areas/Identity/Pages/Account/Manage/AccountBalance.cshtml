@@ -1,0 +1,42 @@
+﻿@page
+@model AccountBalanceModel
+@{
+}
+    <h5><i class="fas fa-coins"></i>&nbsp;Turkonto</h5>
+<div class="overflow-auto">
+    @if (Model.AccountTransactions.Count() == 0)
+    {
+        <h6><i class="fas fa-coins"></i>&nbsp;Ingen transaktioner</h6>
+    }
+    else
+    {
+        <table class="col-auto table small">
+            <thead>
+                <tr>
+                    <th>Dato</th>
+                    <th>Beskrivelse</th>
+                    <th>Beløb</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.AccountTransactions)
+                {
+                    <tr>
+                        <td>@item.PostingDate</td>
+                        <td>@item.Description</td>
+                        <td>
+                            @item.Amount
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">
+                        <h6 class="btn btn-info btn-sm"><i class="fas fa-coins"></i>&nbsp;Balance: @Html.FormatValue(Model.ApplicationUser.Balance, "{0:n2}")</h6>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>

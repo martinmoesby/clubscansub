@@ -1,0 +1,90 @@
+﻿@model CourseTemplate
+@{
+    ViewData["Title"] = "Opret ny kursus template";
+}
+
+<div class="container">
+    <h1 class="display-4 text-info">@ViewData["title"]</h1>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateName"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateName" />
+                <span asp-validation-for="TemplateName"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateDurationInWeeks"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateDurationInWeeks" />
+                <span asp-validation-for="TemplateDurationInWeeks"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm">Kursus type</label>
+                <select class="form-control form-control-sm" asp-items="@Html.GetEnumSelectList<CourseTypeEnum>()" asp-for="CourseType"></select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="MinStudents"></label>
+                <input class="form-control form-control-sm" type="number" asp-for="MinStudents" />
+                <span asp-validation-for="MinStudents"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="MaxStudents"></label>
+                <input class="form-control form-control-sm" type="number" asp-for="MaxStudents" />
+                <span asp-validation-for="MaxStudents"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="DefaultPrice"></label>
+                <input class="form-control form-control-sm" type="number" asp-format="{0:c2}" asp-for="DefaultPrice" />
+                <span asp-validation-for="DefaultPrice"></span>
+            </div>
+
+        </div>
+
+        <!-- Divelocation.Image -->
+        <div class="form-group row">
+            <div class="col-4">
+                <label asp-for="Image" class="col-form-label"></label>
+            </div>
+            <div class="col-4">
+                <input type="file" name="files" id="projectImage" class="form-control" />
+            </div>
+            <span asp-validation-for="Image" class="text-danger"></span>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-8 col-12">
+                @{if (Model.Image!= null)
+                    {
+                        var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Image)}";
+                        <img class="img-fluid rounded rounded-circle" src="@(imgSource)" alt="" />
+                    }
+                    else
+                    {
+                        <p class="">Intet billede indlæst</p>
+                    }
+                }
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-3 form-group form-group-sm">
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem og definer kursus sessioner</button>
+            </div>
+            <div class="col-3 form-group form-group-sm text-right">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fas fa-undo"></i>&nbsp;Tilbage til listen</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+

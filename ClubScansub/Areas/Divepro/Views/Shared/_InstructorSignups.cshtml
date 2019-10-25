@@ -1,0 +1,59 @@
+﻿
+@model IEnumerable<CourseSessionInstructor>
+
+@using ClubScansub.Data
+@using Microsoft.EntityFrameworkCore;
+
+@inject ApplicationDbContext  db;
+
+<div class="container">
+    <div class="row justify-content-between">
+        <div class="col-5 alert alert-danger">
+            @foreach (var item in Model.Where(x => !x.InstructorApproved))
+            {
+                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.Instructor.Id);
+
+                @if (User.IsInRole(Userroles.Administrator) || User.IsInRole(Userroles.Owner))
+                {
+                    if (string.IsNullOrEmpty(appUser.PhotoUrl))
+                    {
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" title="@appUser.Name"><img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" /></a>
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(appUser.PhotoUrl))
+                    {
+                        <span class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
+                    }
+                    else
+                    {
+                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                    }
+                }
+            }
+        </div>
+
+        <div class="col-5 alert alert-success">
+            @foreach (var item in Model.Where(x => x.InstructorApproved))
+            {
+                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.Instructor.Id);
+
+                @if (string.IsNullOrEmpty(appUser.PhotoUrl))
+                {
+                    <span class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
+                }
+                else
+                {
+                    <span title="@appUser.Name">
+                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                    </span>
+                }
+            }
+        </div>
+    </div>
+</div>

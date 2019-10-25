@@ -1,0 +1,228 @@
+﻿@model Event
+@using Microsoft.EntityFrameworkCore;
+@inject ClubScansub.Data.ApplicationDbContext db;
+@{
+    var currentUser = await db.ApplicationUsers.Include(x => x.Certificates).ThenInclude(x => x.Certificate).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+    bool isEligable = Model.RequiredCertificate == null;
+    var certName = "";
+    if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
+    {
+        isEligable = true;
+        certName = Model.RequiredCertificate.ShortName;
+    }
+}
+<div class="row mb-3">
+
+    <div class="col-auto mr-3">
+        <div class="d-flex justify-content-start flex-column">
+            <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
+            <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
+
+            @if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
+            {
+
+                if (User.IsInRole(ClubScansub.Utility.Userroles.User) && !User.IsInRole(ClubScansub.Utility.Userroles.Member))
+                {
+                    <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}") (gratis for Premium medlemmer)</h4>
+                }
+                else
+                {
+                    <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}")</h4>
+                }
+            }
+            else
+            {
+                <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
+            }
+            <h4 class="text-info small"><i class="fas fa-award"></i>&nbsp;@(Model.RequiredCertificate != null ? Model.RequiredCertificate.ShortName : "Ikke krævet")</h4>
+            <h4>
+                @if (Model.Participants.Count + Model.FixedParticipants == 0 || Model.IsCancelled)
+                {
+                    <i class="fas fa-flag-checkered text-danger" title="Ingen tilmeldte"></i>
+                }
+                else if (Model.Participants.Count + Model.FixedParticipants < Model.MinParticipants)
+                {
+                    <i class="fas fa-flag-checkered text-warning" title="Ikke nok tilmeldte"></i>
+                }
+                else
+                {
+                    <i class="fas fa-flag-checkered text-success" title="Tilmeldte OK"></i>
+                }
+            </h4>
+
+        </div>
+    </div>
+
+    <div class="col p-2">
+
+        <div class="row mb-2">
+            <div class="col-6">
+                <h4>
+                    <button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>
+                    @Model.Divelocation.Name
+                </h4>
+                <p>Dybde: @Model.Divelocation.MinDepth til @Model.Divelocation.MaxDepth m.</p>
+                <div class="text-black-50 text-truncate font-weight-light small" style="max-width:250px;">@Model.Divelocation.Description</div>
+            </div>
+            <div class="col-4">
+                @{if (Model.Divelocation.Image != null)
+                    {
+                        var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
+                        <img class="img-fluid rounded" src="@(imgSource)" alt="" />
+                    }
+                    else
+                    {
+                        <p class="small">Intet billede indlæst</p>
+                    }
+                }
+            </div>
+        </div>
+
+
+        <div class="row">
+            <span class="small text-info font-weight-light">Pladsstatus:</span>
+        </div>
+
+        <div class="row">
+            <div class="badge badge-pill bg-light p-2">
+                <partial name="_SeatStatusPartial" model="@Model" />
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-2 text-right">
+        @if (Model.IsCancelled)
+        {
+            <i class="rounded border border-dark text-black-50 p-2 fas fa-ban" title="Aflyst"></i>
+        }
+        else
+        {
+            @if (User.Identity.Name != null && User.IsInRole(ClubScansub.Utility.Userroles.User))
+            {
+
+                if (Model.StartDateAndTime < DateTime.Now)
+                {
+                    <i class="rounded border border-secondary text-black-50 p-2 fas fa-flag-checkered" title="Turen ar afsluttet"></i>
+                }
+                else if (Model.FreeSpots <= 0)
+                {
+                    <i class="fas fa-lightbulb" title="Turen er fyldt op"></i>
+                }
+                else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) != null)
+                {
+                    <i class="rounded border border-success text-success p-2 fas fa-user-check" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>
+                }
+                else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
+                {
+                    if (!isEligable)
+                    {
+                        <span><i class="rounded-circle bg-warning text-white p-2 fas fa-award" title="Du mangler det krævede certifikat"></i>&nbsp; @certName</span>
+                        <a asp-action="Signup" class="btn btn-outline-warning" asp-route-id="@Model.Id" title="Advarsel - du har ikke det krævede certifikat til denne tur, men tilmeld dig denne tur, hvis du har penge på turkontoen">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Signup" class="btn btn-outline-success" asp-route-id="@Model.Id" title="Tilmeld dig, hvis du har penge på turkontoen">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <i title="Kan ikke afgøre tilstand" class="rounded border border-dark text-black-50 p-2 fas fa-question"></i>
+                }
+            }
+            else
+            {
+                <i title="Du skal være logget ind og medlem for at tilmelde dig" class="rounded border border-info text-info p-2 fas fa-sign-in-alt"></i>
+            }
+        }
+    </div>
+</div>
+
+<div class="collapse mt-3 w-100" id="collapse">
+    <div class="row d-flex justify-content-between mb-2">
+
+        <div class="col-12 col-lg-5 order-lg-1">
+
+            <div class="card">
+                <div class="card-header">Mødetid og sted:</div>
+                <div class="card-body small">
+
+                    @Model.StartDateAndTime.ToLongDateString() kl. @Model.StartDateAndTime.ToShortTimeString()
+                    <hr />
+                    @if (@Model.Divelocation.MeetingLocation != null)
+                    {
+                        @Model.Divelocation.MeetingLocation.Name<br />
+                        @Model.Divelocation.MeetingLocation.Streetname<br />
+                        @Model.Divelocation.MeetingLocation.Zipcode  @Model.Divelocation.MeetingLocation.City
+                    } else
+                    {
+                        <p>Ikke angivet mødested for Dykkerlokation</p>
+                    }
+                </div>
+            </div>
+            <br />
+            <div class="card">
+                <div class="card-header">Deltagere:</div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(User.Identity.Name))
+                    {
+                        if (Model.Participants.Count > 0 || Model.FixedParticipants > 0)
+                        {
+                            for (int i = 0; i < Model.FixedParticipants; i++)
+                            {
+                                <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
+                            }
+
+                            foreach (var user in Model.Participants)
+                            {
+                                <span class="p-2 small text-success"><i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name</span>
+                                @if (User.IsInRole(Userroles.Divepro))
+                                {
+                                    <span class="p-2 small text-info"><i class="fas fa-phone"></i>&nbsp;@user.ApplicationUser.PhoneNumber</span>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="p-2 small text-danger"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="p-2 small text-info"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12 col-lg-5 order-lg-3">
+        </div>
+
+        <div class="col-12 col-lg-7 order-lg-2">
+            <div class="card">
+                <div class="card-header">@Model.Divelocation.Name</div>
+                <div class="card-body small">
+                    @Model.Details<hr />
+
+                    @Model.Divelocation.Description
+
+                </div>
+            </div>
+        </div>
+
+        @*<div class="col-12 col-sm-5">
+                <div class="card">
+                    <div class="card-body small">
+
+                    </div>
+                </div>
+            </div>*@
+    </div>
+</div>
+

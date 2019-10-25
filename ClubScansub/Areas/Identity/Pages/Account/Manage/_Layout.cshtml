@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+
+    <div class="container">
+        <h3 class="text-info"><i class="fas fa-user"></i> Din konto</h3>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-12">
+                <partial name="_ManageNav" />
+            </div>
+            <div class="col-md-8 col-sm-6 col-12">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

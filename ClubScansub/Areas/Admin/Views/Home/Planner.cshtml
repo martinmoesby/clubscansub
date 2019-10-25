@@ -1,0 +1,404 @@
+﻿@model PlannerViewModel
+@{
+    ViewData["Title"] = "Planner";
+}
+
+<link href='~/lib/fullCalendar/core/main.css' rel='stylesheet' />
+<link href="~/lib/fullCalendar/bootstrap/main.css" rel="stylesheet" />
+<link href='~/lib/fullCalendar/daygrid/main.css' rel='stylesheet' />
+<link href="~/lib/fullCalendar/timegrid/main.css" rel="stylesheet" />
+<link href="~/lib/fullcalendar/list/main.css" rel="stylesheet" />
+
+<h1 class="text-info mb-3">Planner</h1>
+
+
+<div class="container-fluid d-flex">
+
+
+    <div class="col-9 d-inline mh-100 h-100" style="height:800px;min-height:800px;">
+        <div id="calendar"></div>
+    </div>
+
+    <div class="col-3">
+        <div class="container justify-content-between align-content-center">
+
+            <h3 class="mt-2">Ture</h3>
+            <span class="small text-muted">
+                Træk knapperne hen på den dato du vil planlægge en tur. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
+            </span>
+            <div id="external-events-trips" class=" h-50 overflow-auto border rounded bg-light p-1">
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Bådtur))
+                {
+                    <div class="small drop-item badge badge-info p-2 m-1 bg-boat" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Stranddyk))
+                {
+                    <div class="small drop-item badge badge-info p-2 m-1 bg-beach" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Klubture))
+                {
+                    <div class="small drop-item badge badge-info p-2 m-1 bg-club" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Other))
+                {
+                    <div class="small drop-item badge badge-info p-2 m-1 bg-other" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+            </div>
+
+            <h3 class="mt-2">Kurser</h3>
+            <span class="small text-muted">
+                Træk knapperne hen på den dato du vil lægge et kursus. Kurset bliver automatisk oprettet baseret på indstillingerne fra kursusskabelonen.
+            </span>
+            <div id="external-events-courses" class="h-50 overflow-auto border rounded bg-light p-1">
+                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.BaseCourse))
+                {
+                    <div class="small drop-item badge badge-success p-2 m-1 bg-basecourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                        @item.TemplateName
+                    </div>
+                }
+                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.SpecialtyCourse))
+                {
+                    <div class="small drop-item badge badge-success p-2 m-1 bg-speccourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                        @item.TemplateName
+                    </div>
+                }
+                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.TechCourse))
+                {
+                    <div class="small drop-item badge badge-success p-2 m-1 bg-techcourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                        @item.TemplateName
+                    </div>
+                }
+                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.ProCourse))
+                {
+                    <div class="small drop-item badge badge-success p-2 m-1 bg-procourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                        @item.TemplateName
+                    </div>
+                }
+            </div>
+
+
+            <h3 class="mt-2">Rejser / Ferier</h3>
+            <span class="small text-muted">
+                Træk knapperne hen på den dato du vil planlægge en rejse eller en ferie. Dette er en flere dages aktivitet, og skal senere justeres under turlisten. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
+            </span>
+            <div id="external-events-travels" class=" h-50 overflow-auto border rounded bg-light p-1">
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Rejse))
+                {
+                    <div class="drop-item badge badge-info p-2 m-1 bg-travel" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+
+                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Liveaboard))
+                {
+                    <div class="drop-item badge badge-info p-2 m-1 bg-liveaboard" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                        @item.Name
+                    </div>
+                }
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-light text-black-50 justify-content-between">
+                    <h5 class="modal-title" id="myModalTitle"></h5>
+                    <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body" id="myModalContent">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/fullcalendar/core/main.js"></script>
+    <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
+    <script src="~/lib/fullcalendar/daygrid/main.min.js"></script>
+    <script src="~/lib/fullcalendar/interaction/main.js"></script>
+    <script src="~/lib/fullcalendar/timegrid/main.js"></script>
+    <script src="~/lib/fullcalendar/list/main.js"></script>
+    <script src="~/lib/fullcalendar/core/locales/da.js"></script>
+    <script>
+
+    let calendarEl = document.getElementById("calendar");
+    let coursesEL = document.getElementById("external-events-courses");
+    let eventsEL = document.getElementById("external-events-trips");
+    let travelsEL = document.getElementById("external-events-travels");
+
+    new FullCalendarInteraction.Draggable(coursesEL, {
+        itemSelector: '.drop-item',
+        eventData: function (courseEl) {
+            return {
+                title: courseEl.dataset["title"]
+            }
+        }
+    });
+
+    new FullCalendarInteraction.Draggable(eventsEL, {
+        itemSelector: ".drop-item",
+        eventData: function (eventEl) {
+            return {
+                title: eventEl.dataset["title"]
+            }
+        }
+    });
+
+    new FullCalendarInteraction.Draggable(travelsEL, {
+        itemSelector: ".drop-item",
+        eventData: function (eventEl) {
+            return {
+                title: eventEl.dataset["title"]
+            }
+        }
+    });
+
+    var eventsUrl = '@Url.Action("GetEvents", "Home")';
+    var coursesUrl = '@Url.Action("GetCourses","Home")';
+    var holidayUrl = '@Url.Action("GetHolidays","Home")';
+    var editUrl = '@Url.Action("Edit","Home")'
+
+    var dropurl = "@Url.Action("Create", "Home", new { area = "Admin" })";
+    var moveUrl = "@Url.Action("Move", "Home", new { area = "Admin" })";
+
+    var boatSource = {
+        // Bådture
+        id: "boat",
+        url: eventsUrl,
+        cache: false,
+        extraParams: { eventtype: '@EventTypeEnum.Bådtur' },
+    };
+    var beachSource =
+    {
+        id: "beach",
+        //strandture
+        url: eventsUrl,
+        extraParams: { eventtype: '@EventTypeEnum.Stranddyk' },
+    };
+
+    var travelSource = {
+        //rejser
+        id: "travel",
+        url: eventsUrl,
+        extraParams: { eventtype: '@EventTypeEnum.Rejse' },
+    };
+    var liveaboardSource =
+    {
+        //liveaboards
+        id: "liveaboard",
+        url: eventsUrl,
+        extraParams: { eventtype: '@EventTypeEnum.Liveaboard' },
+    };
+    var clubSource = {
+        //klubture
+        id: "club",
+        url: eventsUrl,
+        extraParams: { eventtype: '@EventTypeEnum.Klubture' },
+    };
+    var otherSource = {
+        //Andre ture
+        id: "other",
+        url: eventsUrl,
+        extraParams: { eventtype: '@EventTypeEnum.Other' },
+    };
+
+    var baseCourse = {
+        //Kurser
+        id: "basecourses",
+        url: coursesUrl,
+        extraParams: { coursetype: '@CourseTypeEnum.BaseCourse' }
+    };
+    var specCourse = {
+        //Kurser
+        id: "specialcourses",
+        url: coursesUrl,
+        extraParams: { coursetype: '@CourseTypeEnum.SpecialtyCourse' }
+    };
+    var techCourse = {
+        //Kurser
+        id: "techcourses",
+        url: coursesUrl,
+        extraParams: { coursetype: '@CourseTypeEnum.TechCourse' }
+    };
+    var proCourse = {
+        //Kurser
+        id: "procourses",
+        url: coursesUrl,
+        extraParams: { coursetype: '@CourseTypeEnum.ProCourse' }
+    };
+
+    var defaultEventSources = [
+        {
+            url: holidayUrl,
+            allDay: true,
+            rendering: 'background',
+        },
+        boatSource,
+        beachSource,
+        clubSource,
+        otherSource,
+        travelSource,
+        liveaboardSource,
+        baseCourse,
+        specCourse,
+        techCourse,
+        proCourse,
+    ];
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: ['interaction', 'dayGrid', 'timeGrid', 'bootstrap' ],
+        themeSystem: 'bootstrap',
+        defaultView: 'dayGridMonth',
+        defaultDate: '@Model.ActiveDate.ToString("yyyy-MM-dd")',
+        header: {
+            right: 'prev,next',
+            left: 'title',
+            center: 'dayGridMonth timeGridWeek'
+        },
+        locale: 'da',
+        eventSources:defaultEventSources,
+        eventLimit: 4,
+        displayEventTime: false,
+        eventTimeFormat:
+        { // like '14:30:00'
+            hour: '2-digit',
+            minute: '2-digit'
+        },
+        /// Other options
+        height:"parent",
+        contentHeight: "auto",
+        handleWindowResize: true,
+        aspectRatio: 2,
+        views: {
+            dayGrid: {
+                titleFormat: { year: 'numeric', month: 'long' }
+            },
+        },
+        weekLabel: "Uge",
+        businessHours: [
+            {
+                daysOfWeek: [1, 2, 3, 4, 5],
+                startTime: '9:00',
+                endTime: '18:00'
+            },
+            {
+                daysOfWeek: [6,7],
+                startTime: '8:00',
+                endTime: '15:00'
+            }
+        ],
+        slotDuration: '00:30:00',
+        slotLabelInterval: '01:00:00',
+        minTime: '08:00:00',
+        maxTime: '22:00:00',
+        showNonCurrentDates: true,
+        fixedWeekCount: true,
+        windowResizeDelay: 500,
+        weekNumbers: true,
+        weekNumbersWithinDays: false,
+        editable: true,
+        droppable: true,
+        eventClick: function (info) {
+            var eventObj = info.event;
+            var id = eventObj.id; //('id');
+            var title = eventObj.title; //.event('title');
+
+            $.ajax({
+                type: "GET",
+                url: editUrl,
+                contentType: "application/json;charset=utf-8",
+                data: { "Id": id },
+                cache: false,
+                datatype: "json",
+                success: function (data) {
+                    $("#myModalTitle").text(title);
+                    $("#myModalContent").html(data);
+                    $("#myModal").modal('show');
+                },
+                error: function () {
+                    $(".modal-header").removeClass("bg-info").addClass("bg-danger");
+                    $("#myModalTitle").text("Fejl");
+                    $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
+                    $("#myModal").modal('show');
+                }
+            });
+        },
+        drop: function (dropInfo) {
+            return dropEvent(dropInfo);
+        },
+        eventDrop: function (dropInfo) {
+            moveEvent(dropInfo)
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        calendar.render();
+    });
+
+    function moveEvent(dropInfo) {
+
+        var newDate = new Date(dropInfo.event.start);
+        var dateStr = newDate.toISOString();
+        var id = dropInfo.event.id;
+
+        $.ajax({
+            url: moveUrl,
+            data: {
+                startdate: dateStr,
+                id: id
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            failure: function (data) {
+                console.log(data);
+            }
+        });
+
+    };
+
+
+    function dropEvent(dropInfo) {
+        var droppedElement = dropInfo.draggedEl;
+        var type = droppedElement.dataset["type"];
+        var id = droppedElement.dataset["eventid"];
+
+        $.ajax({
+            url: dropurl,
+            data: {
+                startdate: dropInfo.dateStr,
+                id: id,
+                type: type
+            },
+            success: function (data) {
+                calendar.refetchEvents()
+                console.log(data);
+            },
+            failure: function (data) {
+                console.log(data);
+            }
+        });
+    };
+
+
+    </script>
+}

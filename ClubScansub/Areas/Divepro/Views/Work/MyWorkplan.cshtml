@@ -1,0 +1,70 @@
+﻿@model IEnumerable<CourseSessionInstructor>
+@{
+    ViewData["Title"] = "Min Undervisningsplan";
+    var pageTitle = ViewData["Title"];
+}
+
+<partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
+
+<div class="container">
+
+    <partial name="_IndexPageHeaderPartialNoCreateButton" model="@pageTitle" />
+
+    <div class="border rounded-sm alert alert-success p-3 mt-3">
+        <h4>Sat på som intruktør:</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:120px;">Kursus</th>
+                    <th style="width:120px">Type</th>
+                    <th style="width:200px;">Session</th>
+                    <th style="width:80px;">Dato</th>
+                    <th style="width:40px;">Start</th>
+                    <th style="width:40px;">Slut</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(x => x.InstructorApproved).OrderBy(x => x.CourseSession.DateTime))
+                {
+                    <tr>
+                        <td class="small">@item.CourseSession.Course.CourseName</td>
+                        <td class="small">@item.CourseSession.Sessiontype</td>
+                        <td class="small">@item.CourseSession.CourseSessionTemplate.Description</td>
+                        <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
+                        <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
+                        <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.CourseSessionTemplate.DefaultDuration).ToString("HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="border rounded-sm alert alert-warning p-3 mt-3">
+        <h4>Skrevet op som instruktør:</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:120px;">Kursus</th>
+                    <th style="width:10px">Type</th>
+                    <th style="width:200px;">Session</th>
+                    <th style="width:80px;">Dato</th>
+                    <th style="width:40px;">Start</th>
+                    <th style="width:40px;">Slut</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(x => !x.InstructorApproved).OrderBy(x => x.CourseSession.DateTime))
+                {
+                    <tr>
+                        <td class="small">@item.CourseSession.Course.CourseName</td>
+                        <td class="small">@item.CourseSession.Sessiontype</td>
+                        <td class="small">@item.CourseSession.CourseSessionTemplate.Description</td>
+                        <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
+                        <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
+                        <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.CourseSessionTemplate.DefaultDuration).ToString("HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

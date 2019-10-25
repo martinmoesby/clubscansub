@@ -1,0 +1,53 @@
+﻿@model IEnumerable<CourseTemplate>
+@{
+    ViewData["Title"] = "Kursus skabeloner";
+}
+
+<div class="container">
+
+    <partial name="_IndexpageHeaderPartial" model="@ViewData["Title"]" />
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="align-top"><label asp-for="@Model.FirstOrDefault().CourseType"></label></th>
+                <th class="align-top"><label asp-for="@Model.FirstOrDefault().TemplateName"></label></th>
+                <th class="align-top"><label asp-for="@Model.FirstOrDefault().TemplateDurationInWeeks"></label></th>
+                <th class="align-top"><label>Sessioner<br /><span class="small">(Academic / Pool / OW)</span></label></th>
+                <th class="align-top"><label asp-for="@Model.FirstOrDefault().DefaultPrice"></label></th>
+                <th class="align-top"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td class="small" style="width:128px;">
+                    @{if (item.Image != null)
+                        {
+                            var imgSource = $"data:image;base64,{Convert.ToBase64String(item.Image)}";
+                            <img class="img rounded" src="@(imgSource)" alt="" height="64" style="height:64px" />
+                        }
+                        else
+                        {
+                            <p class="small">Intet billede indlæst</p>
+                        }
+                    }
+                </td>
+                <td class="small">@item.CourseType</td>
+                <td class="small">@item.TemplateName</td>
+                <td class="small">@item.TemplateDurationInWeeks</td>
+                <td class="small">@item.AcademicSessions / @item.PoolSessions / @item.OpenWaterSessions</td>
+                <td class="small">@Html.FormatValue(item.DefaultPrice,"{0:c2}")</td>
+                <td class="small">
+                    <partial name="_EditDetailsDeleteButtonsPartial" model="item.Id" />
+                </td>
+            </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+

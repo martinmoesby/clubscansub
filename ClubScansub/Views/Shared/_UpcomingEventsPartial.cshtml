@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Event>
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="container">
+    <div class="row d-flex justify-content-between">
+        <div class="col-12 col-md-6">
+            <h5><i class="fas fa-calendar"></i>&nbsp;Liste</h5>
+        </div>
+
+        <div class="col-12 col-md-6 text-right">
+            @if (User.Identity.Name == null)
+            {
+                <a class="btn btn-outline-info" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt"></i>&nbsp; Login for at tilmelde</a>
+            }
+        </div>
+    </div>
+    @if (Model.Count() == 0)
+    {
+        <h3><i class="fas fa-sad-tear text-danger"></i> &nbsp;Ingen ture </h3>
+    }
+    else
+    {
+
+            @foreach (var item in Model)
+            {
+                <partial name="_EventDetailsPartial" model="@item" />
+            }
+
+    }
+
+</div>

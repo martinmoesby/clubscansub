@@ -1,0 +1,78 @@
+﻿@model ClubScansub.Areas.Admin.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+    <div class="container">
+
+        <div class="text-left mb-5">
+            <h1 class="display-4">Hej @Model.AppUser.Name</h1>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-6 col-12 " style="min-height:200px;">
+                <div class="border rounded p-2">
+                    <partial name="_CreateNewTrip" model="Model.NewEvent" />
+                </div>
+            </div>
+
+            <div class="col-md-6 col-12">
+                <div class="border rounded p-2">
+                    <partial name="_CreateNewCourse" model="Model.NewCourse" />
+                </div>
+                <div class="border rounded mt-3 p-2">
+                    <partial name="_CreateNewTransaction" model="Model.NewTransaction" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $('#premiumInfo').hide();
+        });
+
+        function selectedLocatationChanged() {
+
+            var selecteddivelocationId = document.getElementById("locationid").value;
+
+            $.getJSON({
+                url: '@Url.Action("GetLocationPrice","Event", new { area = "Admin" })',
+                data: { locationid: selecteddivelocationId },
+                success: function (data) {
+                    document.getElementById("price").value = data;
+                }
+            });
+
+        };
+
+        function selectedcoursetypeChanged() {
+
+            var selectedcoursetemplateId = document.getElementById("selectedcoursetypeid").value;
+            $.getJSON({
+                url: '@Url.Action("GetCoursePrice","Course", new { area = "Admin"})',
+                data: { templateid: selectedcoursetemplateId },
+                success: function (data) {
+                    document.getElementById("courseprice").value = data;
+                }
+            })
+
+        }
+
+        function selectedEventtypeChanged () {
+
+            var type = document.getElementById('eventtype').value;
+            if (type == 1) {
+                $('#premiumInfo').show();
+
+            } else {
+                $('#premiumInfo').hide();
+            }
+        }
+
+    </script>
+}

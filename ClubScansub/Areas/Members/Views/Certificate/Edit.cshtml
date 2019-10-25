@@ -1,0 +1,76 @@
+﻿@model UserCertificat
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1 class="display-4">Rediger certifikat @Model.Certificate.ShortName</h1>
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Certificate.Id" />
+    <input type="hidden" asp-for="FrontSideImage" />
+    <input type="hidden" asp-for="BackSideImage" />
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-4 col-12">
+                <div class="form-group">
+                    <label asp-for="Certificate.ShortName"></label>
+                    <input asp-for="Certificate.ShortName" readonly class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Certificate.Description"></label>
+                    <input asp-for="Certificate.Description" readonly class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Certificate.DepthLimit"></label>
+                    <input asp-for="Certificate.DepthLimit" readonly class="form-control" />
+                </div>
+                <hr />
+
+                <div class="form-group">
+                    <label asp-for="IssuedDate"></label>
+                    <input asp-for="IssuedDate" type="date" class="form-control" />
+                    <span asp-validation-for="IssuedDate" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="col-md-4 col-12">
+
+                <div class="row flex-column flex-fill mb-4">
+                    <h5>Forside:</h5>
+                    <br />
+                    @if (Model.FrontSideImage != null)
+                    {
+                        <img src="@( $"data:image;base64,{Convert.ToBase64String(Model.FrontSideImage)}")" class="img-fluid" />
+                    }
+                    else
+                    {
+                        <p>Intet billede uploadet</p>
+                    }
+                    <input asp-for="FrontSideImage" type="file" class="form-control form-control-file" id="Front" name="Front" />
+                </div>
+
+                <div class="row flex-column flex-fill">
+                    <h5 class="">Bagside:</h5>
+                    @if (Model.BackSideImage != null)
+                    {
+                        <img src="@( $"data:image;base64,{Convert.ToBase64String(Model.BackSideImage)}")" class="img-fluid" />
+                    }
+                    else
+                    {
+                        <p>Intet billede uploadet</p>
+                    }
+                    <input asp-for="FrontSideImage" type="file" class="form-control form-control-file" id="Back" name="Back" />
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+        </div>
+
+    </div>
+</form>

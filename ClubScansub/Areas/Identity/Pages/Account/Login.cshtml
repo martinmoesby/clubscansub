@@ -1,0 +1,127 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+    <div class="container">
+        <h1 class="display-4">@ViewData["Title"]</h1>
+        <partial name="_StatusMessage" model="@Model.ErrorMessage" />
+
+        <div class="row">
+            <div class="col-md-8">
+                <p>Du kan vælge at logge på med din facebook konto. Såfremt du ikke har en facebook konto, kan du vælge at oprette og logge på med en lokal konto</p>
+
+                @{
+                    if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                    {
+                        <div>
+                            <p>
+                                Stedet understøtter ikke eksterne udbydere - Log på med en lokal konto
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <div>
+                                @*<button type="button" class="btn btn-outline-primary" style="width:200px;" data-target="#localAccountLogin" data-toggle="collapse"><i class="fas fa-sign-in-alt"></i>&nbsp;Lokal konto</button>*@
+
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    var iconClass = "fab ";
+                                    if (provider.Name == "Facebook")
+                                    {
+                                        iconClass += "fa-facebook-f";
+                                    }
+                                    else if (provider.Name == "Google")
+                                    {
+                                        iconClass += "fa-google-plus-g";
+                                    }
+                                    else
+                                    {
+                                        iconClass = "far fa-user-circle";
+                                    }
+
+                                    <button type="submit" class="btn btn-outline-primary bt-sm" style="width:200px;" name="provider" value="@provider.Name" title="Log på med din @provider.DisplayName account"><i class="@iconClass"></i>&nbsp;@provider.DisplayName</button>
+                                }
+
+                            </div>
+                        </form>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 mt-3">
+                <h5><i class="fas fa-sign-in-alt"></i>&nbsp;Log på med brugernavn og kodeord</h5>
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Input.Email"></label>
+                        <input asp-for="Input.Email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.Password"></label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label asp-for="Input.RememberMe">
+                                <input asp-for="Input.RememberMe" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex justify-content-between">
+                        <a id="forgot-password" class="btn btn-outline-info btn-sm" asp-page="./ForgotPassword"><i class="fas fa-question"></i>&nbsp;Glemt dit kodeord?</a>
+                        <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-sign-in-alt"></i>&nbsp; Log ind</button>
+                    </div>
+                    <a class="btn btn-outline-info btn-sm" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl"><i class="fas fa-user-plus"></i>&nbsp;Opret ny bruger</a>
+                </form>
+
+            </div>
+            <div class="collapse" id="localAccountLogin">
+
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Input.Email"></label>
+                        <input asp-for="Input.Email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.Password"></label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label asp-for="Input.RememberMe">
+                                <input asp-for="Input.RememberMe" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex justify-content-between">
+                        <a class="btn btn-outline-info" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl"><i class="fas fa-user-plus"></i>&nbsp;Opret ny bruger</a>
+                        <button type="submit" class="btn btn-outline-primary"><i class="fas fa-sign-in-alt"></i>&nbsp; Log in</button>
+                    </div>
+                    <div class="form-group">
+                        <p>
+                            <a id="forgot-password" asp-page="./ForgotPassword">Glemt dit kodeord?</a>
+                        </p>
+                        <p>
+
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

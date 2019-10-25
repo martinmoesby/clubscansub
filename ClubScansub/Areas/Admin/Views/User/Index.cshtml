@@ -1,0 +1,101 @@
+﻿@model UserIndexViewModel
+@{
+    ViewData["Title"] = Model.MemberType;
+}
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-6">
+                <h1 class="display-4 text-info">@(Model.MemberType)s</h1>
+            </div>
+            <div class="col-6 text-right">
+                <a class="btn btn-outline-info btn-sm" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="/Admin/User"><i class="fas fa-user-plus"></i>&nbsp;Opret bruger...</a>
+            </div>
+        </div>
+        
+        <hr />
+        
+
+        <form asp-action="Index">
+
+            <input type="hidden" asp-for="Pager.CurrentPage" />
+            <input type="hidden" asp-for="Pager.urlParam" />
+            <input type="hidden" asp-for="Pager.TotalItems" />
+            <input type="hidden" asp-for="MemberType" />
+
+            <div class="col-12">
+                <div class="form-group form-inline">
+
+                    <div class="col-6 input-group">
+                        <input class="form-control form-control-sm" id="myInput" type="text" asp-for="SearchText" placeholder="Søg...">
+                        <div class="input-group-append">
+                            <button type="submit" class="input-group-text input-group-sm"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="col-4 text-sm-right">
+                        <div class="btn-group" page-model="@Model.Pager" page-classes-enabled="true" page-class="btn btn-sm" page-class-selected="btn-outline-info active" page-size="Model.Pager.PageSize" page-class-normal="btn-outline-info"></div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Navn</th>
+                    <th>Email</th>
+                    <th>Telefonnummer</th>
+                    <th class="text-center">Cert / godkendte</th>
+                    <th class="text-right">Turkonto</th>
+                    <th class="text-right">Kursuskonto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="myTable">
+                @foreach (var user in Model.Users)
+                {
+                <tr>
+                    <td class="small">
+                        @if (user.LockoutEnd > DateTime.Now)
+                        {
+                            <i class="text-warning fas fa-user-lock" title="Bruger konto deaktiveret"></i>
+                        }
+                        else
+                        {
+                            <i class="text-success fas fa-user" title="Bruger konto aktiveret"></i>
+                        }
+                        &nbsp;@user.Name
+                    </td>
+                    <td class="small">@user.Email</td>
+                    <td class="small">@user.PhoneNumber</td>
+                    <td class="text-center small">
+                        <span class="text-danger">@(user.Certificates.Count - @user.Certificates.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates.Count(x => x.IsVerified)</span>
+                    </td>
+                    <td class="text-right small">@Html.FormatValue(user.Balance, "{0:N2}")</td>
+                    <td class="text-right small">@Html.FormatValue(user.CourseAccountBalance, "{0:N2}")</td>
+                    <td class="text-right small">
+                        <partial name="_EditDetailsDeleteButtonsPartial" model="@user.Id" />
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $("#myInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+}

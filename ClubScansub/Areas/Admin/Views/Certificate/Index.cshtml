@@ -1,0 +1,71 @@
+﻿@model  IEnumerable<Certificate>
+@{
+    ViewData["Title"] = "Certifikater";
+}
+
+    <div class="container">
+
+        <partial name="_IndexpageHeaderPartial" model="@ViewData["Title"]" />
+
+        <div class="row mt-3">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th><label asp-for="FirstOrDefault().ShortName"></label></th>
+                        <th><label asp-for="FirstOrDefault().DepthLimit"></label></th>
+                        <th><label asp-for="FirstOrDefault().Name"></label></th>
+                        <th><label asp-for="FirstOrDefault().Description"></label></th>
+                        <th><a class="btn btn-outline-info btn-sm form-control" asp-action="Create" asp-controller="Certificate" asp-area="Admin"><i class="fas fa-plus"></i>&nbsp;Tilføj</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cert in Model)
+                    {
+                        <tr>
+                            <td class="small">
+                                <i class="fas fa-award"></i>&nbsp;@cert.ShortName
+                                @*<button data-toggle="collapse" data-target="#collapse_@cert.Id" class="btn btn-outline-secondary btn-sm" title="Klik for at se certificater">
+                                </button>*@
+                            </td>
+                            <td class="small text-center">@cert.DepthLimit</td>
+                            <td class="small">@cert.Name</td>
+                            <td class="small">@cert.Description</td>
+                            <td class="small"><partial name="_EditDetailsDeleteButtonsPartial" model="cert.Id" /></td>
+                        </tr>
+                        <tr class="collapse" id="collapse_@cert.Id">
+                            <td></td>
+                            <td colspan="2">
+                                @if (cert.Diveorgs.Count > 0)
+                                {
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="3">
+                                                    <i class="fas fa-award"></i>&nbsp;Certifikater
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        @foreach (var org in cert.Diveorgs)
+                                        {
+                                            <tr>
+                                                <td class="small">@org.Diveorg.ShortName</td>
+                                                <td class="small">@org.Diveorg.Name</td>
+                                                <td class="small">@org.Diveorg.Description</td>
+                                            </tr>
+                                        }
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p class="small pt-2">Ingen Organisationer tilknyttet</p>
+                                }
+                            </td>
+                            <td><button class="btn btn-outline-info btn-sm" asp-action="AddOrganization" asp-route-id="@cert.Id"><i class="fas fa-plus"></i>&nbsp;Tilknyt</button></td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>

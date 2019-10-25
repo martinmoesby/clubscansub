@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Course>
+@{
+    ViewData["Title"] = "Kurser der mangler instruktører";
+    var pageTitle = ViewData["Title"];
+}
+<partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
+<div class="container">
+
+    <partial name="_IndexPageHeaderPartialNoCreateButton" model="@pageTitle" />
+    @foreach (var item in Model.Where(x => x.CourseSessions.Count > 0))
+    {
+        <div class="container border bg-light mb-3">
+
+            <div class="row p-2 mb-2">
+                <h4>
+                    @if (item.InstructorsCovered)
+                    {
+                        <span class="btn btn-outline-success" title="Instruktører OK"><i class="fas fa-thumbs-up"></i></span>
+                    }
+                    else
+                    {
+                        <span class="btn btn-outline-danger" title="Mangler instruktører"><i class="fas fa-thumbs-down"></i></span>
+                    }
+                    @(item.CourseName) d. @(item.StartDateAndTime.ToString("dd-MM-yyyy"))
+                </h4>
+            </div>
+            <div class="row">
+                <div class="card w-25">
+                    <div class="card-header">Elever:</div>
+                    <div class="card-body">
+                        <p class="card-title">Skrevet op :</p>
+                        @foreach (var signup in item.Signups)
+                        {
+                            <div class="alert alert-info small">@signup.ApplicationUser.Name</div>
+                        }
+                        <p class="card-title">Tilmeldt :</p>
+                        @foreach (var participant in item.Participants)
+                        {
+                            <div class="alert alert-info small">@participant.ApplicationUser.Name</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card w-75">
+                    <div class="card-header">Instruktører</div>
+                    <div class="card-body">
+                        @foreach (var session in item.CourseSessions)
+                        {
+                            <div class="row">
+                                <div class="col-11">
+                                    <p>@session.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") : <strong>@session.CourseSessionTemplate.Description</strong></p>
+                                </div>
+                                <div class="col-1 text-right">
+                                    @if (session.SessionInstructors.Select(x => x.Instructor.Id).Contains(User.GetIdentityId()))
+                                    {
+                                        <span class="btn btn-outline-info btn-sm" title="Du har skrevet dog på til dette kursus"><i class="far fa-calendar-check"></i></span>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Apply" asp-route-sessionid="@session.Id" class="btn btn-outline-success btn-sm" title="Ja tak, jeg vil gerne undervise"><i class="fas fa-thumbs-up"></i></a>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <small>
+                                        <partial name="_InstructorSignups" model="session.SessionInstructors" />
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

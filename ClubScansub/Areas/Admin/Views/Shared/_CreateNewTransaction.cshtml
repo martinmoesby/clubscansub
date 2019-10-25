@@ -1,0 +1,47 @@
+﻿@model ClubScansub.Areas.Admin.ViewModels.CreateUserAccountTransactionViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+    <form method="post" asp-action="CreateTransaction" asp-controller="User" asp-area="Admin">
+        <h4 class="text-info"><i class="fas fa-wallet"></i>&nbsp;Tank op</h4>
+        <div class="my-3 border rounded"></div>
+
+
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Medlem</span>
+            </div>
+            <select type="text" class="selectpicker form-control" data-style="btn btn-secondary" data-live-search="true" asp-items="@Model.Members" asp-for="SelectedUserId"></select>
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Beløb</span>
+            </div>
+            <input type="number" autocomplete="off" class="form-control" asp-for="Entry.Amount" />
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Til konto</span>
+            </div>
+            <Select  class="form-control" asp-for="Entry.AccountType" asp-items="@Html.GetEnumSelectList<AccountTypeEnum>()"></Select>
+        </div>
+
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Beskrivelse</span>
+            </div>
+            <input type="text" class="form-control" asp-for="Entry.Description" autocomplete="off" />
+        </div>
+
+        <input type="hidden" asp-for="Entry.PostingDate" />
+
+        <div class="form-group col-12 d-flex justify-content-between mt-3">
+            <button class="btn btn-outline-info" type="reset"><i class="fas fa-times"></i> &nbsp;Annuller</button>
+            <button class="btn btn-outline-success" type="submit"><i class="fas fa-check"></i> &nbsp;Opret</button>
+        </div>
+
+    </form>

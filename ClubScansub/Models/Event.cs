@@ -1,0 +1,74 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ClubScansub.Models
+{
+
+    [Table("Event")]
+    public class Event : ModelBase
+    {
+        public Event()
+        {
+            Participants = new Collection<EventUser>();
+        }
+
+        [Display(Name = "Navn")]
+        public string Title { get; set; }
+
+        [Display(Name = "Detaljer")]
+        public string Details { get; set; }
+
+        [Display(Name = "Tur type")]
+        public EventTypeEnum EventType { get; set; }
+
+        [Display(Name = "min. deltagere")]
+        public int MinParticipants { get; set; }
+
+        [Display(Name = "Max. pladser")]
+        public int MaxParticipants { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "money")]
+        [Display(Name = "Pris")]
+        public decimal Price { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Column(TypeName ="money")]
+        public decimal Deposit { get; set; }
+
+        [Display(Name ="Starttidspunkt")]
+        [DataType(DataType.DateTime)]
+        public System.DateTime StartDateAndTime { get; set; }
+
+        [Display(Name = "Sluttidspunkt")]
+        [DataType(DataType.DateTime)]
+        public System.DateTime EndDateAndTime { get; set; }
+
+        [Display(Name = "Aflyst?")]
+        public bool IsCancelled { get; set; }
+
+        [Display(Name = "Spærrede pladser")]
+        public int FixedParticipants { get; set; }
+
+        public virtual Certificate RequiredCertificate { get; set; }
+
+        public virtual Divelocation Divelocation { get; set; }
+
+        public virtual Address Address { get; set; }
+        //public virtual Club Club { get; set; }
+        public virtual ICollection<EventUser> Participants { get; set; }
+
+        public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Frie pladser")]
+        public int FreeSpots => MaxParticipants - FixedParticipants - Participants.Count;
+
+        [NotMapped]
+        [Display(Name = "Manglende deltagere")]
+        public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants;
+
+    }
+}

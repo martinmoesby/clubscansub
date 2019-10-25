@@ -1,0 +1,77 @@
+@using Microsoft.AspNetCore.Identity
+@using ClubScansub.Data
+@using ClubScansub.Utility
+@using Microsoft.EntityFrameworkCore;
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext db; 
+
+    <ul class="navbar-nav">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var appUser = await db.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+        <li class="nav-item dropdown mx-2">
+            <a class="nav-link dropdown-toggle text-dark"
+               href="#"
+               id="navbarDropDownMenuLink"
+               role="button"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+
+                @if (string.IsNullOrEmpty(appUser.PhotoUrl))
+                {
+                    <span class="rounded-circle bg-info p-2 text-dark">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</span>
+                }
+                else
+                {
+                    <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                }
+                &nbsp;@appUser.Name
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Funktioner:</span>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="fas fa-user"></i>&nbsp;Min konto</a>
+                <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/Certifications"><i class="fas fa-award"></i>&nbsp;Mine Certifikater</a>
+                <a class="dropdown-item small" asp-area="Members" asp-action="Index" asp-controller="Event"><i class="fas fa-calendar-alt"></i>&nbsp;Mine ture</a>
+                @*<a class="dropdown-item small" asp-area="Members" asp-action="Index" asp-controller="Courses"><i class="fas fa-calendar"></i>&nbsp;Mine kurser</a>*@
+                @if (User.IsInRole(Userroles.Divepro))
+                {
+                    <div class="dropdown-divider"></div>
+                    <span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Pro funktioner:</span>
+                    <a class="dropdown-item small" asp-area="Divepro" asp-action="Index" asp-controller="Work"><i class="fas fa-chalkboard-teacher"></i>&nbsp;Kurser</a>
+                    <a class="dropdown-item small" asp-area="Divepro" asp-action="MyWorkplan" asp-controller="Work"><i class="fas fa-calendar"></i>&nbsp;Min Undervisningsplan</a>
+                }
+
+                @if (User.IsInRole(Userroles.Administrator))
+                {
+                    <div class="dropdown-divider"></div>
+                    <span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Admin funktioner:</span>
+                    <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="fas fa-tools"></i>&nbsp;Site Administration</a>
+                    <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Planner"><i class="fas fa-calendar"></i>&nbsp;Planner</a>
+                }
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/AccountBalance"><i class="fas fa-coins"></i>&nbsp;Turkonto: @Html.FormatValue(appUser.Balance, "{0:n0}")</a>
+                <div class="dropdown-divider"></div>
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="dropdown-item small"><i class="fas fa-sign-out-alt"></i>&nbsp;Logout</button>
+                </form>
+            </div>
+        </li>
+
+    }
+    else
+    {
+        @*<li class="nav-item">
+            <form id="external-account" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                <button type="submit" class="btn btn-primary" name="provider" value="@Facebook" title="Log in using your Facebook account"><i class="fas fa-facebook"></i></button>
+                <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-facebook"></i>&nbsp;Login med Facebook</a>
+             </form>
+        </li>*@
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt"></i>&nbsp;Login</a>
+        </li>
+    }
+    </ul>

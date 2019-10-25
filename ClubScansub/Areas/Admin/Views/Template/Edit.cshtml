@@ -1,0 +1,243 @@
+﻿@model CourseTemplate
+@{
+    ViewData["Title"] = "Rediger kursus skabelon";
+}
+
+<div class="container">
+    <h1 class="display-4 text-info mb-4">@ViewData["title"]</h1>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" id="CourseTemplateId" />
+        <input type="hidden" asp-for="Image" />
+
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateName"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateName" />
+                <span asp-validation-for="TemplateName"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateDurationInWeeks"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateDurationInWeeks" />
+                <span asp-validation-for="TemplateDurationInWeeks"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateDurationInWeeks"></label>
+                <select class="form-control form-control-sm" type="text" asp-for="CourseType" asp-items="@Html.GetEnumSelectList<CourseTypeEnum>()"></select>
+                <span asp-validation-for="TemplateDurationInWeeks"></span>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="DefaultPrice"></label>
+                <input class="form-control form-control-sm" asp-for="DefaultPrice" />
+                <span asp-validation-for="DefaultPrice"></span>
+            </div>
+
+
+                <div class="col-3 form-group form-group-sm">
+                    <label class="col-form-label form-control-sm" asp-for="MinStudents"></label>
+                    <input class="form-control form-control-sm" type="number" asp-for="MinStudents" />
+                    <span asp-validation-for="MinStudents"></span>
+                </div>
+                <div class="col-3 form-group form-group-sm">
+                    <label class="col-form-label form-control-sm" asp-for="MaxStudents"></label>
+                    <input class="form-control form-control-sm" type="number" asp-for="MaxStudents" />
+                    <span asp-validation-for="MaxStudents"></span>
+                </div>
+
+
+        </div>
+
+        <!-- CourseTemplate.Image -->
+        <div class="form-group row d-flex justify-content-between">
+            <div class="col-md-6 col-12">
+                <label asp-for="Image" class="col-form-label"></label>
+                <input type="file" name="files" id="projectImage" class="form-control" />
+            </div>
+            <span asp-validation-for="Image" class="text-danger"></span>
+            <div class="col-md-4 col-12">
+                @{if (Model.Image != null)
+                    {
+                        var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Image)}";
+                        <img class="img-fluid rounded" src="@(imgSource)" alt=""  style="height:192px;"/>
+                    }
+                    else
+                    {
+                        <p class="">Intet billede indlæst</p>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="row d-flex justify-content-between">
+            <div class="col-3 form-group form-group-sm order-1">
+                <label class="col-form-label form-control-sm" asp-for="AcademicSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="AcademicSessions" readonly />
+                <span asp-validation-for="AcademicSessions"></span>
+            </div>
+
+            <div class="col-3 form-group form-group-sm order-2">
+                <label class="col-form-label form-control-sm" asp-for="PoolSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="PoolSessions" readonly />
+                <span asp-validation-for="PoolSessions"></span>
+            </div>
+
+            <div class="col-3 form-group form-group-sm order-3">
+                <label class="col-form-label form-control-sm" asp-for="OpenWaterSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="OpenWaterSessions" readonly />
+                <span asp-validation-for="OpenWaterSessions"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 form-group form-group-sm">
+                <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fas fa-undo"></i>&nbsp;Tilbage</a>
+            </div>
+            <div class="col-3 text-right">
+                <button type="button" class="btn btn-outline-info btn-sm" id="createSessionButton" data-id="@Model.Id"><i class="fas fa-plus"></i>&nbsp;Tilføj Session</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mt-4">
+
+        <h5>Sessioner</h5>
+
+        <table class="table table-sm">
+
+            <thead>
+                <tr>
+                    <th style="width:60px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().SessionNumber"></label></th>
+                    <th style="width:60px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().SessionType"></label></th>
+                    <th style="width:120px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().Address"></label></th>
+                    <th style="width:240px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().Name"></label></th>
+                    <th style="width:40px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().UseDefaultWeekDay"></label></th>
+                    <th style="width:120px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultWeekday"></label></th>>
+                    <th style="width:80px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultStartTime"></label></th>
+                    <th style="width:80px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultDuration"></label></th>
+                    <th style="width:80px;"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model.Sessions.OrderBy(x => x.SessionNumber))
+                {
+                <tr>
+                    <td class="small">@item.SessionNumber</td>
+                    <td class="small">@item.SessionType</td>
+                    <td class="small">
+                        @if (item.Address != null)
+                        {
+                        @item.Address.Name
+                    <p class="small">
+                        @item.Address.Streetname<br />
+                        @item.Address.Zipcode  @item.Address.City <br />
+                        @item.Address.Country
+                    </p>
+                        } else
+                        {
+                            <p>Ingen adresse angivet</p>
+                        }
+                    </td>
+                    <td class="small">@item.Name<p class="small">@item.Description</p></td>
+                    <td class="small"><input type="checkbox" disabled asp-for="@item.UseDefaultWeekDay" /></td>
+                    <td class="small">@item.DefaultWeekday</td>
+                    <td class="small">@item.DefaultStartTime</td>
+                    <td class="small">@item.DefaultDuration</td>
+                    <td style="width:80px;text-align:right">
+                        <button type="button" class="btn btn-outline-success btn-sm editSessionButton" data-id="@item.Id"><i class="fas fa-edit"></i></button>
+                        <a asp-action="DeleteSession" asp-controller="Template" asp-area="Admin" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-light text-secondary justify-content-center ">
+
+                <div class="col-10 text-center"><h5 class="modal-title" id="myModalTitle"></h5></div>
+                <div class="col-2 text-right">
+                    <button class="btn btn-outline-danger btn-sm " data-dismiss="modal"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="modal-body justify-content-center" id="myModalContent">
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+
+        var urlCreate = '@Url.Action("CreateSession","Template",new { Area = "Admin" })';
+
+        var urlEdit = '@Url.Action("EditSession","Template",new { Area = "Admin" })';
+
+        $(function () {
+            $("#createSessionButton").click(function () {
+
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.data("id");
+
+                //$(".modal-header").removeClass("bg-info").addClass("bg-success");
+                $("#myModalTitle").text("Tilføj kursus session");
+
+                $.ajax({
+                    type: "GET",
+                    url: urlCreate,
+                    contentType: "application/json;charset=utf-8",
+                    data: { "id": id },
+                    cache: false,
+                    datatype: "json",
+                    success: function (data) {
+                        $("#myModalContent").html(data);
+                        $("#myModal").modal('show');
+                    },
+                    error: function () {
+                        alert("Failed to retrieve Course Session Template form");
+                    }
+                });
+            });
+
+            $(".editSessionButton").click(function () {
+
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.data("id");
+
+                //$(".modal-header").removeClass("bg-info").addClass("bg-success");
+                $("#myModalTitle").text("Rediger kursus session");
+
+                $.ajax({
+                    type: "GET",
+                    url: urlEdit,
+                    contentType: "application/json;charset=utf-8",
+                    data: { "id": id },
+                    cache: false,
+                    datatype: "json",
+                    success: function (data) {
+                        $("#myModalContent").html(data);
+                        $("#myModal").modal('show');
+                    },
+                    error: function () {
+                        alert("Failed to retrieve Course Session Template form");
+                    }
+                });
+            });
+        });
+
+    </script>
+}

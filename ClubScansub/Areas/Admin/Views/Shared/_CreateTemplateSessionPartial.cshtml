@@ -1,0 +1,79 @@
+﻿@model CreateCourseSessionTemplateViewModel
+
+<div class="container">
+    <form asp-action="CreateSession" method="post">
+        <input type ="hidden" value="@Model.SessionTemplate.Id" name="CourseSessionTemplateId" />
+        <input type="hidden" value="@Model.SessionTemplate.CourseTemplate.Id" name="CourseTemplateId" />
+
+
+        <div class="row">
+
+            <div class="col-2 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.SessionNumber"></label>
+                <input class="form-control form-control-sm" type="number" asp-for="SessionTemplate.SessionNumber" autocomplete="off" />
+                <span class="text-danger" asp-validation-for="SessionTemplate.SessionNumber"></span>
+            </div>
+
+            <div class="col form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.Name"></label>
+                <input class="form-control form-control-sm" asp-for="SessionTemplate.Name" autocomplete="off" />
+                <span class="text-danger" asp-validation-for="SessionTemplate.Name"></span>
+            </div>
+
+            <div class="col-12 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.Description"></label>
+                <input class="form-control form-control-sm" asp-for="SessionTemplate.Description" autocomplete="off" />
+                <span class="text-danger" asp-validation-for="SessionTemplate.Description"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.SessionType"></label>
+                <select class="form-control form-control-sm" asp-for="SessionTemplate.SessionType" asp-items="@Html.GetEnumSelectList<CourseSessionTypeEnum>()"></select>
+                <span class="text-danger" asp-validation-for="SessionTemplate.SessionType"></span>
+            </div>
+
+            <div class="col-4 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.DefaultWeekday"></label>
+                <select class="form-control form-control-sm" asp-for="SessionTemplate.DefaultWeekday" asp-items="@Html.GetEnumSelectList<System.DayOfWeek>()"></select>
+                <span class="text-danger" asp-validation-for="SessionTemplate.DefaultWeekday"></span>
+            </div>
+
+            <div class="col-4 form-group">
+                <label class="col-form-label" asp-for="AddressId"></label>
+                <select class="form-control form-control-sm" asp-for="AddressId" asp-items="@Model.AddressItems">
+                    <option selected="selected">Vælg et standard mødested</option>
+                </select>
+                <span class="text-danger" asp-validation-for="AddressId"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 form-group">
+                <input type="checkbox" asp-for="SessionTemplate.UseDefaultWeekDay" class="form-check-inline" />
+                <label class="col-form-label" asp-for="SessionTemplate.UseDefaultWeekDay"></label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.DefaultStartTime"></label>
+                <input class="form-control form-control-sm" type="time" asp-for="SessionTemplate.DefaultStartTime" autocomplete="off" />
+                <span class="text-danger" asp-validation-for="SessionTemplate.DefaultStartTime"></span>
+            </div>
+
+            <div class="col-6 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.DefaultDuration"></label>
+                <input class="form-control form-control-sm" asp-for="SessionTemplate.DefaultDuration" type="time" autocomplete="off" />
+                <span class="text-danger" asp-validation-for="SessionTemplate.DefaultDuration"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+        </div>
+
+    </form>
+
+</div>

@@ -1,0 +1,8 @@
+﻿@model object
+
+
+<div class="btn-group" role="group">
+    <a asp-action="Edit" class="btn btn-outline-primary btn-sm text-primary" asp-route-id="@Model.ToString()"><i class="fas fa-edit"></i></a>
+    @*<a asp-action="Details" class="btn btn-outline-success text-success" asp-route-id="@Model"><i class="fas fa-list-alt"></i></a>*@
+    <a asp-action="Delete" class="btn btn-outline-danger btn-sm text-danger" asp-route-id="@Model.ToString()"><i class="fas fa-trash-alt"></i></a>
+</div>

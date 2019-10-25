@@ -1,0 +1,28 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personlige oplysninger";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<h5><i class="fas fa-user-check"></i>&nbsp;@ViewData["Title"]</h5>
+
+<div class="row">
+    <div class="col-md-6">
+        <p class="small">Din konto indeholder personlige data, som du har givet os. Denne side giver dig mulighed for at slette disse data</p>
+        <p class="small">
+            <strong>Hvis du sletter disse data, sletter du også din konto og vil ikke længere have mulighed for at logge ind.
+            <span class="text-danger">Denne handling kan ikke fortrydes</span>
+            
+            </strong>
+        </p>
+        <form id="download-data" asp-page="DownloadPersonalData" method="post" class="form-group">
+            <button class="btn btn-outline-success btn-sm" type="submit"><i class="fas fa-download"></i>&nbsp;Hent mine opslyninger</button>
+            <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger btn-sm" title="Slet din konto - denne handling kan ikke fortrydes"><i class="fas fa-trash"></i> &nbsp;Slet min konto</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

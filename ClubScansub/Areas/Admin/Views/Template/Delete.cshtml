@@ -1,0 +1,96 @@
+﻿@model CourseTemplate
+@{
+    ViewData["Title"] = "Slet Kursus skabelon?";
+}
+
+<div class="container">
+    <h1 class="display-4 text-info">@ViewData["title"]</h1>
+    <h5 class="text-info">- ønsker du virkelig at slette denne skabelon ?</h5>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateName"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateName" readonly />
+                <span asp-validation-for="TemplateName"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateDurationInWeeks"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="TemplateDurationInWeeks" readonly />
+                <span asp-validation-for="TemplateDurationInWeeks"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="TemplateDurationInWeeks"></label>
+                <select class="form-control form-control-sm" type="text" asp-for="CourseType" asp-items="@Html.GetEnumSelectList<CourseTypeEnum>()" disabled></select>
+                <span asp-validation-for="TemplateDurationInWeeks"></span>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-3 form-group form-group-sm order-1">
+                <label class="col-form-label form-control-sm" asp-for="AcademicSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="AcademicSessions" readonly />
+                <span asp-validation-for="AcademicSessions"></span>
+            </div>
+
+            <div class="col-3 form-group form-group-sm order-2">
+                <label class="col-form-label form-control-sm" asp-for="PoolSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="PoolSessions" readonly />
+                <span asp-validation-for="PoolSessions"></span>
+            </div>
+
+            <div class="col-3 form-group form-group-sm order-3">
+                <label class="col-form-label form-control-sm" asp-for="OpenWaterSessions"></label>
+                <input class="form-control form-control-sm" type="text" asp-for="OpenWaterSessions" readonly />
+                <span asp-validation-for="OpenWaterSessions"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 form-group form-group-sm">
+                <a asp-action="Index" asp-controller="Template" asp-area="Admin" class="btn btn-outline-info btn-sm" ><i class="fas fa-undo"></i>&nbsp;Annuller</a>
+            </div>
+            <div class="col-3 text-right">
+                <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i>&nbsp;Slet</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mt-4">
+
+        <h5>Sessioner</h5>
+
+        <table class="table table-sm">
+
+            <thead>
+                <tr>
+                    <th style="width:120px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().SessionType"></label></th>
+                    <th style="width:120px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().SessionNumber"></label></th>
+                    <th style="width:360px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().Name"></label></th>
+                    <th style="width:120px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultWeekday"></label></th>
+                    <th style="width:80px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultStartTime"></label></th>
+                    <th style="width:80px;"><label class="col-form-label form-control-sm" asp-for="Sessions.FirstOrDefault().DefaultDuration"></label></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model.Sessions.OrderBy(x => x.SessionNumber))
+                {
+                    <tr>
+                        <td class="small">@item.SessionType</td>
+                        <td class="small">@item.SessionNumber</td>
+                        <td class="small">@item.Name<p class="small">@item.Description</p></td>
+                        <td class="small">@item.DefaultWeekday</td>
+                        <td class="small">@item.DefaultStartTime</td>
+                        <td class="small">@item.DefaultDuration</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

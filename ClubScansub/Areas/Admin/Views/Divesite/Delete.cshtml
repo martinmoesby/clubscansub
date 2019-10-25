@@ -1,0 +1,88 @@
+﻿@model Divelocation
+
+@{
+    ViewData["Title"] = "Administration - Dykkersted - Slet ?";
+}
+
+<form method="post" asp-action="Delete">
+    <div class="container p-4 m-4">
+        <h2 class="text-info mb-3">Slet dykkersted ?</h2>
+        <div class="alert-danger my-3 p-4 rounded border-danger">Dette kan ikke fortrydes - alle ture i kalenderen, som går til dette sted vil også blive fjernet fra systemet</div>
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <!-- Name-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Id" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input asp-for="Id" class="form-control" readonly disabled/>
+                    </div>
+                </div>
+
+                <!-- Name-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Name" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <label class="form-control">@Model.Name</label>
+                    </div>
+                </div>
+
+                <!-- DiveType -->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="DiveType" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <label class="form-control">@Model.DiveType</label>
+                    </div>
+                </div>
+
+                <!-- Description -->
+               @* <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Description" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <label class="form-control">@(string.IsNullOrEmpty(Model.Description) ? "Ingen Beskrivelse angivet" : Model.Description)</label>
+                    </div>
+                </div>
+                   *@
+                <!-- Min and Max-->
+                @*<div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="MinDepth" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-control">@Model.MinDepth</label>
+                    </div>
+                    <div class="col-4 text-right">
+                        <label asp-for="MaxDepth" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <label class="form-control">@Model.MaxDepth</label>
+                    </div>
+
+                </div>*@
+
+                @*<button type="submit" class="btn btn-outline-danger form-control" asp-route-id="Id"><i class="fas fa-trash"></i>Slet</button>*@
+
+                @*<div class="row">
+                        <div class="col-4 offset-4">
+                            <button type="submit" class="btn btn-outline-danger form-control" asp-route-id="Id"><i class="fas fa-trash"></i>&nbsp;Slet</button>
+                        </div>
+                        <div class="col-4">
+                            <a asp-action="Index" class="btn btn-outline-success form-control">Annuller</a>
+                        </div>
+                    </div>*@
+                <div class="col-8 offset-4">
+                    <partial name="_DeleteAndBackButtonsPartial" model="@Model.Id" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+

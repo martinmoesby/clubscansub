@@ -1,0 +1,51 @@
+﻿@model  Diveorganization
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<div class="container">
+    <form method="post" asp-action="Edit" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <h3 class="text-info mb-3">Rediger @Model.ShortName</h3>
+
+        <div class="row">
+            <div class="col-md-10 col-12">
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="ShortName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="ShortName" class="form-control" placeholder="Kaldenavn" />
+                    </div>
+                    <span asp-validation-for="ShortName" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Name" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Name" class="form-control" placeholder="Dykkerorganisation navn" />
+                    </div>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Description" class="col-form-label"></label>
+                    </div>
+                    <div class="col-8">
+                        <textarea asp-for="Description" class="form-control" placeholder="Beskrivelse"></textarea>
+                    </div>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+    </form>
+
+</div>

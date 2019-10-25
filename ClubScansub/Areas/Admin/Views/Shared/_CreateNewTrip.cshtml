@@ -1,0 +1,86 @@
+﻿@model ClubScansub.Areas.Admin.ViewModels.CreateEventViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+    <form method="post" asp-action="CreateEvent" asp-controller="Event" asp-area="Admin">
+        <h4 class="text-info"><i class="far fa-calendar-plus"></i>&nbsp;Opret ny tur</h4>
+        <div class="my-3 border rounded"></div>
+
+        <div class="form-group input-group col-12 btn b">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Type:</span>
+            </div>
+            <select type="text" class="form-control selectpicker" asp-items="@Html.GetEnumSelectList<EventTypeEnum>()" data-style="btn btn-secondary" id="eventtype" onchange="selectedEventtypeChanged()" asp-for="Event.EventType"></select>
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Til:</span>
+            </div>
+            <select type="text" class="selectpicker form-control" data-live-search="true" data-style="btn btn-secondary" onchange="selectedLocatationChanged()" id="locationid" asp-items="@Model.Locations" asp-for="DivelocationId"></select>
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Min. cert.:</span>
+            </div>
+            <select type="text" class="form-control" asp-items="@Model.Certificates" asp-for="CertificateId"></select>
+        </div>
+
+        <div class="form-group input-group col-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Titel</span>
+            </div>
+            <input type="text" class="form-control" asp-for="Event.Title" id="title" autocomplete="off" />
+        </div>
+
+
+
+        <div class="form-group input-group col-9">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Start:</span>
+            </div>
+            <input type="datetime-local" class="form-control" asp-for="Event.StartDateAndTime" placeholder="" />
+        </div>
+
+        <div class="form-group input-group col-9">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Slut:</span>
+            </div>
+            <input type="datetime-local" class="form-control" asp-for="Event.EndDateAndTime" placeholder="" />
+        </div>
+
+        <div class="form-group d-flex justify-content-between">
+
+            <div class="input-group  col-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:120px;">Min:</span>
+                </div>
+                <input type="number" class="form-control" asp-for="Event.MinParticipants" />
+            </div>
+
+            <div class="input-group mr-2 col-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:120px;">Max:</span>
+                </div>
+                <input type="number" class="form-control" asp-for="Event.MaxParticipants" />
+            </div>
+        </div>
+
+        <div class="form-group input-group col-auto">
+            <div class="input-group-prepend">
+                <span class="input-group-text" style="width:120px;">Pris:</span>
+            </div>
+            <input type="number" class="form-control" id="price" asp-for="Event.Price" />
+            <div class="input-group-append">
+                <span id="premiumInfo" class="input-group-text">(0 for premium medlemmer)</span>
+            </div>
+
+        </div>
+
+        <div class="form-group col-12 d-flex justify-content-between mt-3">
+            <button class="btn btn-outline-info" type="reset"><i class="fas fa-times"></i> &nbsp;Annuller</button>
+            <button class="btn btn-outline-success" type="submit"><i class="fas fa-check"></i> &nbsp;Opret</button>
+        </div>
+
+    </form>

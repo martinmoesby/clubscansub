@@ -1,0 +1,205 @@
+﻿@model Course
+<div class="row mb-3">
+
+    <div class="col-auto mr-3">
+        <div class="d-flex justify-content-start flex-column">
+            <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
+            <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
+            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
+            <h4>
+                @if (Model.Participants.Count + Model.FixedParticipants == 0 || Model.IsCancelled)
+                {
+                    <i class="fas fa-flag-checkered text-danger" title="Ingen tilmeldte"></i>
+                }
+                else if (Model.Participants.Count + Model.FixedParticipants < Model.MinParticipants)
+                {
+                    <i class="fas fa-flag-checkered text-warning" title="Ikke nok tilmeldte"></i>
+                }
+                else
+                {
+                    <i class="fas fa-flag-checkered text-success" title="Tilmeldte OK"></i>
+                }
+            </h4>
+
+        </div>
+    </div>
+
+    <div class="col p-2">
+
+        <div class="row mb-2">
+            <div class="col-6">
+                <h4>
+                    <button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>
+                    @Model.CourseName
+                </h4>
+                <p>
+                    Start dato: <strong>@Model.CourseSessions.Min(x => x.DateTime).ToString("dd. MMMM yyyy kl. HH:mm") </strong>
+                    <br />
+                    Slut dato: <strong> @Model.CourseSessions.Max(x => x.DateTime.Add(x.Duration)).ToString("dd. MMMM yyyy kl. HH:mm") </strong>
+                </p>            
+                
+                <div class="text-black text-truncate font-weight-lighter small">
+                    @Model.CourseTemplate.TemplateName<br />
+                    @Model.CourseTemplate.Sessions.Count dage fordelt på
+
+                    @Model.CourseTemplate.AcademicSessions teoriaftener, <br />
+                    @Model.CourseTemplate.PoolSessions svømmehalsdage og <br />
+                    @Model.CourseTemplate.OpenWaterSessions dage med dykning i åbent vand.
+
+                </div>
+            </div>
+            <div class="col-4">
+                @{if (Model.CourseTemplate.Image != null)
+                    {
+                        var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.CourseTemplate.Image)}";
+                        <img class="img rounded" src="@(imgSource)" alt="" height="192" style="height:192px" />
+                    }
+                    else
+                    {
+                        <p class="small">Intet billede indlæst</p>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <span class="small text-info font-weight-light">Pladsstatus:</span>
+        </div>
+
+        <div class="row">
+            <div class="badge badge-pill bg-light p-2">
+                <partial name="_CourseSeatStatusPartial" model="@Model" />
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-2 text-right">
+        @if (Model.IsCancelled)
+        {
+            <i class="rounded border border-dark text-black-50 p-2 fas fa-ban" title="Aflyst"></i>
+        }
+        else
+        {
+            @if (User.Identity.Name != null && User.IsInRole(ClubScansub.Utility.Userroles.User))
+            {
+
+                if (Model.StartDateAndTime < DateTime.Now)
+                {
+                    <i class="rounded border border-secondary text-black-50 p-2 fas fa-flag-checkered" title="Kurset er igang eller alsluttet"></i>
+                }
+                else if (Model.FreeSpots <= 0)
+                {
+                    <i class="fas fa-lightbulb" title="Kurset er fyldt op"></i>
+                }
+                else if (Model.Signups.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) != null)
+                {
+                    <i class="rounded border border-info text-info p-2 fas fa-user" title="Du er skrevet op til dette kursus"></i>
+                }
+                else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) != null)
+                {
+                    <i class="rounded border border-success text-success p-2 fas fa-user-check" title="Du er tilmeldt dette kursus"></i>
+                }
+                else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null && Model.Signups.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
+                {
+                    <a asp-action="Attend" class="btn btn-outline-success" asp-route-id="@Model.Id" title="Tryk her for at skrive dig op til kurset. Tilmeldingen er ikke bindende før du har være i kontakt med DK Diver">
+                        <i class="fas fa-user-plus"></i>
+                    </a>
+                }
+                else
+                {
+                    <i title="Kan ikke afgøre tilstand" class="rounded border border-dark text-black-50 p-2 fas fa-question"></i>
+                }
+            }
+            else
+            {
+                <i title="Du skal være logget ind og medlem for at tilmelde dig" class="rounded border border-info text-info p-2 fas fa-sign-in-alt"></i>
+            }
+        }
+    </div>
+</div>
+
+<div class="collapse mt-3 w-100" id="collapse">
+    <div class="row d-flex justify-content-between mb-2">
+
+        <div class="col-12 col-lg-5 order-lg-1">
+
+            @*<div class="card">
+                    <div class="card-header">Mødetid og sted:</div>
+                    <div class="card-body small">
+
+                        @Model.StartDateAndTime.ToLongDateString() kl. @Model.StartDateAndTime.ToShortTimeString()
+                        <hr />
+                        @Model.Divelocation.MeetingLocation.Name<br />
+                        @Model.Divelocation.MeetingLocation.Streetname<br />
+                        @Model.Divelocation.MeetingLocation.Zipcode&nbsp;@Model.Divelocation.MeetingLocation.City
+                    </div>
+                </div>
+                <br />*@
+            <div class="card">
+                <div class="card-header">Deltagere:</div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(User.Identity.Name))
+                    {
+                        if (Model.Participants.Count > 0 || Model.FixedParticipants > 0 || Model.Signups.Count > 0)
+                        {
+
+                            @*for (int i = 0; i < Model.FixedParticipants; i++)
+                {
+                    <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
+                }*@
+
+                            <p class="small">
+                                Skrevet op:
+                            </p>
+                            foreach (var user in Model.Signups)
+                            {
+                                <span class="p-2 small text-info"><i class="fas fa-user"></i>&nbsp;@user.ApplicationUser.Name</span><br />
+                            }
+
+                            <p class="small">Tilmeldt:</p>
+                            foreach (var user in Model.Participants)
+                            {
+                                <span class="p-2 small text-success"><i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name</span>
+                                @if (User.IsInRole(Userroles.Divepro))
+                                {
+                                    <span class="p-2 small text-info"><i class="fas fa-phone"></i>&nbsp;@user.ApplicationUser.PhoneNumber</span>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="p-2 small text-danger"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="p-2 small text-info"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12 col-lg-7 order-lg-2">
+            <div class="card">
+                <div class="card-header">Kursusplan</div>
+                <div class="card-body small">
+                    <ul class="list-group">
+
+                        @foreach (var item in Model.CourseSessions.OrderBy(x=>x.DateTime))
+                        {
+                            <li class="list-group-item">
+                                    <p>@item.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm")</p>
+                                    <strong>@item.CourseSessionTemplate.Description</strong>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

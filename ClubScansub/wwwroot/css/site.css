@@ -1,0 +1,160 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+.form-control:disabled, .form-control[readonly] {
+    opacity: 1;
+    background-color: inherit;
+}
+
+
+
+.techdive {
+    background-color: lightpink;
+}
+
+.naturedive {
+    background-color: lightgreen;
+}
+
+.wreckdive {
+    background-color: lightblue;
+}
+
+.pooldive {
+    background-color: lightyellow !important;
+}
+
+.bg-boat {
+    background-color: lightskyblue !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-beach {
+    background-color: skyblue !important;
+    color: #333 !important;
+    /*border: 1px solid #333 !important;*/
+}
+
+.bg-club {
+    background-color: deepskyblue !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-other {
+    background-color: lightseagreen !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-travel {
+    background-color: mediumseagreen !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-liveaboard {
+    background-color: seagreen !important;
+    color: #FFF !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-basecourse {
+    background-color: pink !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-speccourse {
+    background-color: lightpink !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-techcourse {
+    background-color: hotpink !important;
+    color: #000 !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+.bg-procourse {
+    background-color: deeppink !important;
+    color: #FFF !important;
+    /*border: 1px solid #000 !important;*/
+}
+
+#calendar {
+    font-size:0.8rem;
+    min-height:640px;
+}
+
+.calendar-event {
+    font-size: .75rem;
+    cursor: pointer;
+}
+
+
+@media (min-width: 576px) {
+    #myModal .modal-dialog {
+        min-width: 576px;
+        max-width: 960px;
+    }
+
+}
+
+
