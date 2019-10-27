@@ -1,0 +1,101 @@
+﻿@model ClubSettings
+@{
+    ViewData["Title"] = "Klubindstillinger";
+    var pageTitle = ViewBag.PageTitle;
+
+}
+
+<partial name="_IndexPageHeaderPartialNoCreateButton" model=@pageTitle />
+
+<div class="container">
+    <div class="col-8">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Logo" />
+            <div class="card">
+                <div class="card-header">
+                    <div class="row d-flex justify-content-between">
+                        @{if (Model.Logo != null)
+                            {
+                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Logo)}";
+                                <img class="img rounded" src="@(imgSource)" alt="" />
+
+                            }
+                            else
+                            {
+                                <img src="~/images/alpha-flag-hi.png" height="55" />
+                            }
+                        }
+
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Logo" class="col-form-label"></label>
+                        <input type="file" formenctype="multipart/form-data" name="files" multiple class="form-control" value="Upload nyt logo" />
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <div class="col-4">
+                            <label asp-for="Name" class="col-form-label"></label>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" asp-for="Name" class="form-control" placeholder="Klubnavn" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-4">
+                            <label asp-for="Tagline" class="col-form-label"></label>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" asp-for="Tagline" class="form-control" placeholder="Tagline" />
+                        </div>
+                        <span asp-validation-for="Tagline" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-8">
+                            <label asp-for="PrivacyText" class="col-form-label"></label>
+                        </div>
+                        <div class="col-12">
+                            <textarea type="text" asp-for="PrivacyText" class="tinymce form-control" placeholder="Privatlivs tekst"></textarea>
+                        </div>
+                        <span asp-validation-for="PrivacyText" class="text-danger"></span>
+                    </div>
+
+                    @*<div class="form-group">
+                        <div class="col-8">
+                            <label asp-for="TermsText" class="col-form-label"></label>
+                        </div>
+                        <div class="col-12">
+                            <textarea type="text" asp-for="TermsText" class="tinymce form-control" placeholder="Klub betingnelser" ></textarea>
+                        </div>
+                        <span asp-validation-for="TermsText" class="text-danger"></span>
+                    </div>*@
+
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-save"></i>&nbsp; Gem</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.tiny.cloud/1/0b0yzb8er7yrh8cgp5y9ev2ew5nkeowz538r4b786b7bvm68/tinymce/5/tinymce.min.js"></script>
+
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: "lists",
+            menubar: 'file edit format'
+        });
+    </script>
+
+}

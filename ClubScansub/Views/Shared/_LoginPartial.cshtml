@@ -52,6 +52,11 @@
                     <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="fas fa-tools"></i>&nbsp;Site Administration</a>
                     <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Planner"><i class="fas fa-calendar"></i>&nbsp;Planner</a>
                 }
+                @if (User.IsInRole(Userroles.Owner))
+                {
+                    <a class="dropdown-item small" asp-area="Admin" asp-controller="ClubInfo" asp-action="Index"><i class="fas fa-info"></i>&nbsp;Klubinformationer</a>
+                }
+
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/AccountBalance"><i class="fas fa-coins"></i>&nbsp;Turkonto: @Html.FormatValue(appUser.Balance, "{0:n0}")</a>
                 <div class="dropdown-divider"></div>

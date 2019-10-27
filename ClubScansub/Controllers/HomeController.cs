@@ -302,7 +302,11 @@ namespace ClubScansub.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            return View(db.ClubSettings.SingleOrDefault());
+        }
+        public IActionResult Terms()
+        {
+            return View(db.ClubSettings.SingleOrDefault());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

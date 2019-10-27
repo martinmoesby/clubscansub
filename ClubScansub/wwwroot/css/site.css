@@ -148,6 +148,10 @@ body {
     cursor: pointer;
 }
 
+textarea.tinymce {
+    height:240px;
+    min-height:240px;
+}
 
 @media (min-width: 576px) {
     #myModal .modal-dialog {

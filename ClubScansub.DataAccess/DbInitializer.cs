@@ -63,6 +63,20 @@ namespace ClubScansub.Data
                 await db.SaveChangesAsync();
             }
 
+            var clubInfo = db.ClubSettings.SingleOrDefault();
+
+            if (clubInfo == null)
+            {
+                clubInfo = new ClubSettings();
+                clubInfo.Name = "Min Dykkerklub";
+                clubInfo.Tagline = "gode oplevelser under overfladen - og over";
+                clubInfo.Address = new Address();
+                clubInfo.Address.Name = "Klubben";
+
+                db.ClubSettings.Add(clubInfo);
+                await db.SaveChangesAsync();
+
+            }
             //seedUsers();
         }
 

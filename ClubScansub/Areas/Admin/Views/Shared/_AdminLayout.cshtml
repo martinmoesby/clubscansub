@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using ClubScansub.Utility;
+@inject ClubScansub.Data.ApplicationDbContext db
+
+@{
+    var clubInfo = db.ClubSettings.SingleOrDefault();
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -29,7 +36,18 @@
             <div class="container-fluid">
                 <div class="navbar-brand">
                     <h5 class="text-dark bg-light badge badge-pill pb-1">
-                        <a asp-action="Index" asp-area="" asp-controller="Home"><img src="~/images/logo.png" alt="" title="Click to go back to homepage" /></a>
+                        <a asp-action="Index" asp-area="" asp-controller="Home" class="text-info h3">
+                            @{if (clubInfo.Logo != null)
+                                {
+                                    var imgSource = $"data:image;base64,{Convert.ToBase64String(clubInfo.Logo)}";
+                                    <img class="img rounded" src="@(imgSource)" alt="" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/alpha-flag-hi.png" height="55" alt="" title="Click to go back to homepage" />@clubInfo.Name
+                                }
+                            }
+                        </a>
                         <br />Adminstration
                     </h5>
 
@@ -142,9 +160,15 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-light bg-info">
-        <div class="container-fluid">
-            &copy; 2019 - Klub Scansub - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-black-50">Privacy</a>
+    <footer class="border-top footer text-white-50 bg-dark">
+        <div class="container small d-flex justify-content-between">
+            <span><i class="far fa-copyright"></i>&nbsp;@clubInfo.Name - @clubInfo.Tagline</span>
+            <span>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy"><span class="text-info">Privatlivsindstillinger</span></a>
+                @*&nbsp;<span class="text-info">|</span>&nbsp;
+                <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info">Betingelser</span></a>*@
+            </span>
+            <span><i class="fab fa-superpowers"></i>&nbsp;Powered by Diveclub Manager</span>
         </div>
     </footer>
 
