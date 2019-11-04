@@ -13,5 +13,9 @@ namespace ClubScansub.Areas.Admin.ViewModels
         public IList<SelectListItem> ExistingAddresses { get; set; }
 
         public string SelectedAddressId { get; set; }
+        public IList<SelectListItem> Certificates { get; set; }
+
+        public string SelectedCertificateId { get; set; }
+
     }
 }

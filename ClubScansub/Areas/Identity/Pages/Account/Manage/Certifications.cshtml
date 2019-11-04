@@ -1,12 +1,16 @@
 ﻿@page
 @model CertificationsModel
+@using ClubScansub.Utility
 @{
 }
 
 <div class="row justify-content-between">
 
     <h5><i class="fas fa-award"></i>&nbsp;Certificeringer</h5>
-    <a asp-action="Index" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-info btn-sm"><i class="fas fa-award"></i>&nbsp;Certifikat-detaljer</a>
+    @if (User.IsInRole(Userroles.Member))
+    {
+        <a asp-action="Index" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-info btn-sm"><i class="fas fa-award"></i>&nbsp;Certifikat-detaljer</a>
+    }
 </div>
 
 
@@ -17,8 +21,14 @@
             <div class="input-group">
                 <select class="form-control" asp-items="Model.Certificates" asp-for="SelectedCertificate"></select>
                 <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-info btn-sm input-group-btn">Tilføj</button>
-                </div>
+                    @if (User.IsInRole(Userroles.Member))
+                    {
+                        <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
+                    } else
+                    {
+                        <span class="btn btn-outline-info btn-sm" title="Du skal være registreret som medlem af klubben, før du kan tilføje certifikater til din profil"><i class="fas fa-ban mr-1"></i>Kun for medlemmer</span> 
+                    }
+                    </div>
             </div>
         </form>
     </div>
