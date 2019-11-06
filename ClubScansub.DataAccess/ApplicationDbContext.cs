@@ -27,6 +27,7 @@ namespace ClubScansub.Data
         public DbSet<CourseSession> CourseSessions { get; set; }
         public DbSet<CourseSessionInstructor> CourseSessionInstructors { get; set; }
         public DbSet<ClubSettings> ClubSettings { get; set; }
+        public DbSet<CourseSignup> CourseSignups { get; set; }
 
 
 

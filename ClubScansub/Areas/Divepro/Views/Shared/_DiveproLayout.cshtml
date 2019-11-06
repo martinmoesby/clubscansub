@@ -66,21 +66,22 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark btn btn-light btn-sm" asp-area="" asp-controller="Home" asp-action="Index">Kalender</a>
                         </li>
-
-                        <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
-                               href="#"
-                               id="diveproDropdown"
-                               role="button"
-                               data-toggle="dropdown"
-                               aria-haspopup="true"
-                               aria-expanded="false">Divepro</a>
-                            <div class="dropdown-menu" aria-labelledby="diveproDropdown">
-                                <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="Index">Kurser</a>
-                                <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="MyWorkplan">Arbejdsplan</a>
-                            </div>
-                        </li>
-
+                        @if (User.IsInRole(Userroles.Administrator))
+                        {
+                            <li class="nav-item dropdown mx-2">
+                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                   href="#"
+                                   id="diveproDropdown"
+                                   role="button"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">Divepro</a>
+                                <div class="dropdown-menu" aria-labelledby="diveproDropdown">
+                                    <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="Index">Kurser</a>
+                                    <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="MyWorkplan">Min undervisninsplan</a>
+                                </div>
+                            </li>
+                        }
                         @if (User.IsInRole(Userroles.Administrator))
                         {
 
