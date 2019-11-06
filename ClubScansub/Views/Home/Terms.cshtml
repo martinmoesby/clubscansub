@@ -1,13 +1,13 @@
 ﻿@model ClubSettings
 
 @{
-    ViewData["Title"] = "Privatlivspolitik";
+    ViewData["Title"] = "Betingelser";
 }
 
 
 <div class="container">
     <h1 class="display-1">@ViewData["Title"]</h1>
     <div class="row border rounded p-2 small text-black-50">
-            @Html.Raw(Model.PrivacyText)
+            @Html.Raw(Model.TermsText)
     </div>
 </div>

@@ -8,20 +8,20 @@
 
 <div class="container">
     <div class="row justify-content-between">
-        <div class="col-5 alert alert-danger">
+        <div class="col-5 alert alert-secondary" style="height:32px;min-height:32px;overflow:hidden">
             @foreach (var item in Model.Where(x => !x.InstructorApproved))
             {
-                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.Instructor.Id);
+                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.InstructorId);
 
                 @if (User.IsInRole(Userroles.Administrator) || User.IsInRole(Userroles.Owner))
                 {
                     if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</a>
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" class="small rounded-circle bg-info p-1 text-dark" title="@appUser.Name">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</a>
                     }
                     else
                     {
-                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" title="@appUser.Name"><img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" /></a>
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" title="@appUser.Name"><img class="small img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:24px; width:24px;" /></a>
                     }
                 }
                 else
@@ -38,19 +38,19 @@
             }
         </div>
 
-        <div class="col-5 alert alert-success">
+        <div class="col-5 alert alert-success" style="height:32px;min-height:32px;overflow:hidden;">
             @foreach (var item in Model.Where(x => x.InstructorApproved))
             {
-                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.Instructor.Id);
+                var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.InstructorId);
 
                 @if (string.IsNullOrEmpty(appUser.PhotoUrl))
                 {
-                    <span class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
+                    <span class="small rounded-circle bg-info p-2 text-dark align-top" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
                 }
                 else
                 {
                     <span title="@appUser.Name">
-                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:24px; width:24px;" />
                     </span>
                 }
             }

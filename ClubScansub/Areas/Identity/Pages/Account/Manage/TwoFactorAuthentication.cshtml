@@ -6,7 +6,8 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h5><i class="fas fa-user-lock"></i>&nbsp;2-Faktor Authentication</h5>
+<h5><i class="fas fa-user-lock"></i>&nbsp;Konto sikkerhed</h5>
+
 @if (Model.Is2faEnabled)
 {
     if (Model.RecoveryCodesLeft == 0)
@@ -41,11 +42,19 @@
     <a asp-page="./GenerateRecoveryCodes" class="btn btn-outline-info btn-sm">Nulstil gendannelseskoder</a>
 }
 
-<h6 class="text-info small">Authenticator app</h6>
-<p class="small text-black-50">Hvis du ikke har brugt en Authenticator App før, så kan du kigge på Microsoft Authenticator</p>
 
 @if (!Model.HasAuthenticator)
 {
+    <h5 class="text-info small">Authenticator app</h5>
+    
+    <p class="small text-muted">
+        For at sikre din konto, kan du tilknytte en Authneticator app.
+        Det betyder at du, når du logger ind, skal angive en kode fra din Authenticator App.<br />
+        På den måde kan du sikre dig at andre ikke får adgang til din konto
+    </p>
+
+    //<p class="small text-muted">Hvis du ikke har brugt en Authenticator App før, så kan du kigge på Microsoft Authenticator</p>
+
     <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-outline-info btn-sm">Tilføj App</a>
 }
 else

@@ -24,9 +24,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             {
                 Divelocation = new Divelocation(),
                 SelectedAddressId = string.Empty,
-                ExistingAddresses = db.Addresses.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
+                SelectedCertificateId = string.Empty,
+                ExistingAddresses = db.Addresses.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList(),
+                Certificates = db.Certificates.Select(x=> new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
             };
-            DiveLocationViewModel.ExistingAddresses.Add(new SelectListItem { Selected = true, Value = "", Text = "" });
+            //DiveLocationViewModel.ExistingAddresses.Add(new SelectListItem { Selected = true, Value = "", Text = "" });
             DiveLocationViewModel.Divelocation.MeetingLocation = new Address();
             //End init
 
@@ -76,6 +78,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                     existingAddress.Country = DiveLocationViewModel.Divelocation.MeetingLocation.Country;
 
                 DiveLocationViewModel.Divelocation.MeetingLocation = existingAddress;
+            }
+
+            if (!string.IsNullOrEmpty(DiveLocationViewModel.SelectedAddressId))
+            {
+                var certificate = await db.Certificates.FindAsync(int.Parse(DiveLocationViewModel.SelectedAddressId));
+                if (certificate != null)
+                {
+                    DiveLocationViewModel.Divelocation.Certificate = certificate;
+                }
             }
 
             var files = HttpContext.Request.Form.Files;
@@ -132,7 +143,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         #region Edit Get Post
         public async Task<IActionResult> Edit (int id)
         {
-            var divelocation = await db.Divelocations.Include(x=>x.MeetingLocation).FirstOrDefaultAsync(x=>x.Id == id);
+            var divelocation = await db.Divelocations.Include(x=>x.MeetingLocation).Include(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == id);
             if (divelocation == null)
                 return NotFound();
 
@@ -140,10 +151,13 @@ namespace ClubScansub.Areas.Admin.Controllers
             var model = new CreateDivelocationViewModel();
             model.Divelocation = divelocation;
             model.ExistingAddresses = await db.Addresses.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToListAsync();
+            model.Certificates = db.Certificates.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList();
 
             if (divelocation.MeetingLocation != null)
                 model.SelectedAddressId = divelocation.MeetingLocation.Id.ToString();
 
+            if (divelocation.Certificate != null)
+                model.SelectedCertificateId = divelocation.Certificate.Id.ToString();
 
             return View(model);
         }
@@ -153,6 +167,15 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> EditPost()
         {
             var model = DiveLocationViewModel.Divelocation;
+
+            if (!string.IsNullOrEmpty(DiveLocationViewModel.SelectedCertificateId))
+            {
+                var certificate = await db.Certificates.FindAsync(int.Parse(DiveLocationViewModel.SelectedCertificateId));
+                if (certificate != null)
+                {
+                    model.Certificate = certificate;
+                }
+            }
 
             var files = HttpContext.Request.Form.Files;
 

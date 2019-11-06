@@ -21,6 +21,37 @@
                     <span asp-validation-for="Divelocation.Name" class="text-danger"></span>
                 </div>
 
+                <!-- Divelocation.Min and Max-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Divelocation.MinDepth" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MinDepth" class="form-control" placeholder="Min. dybde" />
+                    </div>
+                    <div class="col-4 text-right">
+                        <label asp-for="Divelocation.MaxDepth" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MaxDepth" class="form-control" placeholder="Max. dybde" />
+                    </div>
+                    <span asp-validation-for="Divelocation.MinDepth" class="text-danger"></span>
+                    <span asp-validation-for="Divelocation.MaxDepth" class="text-danger"></span>
+                </div>
+
+                <!-- Divelocation.Certification-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label class="col-form-label">Min. certifikat krav</label>
+                    </div>
+                    <div class="col-8">
+                        <select asp-for="SelectedCertificateId" class="form-control" placeholder="Angiv minimums certifikat" asp-items="Model.Certificates">
+                            <option value="" selected>Vælg certifikat krav</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="SelectedCertificateId" class="text-danger"></span>
+                </div>
+
                 <!-- Divelocation.Default Start and duration-->
                 <div class="form-group row">
                     <div class="col-4">
@@ -55,24 +86,7 @@
                     <span asp-validation-for="Divelocation.Price" class="text-danger"></span>
                 </div>
 
-                <!-- Divelocation.Min and Max-->
-                <div class="form-group row">
-                    <div class="col-4">
-                        <label asp-for="Divelocation.MinDepth" class="col-form-label"></label>
-                    </div>
-                    <div class="col-2">
-                        <input type="text" asp-for="Divelocation.MinDepth" class="form-control" placeholder="Min. dybde" />
-                    </div>
-                    <div class="col-4 text-right">
-                        <label asp-for="Divelocation.MaxDepth" class="col-form-label"></label>
-                    </div>
-                    <div class="col-2">
-                        <input type="text" asp-for="Divelocation.MaxDepth" class="form-control" placeholder="Max. dybde" />
-                    </div>
-                    <span asp-validation-for="Divelocation.MinDepth" class="text-danger"></span>
-                    <span asp-validation-for="Divelocation.MaxDepth" class="text-danger"></span>
 
-                </div>
 
                 <div class="form-group row">
                     <div class="col-4">

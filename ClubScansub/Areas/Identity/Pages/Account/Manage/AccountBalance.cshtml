@@ -13,6 +13,11 @@
         <table class="col-auto table small">
             <thead>
                 <tr>
+                    <td colspan="3">
+                        <h6 class="btn btn-info btn-sm"><i class="fas fa-coins"></i>&nbsp;Balance: @Html.FormatValue(Model.ApplicationUser.Balance, "{0:n2}")</h6>
+                    </td>
+                </tr>
+                <tr>
                     <th>Dato</th>
                     <th>Beskrivelse</th>
                     <th>Beløb</th>
@@ -30,13 +35,6 @@
                     </tr>
                 }
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3">
-                        <h6 class="btn btn-info btn-sm"><i class="fas fa-coins"></i>&nbsp;Balance: @Html.FormatValue(Model.ApplicationUser.Balance, "{0:n2}")</h6>
-                    </td>
-                </tr>
-            </tfoot>
         </table>
     }
 </div>

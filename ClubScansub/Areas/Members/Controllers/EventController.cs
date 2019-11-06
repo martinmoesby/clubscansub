@@ -25,6 +25,10 @@ namespace ClubScansub.Areas.Members.Controllers
         [BindProperty]
         public IEnumerable<Event> Events { get; set; }
 
+        [BindProperty]
+        public IEnumerable<Course> Courses { get; set; }
+
+
         public async Task<IActionResult> Index()
         {
             Events = await db.EventUsers.Include(x=>x.Event)
@@ -34,6 +38,27 @@ namespace ClubScansub.Areas.Members.Controllers
                 .ToListAsync();
 
             return View(Events);
+        }
+
+        public async Task<IActionResult> CourseIndex()
+        {
+            var events = db.EventUsers.Where(x => x.ApplicationUserId == User.GetIdentityId()).Select(x=>x.EventId).ToList();
+            var signups = db.CourseSignups.Where(x => x.ApplicationUserId == User.GetIdentityId()).Select(x => x.CourseId).ToList();
+
+            Courses = await db.Courses
+                .Include(x=>x.Participants)
+                .Where(x => events.Contains(x.Id) || signups.Contains(x.Id))
+                .Include(x => x.CourseSessions)
+                    .ThenInclude(x=>x.CourseSessionTemplate)
+                        .ThenInclude(x=>x.Address)
+                .Include(x=>x.CourseSessions)
+                    .ThenInclude(x=>x.Address)
+                .Include(x => x.CourseSessions)
+                    .ThenInclude(x => x.Divelocation)
+                .OrderBy(x => x.StartDateAndTime)
+                .ToListAsync();
+
+            return View(Courses);
         }
     }
 }

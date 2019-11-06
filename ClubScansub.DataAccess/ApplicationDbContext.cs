@@ -26,6 +26,9 @@ namespace ClubScansub.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<CourseSession> CourseSessions { get; set; }
         public DbSet<CourseSessionInstructor> CourseSessionInstructors { get; set; }
+        public DbSet<ClubSettings> ClubSettings { get; set; }
+        public DbSet<CourseSignup> CourseSignups { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)

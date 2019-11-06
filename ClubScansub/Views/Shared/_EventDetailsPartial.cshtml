@@ -2,8 +2,12 @@
 @using Microsoft.EntityFrameworkCore;
 @inject ClubScansub.Data.ApplicationDbContext db;
 @{
-    var currentUser = await db.ApplicationUsers.Include(x => x.Certificates).ThenInclude(x => x.Certificate).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+    var currentUser = await db.ApplicationUsers
+        .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
+        .Include(x=>x.AccountTransactions)
+        .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
     bool isEligable = Model.RequiredCertificate == null;
+    bool hasFunds = currentUser.Balance >= Model.Price;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
     {
@@ -114,6 +118,10 @@
                 {
                     <i class="rounded border border-success text-success p-2 fas fa-user-check" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>
                 }
+                else if (!hasFunds)
+                {
+                    <i class="rounded border border-warning text-warning p-2 fas fa-user-plus" title="Du har ikke penge nok på din turkonto."></i>
+                }
                 else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
                 {
                     if (!isEligable)
@@ -125,7 +133,7 @@
                     }
                     else
                     {
-                        <a asp-action="Signup" class="btn btn-outline-success" asp-route-id="@Model.Id" title="Tilmeld dig, hvis du har penge på turkontoen">
+                        <a asp-action="Signup" class="btn btn-outline-success" asp-route-id="@Model.Id" title="Tilmeld dig">
                             <i class="fas fa-user-plus"></i>
                         </a>
                     }

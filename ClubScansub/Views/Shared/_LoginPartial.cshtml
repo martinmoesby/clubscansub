@@ -5,12 +5,12 @@
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject ApplicationDbContext db; 
+@inject ApplicationDbContext db;
 
-    <ul class="navbar-nav">
-        @if (SignInManager.IsSignedIn(User))
-        {
-            var appUser = await db.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var appUser = await db.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
         <li class="nav-item dropdown mx-2">
             <a class="nav-link dropdown-toggle text-dark"
                href="#"
@@ -20,16 +20,29 @@
                aria-haspopup="true"
                aria-expanded="false">
 
-                @if (string.IsNullOrEmpty(appUser.PhotoUrl))
-                {
-                    <span class="rounded-circle bg-info p-2 text-dark">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</span>
-                }
-                else
-                {
-                    <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
-                }
-                &nbsp;@appUser.Name
+                    @if (string.IsNullOrEmpty(appUser.PhotoUrl))
+                    {
+                        <span class="rounded-circle bg-info p-2 text-dark mr-2">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</span>
+                    }
+                    else
+                    {
+                        <img class="img-fluid rounded-circle mr-2" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                    }
+                    @appUser.Name
+                    @*@if (User.IsInRole(Userroles.Administrator))
+                    {
+                        <span class="small badge badge-primary">Administrator</span>
+                    }
+                    else if (User.IsInRole(Userroles.Divepro))
+                    {
+                        <span class="small badge badge-secondary">Divepro</span>
+                    }
+                    else if (User.IsInRole(Userroles.Member))
+                    {
+                        <span class="small badge badge-info">Klubmedlem</span>
+                    }*@
             </a>
+
             <div class="dropdown-menu dropdown-menu-right">
                 <span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Funktioner:</span>
                 <div class="dropdown-divider"></div>
@@ -52,6 +65,11 @@
                     <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="fas fa-tools"></i>&nbsp;Site Administration</a>
                     <a class="dropdown-item small" asp-area="Admin" asp-controller="Home" asp-action="Planner"><i class="fas fa-calendar"></i>&nbsp;Planner</a>
                 }
+                @if (User.IsInRole(Userroles.Owner))
+                {
+                    <a class="dropdown-item small" asp-area="Admin" asp-controller="ClubInfo" asp-action="Index"><i class="fas fa-info"></i>&nbsp;Klubinformationer</a>
+                }
+
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/AccountBalance"><i class="fas fa-coins"></i>&nbsp;Turkonto: @Html.FormatValue(appUser.Balance, "{0:n0}")</a>
                 <div class="dropdown-divider"></div>
@@ -65,13 +83,13 @@
     else
     {
         @*<li class="nav-item">
-            <form id="external-account" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                <button type="submit" class="btn btn-primary" name="provider" value="@Facebook" title="Log in using your Facebook account"><i class="fas fa-facebook"></i></button>
-                <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-facebook"></i>&nbsp;Login med Facebook</a>
-             </form>
-        </li>*@
+                <form id="external-account" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                    <button type="submit" class="btn btn-primary" name="provider" value="@Facebook" title="Log in using your Facebook account"><i class="fas fa-facebook"></i></button>
+                    <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-facebook"></i>&nbsp;Login med Facebook</a>
+                 </form>
+            </li>*@
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt"></i>&nbsp;Login</a>
         </li>
     }
-    </ul>
+</ul>

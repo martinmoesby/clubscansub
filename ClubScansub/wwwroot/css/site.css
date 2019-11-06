@@ -79,19 +79,19 @@ body {
 }
 
 .bg-boat {
-    background-color: lightskyblue !important;
+    background-color: deepskyblue !important;
     color: #000 !important;
     /*border: 1px solid #000 !important;*/
 }
 
 .bg-beach {
-    background-color: skyblue !important;
+    background-color: lightskyblue !important;
     color: #333 !important;
     /*border: 1px solid #333 !important;*/
 }
 
 .bg-club {
-    background-color: deepskyblue !important;
+    background-color: cornflowerblue !important;
     color: #000 !important;
     /*border: 1px solid #000 !important;*/
 }
@@ -121,7 +121,7 @@ body {
 }
 
 .bg-speccourse {
-    background-color: lightpink !important;
+    background-color: palevioletred !important;
     color: #000 !important;
     /*border: 1px solid #000 !important;*/
 }
@@ -148,6 +148,10 @@ body {
     cursor: pointer;
 }
 
+textarea.tinymce {
+    height:240px;
+    min-height:240px;
+}
 
 @media (min-width: 576px) {
     #myModal .modal-dialog {
