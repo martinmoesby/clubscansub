@@ -22,11 +22,11 @@
 
                     @if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <span class="rounded-circle bg-info p-2 text-dark mr-2">@appUser.Initials</span>
+                        <span class="rounded-circle bg-primary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
                     }
                     else
                     {
-                        <img class="img-fluid rounded-circle mr-2" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                        <img class="img rounded-circle mr-2" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" />
                     }
                     @appUser.Name
                     @*@if (User.IsInRole(Userroles.Administrator))

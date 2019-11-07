@@ -51,7 +51,7 @@
                                             <span class="small text-muted">@session.CourseSessionTemplate.Description</span>
                                         </div>
                                         <div class="col-3 small text-muted">D. @session.DateTime.ToShortDateString() kl. @session.DateTime.ToShortTimeString() til @session.DateTime.Add(session.Duration).ToShortTimeString()</div>
-                                        <div class="col-3 small text-muted">@session.CourseSessionTemplate.Address.Name</div>
+                                        <div class="col-3 small text-muted">@session.CourseSessionTemplate.Address?.Name</div>
                                     </div>
                                 }
                             </div>

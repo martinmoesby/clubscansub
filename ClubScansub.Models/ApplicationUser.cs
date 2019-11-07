@@ -47,13 +47,21 @@ namespace ClubScansub.Models
 
         [NotMapped]
         [Display(Name = "Initialer")]
-        public string Initials => string.Join(string.Empty, Firstname.Split(' ').Select(x => x[0]).Concat(Lastname.Split(' ').Select(x => x[0])).ToArray());
-        //{
-        //    get {
-        //        var initials = string.Join(string.Empty,Firstname.Split(' ').Select(x => x[0]).Concat(Lastname.Split(' ').Select(x => x[0])).ToArray());
-        //        return initials;
-        //    }
-        //}
+        public string Initials
+        {
+            get
+            {
+                try
+                {
+                    return string.Join(string.Empty, Firstname?.Split(' ').Select(x => x[0]).Concat(Lastname?.Split(' ').Select(x => x[0])).ToArray()); ;
+                }
+                catch (Exception)
+                {
+
+                    return "";
+                }
+            }
+        }
         //$"{Firstname.Split(' ').ToList().ForEach(x => x[0]) } {Lastname?.Take(1).ToString().ToUpper()}";
 
 

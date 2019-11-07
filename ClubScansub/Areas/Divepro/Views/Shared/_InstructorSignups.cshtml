@@ -18,7 +18,7 @@
                     if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
                         <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId"
-                           class="rounded-circle bg-primary text-center text-light btn btn-sm pt-1" title="@appUser.Name" style="height:40px; width:40px;">
+                           class="rounded-circle bg-primary text-center text-light btn btn-sm pt-2" title="@appUser.Name" style="height:40px; width:40px;">
                             <span>@appUser.Initials</span>
                         </a>
                     }
@@ -33,7 +33,7 @@
                 {
                     if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <span class="rounded-circle bg-primary btn btn-sm pt-1 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
+                        <span class="rounded-circle bg-primary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
                     }
                     else
                     {
