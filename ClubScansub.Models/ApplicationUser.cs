@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,10 +40,22 @@ namespace ClubScansub.Models
         public string PhotoUrl { get; set; }
 
         [PersonalData]
-        [Display(Name="Bruger nummer")]
+        [Display(Name = "Bruger nummer")]
         public string AccountNumber { get; set; }
 
         public string Name => $"{Firstname} {Lastname}";
+
+        [NotMapped]
+        [Display(Name = "Initialer")]
+        public string Initials => string.Join(string.Empty, Firstname.Split(' ').Select(x => x[0]).Concat(Lastname.Split(' ').Select(x => x[0])).ToArray());
+        //{
+        //    get {
+        //        var initials = string.Join(string.Empty,Firstname.Split(' ').Select(x => x[0]).Concat(Lastname.Split(' ').Select(x => x[0])).ToArray());
+        //        return initials;
+        //    }
+        //}
+        //$"{Firstname.Split(' ').ToList().ForEach(x => x[0]) } {Lastname?.Take(1).ToString().ToUpper()}";
+
 
         [PersonalData]
         [Display(Name ="Kursuskonto balance")]

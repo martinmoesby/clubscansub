@@ -22,7 +22,7 @@
 
                     @if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <span class="rounded-circle bg-info p-2 text-dark mr-2">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</span>
+                        <span class="rounded-circle bg-info p-2 text-dark mr-2">@appUser.Initials</span>
                     }
                     else
                     {
