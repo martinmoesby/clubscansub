@@ -46,7 +46,7 @@
             }
         </div>
 
-        <div class="col alert alert-success d-flex justify-content-between align-items-center" style="height:50px;min-height:50px;overflow:hidden;">
+        <div class="col alert alert-success d-flex justify-content-start align-items-center" style="height:50px;min-height:50px;overflow:hidden;">
             @foreach (var item in Model.Where(x => x.InstructorApproved))
             {
                 var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.InstructorId);
