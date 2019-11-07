@@ -8,7 +8,7 @@
 
 <div class="container">
     <div class="row justify-content-between">
-        <div class="col-5 alert alert-secondary" style="height:32px;min-height:32px;overflow:hidden">
+        <div class="col alert alert-secondary d-flex justify-content-start align-items-center" style="height:50px;min-height:50px;overflow:hidden">
             @foreach (var item in Model.Where(x => !x.InstructorApproved))
             {
                 var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.InstructorId);
@@ -17,40 +17,48 @@
                 {
                     if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" class="small rounded-circle bg-info p-1 text-dark" title="@appUser.Name">@string.Join("", User.Identity.Name.Take(2)).ToUpper()</a>
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId">
+                            <span class="rounded-circle bg-info p-2" title="@appUser.Name">
+                                @string.Join("", User.Identity.Name.Take(2)).ToUpper()
+                            </span>
+                        </a>
                     }
                     else
                     {
-                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" title="@appUser.Name"><img class="small img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:24px; width:24px;" /></a>
+                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId">
+                            <img class="img rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" alt="" title="@appUser.Name" />
+                        </a>
                     }
                 }
                 else
                 {
                     if (string.IsNullOrEmpty(appUser.PhotoUrl))
                     {
-                        <span class="small rounded-circle bg-info p-2 text-dark" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
+                        <span class="rounded-circle bg-info p-2" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
                     }
                     else
                     {
-                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:32px; width:32px;" />
+                        <span title="@appUser.Name">
+                            <img class="img rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" />
+                        </span>
                     }
                 }
             }
         </div>
 
-        <div class="col-5 alert alert-success" style="height:32px;min-height:32px;overflow:hidden;">
+        <div class="col alert alert-success d-flex justify-content-between align-items-center" style="height:50px;min-height:50px;overflow:hidden;">
             @foreach (var item in Model.Where(x => x.InstructorApproved))
             {
                 var appUser = await db.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == item.InstructorId);
 
                 @if (string.IsNullOrEmpty(appUser.PhotoUrl))
                 {
-                    <span class="small rounded-circle bg-info p-2 text-dark align-top" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
+                    <span class="rounded-circle bg-info p-2" title="@appUser.Name">@string.Join("", appUser.UserName.Take(2)).ToUpper()</span>
                 }
                 else
                 {
                     <span title="@appUser.Name">
-                        <img class="img-fluid rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:24px; width:24px;" />
+                        <img class="img rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" />
                     </span>
                 }
             }
