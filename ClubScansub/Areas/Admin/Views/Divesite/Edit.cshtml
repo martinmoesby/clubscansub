@@ -251,7 +251,6 @@
     }
 
     <script language="javascript">
-        var map, searchManager, pin;
 
         function onDivelocationChange() {
 
@@ -274,138 +273,8 @@
             })
         }
 
-        function GetMap() {
-
-            map = new Microsoft.Maps.Map("#meetLocationMap");
-
-            var lat = $("#latitude").val();
-            var lon = $("#longitude").val();
-
-            var location = new Microsoft.Maps.Location(lat, lon);
-
-            Microsoft.Maps.Events.addHandler(map, 'click', displayLatLong);
-            Microsoft.Maps.loadModule('Microsoft.Maps.Search', function () {
-                searchManager = new Microsoft.Maps.Search.SearchManager(map);
-            });
-
-            if (lat != "" && lon != "") {
-                addPushpin(location, $('#addressName').val());
-
-                map.setView({
-                    mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-                    center: location,
-                    zoom: 17
-                });
-            } else {
-                geocodeMap();
-            }
-
-        }
-
-        function geocodeMap() {
-
-            var query = $('#addressStreetname').val() + "," +
-                $('#addressZipcode').val() + " " +
-                $('#addressCity').val() + ", " +
-                $('#addressCountry').val();
-
-            console.log(query);
-
-            //$("#geocodeAddress").innerHtml(query);
-
-            var searchRequest = {
-                where: query,
-                callback: function (r) {
-                    //Add the first result to the map and zoom into it.
-                    if (r && r.results && r.results.length > 0) {
-
-                        addPushpin(r.results[0].location);
-
-                        $("#latitude").val(r.results[0].location.latitude);
-                        $("#longitude").val(r.results[0].location.longitude);
-                    }
-                },
-                errorCallback: function (e) {
-                    //If there is an error, alert the user about it.
-                    //alert("No results found.");
-                }
-            };
-
-            //Make the geocode request.
-            searchManager.geocode(searchRequest);
-        }
-
-        function displayLatLong(e) {
-            if (e.targetType == "map") {
-                var point = new Microsoft.Maps.Point(e.getX(), e.getY());
-                var loc = e.target.tryPixelToLocation(point);
-
-                document.getElementById("latitude").value = loc.latitude;
-                document.getElementById("longitude").value = loc.longitude;
-
-                getAdressByLocation(loc);
-
-                addPushpin(loc);
-
-            }
-        }
-
-        function addPushpin(location) {
-
-            var name = $("#addressName").val();
-
-            //Create custom Pushpin
-            if (pin == undefined) {
-                pin = new Microsoft.Maps.Pushpin(location);
-                //Add the pushpin to the map
-                map.entities.push(pin);
-
-            } else {
-                pin.setLocation(location);
-            }
-
-            pin.setOptions({
-                title: name
-            });
-
-            map.setView({
-                center: location,
-            });
-
-        }
-
-        function getAdressByLocation(location) {
-
-            var point = location.latitude + "," + location.longitude;
-            var types = "Address,Postcode1,CountryRegion,Locality";
-            var key = "Am0MRTxgaifeEFyXMSZw5AWlnAaMTVOcK2xBxt2c9gVbGJjc0zIK7lOldalP4biR";
-
-            var query = "https://dev.virtualearth.net/REST/v1/Locations/" + point + "?includeEntityType=" + types + "&key=" + key;
-
-            //http://dev.virtualearth.net/REST/v1/Locations/56.02614171580097,12.604299224804851?key=Am0MRTxgaifeEFyXMSZw5AWlnAaMTVOcK2xBxt2c9gVbGJjc0zIK7lOldalP4biR
-
-            //console.log(query);
-
-            $.getJSON(query, function (data) {
-
-
-                //console.log(data.resourceSets[0].resources[0].address.addressLine);
-                //console.log(data.resourceSets[0].resources[0].address.locality);
-                //console.log(data.resourceSets[0].resources[0].address.postalCode);
-                //console.log(data.resourceSets[0].resources[0].address.countryRegion);
-
-                $('#addressCity').val(data.resourceSets[0].resources[0].address.locality);
-                $('#addressZipcode').val(data.resourceSets[0].resources[0].address.postalCode);
-                $('#addressStreetname').val(data.resourceSets[0].resources[0].address.addressLine);
-                $('#addressName').val(data.resourceSets[0].resources[0].name);
-                $('#addressCountry').val(data.resourceSets[0].resources[0].address.countryRegion);
-
-            });
-
-
-
-        }
 
     </script>
 
+    <script src="~/js/bingmap.js"></script>
 }

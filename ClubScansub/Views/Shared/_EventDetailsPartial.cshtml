@@ -4,10 +4,10 @@
 @{
     var currentUser = await db.ApplicationUsers
         .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
-        .Include(x=>x.AccountTransactions)
+        .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
     bool isEligable = Model.RequiredCertificate == null;
-    bool hasFunds = currentUser.Balance >= Model.Price;
+    bool hasFunds = currentUser?.Balance >= Model.Price;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
     {
@@ -166,11 +166,18 @@
                     {
                         @Model.Divelocation.MeetingLocation.Name<br />
                         @Model.Divelocation.MeetingLocation.Streetname<br />
-                        @Model.Divelocation.MeetingLocation.Zipcode  @Model.Divelocation.MeetingLocation.City
-                    } else
+                        <span>@Model.Divelocation.MeetingLocation.Zipcode</span>
+                        <span class="ml-2">@Model.Divelocation.MeetingLocation.City</span>
+
+                        <input type="hidden" value="@Model.Divelocation.MeetingLocation.Latitude" id="latitude" />
+                        <input type="hidden" readonly value="@Model.Divelocation.MeetingLocation.Longitude" id="longitude" />
+                    }
+                    else
                     {
                         <p>Ikke angivet mødested for Dykkerlokation</p>
                     }
+
+                    <div id="meetLocationMap" class="rounded border map mt-2" style="height:300px;"></div>
                 </div>
             </div>
             <br />
@@ -233,4 +240,3 @@
             </div>*@
     </div>
 </div>
-
