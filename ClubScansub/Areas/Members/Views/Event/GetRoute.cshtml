@@ -1,0 +1,203 @@
+﻿@model ClubScansub.Models.Structs.RoutePoints
+@{
+    ViewData["Title"] = "Hent Kørseslbeskrivelse";
+}
+
+<div class="container mb-2">
+
+    <h3 class="display-4 text-info"><i class="fas fa-map-marked-alt mr-2"></i>Kørselsbeskrivelse</h3>
+    <input id="endLat" type="hidden" asp-for="End.latitude" readonly />
+    <input id="endLong" type="hidden" asp-for="End.longitude" readonly />
+
+    @*<div id="askPermission">
+            Can w use your location? (Click no to enter manually)
+            <input id="yes" value="Yes" type="button" />
+            <input id="no" value="No" type="button" />
+        </div>*@
+
+    <div id="manualEntry" class="col-md-6 col-12">
+        <div class="row mb-2">
+            <div class="col-12">
+                Fra:<br />
+                <input id="manualAddress" type="text" asp-for="StartAddress" readonly class="form-control" />
+
+            </div>
+            <div class="col-12">
+                Til:<br /><input id="manualEndAddress" type="text" asp-for="EndAddress" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col d-inline-flex justify-content-between">
+                <div>
+                    <button id="getManualDirection" type="button" value="Hent rute" class="btn btn-sm btn-outline-primary"><i class="fas fa-map-marked-alt"></i>&nbsp;Rute</button>
+                </div>
+                <div>
+                    <a class="btn btn-sm btn-outline-secondary" asp-area="Members" asp-controller="Event" asp-action="CourseIndex"><i class="fas fa-undo"></i>&nbsp;Tilbage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="mapContainer" class="container">
+    <div class="row d-flex justify-content-between">
+        <div class="col-md-8 col-12">
+            <div id="directionsMap" style="height:600px;"></div>
+        </div>
+        <div id="directionsList" class="col-md-4 col-12">
+        </div>
+    </div>
+</div>
+@section Scripts {
+
+
+    <script type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+
+    <script type="text/javascript">
+
+        $(function () {
+            var map = null;
+            var directionsManager = null;
+            var location = null;
+
+            //var store_location = "Støvlestræde, Albertslund, Danmark";
+
+            //$("#manualEntry").hide();
+            //$("#askPermission").hide();
+            //$("#yes").click(function () {
+            //    $("#manualEntyry").hide();
+            //    loadMap();
+
+            //    var options = {
+            //        enableHighAccuracy: true,
+            //        timeout: 20000,
+            //        maximumAge: 2000
+            //    };
+
+            //    navigator.geolocation.getCurrentPosition(showPosition, positionError, options);
+
+            //});
+            //$("#no").click(function () {
+            //    $("#askPermission").hide();
+            //    showManualEntry();
+            //})
+
+
+            $("#getManualDirection").click(function () {
+                loadMap();
+                showPosition(null);
+            });
+
+            function showManualEntry() {
+                $("#manualEntry").show();
+            }
+
+            function loadMap() {
+                if (!map) {
+                    map = new Microsoft.Maps.Map(document.getElementById("directionsMap"), {
+                        credentials: "AoB5pR5UTZfq_sbRPc6qadclXUP7pMgAzgJhO6aGn5cojO__kxWuC99ipn925Lsf"
+                    });
+                }
+            };
+
+            function showPosition(position) {
+
+                map.entities.clear();
+
+                if (position) {
+                    location = position.coords;
+                    map.setView({
+                        zoom: 15,
+                        center: new Microsoft.Maps.Location(location.latitude, location.longitude)
+                    });
+                }
+
+                if (!directionsManager) {
+                    Microsoft.Maps.loadModule('Microsoft.Maps.Directions', { callback: createDirectionsManager });
+                } else {
+                    createDirectionsManager();
+                }
+            }
+
+            function createDirectionsManager() {
+                var displayMessage;
+                if (!directionsManager) {
+                    directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    displayMessage = "Directions Module loaded\n";
+                    displayMessage += "Directions Manager loaded";
+                }
+
+                console.log(displayMessage);
+
+                directionsManager.clearAll();
+
+                //directionsManager.resetDirections();
+                directionsErrorEventObj = Microsoft.Maps.Events.addHandler(directionsManager, 'directionsError', directionsError);
+                directionsUpdatedEventObj = Microsoft.Maps.Events.addHandler(directionsManager, 'directionsUpdated', directionsUpdated);
+                createDrivingRoute(location);
+            }
+
+            function directionsUpdated() {
+
+            }
+
+            function directionsError(args) {
+                alert(args);
+            }
+
+            function createDrivingRoute(coords) {
+                if (!directionsManager) {
+                    createDirectionsManager();
+                }
+                //directionsManager.resetDirections();
+                directionsManager.clearAll();
+
+                directionsManager.setRequestOptions({
+                    routeMode: Microsoft.Maps.Directions.RouteMode.driving
+                });
+
+                var fromWayPoint = null;
+                if (coords != null) {
+                    fromWayPoint = new Microsoft.Maps.Directions.Waypoint({
+                        location: new Microsoft.Maps.Location(coords.latitude, coords.longitude)
+                    });
+                    directionsManager.addWaypoint(fromWayPoint);
+                } else {
+                    fromWayPoint = new Microsoft.Maps.Directions.Waypoint({ address: $("#manualAddress").val() });
+                    directionsManager.addWaypoint(fromWayPoint);
+                }
+
+                var toWayPoint = new Microsoft.Maps.Directions.Waypoint({ address: $("#manualEndAddress").val() });
+                //var toWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(coords.latitude, coords.longitude) });
+
+                directionsManager.addWaypoint(toWayPoint);
+
+                directionsManager.setRenderOptions({ itineraryContainer: document.getElementById("directionsList") });
+                directionsManager.calculateDirections();
+
+            }
+
+            function positionError(position) {
+                switch (position.code) {
+                    case 1:
+                        showManualEntry();
+                        break;
+                    case 2:
+                        showManualEntry();
+                        break;
+                    case 3:
+                        showManualEntry();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+        });
+
+    </script>
+
+
+}
