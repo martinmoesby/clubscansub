@@ -83,7 +83,7 @@ namespace ClubScansub.Controllers
             }
 
             var data = await db.Events
-                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled)
+                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled && !x.IsInternal)
                     .OrderBy(x => x.StartDateAndTime)
                     .ToListAsync();
 

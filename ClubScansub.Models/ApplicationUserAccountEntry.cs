@@ -23,7 +23,12 @@ namespace ClubScansub.Models
         [Column(TypeName ="decimal(18,2)")]
         [Range(1,double.MaxValue, ErrorMessage = "Beløbet skal mindst være 1")]
         [Display(Name ="Beløb", Description ="Det beløb der skal haves eller indsættes på brugerens konto")]
+                
         public decimal Amount { get; set; }
+
+        [Display(Name = "Faktura nr:?")]
+        public string InvoiceNumber { get; set; }
+
         public AccountTypeEnum AccountType { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
         public virtual Event Event { get; set; }
