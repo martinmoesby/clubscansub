@@ -51,7 +51,7 @@
                             }
                         </a>
                     </h5>
-                    
+
                 </div>
                 <button class="navbar-toggler text-dark" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -178,6 +178,10 @@
                                     <a class="dropdown-item small" asp-action="Index" asp-controller="Diveorganization" asp-area="Admin">Dykkerorganisationer</a>
                                 </div>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt"></i>&nbsp;Planner</a>
+                            </li>
                         }
                     </ul>
                 </div>
@@ -193,11 +197,11 @@
 
     <footer class="border-top footer text-white-50 bg-dark">
         <div class="container small d-flex justify-content-between">
-            <span><i class="far fa-copyright"></i>&nbsp;@clubInfo.Name - @clubInfo.Tagline</span>            
+            <span><i class="far fa-copyright"></i>&nbsp;@clubInfo.Name - @clubInfo.Tagline</span>
             <span>
                 <a asp-area="" asp-controller="Home" asp-action="Privacy"><span class="text-info">Privatlivsindstillinger</span></a>
                 @*&nbsp;<span class="text-info">|</span>&nbsp;
-                <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info">Betingelser</span></a>*@
+                    <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info">Betingelser</span></a>*@
             </span>
             <span><i class="fab fa-superpowers"></i>&nbsp;Powered by Diveclub Manager</span>
         </div>
@@ -206,6 +210,8 @@
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&setMkt=da-DK&setLang=da&UR=DK&key=Am0MRTxgaifeEFyXMSZw5AWlnAaMTVOcK2xBxt2c9gVbGJjc0zIK7lOldalP4biR' async defer></script>
+        
     </environment>
     <environment exclude="Development">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
@@ -220,7 +226,9 @@
                 crossorigin="anonymous"
                 integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
         </script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&setMkt=da-DK&setLang=da&UR=DK&key=Anv6_xU3GX5rnzLtJ6EZbiHF2vRnfONCI9fVn43ibVRDJD-ol9rFRmOb5aGKDLAC' async defer></script>
     </environment>
+    
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)

@@ -36,10 +36,10 @@ namespace ClubScansub.Models
         public decimal Price { get; set; }
 
         [DataType(DataType.Currency)]
-        [Column(TypeName ="money")]
+        [Column(TypeName = "money")]
         public decimal Deposit { get; set; }
 
-        [Display(Name ="Starttidspunkt")]
+        [Display(Name = "Starttidspunkt")]
         [DataType(DataType.DateTime)]
         public System.DateTime StartDateAndTime { get; set; }
 
@@ -52,6 +52,12 @@ namespace ClubScansub.Models
 
         [Display(Name = "Spærrede pladser")]
         public int FixedParticipants { get; set; }
+
+        [Display(Name = "Kun for Instruktører?")]
+        public bool IsInternal { get; set; }
+
+        [Display(Name = "Gratis for Instruktører?")]
+        public bool IsFreeForDivepros { get; set; } 
 
         public virtual Certificate RequiredCertificate { get; set; }
 

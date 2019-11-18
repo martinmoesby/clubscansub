@@ -39,6 +39,9 @@ namespace ClubScansub.Models
 
         public virtual ICollection<Event> Events { get; set; }
 
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
+
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }
 
     }

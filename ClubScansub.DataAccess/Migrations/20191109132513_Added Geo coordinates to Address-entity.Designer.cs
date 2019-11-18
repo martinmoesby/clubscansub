@@ -4,14 +4,16 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191109132513_Added Geo coordinates to Address-entity")]
+    partial class AddedGeocoordinatestoAddressentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +33,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<string>("Country")
                         .HasMaxLength(50);
 
-                    b.Property<string>("Latitude");
+                    b.Property<float>("Latitude");
 
-                    b.Property<string>("Longitude");
+                    b.Property<float>("Longitude");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50);
@@ -66,8 +68,6 @@ namespace ClubScansub.Data.Migrations
                         .HasMaxLength(250);
 
                     b.Property<int?>("EventId");
-
-                    b.Property<string>("InvoiceNumber");
 
                     b.Property<DateTime?>("PostingDate");
 
@@ -359,10 +359,6 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int>("FixedParticipants");
 
                     b.Property<bool>("IsCancelled");
-
-                    b.Property<bool>("IsFreeForDivepros");
-
-                    b.Property<bool>("IsInternal");
 
                     b.Property<int>("MaxParticipants");
 

@@ -19,126 +19,159 @@
         <div id="calendar"></div>
     </div>
 
-    <div class="col-3">
-        <div class="container justify-content-between align-content-center">
+    <div class="col-3 mt-5">
+        <div class="container justify-content-between align-content-center accordion" id="planningitemsaccordion">
 
-            <h3 class="mt-2">Ture</h3>
-            <span class="small text-muted">
-                Træk knapperne hen på den dato du vil planlægge en tur. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
-            </span>
-            <div id="external-events-trips" class=" h-50 overflow-auto border rounded bg-light p-1">
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Bådtur))
-                {
-                    <div class="small drop-item badge badge-info p-2 m-1 bg-boat" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Stranddyk))
-                {
-                    <div class="small drop-item badge badge-info p-2 m-1 bg-beach" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Klubture))
-                {
-                    <div class="small drop-item badge badge-info p-2 m-1 bg-club" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Other))
-                {
-                    <div class="small drop-item badge badge-info p-2 m-1 bg-other" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-            </div>
-
-            <h3 class="mt-2">Kurser</h3>
-            <span class="small text-muted">
-                Træk knapperne hen på den dato du vil lægge et kursus. Kurset bliver automatisk oprettet baseret på indstillingerne fra kursusskabelonen.
-            </span>
-            <div id="external-events-courses" class="h-50 overflow-auto border rounded bg-light p-1">
-                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.BaseCourse))
-                {
-                    <div class="small drop-item badge badge-success p-2 m-1 bg-basecourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
-                        @item.TemplateName
-                    </div>
-                }
-                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.SpecialtyCourse))
-                {
-                    <div class="small drop-item badge badge-success p-2 m-1 bg-speccourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
-                        @item.TemplateName
-                    </div>
-                }
-                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.TechCourse))
-                {
-                    <div class="small drop-item badge badge-success p-2 m-1 bg-techcourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
-                        @item.TemplateName
-                    </div>
-                }
-                @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.ProCourse))
-                {
-                    <div class="small drop-item badge badge-success p-2 m-1 bg-procourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
-                        @item.TemplateName
-                    </div>
-                }
-            </div>
-
-
-            <h3 class="mt-2">Rejser / Ferier</h3>
-            <span class="small text-muted">
-                Træk knapperne hen på den dato du vil planlægge en rejse eller en ferie. Dette er en flere dages aktivitet, og skal senere justeres under turlisten. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
-            </span>
-            <div id="external-events-travels" class=" h-50 overflow-auto border rounded bg-light p-1">
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Rejse))
-                {
-                    <div class="drop-item badge badge-info p-2 m-1 bg-travel" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-
-                @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Liveaboard))
-                {
-                    <div class="drop-item badge badge-info p-2 m-1 bg-liveaboard" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
-                        @item.Name
-                    </div>
-                }
-            </div>
-
-
-        </div>
-    </div>
-</div>
-
-<div>
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog-centered modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-light text-black-50 justify-content-between">
-                    <h5 class="modal-title" id="myModalTitle"></h5>
-                    <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+            <div class="card border">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" aria-expanded="false" aria-controls="collapseExample"
+                                data-toggle="collapse" data-target="#external-events-trips" title="For at se tilgængelige ture">
+                            Ture
+                        </button>
+                    </h5>
                 </div>
-                <div class="modal-body" id="myModalContent">
+                <div id="external-events-trips" class="collapse show" data-parent="#planningitemsaccordion">
+                    <div class=" card-body h-50 overflow-auto border rounded bg-light p-1">
+                        <span class="small text-muted">
 
+                            Træk knapperne hen på den dato du vil planlægge en tur. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
+                        </span><br />
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Bådtur))
+                        {
+                            <div class="small drop-item badge badge-info p-2 m-1 bg-boat" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
 
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Stranddyk))
+                        {
+                            <div class="small drop-item badge badge-info p-2 m-1 bg-beach" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
+
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Klubture))
+                        {
+                            <div class="small drop-item badge badge-info p-2 m-1 bg-club" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
+
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Other))
+                        {
+                            <div class="small drop-item badge badge-info p-2 m-1 bg-other" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
+
+            <div class="card border">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" aria-expanded="false" aria-controls="collapseExample"
+                                data-toggle="collapse" data-target="#external-events-courses" title="For at se tilgængelige kurser">
+                            Kurser
+                        </button>
+                    </h5>
+                </div>
+                <div id="external-events-courses" class="collapse" data-parent="#planningitemsaccordion">
+                    <div class="card-body h-50 overflow-auto border rounded bg-light p-1">
+                        <span class="small text-muted">
+
+                            Træk knapperne hen på den dato du vil lægge et kursus. Kurset bliver automatisk oprettet baseret på indstillingerne fra kursusskabelonen.
+                        </span><br />
+
+                        @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.BaseCourse))
+                        {
+                            <div class="small drop-item badge badge-success p-2 m-1 bg-basecourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                                @item.TemplateName
+                            </div>
+                        }
+                        @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.SpecialtyCourse))
+                        {
+                            <div class="small drop-item badge badge-success p-2 m-1 bg-speccourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                                @item.TemplateName
+                            </div>
+                        }
+                        @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.TechCourse))
+                        {
+                            <div class="small drop-item badge badge-success p-2 m-1 bg-techcourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                                @item.TemplateName
+                            </div>
+                        }
+                        @foreach (var item in Model.Courses.Where(x => x.CourseType == CourseTypeEnum.ProCourse))
+                        {
+                            <div class="small drop-item badge badge-success p-2 m-1 bg-procourse" data-eventid="@item.Id" data-type="course" data-title="@item.TemplateName" style="cursor:move">
+                                @item.TemplateName
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link btn-sm" type="button" aria-expanded="false" aria-controls="collapseExample"
+                                data-toggle="collapse" data-target="#external-events-travels" title="For at se tilgængelige rejser ture">
+                            Rejser / Ferier
+                        </button>
+                    </h5>
+                </div>
+                <div id="external-events-travels" class="collapse" data-parent="#planningitemsaccordion">
+                    <div class="card-body h-50 overflow-auto border rounded bg-light p-1">
+                        <span class="small text-muted">
+                            Træk knapperne hen på den dato du vil planlægge en rejse eller en ferie. Dette er en flere dages aktivitet, og skal senere justeres under turlisten. Turen bliver oprettet med dine default-indstillinger for dykker stedet.
+                        </span>
+                        <br />
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Rejse))
+                        {
+                            <div class="drop-item badge badge-info p-2 m-1 bg-travel" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
+
+                        @foreach (var item in Model.Divesites.Where(x => x.DefaultEventType == EventTypeEnum.Liveaboard))
+                        {
+                            <div class="drop-item badge badge-info p-2 m-1 bg-liveaboard" data-eventid="@item.Id" data-type="trip" data-title="@item.Name" style="cursor:move">
+                                @item.Name
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script src="~/lib/fullcalendar/core/main.js"></script>
-    <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
-    <script src="~/lib/fullcalendar/daygrid/main.min.js"></script>
-    <script src="~/lib/fullcalendar/interaction/main.js"></script>
-    <script src="~/lib/fullcalendar/timegrid/main.js"></script>
-    <script src="~/lib/fullcalendar/list/main.js"></script>
-    <script src="~/lib/fullcalendar/core/locales/da.js"></script>
-    <script>
+    <div>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog-centered modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-light text-black-50 justify-content-between">
+                        <h5 class="modal-title" id="myModalTitle"></h5>
+                        <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body" id="myModalContent">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="~/lib/fullcalendar/core/main.js"></script>
+        <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
+        <script src="~/lib/fullcalendar/daygrid/main.min.js"></script>
+        <script src="~/lib/fullcalendar/interaction/main.js"></script>
+        <script src="~/lib/fullcalendar/timegrid/main.js"></script>
+        <script src="~/lib/fullcalendar/list/main.js"></script>
+        <script src="~/lib/fullcalendar/core/locales/da.js"></script>
+        <script>
 
     let calendarEl = document.getElementById("calendar");
     let coursesEL = document.getElementById("external-events-courses");
@@ -400,5 +433,5 @@
     };
 
 
-    </script>
-}
+        </script>
+    }

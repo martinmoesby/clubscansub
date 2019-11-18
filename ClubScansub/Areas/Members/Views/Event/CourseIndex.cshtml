@@ -44,14 +44,29 @@
                             <div class="card-body">
                                 @foreach (var session in item.CourseSessions)
                                 {
-                                    <div class="row d-flex justify-content-between mb-1 border-bottom">
-                                        <div class="col-6">
-                                            @session.CourseSessionTemplate.Name
+                                    <div class="row mb-1 border-bottom p-2">
+                                        
+                                        <div class="col-md-6 col-12">
+
+                                            <strong>@session.CourseSessionTemplate.Name</strong>
                                             <br />
                                             <span class="small text-muted">@session.CourseSessionTemplate.Description</span>
+                                        
                                         </div>
-                                        <div class="col-3 small text-muted">D. @session.DateTime.ToShortDateString() kl. @session.DateTime.ToShortTimeString() til @session.DateTime.Add(session.Duration).ToShortTimeString()</div>
-                                        <div class="col-3 small text-muted">@session.CourseSessionTemplate.Address.Name</div>
+
+                                        <div class="col-md-3 col-6 small text-muted ">
+
+                                            <span class="text-dark"><strong>@session.CourseSessionTemplate.Address?.Name</strong></span>
+                                            <br />
+                                            <span class="text-muted">
+                                                D. @session.DateTime.ToShortDateString() kl. @session.DateTime.ToShortTimeString() til @session.DateTime.Add(session.Duration).ToShortTimeString()
+                                            </span>
+
+                                        </div>
+                                        @if (session.Sessiontype != ClubScansub.Utility.CourseSessionTypeEnum.AcademicSession)
+                                        {
+                                            <div class="col-md-2 col-6 small text-muted text-right"><a class="btn btn-sm btn-outline-info" asp-action="GetRoute" asp-route-CourseSessionId="@session.Id"><i class="fas fa-map-marked-alt"></i>&nbsp;Find rute</a></div>
+                                        }
                                     </div>
                                 }
                             </div>

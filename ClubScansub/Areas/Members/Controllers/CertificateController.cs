@@ -78,5 +78,31 @@ namespace ClubScansub.Areas.Members.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet, ActionName("Delete")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var certificate = await db.UserCertificates.Include(x=>x.Certificate).Include(x=>x.User).FirstOrDefaultAsync(x=>x.Id == id);
+
+            if (certificate == null)
+                return NotFound();
+
+            return View(certificate);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCertificate(UserCertificat userCertificat)
+        {
+            if (!ModelState.IsValid)
+                return View(userCertificat);
+
+            db.Attach(userCertificat).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+
+        }
     }
 }

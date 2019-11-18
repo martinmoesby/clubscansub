@@ -4,10 +4,10 @@
 @{
     var currentUser = await db.ApplicationUsers
         .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
-        .Include(x=>x.AccountTransactions)
+        .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
     bool isEligable = Model.RequiredCertificate == null;
-    bool hasFunds = currentUser.Balance >= Model.Price;
+    bool hasFunds = currentUser?.Balance >= Model.Price;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
     {
@@ -22,10 +22,14 @@
             <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
             <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
 
-            @if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
+            @if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+            {
+                <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}") (gratis for Divepros)</h4>
+            }
+            else if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
             {
 
-                if (User.IsInRole(ClubScansub.Utility.Userroles.User) && !User.IsInRole(ClubScansub.Utility.Userroles.Member))
+                if (User.IsInRole(ClubScansub.Utility.Userroles.Member))
                 {
                     <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}") (gratis for Premium medlemmer)</h4>
                 }
@@ -33,11 +37,14 @@
                 {
                     <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}")</h4>
                 }
+
             }
             else
             {
                 <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
             }
+
+
             <h4 class="text-info small"><i class="fas fa-award"></i>&nbsp;@(Model.RequiredCertificate != null ? Model.RequiredCertificate.ShortName : "Ikke krævet")</h4>
             <h4>
                 @if (Model.Participants.Count + Model.FixedParticipants == 0 || Model.IsCancelled)
@@ -118,6 +125,12 @@
                 {
                     <i class="rounded border border-success text-success p-2 fas fa-user-check" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>
                 }
+                else if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+                {
+                    <a asp-action="Signup" class="btn btn-outline-success" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
+                        <i class="fas fa-user-plus"></i>
+                    </a>
+                }
                 else if (!hasFunds)
                 {
                     <i class="rounded border border-warning text-warning p-2 fas fa-user-plus" title="Du har ikke penge nok på din turkonto."></i>
@@ -166,11 +179,20 @@
                     {
                         @Model.Divelocation.MeetingLocation.Name<br />
                         @Model.Divelocation.MeetingLocation.Streetname<br />
-                        @Model.Divelocation.MeetingLocation.Zipcode  @Model.Divelocation.MeetingLocation.City
-                    } else
+
+                        <span>@Model.Divelocation.MeetingLocation.Zipcode</span>
+
+                        <span class="ml-2">@Model.Divelocation.MeetingLocation.City</span>
+
+                        <input type="hidden" value="@Model.Divelocation.MeetingLocation.Latitude" id="latitude" />
+                        <input type="hidden" readonly value="@Model.Divelocation.MeetingLocation.Longitude" id="longitude" />
+                    }
+                    else
                     {
                         <p>Ikke angivet mødested for Dykkerlokation</p>
                     }
+
+                    <div id="meetLocationMap" class="rounded border map mt-2" style="height:300px;"></div>
                 </div>
             </div>
             <br />
@@ -233,4 +255,3 @@
             </div>*@
     </div>
 </div>
-

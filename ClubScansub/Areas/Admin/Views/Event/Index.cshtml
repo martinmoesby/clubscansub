@@ -19,9 +19,9 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th>
-                        <label asp-for="@Model.First().Id"></label>
-                    </th>
+                    @*<th>
+                            <label asp-for="@Model.First().Id"></label>
+                        </th>*@
                     <th>
                         <label asp-for="@Model.First().Title"></label>
                     </th>
@@ -35,38 +35,51 @@
                         <label>Dybde</label>
                     </th>
                     <th><label>Tilmeldte</label></th>
+                    <th>
+                        <label asp-for="@Model.First().IsInternal"></label>
+                    </th>
+                    @*<th>
+                        <label asp-for="@Model.First().IsFreeForDivepros"></label>
+                    </th>*@
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                <tr>
-                    <td class="small">@item.Id</td>
-                    <td class="small">@item.Title</td>
-                    <td class="small">@item.StartDateAndTime.ToShortDateString() kl. @item.StartDateAndTime.ToShortTimeString()</td>
-                    @if (item.Divelocation != null)
-                    {
-                        <td class="small">@item.Divelocation.Name)</td>
-                        <td class="small">@item.Divelocation.MinDepth til @item.Divelocation.MaxDepth m.</td>
-                    }
-                    else
-                    {
-                        <td class="small" colspan="2">Dykker lokation ikke angivet</td>
-                    }
-
-                    <td class="small">@(item.Participants.Count + item.FixedParticipants) af @item.MinParticipants - @item.MaxParticipants</td>
-                    <td class="small">
-                        @if (!item.IsCancelled)
+                    <tr>
+                        @*<td class="small">@item.Id</td>*@
+                        <td class="small">@item.Title</td>
+                        <td class="small">@item.StartDateAndTime.ToShortDateString() kl. @item.StartDateAndTime.ToShortTimeString()</td>
+                        @if (item.Divelocation != null)
                         {
-                            <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
+                            <td class="small">@item.Divelocation.Name)</td>
+                            <td class="small">@item.Divelocation.MinDepth til @item.Divelocation.MaxDepth m.</td>
                         }
                         else
                         {
-                            <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                            <td class="small" colspan="2">Dykker lokation ikke angivet</td>
                         }
-                    </td>
-                </tr>
+
+                        <td class="small">@(item.Participants.Count + item.FixedParticipants) af @item.MinParticipants - @item.MaxParticipants</td>
+
+                        <td>
+                            <input type="checkbox" asp-for="@item.IsInternal" readonly disabled />
+                        </td>
+                        @*<td>
+                            <input type="checkbox" asp-for="@item.IsFreeForDivepros" readonly disabled />
+                        </td>*@
+                        <td class="small">
+                            @if (!item.IsCancelled)
+                            {
+                                <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                            }
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>

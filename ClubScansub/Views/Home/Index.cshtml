@@ -12,80 +12,93 @@
 <div class="container-fluid">
     <partial name="_StatusMessage" model="Model.Statusmessage" />
 
-<div class="row">
-    <div class="d-flex justify-content-between mb-3 p-3">
-        <div class="form-check form-check-inline bg-boat p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="boatevents" checked onchange="eventsCheckedChanged('boat')">
-            <label class="form-check-label" for="boatevents">Bådture</label>
+    <div class="row">
+        <div class="d-flex justify-content-between mb-3 p-3">
+            <div class="form-check form-check-inline bg-boat p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="boatevents" checked onchange="eventsCheckedChanged('boat')">
+                <label class="form-check-label" for="boatevents">Bådture</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-beach p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="beachevents" checked onchange="eventsCheckedChanged('beach')">
+                <label class="form-check-label" for="beachevents">Stranddyk</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-club p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="clubevents" checked onchange="eventsCheckedChanged('club')">
+                <label class="form-check-label" for="clubevents">Klubture</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-other p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="otherevents" onchange="eventsCheckedChanged('other')">
+                <label class="form-check-label" for="otherevents">Andet</label>
+            </div>
         </div>
 
-        <div class="form-check form-check-inline bg-beach p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="beachevents" checked onchange="eventsCheckedChanged('beach')">
-            <label class="form-check-label" for="beachevents">Stranddyk</label>
+        <div class="d-flex justify-content-between mb-3 p-3">
+            <div class="form-check form-check-inline bg-travel p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="travelevents" onchange="eventsCheckedChanged('travel')">
+                <label class="form-check-label" for="travelevents">Rejser</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-liveaboard p-2 rounded small">
+                <input class="form-check-input" type="checkbox" id="liveaboardevents" onchange="eventsCheckedChanged('liveaboard')">
+                <label class="form-check-label" for="liveaboardevents">Liveaboards</label>
+            </div>
         </div>
 
-        <div class="form-check form-check-inline bg-club p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="clubevents" checked onchange="eventsCheckedChanged('club')">
-            <label class="form-check-label" for="clubevents">Klubture</label>
+        <div class="d-flex justify-content-between mb-3 p-3">
+            <div class="form-check form-check-inline bg-basecourse p-2 border rounded small">
+                <input class="form-check-input" type="checkbox" id="basecoursesevents" checked onchange="eventsCheckedChanged('basecourses')">
+                <label class="form-check-label" for="basecoursesevents">Kurser</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-speccourse p-2 border rounded small">
+                <input class="form-check-input" type="checkbox" id="specialcoursesevents" checked onchange="eventsCheckedChanged('specialcourses')">
+                <label class="form-check-label" for="specialcoursesevents">Specialer</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-techcourse p-2 border rounded small">
+                <input class="form-check-input" type="checkbox" id="techcoursesevents" onchange="eventsCheckedChanged('techcourses')">
+                <label class="form-check-label" for="techcoursesevents">Tech-kurser</label>
+            </div>
+
+            <div class="form-check form-check-inline bg-procourse p-2 border rounded small">
+                <input class="form-check-input" type="checkbox" id="procoursesevents" onchange="eventsCheckedChanged('procourses')">
+                <label class="form-check-label" for="procoursesevents">Pro-kurser</label>
+            </div>
         </div>
 
-        <div class="form-check form-check-inline bg-other p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="otherevents" onchange="eventsCheckedChanged('other')">
-            <label class="form-check-label" for="otherevents">Andet</label>
-        </div>
-    </div>
-    <div class="d-flex justify-content-between mb-3 p-3">
-        <div class="form-check form-check-inline bg-travel p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="travelevents" onchange="eventsCheckedChanged('travel')">
-            <label class="form-check-label" for="travelevents">Rejser</label>
-        </div>
+        @if (User.IsInRole(Userroles.Divepro))
+        {
+            <div class="d-flex justify-content-between mb-3 p-3">
+                <div class="form-check form-check-inline bg-internal p-2 border rounded small">
+                    <input class="form-check-input" type="checkbox" id="internalevents" onchange="eventsCheckedChanged('internal')">
+                    <label class="form-check-label" for="internalevents">Kun for Divepros</label>
+                </div>
+            </div>
+        }
 
-        <div class="form-check form-check-inline bg-liveaboard p-2 rounded small">
-            <input class="form-check-input" type="checkbox" id="liveaboardevents" onchange="eventsCheckedChanged('liveaboard')">
-            <label class="form-check-label" for="liveaboardevents">Liveaboards</label>
-        </div>
-    </div>
-    <div class="d-flex justify-content-between mb-3 p-3">
-        <div class="form-check form-check-inline bg-basecourse p-2 border rounded small">
-            <input class="form-check-input" type="checkbox" id="basecoursesevents" checked onchange="eventsCheckedChanged('basecourses')">
-            <label class="form-check-label" for="basecoursesevents">Kurser</label>
-        </div>
+            </div>
+            <div id="calendar"></div>
 
-        <div class="form-check form-check-inline bg-speccourse p-2 border rounded small">
-            <input class="form-check-input" type="checkbox" id="specialcoursesevents" checked onchange="eventsCheckedChanged('specialcourses')">
-            <label class="form-check-label" for="specialcoursesevents">Specialer</label>
-        </div>
-
-        <div class="form-check form-check-inline bg-techcourse p-2 border rounded small">
-            <input class="form-check-input" type="checkbox" id="techcoursesevents" onchange="eventsCheckedChanged('techcourses')">
-            <label class="form-check-label" for="techcoursesevents">Tech-kurser</label>
-        </div>
-
-        <div class="form-check form-check-inline bg-procourse p-2 border rounded small">
-            <input class="form-check-input" type="checkbox" id="procoursesevents" onchange="eventsCheckedChanged('procourses')">
-            <label class="form-check-label" for="procoursesevents">Pro-kurser</label>
-        </div>
-    </div>
-</div>
-    <div id="calendar"></div>
-
-    <div>
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog-centered modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-light text-black-50 justify-content-between">
-                        <h5 class="modal-title" id="myModalTitle"></h5>
-                        <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body" id="myModalContent">
+            <div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog-centered modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light text-black-50 justify-content-between">
+                                <h5 class="modal-title" id="myModalTitle"></h5>
+                                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="modal-body" id="myModalContent">
 
 
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 @section Scripts {
     <script src="~/lib/fullcalendar/core/main.js"></script>
@@ -103,6 +116,7 @@
 
         var eventDetails = '@Url.Action("GetEventdetails","Home")';
         var eventsUrl = '@Url.Action("GetEvents", "Home")';
+        var internalsUrl = '@Url.Action("GetInternalEvents", "Home")';
         var coursesUrl = '@Url.Action("GetCourses","Home")';
         var holidayUrl = '@Url.Action("GetHolidays","Home")';
 
@@ -171,6 +185,13 @@
             url: coursesUrl,
             extraParams: { coursetype: '@CourseTypeEnum.ProCourse' }
         };
+
+        var internals = {
+            //Kurser
+            id: "internal",
+            url: internalsUrl
+        };
+
 
         var defaultEventSources = [
             {
@@ -281,6 +302,8 @@
                         $("#myModalTitle").text(title);
                         $("#myModalContent").html(data);
                         $("#myModal").modal('show');
+                        console.log("Before calling GetMap");
+                        GetMap(false);
                     },
                     error: function () {
                         $(".modal-header").removeClass("bg-info").addClass("bg-danger");
@@ -292,8 +315,6 @@
             }
 
         });
-
-
 
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -355,6 +376,9 @@
                     case 'procourses':
                         eventsource = proCourse;
                         break;
+                    case 'internal':
+                        eventsource = internals;
+                        break;
                     default:
                         break;
                 }
@@ -365,6 +389,8 @@
         }
 
 
-</script>
+    </script>
+
+    <script src="~/js/bingmap.js"></script>
 
 }

@@ -83,7 +83,7 @@ namespace ClubScansub.Controllers
             }
 
             var data = await db.Events
-                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled)
+                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled && !x.IsInternal)
                     .OrderBy(x => x.StartDateAndTime)
                     .ToListAsync();
 
@@ -98,6 +98,29 @@ namespace ClubScansub.Controllers
 
             return new JsonResult(result);//, JsonRequestBehavior = }
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetInternalEvents(DateTime start, DateTime end)
+        {
+            DefaultClassNames.Add("bg-internal");
+
+            var data = await db.Events
+                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && !x.IsCancelled && x.IsInternal)
+                    .OrderBy(x => x.StartDateAndTime)
+                    .ToListAsync();
+
+            var result = data.Select(v => new {
+                id = $"eventId:{v.Id}",
+                title = v.Title,
+                //description = v.Details,
+                start = v.StartDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
+                end = v.EndDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
+                classNames = DefaultClassNames.ToArray()
+            });
+
+            return new JsonResult(result);//, JsonRequestBehavior = }
+        }
+
         [HttpGet]
         public async Task<JsonResult> GetCourses(DateTime start, DateTime end, CourseTypeEnum courseType)
         {
@@ -208,12 +231,17 @@ namespace ClubScansub.Controllers
             var item = await db.Events.Include(x=>x.Participants).Include(x=>x.RequiredCertificate).FirstAsync(x=>x.Id==id);
             var user = await db.ApplicationUsers.Include(x=>x.AccountTransactions).Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == User.GetIdentityId());
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
-
             if (item == null || user == null)
             {
                 StatusMessage = $"Der skete en fejl: Bruger eller begivenhed ikke genkendt.";
                 return RedirectToAction(nameof(Index));
+            }
+
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
+            
+            if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
+            {
+                isPaymentRequired = false;
             }
 
             if (item.Price > user.Balance && isPaymentRequired)
@@ -221,7 +249,6 @@ namespace ClubScansub.Controllers
                 StatusMessage = "Fejl - der er ikke penge nok på din turkonto, du bliver nødt til at tanke op";
                 return RedirectToAction(nameof(Index));
             }
-
 
             var accounttrans = new ApplicationUserAccountEntry
             {
