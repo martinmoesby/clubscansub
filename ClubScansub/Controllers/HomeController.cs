@@ -231,12 +231,17 @@ namespace ClubScansub.Controllers
             var item = await db.Events.Include(x=>x.Participants).Include(x=>x.RequiredCertificate).FirstAsync(x=>x.Id==id);
             var user = await db.ApplicationUsers.Include(x=>x.AccountTransactions).Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == User.GetIdentityId());
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
-
             if (item == null || user == null)
             {
                 StatusMessage = $"Der skete en fejl: Bruger eller begivenhed ikke genkendt.";
                 return RedirectToAction(nameof(Index));
+            }
+
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
+            
+            if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
+            {
+                isPaymentRequired = false;
             }
 
             if (item.Price > user.Balance && isPaymentRequired)
@@ -244,7 +249,6 @@ namespace ClubScansub.Controllers
                 StatusMessage = "Fejl - der er ikke penge nok på din turkonto, du bliver nødt til at tanke op";
                 return RedirectToAction(nameof(Index));
             }
-
 
             var accounttrans = new ApplicationUserAccountEntry
             {
