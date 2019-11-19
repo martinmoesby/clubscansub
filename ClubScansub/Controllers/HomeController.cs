@@ -36,7 +36,7 @@ namespace ClubScansub.Controllers
         public string StatusMessage { get; set; }
 
         public HomeIndexViewModel PageModel { get; set; }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string showcalendar = "trips")
         {
             PageModel = new HomeIndexViewModel()
             {
@@ -48,7 +48,8 @@ namespace ClubScansub.Controllers
                     .Where(x => x.StartDateAndTime > DateTime.Now)
                     .OrderBy(x=>x.StartDateAndTime)
                     .ToListAsync(),
-                Statusmessage = StatusMessage
+                Statusmessage = StatusMessage,
+                CalendarType = showcalendar
             };
             return View(PageModel);
         }
