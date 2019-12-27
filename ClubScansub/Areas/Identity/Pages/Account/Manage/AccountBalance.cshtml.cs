@@ -26,6 +26,9 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             this.db = db;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         [BindProperty]
         public ApplicationUser ApplicationUser { get; set; }
         [BindProperty]

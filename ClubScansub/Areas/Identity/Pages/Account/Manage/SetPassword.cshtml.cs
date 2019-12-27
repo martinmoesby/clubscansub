@@ -22,6 +22,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
+
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -33,12 +34,12 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "New password")]
+            [Display(Name = "Kodeord")]
             public string NewPassword { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+            [Display(Name = "Gentag kodeord")]
+            [Compare("NewPassword", ErrorMessage = "De 2 kodeord er ikke ens.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -84,9 +85,9 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your password has been set.";
+            StatusMessage = "Din lokale konto er blevet oprettet med dit nye kodeord.";
 
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
     }
 }

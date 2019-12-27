@@ -8,28 +8,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\**" />
+    <Compile Remove="App_Data\**" />
     <Compile Remove="Models\**" />
     <Compile Remove="Utility\**" />
-    <Content Remove="Data\**" />
+    <Content Remove="App_Data\**" />
     <Content Remove="Models\**" />
     <Content Remove="Utility\**" />
-    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="App_Data\**" />
     <EmbeddedResource Remove="Models\**" />
     <EmbeddedResource Remove="Utility\**" />
-    <None Remove="Data\**" />
+    <None Remove="App_Data\**" />
     <None Remove="Models\**" />
     <None Remove="Utility\**" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="Mailjet.Api" Version="1.2.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Nager.Date" Version="1.25.3" />
+    <PackageReference Include="system.data.odbc" Version="4.6.0" />
   </ItemGroup>
 
 

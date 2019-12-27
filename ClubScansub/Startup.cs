@@ -18,6 +18,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using ClubScansub.Service;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using ClubScansub.App_Data;
 
 namespace ClubScansub
 {
@@ -43,7 +44,6 @@ namespace ClubScansub
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => {
 
@@ -77,7 +77,6 @@ namespace ClubScansub
 
 
             services.AddScoped<IDbInitializer, DbInitializer>();
-
 
             services.Configure<FacebookOptions>(Configuration.GetSection("facebook"));
 

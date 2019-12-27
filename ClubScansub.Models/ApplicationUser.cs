@@ -40,7 +40,7 @@ namespace ClubScansub.Models
         public string PhotoUrl { get; set; }
 
         [PersonalData]
-        [Display(Name = "Bruger nummer")]
+        [Display(Name = "Medlemsnummer")]
         public string AccountNumber { get; set; }
 
         public string Name => $"{Firstname} {Lastname}";
@@ -73,6 +73,7 @@ namespace ClubScansub.Models
         [Display(Name = "Turkonto balance")]
         public decimal Balance => AccountTransactions == null ? 0 : AccountTransactions.Where(x => x.AccountType == Utility.AccountTypeEnum.EventAccountType).Sum(x => x.Amount);
 
+        public bool OldAccountImported { get; set; }
 
         [PersonalData]
         [Display(Name = "Certifikater")]

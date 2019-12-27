@@ -80,7 +80,6 @@ namespace ClubScansub.Data
             //seedUsers();
         }
 
-
         private void seedUsers()
         {
             var users = new string[]

@@ -19,6 +19,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
         public static string AccountBalance => "AccountBalance";
 
+        public static string ImportOldAccount => "Imort Old Account";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
@@ -32,6 +33,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
         public static string CertificationsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Certifications);
         public static string AccountBalanceNavClass(ViewContext viewContext) => PageNavClass(viewContext, AccountBalance);
+
+        public static string ImportOldAccountNavClass(ViewContext viewContext) => PageNavClass(viewContext, ImportOldAccount);
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

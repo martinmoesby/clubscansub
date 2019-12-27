@@ -4,84 +4,22 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191222040259_Added Import flag to AppUser")]
+    partial class AddedImportflagtoAppUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("ClubScansub.App_Data.ScansubModels.medlemsdata", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Certifikat");
-
-                    b.Property<string>("adresse");
-
-                    b.Property<string>("cpr");
-
-                    b.Property<string>("dsfnr");
-
-                    b.Property<string>("eMail");
-
-                    b.Property<string>("efternavn");
-
-                    b.Property<string>("fornavn");
-
-                    b.Property<bool>("jstatus");
-
-                    b.Property<string>("navn");
-
-                    b.Property<string>("password");
-
-                    b.Property<double>("post");
-
-                    b.Property<bool>("status");
-
-                    b.Property<string>("telefonBil");
-
-                    b.Property<string>("telefonprivat");
-
-                    b.Property<string>("tlf");
-
-                    b.HasKey("id");
-
-                    b.ToTable("medlemsdata");
-                });
-
-            modelBuilder.Entity("ClubScansub.App_Data.ScansubModels.saldooplysning", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("dato");
-
-                    b.Property<string>("dsfnr");
-
-                    b.Property<string>("password");
-
-                    b.Property<decimal>("pris");
-
-                    b.Property<string>("tekst");
-
-                    b.Property<int>("turid");
-
-                    b.HasKey("id");
-
-                    b.ToTable("saldooplysning");
-                });
 
             modelBuilder.Entity("ClubScansub.Models.Address", b =>
                 {
