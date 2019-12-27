@@ -2,11 +2,16 @@
 @model AccountBalanceModel
 @{
 }
-    <h5><i class="fas fa-coins"></i>&nbsp;Turkonto</h5>
+<h5><i class="fas fa-coins"></i>&nbsp;Turkonto</h5>
+<partial name="_StatusMessage" for="StatusMessage" />
 <div class="overflow-auto">
     @if (Model.AccountTransactions.Count() == 0)
     {
         <h6><i class="fas fa-coins"></i>&nbsp;Ingen transaktioner</h6>
+        @if (!Model.ApplicationUser.OldAccountImported)
+        {
+            <a class="btn btn-outline-info nav-link text-left @ManageNavPages.ImportOldAccountNavClass(ViewContext)" id="importoldaccount-data" asp-page="./ImportAccount" title="Her kan du importere din turkonto fra den gamle kalender"><i class="fas fa-user-secret"></i>&nbsp;Importer turkonto</a>
+        }
     }
     else
     {

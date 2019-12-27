@@ -50,7 +50,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             public bool AlreadyImported { get; set; }
         }
 
-        public async void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
 
             var user = await userManager.GetUserAsync(User);
@@ -59,6 +59,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             {
                 AlreadyImported = appUser.OldAccountImported
             };
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()

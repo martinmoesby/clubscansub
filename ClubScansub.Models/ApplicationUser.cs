@@ -40,7 +40,7 @@ namespace ClubScansub.Models
         public string PhotoUrl { get; set; }
 
         [PersonalData]
-        [Display(Name = "Bruger nummer")]
+        [Display(Name = "Medlemsnummer")]
         public string AccountNumber { get; set; }
 
         public string Name => $"{Firstname} {Lastname}";

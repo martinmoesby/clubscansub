@@ -36,8 +36,6 @@ namespace ClubScansub.Data
                 roleManager.CreateAsync(new IdentityRole(Userroles.User)).GetAwaiter().GetResult();
             }
 
-            var users = db.Users.ToList();
-
             var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@site.local");
 
             if ( owner == null)

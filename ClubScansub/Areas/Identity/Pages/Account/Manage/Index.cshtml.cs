@@ -41,6 +41,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
         public bool IsEmailConfirmed { get; set; }
         public bool IsPhoneNumberConfirmed { get; set; }
+        public bool IsOldAccountImported { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -51,6 +52,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
+            [Display(Name ="Brugernavn")]
             public string UserName { get; set; }
 
             [Required]
@@ -58,7 +60,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             public string Email { get; set; }
 
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Mobiltelefon")]
             public string PhoneNumber { get; set; }
             [PersonalData]
             [Display(Name = "Fornavn")]
@@ -86,8 +88,9 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Postnr.")]
             public string PostalCode { get; set; }
             [PersonalData]
-            [Display(Name = "Debitor nummer")]
-            public string AccountNumber { get; set; } 
+            [Display(Name = "Klub medlemsnummer", Description ="Dit klubmedlemsnummer og dit kontonummer hos ScansubDkDiver")]
+            public string AccountNumber { get; set; }
+
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -120,6 +123,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
                 AccountNumber = appUser.AccountNumber
             };
 
+
+            IsOldAccountImported = appUser.OldAccountImported;
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
             IsPhoneNumberConfirmed = await _userManager.IsPhoneNumberConfirmedAsync(user);
 
