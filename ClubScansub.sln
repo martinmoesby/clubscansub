@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub", "ClubScansub\ClubScansub.csproj", "{62833749-58D4-4F51-AA14-4A53A369F500}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubScansub.Models", "ClubScansub.Models\ClubScansub.Models.csproj", "{2BB04CD0-F2AF-4DE1-B9DD-0AC3C83F5E92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.Models", "ClubScansub.Models\ClubScansub.Models.csproj", "{2BB04CD0-F2AF-4DE1-B9DD-0AC3C83F5E92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubScansub.Utility", "ClubScansub.Utility\ClubScansub.Utility.csproj", "{70C464F7-FA2F-4D41-A5DE-7B9A2D252C13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.Utility", "ClubScansub.Utility\ClubScansub.Utility.csproj", "{70C464F7-FA2F-4D41-A5DE-7B9A2D252C13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubScansub.DataAccess", "ClubScansub.DataAccess\ClubScansub.DataAccess.csproj", "{94B2D374-F79E-40CF-8ED1-EF9990B740B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.DataAccess", "ClubScansub.DataAccess\ClubScansub.DataAccess.csproj", "{94B2D374-F79E-40CF-8ED1-EF9990B740B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

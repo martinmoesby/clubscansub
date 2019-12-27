@@ -1,4 +1,5 @@
-﻿using ClubScansub.Models;
+﻿using ClubScansub.App_Data.ScansubModels;
+using ClubScansub.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,10 @@ namespace ClubScansub.Data
         public DbSet<CourseSessionInstructor> CourseSessionInstructors { get; set; }
         public DbSet<ClubSettings> ClubSettings { get; set; }
         public DbSet<CourseSignup> CourseSignups { get; set; }
+
+
+        public DbSet<medlemsdata> medlemsdata { get; private set; }
+        public DbSet<saldooplysning> saldooplysning { get; private set; }
 
 
 

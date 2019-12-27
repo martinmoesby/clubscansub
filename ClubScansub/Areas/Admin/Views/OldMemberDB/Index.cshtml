@@ -1,0 +1,14 @@
+﻿@model IEnumerable<ClubScansub.App_Data.ScansubModels.medlemsdata>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<ul>
+    @foreach (var item in Model)
+    {
+        <li>@item.fornavn @item.efternavn, @item.adresse , @item.post</li>
+    }
+
+</ul>
