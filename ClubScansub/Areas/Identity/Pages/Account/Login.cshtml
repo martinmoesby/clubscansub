@@ -58,13 +58,17 @@
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="Input.Email"></label>
-                        <input asp-for="Input.Email" class="form-control" />
+
+                        <div class="input-group mb-3">
+                            <input asp-for="Input.Email" type="text" class="form-control" placeholder="Klubmedlemsnummer eks. '2120'" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">@@scansub.dk</span>
+                            </div>
+                        </div>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.Password"></label>
-                        <input asp-for="Input.Password" class="form-control" />
+                        <input asp-for="Input.Password" placeholder="Kodeord" class="form-control" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
                     <div class="form-group">
