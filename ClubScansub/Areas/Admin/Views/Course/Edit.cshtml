@@ -1,14 +1,16 @@
-﻿@model Course
+﻿@model ClubScansub.Areas.Admin.Controllers.CourseController.PageModel
 @{
     ViewData["Title"] = "Administrer kursus";
 }
 
-<div class="justify-content-between">
-    <h1 class="display-4">@Model.CourseName d. @Html.FormatValue(Model.StartDateAndTime, "{0:d}")</h1>
+<div class="justify-content-between mb-5">
+    <h1 class="display-4">@Model.Course.CourseName d. @Html.FormatValue(Model.Course.StartDateAndTime, "{0:d}")</h1>
 </div>
 
+<partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 
 <div class="container">
+
     <div class="row">
 
         <div class="col-md-6 col-12">
@@ -16,29 +18,29 @@
 
             <form method="post">
 
-                <input type="hidden" asp-for="Id"/>
-                <input type="hidden" asp-for="EventType" />
-                <input type="hidden" asp-for="EndDateAndTime" />
+                <input type="hidden" asp-for="Course.Id" />
+                <input type="hidden" asp-for="Course.EventType" />
+                <input type="hidden" asp-for="Course.EndDateAndTime" />
 
                 <div class="form-group input-group col-12 btn b">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Type:</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="CourseType" readonly />
+                    <input type="text" class="form-control" asp-for="Course.CourseType" readonly />
                 </div>
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Titel</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="CourseName" id="title" autocomplete="off" />
+                    <input type="text" class="form-control" asp-for="Course.CourseName" id="title" autocomplete="off" />
                 </div>
 
                 <div class="form-group input-group col-9">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Start:</span>
                     </div>
-                    <input type="date" class="form-control" readonly asp-for="StartDateAndTime" placeholder="" />
+                    <input type="date" class="form-control" readonly asp-for="Course.StartDateAndTime" placeholder="" />
                 </div>
 
                 <div class="form-group d-flex justify-content-between">
@@ -47,14 +49,14 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" style="width:120px;">Min:</span>
                         </div>
-                        <input type="number" class="form-control" asp-for="MinParticipants" />
+                        <input type="number" class="form-control" asp-for="Course.MinParticipants" />
                     </div>
 
                     <div class="input-group mr-2 col-6">
                         <div class="input-group-prepend">
                             <span class="input-group-text" style="width:120px;">Max:</span>
                         </div>
-                        <input type="number" class="form-control" asp-for="MaxParticipants" />
+                        <input type="number" class="form-control" asp-for="Course.MaxParticipants" />
                     </div>
                 </div>
 
@@ -62,100 +64,113 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Pris:</span>
                     </div>
-                    <input class="form-control" asp-for="Price" />
+                    <input class="form-control" asp-for="Course.Price" />
                 </div>
 
                 <div class="form-group col-12 d-flex justify-content-between mt-3">
                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
-                    <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
+                    <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.Course.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
                 </div>
 
             </form>
         </div>
 
         <div class="col-md-6 col-12">
+
             <div class="row justify-content-between mb-1">
                 <div class="col">
                     <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
+
+
+                    <ul class="list-group">
+                        @if (Model.Course.Participants.Count() == 0 && Model.Course.FixedParticipants == 0 && Model.Course.Signups.Count() == 0)
+                        {
+                            <li class="list-group-item m-1 col">
+                                <span class="btn btn-outline-dark ">
+                                    <i class="fas fa-ban"></i>&nbsp;Ingen tilmeldinger
+                                </span>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="list-group-item col">
+                                Skrevet op:
+                            </li>
+                            foreach (var item in Model.Course.Signups)
+                            {
+                                <li class="list-group-item col">
+                                    <a class="btn btn-outline-success btn-sm" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
+                                        <i class="fas fa-user-plus"></i>&nbsp;@item.ApplicationUser.Name
+                                    </a>
+                                </li>
+                            }
+                            <li class="list-group-item col">
+                                Tilmeldte:
+                            </li>
+                            foreach (var item in Model.Course.Participants)
+                            {
+                                <li class="list-group-item col">
+                                    <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
+                                        <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <div class="col-12 border-top mt-3">
+                        <form method="post" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id">
+                            <div class="form-group">
+                                <label class="text-black-50 small">Tilføj bruger til kursus</label>
+                                <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded"></select>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
-
-            <ul class="list-group">
-                @if (Model.Participants.Count() == 0 && Model.FixedParticipants == 0 && Model.Signups.Count() == 0)
-                {
-                    <li class="list-group-item m-1 col">
-                        <span class="btn btn-outline-dark ">
-                            <i class="fas fa-ban"></i>&nbsp;Ingen tilmeldinger
-                        </span>
-                    </li>
-
-                }
-                else
-                {
-                    <li class="list-group-item col">
-                        Skrevet op:
-                    </li>
-                    foreach (var item in Model.Signups)
-                    {
-                        <li class="list-group-item col">
-                            <a class="btn btn-outline-success btn-sm" asp-action="AddUserToCourse" asp-route-courseId="@Model.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
-                                <i class="fas fa-user-plus"></i>&nbsp;@item.ApplicationUser.Name
-                            </a>
-                        </li>
-                    }
-                    <li class="list-group-item col">
-                        Tilmeldte:
-                    </li>
-                    foreach (var item in Model.Participants)
-                    {
-                        <li class="list-group-item col">
-                            <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
-                                <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
-                            </a>
-                        </li>
-                    }
-                }
-            </ul>
 
         </div>
     </div>
     <h5 class="mt-3 mb-2">Kursus dage</h5>
-    @foreach (var item in Model.CourseSessions)
+    @foreach (var item in Model.Course.CourseSessions)
     {
-<div class="row d-flex justify-content-between m-2 border-top">
-    <div class="col-2 small">
-            @item.DateTime.ToString("dd. MMMM yyyy") 
-        <br />
-        <p class="small text-muted">
-            fra kl. @item.DateTime.ToString("HH:mm")
-            til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm") (ca.)
-        </p>
-    </div>
-    <div class="col-2 small">
-        @item.CourseSessionTemplate.Name<br />
-        <span class="small text-muted"> @item.CourseSessionTemplate.Description</span>
-    </div>
-    <div class="col small">
-        @if (item.Address != null)
-        {
-            @item.Address.Name
-            <p class="small text-muted">
-                @item.Address.Streetname<br />
-                @item.Address.Zipcode  @item.Address.City <br />
-                @item.Address.Country
-            </p>
-        }
-        else
-        {
-            <p class="small">Ingen adresse angivet</p>
-        }
-    </div>
+        <div class="row d-flex justify-content-between m-2 border-top">
+            <div class="col-2 small">
+                @item.DateTime.ToString("dd. MMMM yyyy")
+                <br />
+                <p class="small text-muted">
+                    fra kl. @item.DateTime.ToString("HH:mm")
+                    til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm") (ca.)
+                </p>
+            </div>
+            <div class="col-2 small">
+                @item.CourseSessionTemplate.Name<br />
+                <span class="small text-muted"> @item.CourseSessionTemplate.Description</span>
+            </div>
+            <div class="col small">
+                @if (item.Address != null)
+                {
+                    @item.Address.Name
+                    <p class="small text-muted">
+                        @item.Address.Streetname<br />
+                        @item.Address.Zipcode  @item.Address.City <br />
+                        @item.Address.Country
+                    </p>
+                }
+                else
+                {
+                    <p class="small">Ingen adresse angivet</p>
+                }
+            </div>
 
-    <div class="col-4 pt-2">
-        <p class="small text-muted">Instruktører:</p>
-        <partial name="~/Areas/Divepro/Views/Shared/_InstructorSignups.cshtml" model="@item.SessionInstructors" />
-    </div>
-</div>
+            <div class="col-4 pt-2">
+                <p class="small text-muted">Instruktører:</p>
+                <partial name="~/Areas/Divepro/Views/Shared/_InstructorSignups.cshtml" model="@item.SessionInstructors" />
+            </div>
+        </div>
     }
 </div>
 

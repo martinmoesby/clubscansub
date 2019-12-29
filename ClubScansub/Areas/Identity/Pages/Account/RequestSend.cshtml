@@ -1,0 +1,15 @@
+﻿@page
+@model ClubScansub.Areas.Identity.Pages.Account.RequestSendModel
+@{
+    ViewData["Title"] = "Ansøgning sendt";
+}
+
+<h1 class="display-4">@ViewData["Title"]</h1>
+
+<div class="container">
+    <p>Så er din ansøgning blevet afsendt.</p>
+    <p>Bemærk, der kan gå op til 24 timer, før din bruger er blevet oprettet.</p>
+    <p>I mellemtiden er du velkommen til at kigge kalenderen igennem og se de spændende ture og kurser vi har på tapetet.</p>
+
+    <a class="btn btn-sm btn-outline-info" asp-action="Index" asp-controller="Home"><i class="fas fa-calendar-alt mr-2"></i>Kig i kalenderen</a>
+</div>

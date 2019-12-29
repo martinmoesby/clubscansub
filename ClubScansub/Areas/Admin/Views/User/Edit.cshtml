@@ -3,172 +3,212 @@
     ViewData["Title"] = "Rediger bruger";
 }
 
-<div class="container">
-    <div class="row justify-content-between">
+    <div class="container">
 
-        <div class="col-6">
-            <h1 class="display-4">@Model.User.Name</h1>
+        <div class="row justify-content-between">
+
+            <div class="col-6">
+                <h1 class="display-4">@Model.User.Name</h1>
+            </div>
+
+            <div class="col-3 text-right">
+                <a asp-action="Index" class="btn btn-outline-info btn-sm"><i class="fas fa-undo"></i>&nbsp;Tilbage til listen</a>
+
+            </div>
+
         </div>
+        <form method="post">
 
-        <div class="col-3 text-right">
-            <a asp-action="Index" class="btn btn-outline-info btn-sm"><i class="fas fa-undo"></i>&nbsp;Tilbage til listen</a>
-
-        </div>
-
-    </div>
-
-    <div class="row justify-content-between">
-        <div class="col-5 box-shadow p-2 m-1 order-1">
-
-            <h5><i class="fas fa-user"></i>&nbsp;Bruger information</h5>
-            <form method="post">
+            <div class="row mb-5">
                 <input type="hidden" asp-for="User.Id" />
-                <div>
 
-                    <div class="form-group form-group-sm input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <label asp-for="User.UserName" class="input-group-text"></label>
-                        </div>
+                <div class="col-6 mb-2 border-bottom">
+                    <h5><i class="fas fa-user-secret"></i>&nbsp;Bruger konto</h5>
+
+                    <div class="form-group form-group-sm">
+                        <label asp-for="User.UserName" class="text text-black-50 small"></label>
                         <input class="form-control form-control-sm" type="text" asp-for="User.UserName" readonly />
                     </div>
 
-                    <div class="form-group form-group-sm input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <label asp-for="User.Email" class="input-group-text"></label>
-                        </div>
-                        <input class="form-control" type="text" asp-for="User.Email" />
+                    <div class="form-group form-group-sm">
+                        <label asp-for="User.Email" class="text text-black-50 small"></label>
+                        <input class="form-control form-control-sm" type="text" asp-for="User.Email" />
                     </div>
 
-                    <div class="form-group form-group-sm input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <label asp-for="User.PhoneNumber" class="input-group-text"></label>
-                        </div>
-                        <input class="form-control" type="text" asp-for="User.PhoneNumber" />
+                    <div class="form-group form-group-sm">
+                        <label asp-for="User.PhoneNumber" class="text text-black-50 small"></label>
+                        <input class="form-control form-control-sm" type="text" asp-for="User.PhoneNumber" />
                     </div>
 
-                    <div class="form-group form-group-sm input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <label asp-for="User.AccountNumber" class="input-group-text"></label>
+                    <div class="form-group form-group-sm">
+                        <label asp-for="User.AccountNumber" class="text text-black-50 small"></label>
+                        <input class="form-control form-control-sm" type="text" asp-for="User.AccountNumber" />
+                    </div>
+                </div>
+
+                <div class="col-6 mb-2 border-bottom">
+                    <h5><i class="fas fa-user"></i>&nbsp;Personlige informationer</h5>
+
+                    <div class="form-group form-group-sm">
+                        <div class="form-row">
+                            <div class="col-6">
+                                <label asp-for="User.Firstname" class="text text-black-50 small"></label>
+                                <input asp-for="User.Firstname" placeholder="Fornavn" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="User.Lastname" class="text text-black-50 small"></label>
+                                <input asp-for="User.Lastname" placeholder="Efternavn" class="form-control form-control-sm" />
+                            </div>
                         </div>
-                        <input class="form-control" type="text" asp-for="User.AccountNumber" />
                     </div>
 
-                    @*<div class="form-group form-group-sm input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text">Turkonto</label>
+                    <div class="form-group form-group-sm">
+                        <div class="form-row">
+                            <div class="col-12">
+                                <label asp-for="User.Streetaddress" class="text text-black-50 small"></label>
+
+                                <input asp-for="User.Streetaddress" placeholder="Adresse" class="form-control form-control-sm" />
+                            </div>
                         </div>
-                        <label class="form-control text-right">@Html.FormatValue(Model.Balance,"{0:n}")</label>
-                    </div>*@
+                    </div>
 
-
-                    <div class="form-group d-flex justify-content-between">
-
-                        <button type="submit" asp-action="UpdateUser" asp-controller="User" asp-area="Admin" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Opdater bruger</button>
-
-                        @if (Model.User.LockoutEnd > DateTime.Now)
-                        {
-                            <a asp-action="Reactivate" asp-controller="User" asp-area="Admin" asp-route-id="@Model.User.Id" class="btn btn-outline-info btn-sm"><i class="fas fa-user-check"></i>&nbsp;Aktiver bruger</a>
-                        }
-                        else
-                        {
-                            <a asp-action="Deactivate" asp-controller="User" asp-area="Admin" asp-route-id="@Model.User.Id" class="btn btn-danger btn-sm"><i class="fas fa-user-slash"></i>&nbsp;Deaktiver bruger</a>
-                        }
-
+                    <div class="form-group form-group-sm">
+                        <div class="form-row">
+                            <div class="col-4">
+                                <label asp-for="User.PostalCode" class="text text-black-50 small"></label>
+                                <input asp-for="User.PostalCode" placeholder="Postnr." class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-8">
+                                <label asp-for="User.City" class="text text-black-50 small"></label>
+                                <input asp-for="User.City" placeholder="By" class="form-control form-control-sm" />
+                            </div>
+                        </div>
                     </div>
 
                 </div>
-            </form>
-        </div>
 
-        <div class="col-2 box-shadow flex-column p-2 m-1 order-2">
-            <h5><i class="fas fa-user-tag"></i>&nbsp;Roller</h5>
-            <ul class="list-group list-group">
-                @foreach (var item in Model.Roles)
-                {
-                    <li class="list-group-item">
+                <div class="col-12 justify-content-between">
+                    <button type="submit" asp-action="UpdateUser" asp-controller="User" asp-area="Admin" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Opdater bruger</button>
 
-                        @if (Model.Userroles.Contains(item.Id))
-                        {
-                            <a asp-action="RemoveFromRole" asp-route-roleid="@item.Name" asp-route-userid="@Model.User.Id" class="form-control btn btn-danger btn-sm text-left small"><i class="fas fa-minus"></i>&nbsp;<span class="small">@item</span></a>
-                        }
-                        else
-                        {
-                            <a asp-action="AddToRole" asp-route-roleid="@item.Name" asp-route-userid="@Model.User.Id" class="form-control btn btn-outline-success btn-sm text-left small"><i class="fas fa-plus"></i>&nbsp;<span class="small">@item</span></a>
-                        }
-                    </li>
-                }
-            </ul>
-        </div>
-
-        <div class="col-4 box-shadow p-2 m-1 order-3">
-            <h5><i class="fas fa-coins"></i>&nbsp;Tank op</h5>
-            <form method="post" asp-action="MakeDeposit" asp-controller="User" asp-area="Admin">
-                <input type="hidden" id="userid" name="userid" value="@Model.User.Id" />
-                <div class="form-group form-group-sm input-group input-group-sm">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text">Beløb</label>
-                    </div>
-                    <input class="form-control form-control-sm" name="amount" type="number" id="amount" />
-                </div>
-                <div class="form-group form-group-sm input-group input-group-sm">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text">Indsættes på konto</label>
-                    </div>
-                    <select class="form-control form-control-sm" name="accounttype" asp-items="@Html.GetEnumSelectList<AccountTypeEnum>()" id="accounttype"></select>
-                </div>
-
-                <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-coins"></i>&nbsp; Indsæt</button>
-            </form>
-        </div>
-
-        <div class="col-12 box-shadow p-2 m-1 order-4">
-            <h5><i class="fas fa-award"></i>&nbsp;Certifikater</h5>
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Navn</th>
-                        <th> Billede</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.User.Certificates)
+                    @if (Model.User.LockoutEnd > DateTime.Now)
                     {
-                        <tr>
-                            <td>@item.Certificate.ShortName</td>
-                            <td>
-                                @if (item.FrontSideImage != null)
-                                {
-                                    <img src="@( $"data:image;base64,{Convert.ToBase64String(item.FrontSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
-                                }
-                                |
-                                @if (item.BackSideImage != null)
-                                {
-                                    <img src="@( $"data:image;base64,{Convert.ToBase64String(item.BackSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
-                                }
-                            </td>
-                            <td>
-                                @if (!item.IsVerified)
-                                {
-                                    <a class="btn btn-outline-danger btn-sm" asp-action="VerifyCertificate" asp-route-id="@item.Id"><i class="far fa-question-circle"></i></a>
-                                }
-                                else
-                                {
-                                    <span class="btn btn-outline-success"><i class="fas fa-check-square"></i></span><br />
-                                    <span class="small">@item.VerifiedBy.Name<br />
-                                        <span class="small">@item.VerifiedDate.ToShortDateString()</span>
-                                    </span>
-                                }
-
-                            </td>
-                        </tr>
+                        <a asp-action="Reactivate" asp-controller="User" asp-area="Admin" asp-route-id="@Model.User.Id" class="btn btn-outline-info btn-sm"><i class="fas fa-user-check"></i>&nbsp;Aktiver bruger</a>
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        <a asp-action="Deactivate" asp-controller="User" asp-area="Admin" asp-route-id="@Model.User.Id" class="btn btn-outline-danger btn-sm"><i class="fas fa-user-slash"></i>&nbsp;Deaktiver bruger</a>
+                    }
+                </div>
+            </div>
+        </form>
+
+        <div class="row mb-5 justify-content-between">
+
+            <div class="col-lg-3 col-md-6 col-12 mb-3">
+                <h5><i class="fas fa-user-tag"></i>&nbsp;Roller</h5>
+                <ul class="list-group">
+                    @foreach (var item in Model.Roles.OrderBy(x => x.Id))
+                    {
+                        <li class="list-group-item small">
+
+                            @if (Model.Userroles.Contains(item.Id))
+                            {
+                                <a asp-action="RemoveFromRole" asp-route-roleid="@item.Name" asp-route-userid="@Model.User.Id" class="form-control btn btn-outline-success btn-sm text-left small"><i class="fas fa-minus"></i>&nbsp;<span class="small">@item</span></a>
+                            }
+                            else
+                            {
+                                <a asp-action="AddToRole" asp-route-roleid="@item.Name" asp-route-userid="@Model.User.Id" class="form-control btn btn-outline-danger btn-sm text-left small"><i class="fas fa-plus"></i>&nbsp;<span class="small">@item</span></a>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
+                <h5><i class="fas fa-coins"></i>&nbsp;Tank op</h5>
+                <form method="post" asp-action="MakeDeposit" asp-controller="User" asp-area="Admin">
+                    <input type="hidden" id="userid" name="userid" value="@Model.User.Id" />
+
+                    <div class="form-group form-group-sm">
+                        <label class="text text-black-50 small">Beløb</label>
+                        <input class="form-control form-control-sm" name="amount" type="number" id="amount" />
+                    </div>
+
+                    <div class="form-group form-group-sm">
+                        <label class="text text-black-50 small">Fakt. nr.</label>
+                        <input class="form-control form-control-sm" name="invoicenumber" type="text" id="invoicenumber" />
+                    </div>
+
+                    <div class="form-group form-group-sm">
+                        <label class="text text-black-50 small">Indsættes på konto</label>
+                        <select class="form-control form-control-sm" name="accounttype" asp-items="@Html.GetEnumSelectList<AccountTypeEnum>()" id="accounttype"></select>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-coins"></i>&nbsp; Indsæt</button>
+                </form>
+            </div>
+
+            <div class="col-lg-4 col-12">
+                <h5><i class="fas fa-balance-scale"></i>&nbsp;Balancer</h5>
+                <div class="form-group form-group-sm">
+                    <label class="text text-black-50 small">Turkonto</label>
+                    <input type="text" class="form-control form-control-sm form-control-plaintext" asp-for="User.Balance" asp-format="{0:C}"/>
+                </div>
+                <div class="form-group form-group-sm">
+                    <label class="text text-black-50 small">Kursus konto</label>
+                    <input type="text" class="form-control form-control-sm form-control-plaintext" asp-for="User.CourseAccountBalance" asp-format="{0:C}"/>
+                </div>
+            </div>
         </div>
 
+        <div class="row">
+            <div class="col-12 box-shadow p-2 m-1 order-4">
+                <h5><i class="fas fa-award"></i>&nbsp;Certifikater</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Navn</th>
+                            <th>Billede</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.User.Certificates)
+                        {
+                            <tr>
+                                <td>@item.Certificate.ShortName</td>
+                                <td>
+                                    @if (item.FrontSideImage != null)
+                                    {
+                                        <img src="@( $"data:image;base64,{Convert.ToBase64String(item.FrontSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
+                                    }
+                                    |
+                                    @if (item.BackSideImage != null)
+                                    {
+                                        <img src="@( $"data:image;base64,{Convert.ToBase64String(item.BackSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
+                                    }
+                                </td>
+                                <td>
+                                    @if (!item.IsVerified)
+                                    {
+                                        <a class="btn btn-outline-danger btn-sm" asp-action="VerifyCertificate" asp-route-id="@item.Id"><i class="far fa-question-circle"></i></a>
+                                    }
+                                    else
+                                    {
+                                        <span class="btn btn-outline-success"><i class="fas fa-check-square"></i></span><br />
+                                        <span class="small">
+                                            @item.VerifiedBy.Name<br />
+                                            <span class="small">@item.VerifiedDate.ToShortDateString()</span>
+                                        </span>
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
-
-</div>
 

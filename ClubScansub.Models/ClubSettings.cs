@@ -25,6 +25,7 @@ namespace ClubScansub.Models
         [Display(Name = "Hvad er klubbens adresse=")]
         public virtual Address Address { get; set; }
 
+        public bool IsOldMemberDatabaseImported { get; set; }
 
     }
 }

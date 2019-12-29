@@ -4,9 +4,12 @@ using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,12 +20,26 @@ namespace ClubScansub.Areas.Admin.Controllers
     {
         private readonly UserManager<IdentityUser> um;
         private readonly ISmsSender smsSender;
-        public EventController(ApplicationDbContext db, UserManager<IdentityUser> um, ISmsSender smsSender)
+        private readonly IEmailSender emailSender;
+
+        public EventController(ApplicationDbContext db, UserManager<IdentityUser> um, ISmsSender smsSender, IEmailSender emailSender)
             : base(db)
         {
             this.um = um;
             this.smsSender = smsSender;
+            this.emailSender = emailSender;
+
+            _PageModel = new PageModel();
         }
+
+        public class PageModel
+        {
+            public Event Event { get; set; }
+            public IEnumerable<SelectListItem> UsersList { get; set; }
+
+        }
+
+        public PageModel _PageModel { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -72,26 +89,37 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (eventItem == null)
                 return NotFound();
 
-            return View(eventItem);
+            _PageModel.Event = eventItem;
+
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
+            {
+                Text = x.Name,
+                Value = x.Id
+            }).ToListAsync();
+
+            return View(_PageModel);
 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Event item)
+        public async Task<IActionResult> Edit()
         {
 
             if (ModelState.IsValid)
             {
                 
-                db.Attach(item).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                db.Attach(_PageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index", new { eventtype = item.EventType });
+                return RedirectToAction("Index", new { eventtype = _PageModel.Event.EventType });
             }
 
-            item.Participants = await db.EventUsers.Where(x => x.EventId == item.Id).Include(x => x.ApplicationUser).ToListAsync();
-            item.Divelocation = await db.Divelocations.FindAsync(item.Divelocation.Id);
-            return View(item);
+            _PageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == _PageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
+            _PageModel.Event.Divelocation = await db.Divelocations.FindAsync(_PageModel.Event.Divelocation.Id);
+
+            ViewBag.StatusMessage = StatusMessage;
+
+            return View(_PageModel.Event);
 
         }
 
@@ -182,6 +210,72 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             return RedirectToAction("Edit", new { id = eventid });
 
+        }
+
+        [HttpPost, ActionName("AddUserToEvent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddUserToEvent(int eventId, string userId)
+        {
+            // TODO - add user to Course and withdraw payment from users CourseAccountBalance
+            // TODO - remove user from SignUps
+
+            var @event = await db.Events
+                .Include(x => x.Participants)
+                .FirstOrDefaultAsync(x => x.Id == eventId);
+
+            var applicationUser = await db.ApplicationUsers.FindAsync(userId);
+
+            @event.Participants.Add(new EventUser() { ApplicationUserId = userId });
+
+            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+            {
+                AccountType = AccountTypeEnum.CourseAccountType,
+                Amount = -@event.Price,
+                Description = $"Betaling for {@event.Title}",
+                PostingDate = DateTime.Now,
+                Event = @event,
+                ApplicationUser = applicationUser
+            });
+
+            if (applicationUser.PhoneNumberConfirmed)
+            {
+                var smsMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt turen {@event.Title} d. {@event.StartDateAndTime}." +
+                    $"" +
+                    $"" +
+                    $"" +
+                    $"Vi glæder os rgtig meget til at se dig." +
+                    $"" +
+                    $"Med venlig hilsen " +
+                    $"Scansub DK Diver";
+
+                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået beksed via SMS";
+            }
+
+            if (applicationUser.EmailConfirmed)
+            {
+                var mailMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt turen {@event.Title} med start d. {@event.StartDateAndTime}.<br />" +
+                    $"" +
+                    $"" +
+                    $"<br />" +
+                    $"Vi glæder os rgtig meget til at se dig.<br/>" +
+                    $"<br />" +
+                    $"<br/><br/>Med venlig hilsen <br/><br/> Scansub DK Diver";
+
+                await emailSender.SendEmailAsync(applicationUser.Email, $"Tilmelding til {@event.Title}", mailMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået besked vial mail";
+            }
+
+            if (!applicationUser.EmailConfirmed && !applicationUser.PhoneNumberConfirmed)
+            {
+                StatusMessage = $"Fejl: {applicationUser.Firstname} har hverken valideret sin email eller sit telefonr. så det har ikke været muligt at give elektronisk besked.";
+            }
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Edit), new { id = eventId });
         }
 
         [HttpGet]

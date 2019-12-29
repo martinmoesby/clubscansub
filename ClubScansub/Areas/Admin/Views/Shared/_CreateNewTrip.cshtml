@@ -10,14 +10,14 @@
             <div class="input-group-prepend">
                 <span class="input-group-text" style="width:120px;">Type:</span>
             </div>
-            <select type="text" class="form-control selectpicker" asp-items="@Html.GetEnumSelectList<EventTypeEnum>()" data-style="btn btn-secondary" id="eventtype" onchange="selectedEventtypeChanged()" asp-for="Event.EventType"></select>
+            <select type="text" class="form-control selectpicker" asp-items="@Html.GetEnumSelectList<EventTypeEnum>()" data-style="btn btn-outline-light text-dark border rounded" id="eventtype" onchange="selectedEventtypeChanged()" asp-for="Event.EventType"></select>
         </div>
 
         <div class="form-group input-group col-12">
             <div class="input-group-prepend">
                 <span class="input-group-text" style="width:120px;">Til:</span>
             </div>
-            <select type="text" class="selectpicker form-control" data-live-search="true" data-style="btn btn-secondary" onchange="selectedLocatationChanged()" id="locationid" asp-items="@Model.Locations" asp-for="DivelocationId"></select>
+            <select type="text" class="selectpicker form-control" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded" onchange="selectedLocatationChanged()" id="locationid" asp-items="@Model.Locations" asp-for="DivelocationId"></select>
         </div>
 
         <div class="form-group input-group col-12">

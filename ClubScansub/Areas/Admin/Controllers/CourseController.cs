@@ -9,6 +9,7 @@ using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClubScansub.Areas.Admin.Controllers
@@ -24,13 +25,20 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             this.smsSender = smsSender;
             this.emailSender = emailSender;
+            _PageModel = new PageModel();
+        }
+        public class PageModel
+        {
+            public Course Course { get; set; }
+            public IEnumerable<SelectListItem> UsersList { get; set; }
+
         }
 
         [TempData]
         public string StatusMessage { get; set; }
 
         [BindProperty]
-        public Course Course { get; set; }
+        public PageModel _PageModel { get; set; }
 
         public IActionResult Index(CourseTypeEnum courseType = CourseTypeEnum.BaseCourse)
         {
@@ -55,14 +63,13 @@ namespace ClubScansub.Areas.Admin.Controllers
             }
 
             ViewBag.StatusMessage = StatusMessage;
-
             return View(db.Courses.Where(x=>x.CourseType == courseType).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
 
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            Course = await db.Courses
+            _PageModel.Course = await db.Courses
                 .Include(x => x.CourseSessions)
                     .ThenInclude(x=>x.CourseSessionTemplate)
                 .Include(x=>x.CourseSessions)
@@ -74,19 +81,27 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .Include(x=>x.Participants)
                     .ThenInclude(c=>c.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
+            
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem()
+            {
+                Text = x.Name,
+                Value = x.Id
+            }).ToListAsync();
+            
+            ViewBag.StatusMessage = StatusMessage;
 
-            return View(Course);
+            return View(_PageModel);
         }
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCourse()
         {
-            db.Attach(Course).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            Course.EventType = EventTypeEnum.NotAnEvent;
+            db.Attach(_PageModel.Course).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _PageModel.Course.EventType = EventTypeEnum.NotAnEvent;
             await db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index), new { courseType = Course.CourseType });
+            return RedirectToAction(nameof(Index), new { courseType = _PageModel.Course.CourseType });
         }
 
         [HttpPost, ActionName("CreateCourse")]
@@ -258,7 +273,10 @@ namespace ClubScansub.Areas.Admin.Controllers
                 ApplicationUser = applicationUser
             });
 
-            await smsSender.SendSmsAsync(applicationUser.PhoneNumber, $"Du er blevet afmeldt kurset '{course.CourseName}' der begynder den {course.StartDateAndTime}, og beløbet er runderet til din kursus-konto til brug for et senere tidspunkt");
+            if (applicationUser.PhoneNumberConfirmed)
+            {
+                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, $"Du er blevet afmeldt kurset '{course.CourseName}' der begynder den {course.StartDateAndTime}, og beløbet er refunderet til din kursus-konto til brug for et senere tidspunkt");
+            }
 
             await db.SaveChangesAsync();
 
@@ -293,10 +311,38 @@ namespace ClubScansub.Areas.Admin.Controllers
             
             if (applicationUser.PhoneNumberConfirmed)
             {
-                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, $"Du er blevet tilmeldt kurset '{course.CourseName}' der begynder den {course.StartDateAndTime} - vi glæder os til at se dig");
-            } else
+                var smsMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt kurset {course.CourseName} med start d. {course.StartDateAndTime}." +
+                    $"Dit kursus materiale er tilgængeligt på www.divessi.com og i DiveSSI-appen" +
+                    $"Det er en fordel, hvis du har gennemgået materialet inden den 1. kursusaften begynder." +
+                    $"" +
+                    $"Vi glæder os rgtig meget til at se dig." +
+                    $"" +
+                    $"Med venlig hilsen " +
+                    $"Scansub DK Diver";
+
+                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået beksed via SMS";
+            }
+
+            if (applicationUser.EmailConfirmed)
             {
-                await emailSender.SendEmailAsync(applicationUser.Email, $"Tilmelding til {course.CourseName}", $"Du er blevet tilmeldt kurset {course.CourseName} med start d. {course.StartDateAndTime}");
+                var mailMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt kurset {course.CourseName} med start d. {course.StartDateAndTime}.<br />" +
+                    $"Dit kursus materiale er tilgængeligt på www.divessi.com og i DiveSSI appen <br/>" +
+                    $"Det er en fordel, hvis du har gennemgået materialet inden den 1. kursusaften begynder. <br />" +
+                    $"<br />" +
+                    $"Vi glæder os rgtig meget til at se dig.<br/>" +
+                    $"<br />" +
+                    $"<br/><br/>Med venlig hilsen <br/><br/> Scansub DK Diver";
+
+                await emailSender.SendEmailAsync(applicationUser.Email, $"Tilmelding til {course.CourseName}",mailMessage );
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået besked vial mail";
+            }
+
+            if (!applicationUser.EmailConfirmed && !applicationUser.PhoneNumberConfirmed)
+            {
+                StatusMessage = $"Fejl: {applicationUser.Firstname} har hverken valideret sin email eller sit telefonr. så det har ikke været muligt at give elektronisk besked.";
             }
 
             await db.SaveChangesAsync();
@@ -304,5 +350,10 @@ namespace ClubScansub.Areas.Admin.Controllers
             return RedirectToAction(nameof(Edit), new { id = courseId });
         }
         
+
+        //public async Task<JsonResult> FindUsersAsyn(string searchstring)
+        //{
+
+        //}
     }
 }

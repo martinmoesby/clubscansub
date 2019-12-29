@@ -25,26 +25,24 @@
             <input type="hidden" asp-for="MemberType" />
 
             <div class="col-12">
-                <div class="form-group form-inline">
-
-                    <div class="col-6 input-group">
-                        <input class="form-control form-control-sm" id="myInput" type="text" asp-for="SearchText" placeholder="Søg...">
-                        <div class="input-group-append">
-                            <button type="submit" class="input-group-text input-group-sm"><i class="fas fa-search"></i></button>
-                        </div>
+                <div class="input-group">
+                    <input class="form-control form-control-sm" id="myInput" type="text" asp-for="SearchText" placeholder="Søg...">
+                    <div class="input-group-append">
+                        <button type="submit" class="input-group-text input-group-sm"><i class="fas fa-search"></i></button>
                     </div>
-
-                    <div class="col-4 text-sm-right">
-                        <div class="btn-group" page-model="@Model.Pager" page-classes-enabled="true" page-class="btn btn-sm" page-class-selected="btn-outline-info active" page-size="Model.Pager.PageSize" page-class-normal="btn-outline-info"></div>
-                    </div>
-
                 </div>
             </div>
+
+            <div class="col-12 text-sm-center my-3">
+                <div class="btn-group" page-model="@Model.Pager" page-classes-enabled="true" page-class="btn btn-sm" page-class-selected="btn-outline-info active" page-size="Model.Pager.PageSize" page-class-normal="btn-outline-info"></div>
+            </div>
+
         </form>
 
         <table class="table table-sm">
             <thead>
                 <tr>
+                    <th>Medl. nr.</th>
                     <th>Navn</th>
                     <th>Email</th>
                     <th>Telefonnummer</th>
@@ -67,8 +65,9 @@
                         {
                             <i class="text-success fas fa-user" title="Bruger konto aktiveret"></i>
                         }
-                        &nbsp;@user.Name
+                        &nbsp;@user.AccountNumber
                     </td>
+                    <td class="small">@user.Name</td>
                     <td class="small">@user.Email</td>
                     <td class="small">@user.PhoneNumber</td>
                     <td class="text-center small">

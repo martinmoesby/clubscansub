@@ -55,9 +55,9 @@ namespace ClubScansub
 
                 options.Password = new PasswordOptions
                 {
-                    RequireDigit = true,
+                    RequireDigit = false,
                     RequiredLength = 3,
-                    RequiredUniqueChars = 3,
+                    //RequiredUniqueChars = 3,
                     RequireLowercase = false,
                     RequireNonAlphanumeric = false,
                     RequireUppercase = false

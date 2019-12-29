@@ -43,11 +43,11 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var userSearchResult = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(c=>c.Certificates)
                 .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id)               
-                ).ToListAsync();
+                ).OrderBy(x=>x.AccountNumber).ToListAsync();
 
             IndexPageVM.Pager = new Pager
             {
-                PageSize = 25,
+                PageSize = 100,
                 urlParam = $"/Admin/User/?page=:&searchText={searchText}&membertype={membertype}"
             };
 
@@ -75,7 +75,10 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(x=>x.Certificate)
                  .Include(c=>c.Certificates)   
                     .ThenInclude(c=>c.VerifiedBy)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(a=>a.AccountTransactions)
+                .FirstOrDefaultAsync(x => x.Id == id)
+                
+                ;
 
             if (user == null)
                 return NotFound(new NotFoundObjectResult($"User with id '{id}' wasn't found in the database"));
@@ -130,13 +133,14 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [HttpPost,ActionName("MakeDeposit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTransaction(string userid, decimal amount, AccountTypeEnum accounttype)
+        public async Task<IActionResult> CreateTransaction(string userid, decimal amount, string invoicenumber, AccountTypeEnum accounttype)
         {
             var entry = new ApplicationUserAccountEntry
             {
                 Amount = amount,
                 AccountType = accounttype,
                 Description = $"Beløb Indsat af '{User.Identity.Name}'",
+                InvoiceNumber = invoicenumber,
                 PostingDate = DateTime.Now
             };
 
@@ -168,6 +172,12 @@ namespace ClubScansub.Areas.Admin.Controllers
             user.PhoneNumber = model.User.PhoneNumber;
             user.Email = model.User.Email;
             user.AccountNumber = model.User.AccountNumber;
+            user.Firstname = model.User.Firstname;
+            user.Lastname = model.User.Lastname;
+            user.Streetaddress = model.User.Streetaddress;
+            user.PostalCode = model.User.PostalCode;
+            user.City = model.User.City;
+            user.Country = model.User.Country;
 
             await db.SaveChangesAsync();
 

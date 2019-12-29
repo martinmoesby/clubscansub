@@ -1,13 +1,14 @@
-﻿@model Event
+﻿@model ClubScansub.Areas.Admin.Controllers.EventController.PageModel
 @{
-    ViewData["Title"] = "Rediger begivenhed";
+    ViewData["Title"] = "Administrer begivenhed";
 }
 
 <div class="justify-content-between">
-    <h1 class="display-4">@(string.IsNullOrEmpty(Model.Title) ? Model.Divelocation.Name : Model.Title) d. @Html.FormatValue(Model.StartDateAndTime,"{0:d}")</h1>
+    <h1 class="display-4">@(string.IsNullOrEmpty(Model.Event.Title) ? Model.Event.Divelocation.Name : Model.Event.Title) d. @Html.FormatValue(Model.Event.StartDateAndTime,"{0:d}")</h1>
 
 </div>
 
+<partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 
 <div class="container">
     <div class="row">
@@ -16,24 +17,24 @@
             <h5><i class="fas fa-calendar-alt"></i>&nbsp;Detaljer</h5>
 
             <form method="post">
-                <input type="hidden" asp-for="Divelocation.Id" />
+                <input type="hidden" asp-for="Event.Divelocation.Id" />
 
-                <input type="hidden" asp-for="Divelocation.MinDepth" />
-                <input type="hidden" asp-for="Divelocation.MaxDepth" />
-                <input type="hidden" asp-for="FixedParticipants" />
+                <input type="hidden" asp-for="Event.Divelocation.MinDepth" />
+                <input type="hidden" asp-for="Event.Divelocation.MaxDepth" />
+                <input type="hidden" asp-for="Event.FixedParticipants" />
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Type:</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="EventType" readonly />
+                    <input type="text" class="form-control" asp-for="Event.EventType" readonly />
                 </div>
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Til:</span>
                     </div>
-                    <input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Divelocation.Name" readonly />
+                    <input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Event.Divelocation.Name" readonly />
                 </div>
 
 
@@ -41,28 +42,28 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Titel</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="Title" id="title" autocomplete="off" />
+                    <input type="text" class="form-control" asp-for="Event.Title" id="title" autocomplete="off" />
                 </div>
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend align-content-start">
                         <span class="input-group-text" style="width:120px;">Detaljer</span>
                     </div>
-                    <textarea class="form-control" asp-for="Details" autocomplete="off" style="height:150px;"></textarea>
+                    <textarea class="form-control" asp-for="Event.Details" autocomplete="off" style="height:150px;"></textarea>
                 </div>
 
                 <div class="form-group input-group col-9">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Start:</span>
                     </div>
-                    <input type="datetime-local" class="form-control" asp-for="StartDateAndTime" placeholder="" />
+                    <input type="datetime-local" class="form-control" asp-for="Event.StartDateAndTime" placeholder="" />
                 </div>
 
                 <div class="form-group input-group col-9">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Slut:</span>
                     </div>
-                    <input type="datetime-local" class="form-control" asp-for="EndDateAndTime" placeholder="" />
+                    <input type="datetime-local" class="form-control" asp-for="Event.EndDateAndTime" placeholder="" />
                 </div>
 
                 <div class="form-group d-flex justify-content-between">
@@ -71,14 +72,14 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" style="width:120px;">Min:</span>
                         </div>
-                        <input type="number" class="form-control" asp-for="MinParticipants" />
+                        <input type="number" class="form-control" asp-for="Event.MinParticipants" />
                     </div>
 
                     <div class="input-group mr-2 col-6">
                         <div class="input-group-prepend">
                             <span class="input-group-text" style="width:120px;">Max:</span>
                         </div>
-                        <input type="number" class="form-control" asp-for="MaxParticipants" />
+                        <input type="number" class="form-control" asp-for="Event.MaxParticipants" />
                     </div>
                 </div>
 
@@ -86,7 +87,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Pris:</span>
                     </div>
-                    <input type="number" class="form-control" asp-for="Price" />
+                    <input type="number" class="form-control" asp-for="Event.Price" />
                 </div>
 
 
@@ -94,18 +95,18 @@
                     <div class="form-group input-group col-6">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <input type="checkbox" asp-for="IsInternal" />
+                                <input type="checkbox" asp-for="Event.IsInternal" />
                             </span>
                         </div>
-                        <label class="form-control" asp-for="IsInternal"></label>
+                        <label class="form-control" asp-for="Event.IsInternal"></label>
                     </div>
                     <div class="form-group input-group col-6">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <input type="checkbox" asp-for="IsFreeForDivepros" />
+                                <input type="checkbox" asp-for="Event.IsFreeForDivepros" />
                             </span>
                         </div>
-                        <label class="form-control" asp-for="IsFreeForDivepros"></label>
+                        <label class="form-control" asp-for="Event.IsFreeForDivepros"></label>
                     </div>
 
 
@@ -113,7 +114,7 @@
 
                     <div class="form-group col-12 d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
-                        <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
+                        <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.Event.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
                     </div>
 
             </form>
@@ -126,11 +127,11 @@
                     <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
                 </div>
                 <div class="col text-right">
-                    <a asp-action="FixedUser" asp-route-isadding="true" asp-route-eventid="@Model.Id" class="btn btn-outline-info btn-sm"><i class="fas fa-user-plus"></i>&nbsp;Spær en plads</a>
+                    <a asp-action="FixedUser" asp-route-isadding="true" asp-route-eventid="@Model.Event.Id" class="btn btn-outline-info btn-sm"><i class="fas fa-user-plus"></i>&nbsp;Spær en plads</a>
                 </div>
             </div>
             <ul class="list-group">
-                @if (Model.Participants.Count() == 0 && Model.FixedParticipants == 0)
+                @if (Model.Event.Participants.Count() == 0 && Model.Event.FixedParticipants == 0)
                 {
                     <li class="list-group-item m-1 col">
                         <span class="btn btn-outline-dark ">
@@ -141,25 +142,35 @@
                 }
                 else
                 {
-                    for (int i = 0; i < Model.FixedParticipants;i++)
+                    for (int i = 0; i < Model.Event.FixedParticipants; i++)
                     {
                         <li class="list-group-item col">
-                            <a asp-action="FixedUser" asp-route-isadding="false" asp-route-eventid="@Model.Id" class="btn btn-outline-info btn-sm">
+                            <a asp-action="FixedUser" asp-route-isadding="false" asp-route-eventid="@Model.Event.Id" class="btn btn-outline-info btn-sm">
                                 <i class="fas fa-user-minus"></i>&nbsp;Dk Diver
                             </a>
                         </li>
                     }
 
-                    foreach (var item in Model.Participants)
+                    foreach (var item in Model.Event.Participants)
                     {
                         <li class="list-group-item col">
-                            <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
+                            <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
                                 <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
                             </a>
                         </li>
                     }
                 }
             </ul>
+
+            <div class="col-12 border-top mt-3">
+                <form method="post" asp-action="AddUserToEvent" asp-route-eventId="@Model.Event.Id">
+                    <div class="form-group">
+                        <label class="text-black-50 small">Tilføj bruger til begivenhed</label>
+                        <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded"></select>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
+                </form>
+            </div>
 
         </div>
     </div>

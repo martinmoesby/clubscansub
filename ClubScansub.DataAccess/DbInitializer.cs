@@ -36,16 +36,16 @@ namespace ClubScansub.Data
                 roleManager.CreateAsync(new IdentityRole(Userroles.User)).GetAwaiter().GetResult();
             }
 
-            var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@site.local");
+            var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@scansub.dk");
 
-            if ( owner == null)
+            if (owner == null)
             {
                 var user = new ApplicationUser
                 {
                     Firstname = "Site",
                     Lastname = "Admin",
                     Email = "admin@site.local",
-                    UserName = "admin@site.local",
+                    UserName = "admin@scansub.dk",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false
@@ -72,106 +72,70 @@ namespace ClubScansub.Data
                 clubInfo.Tagline = "gode oplevelser under overfladen - og over";
                 clubInfo.Address = new Address();
                 clubInfo.Address.Name = "Klubben";
+                clubInfo.IsOldMemberDatabaseImported = false;
 
                 db.ClubSettings.Add(clubInfo);
                 await db.SaveChangesAsync();
 
             }
-            //seedUsers();
+
+            if (!clubInfo.IsOldMemberDatabaseImported)
+            {
+                importUsers();
+                clubInfo.IsOldMemberDatabaseImported = true;
+                await db.SaveChangesAsync();
+            }
         }
 
-        private void seedUsers()
+        private void importUsers()
         {
-            var users = new string[]
-            {
-                "Urs Lancaster"
-                , "Duval Snape"
-                , "Jervis Lindsay"
-                , "Townsend Langdon"
-                , "Grischa Knottley"
-                , "Ramsey Thackeray"
-                , "Cheney Penny"
-                , "Aubry Landon"
-                , "Mayne Garrick"
-                , "Karl Whiteley"
-                , "Berdine Stevenson"
-                , "Elfie Paddley"
-                , "Heide Reeve"
-                , "Albertyna Payton"
-                , "Odila Snowdon"
-                , "Daniella Adlam"
-                , "Louanne Blackwood"
-                , "Norae Burton"
-                , "Isabella Fulton"
-                , "Maryam Swale"
-                , "Dueath Sparkwood"
-                , "Saetdis Boldcrown"
-                , "Pethemar Whiteburst"
-                , "Saeazhen Firelight"
-                , "Lelomir Cinderflare"
-                , "Kaenas Eagerstalker"
-                , "Erinian Strongveil"
-                , "Selron Darkswitch"
-                , "Noral Violetrest"
-                , "Lenin Richbane"
-                , "Zanuzen Sunstalker"
-                , "Inetven Phoenixlove"
-                , "Yaash Highkind"
-                , "Taeath Longrest"
-                , "Tymarrin Sparkflame"
-                , "Zantheol Azuresmile"
-                , "Artheon Highsense"
-                , "Perrodan Whitegaze"
-                , "Ithiran Violetbirth"
-                , "Celoedanis Highreaver"
-                , "Novidine Rightstrider"
-                , "Ellean Somberburst"
-                , "Narel Coldtwist"
-                , "Emenna Tindertrail"
-                , "Olisalia Sparkdepth"
-                , "Cainara Slimshield"
-                , "Samisa Grimveil"
-                , "Jisia Ancientburn"
-                , "Lyraden Goldtrick"
-                , "Emedana Lighthide"
-                , "Urom Doomblade"
-                , "Thegus Firstgem"
-                , "Drormolann Fusefall"
-                , "Bigarn Frozenshout"
-                , "Magnihm Highshaper"
-                , "Hugrik Dimgift"
-                , "Arginas Hardtoe"
-                , "Giliuth Caskkind"
-                , "Byndenn Cragshield"
-                , "Brognohr Truegrace"
-                , "Konmy Blankforce"
-                , "Mitass Slowbuster"
-                , "Dammegu Vaststone"
-                , "Yhmagus Warcave"
-                , "Nashi Cragbraid"
-                , "Anovio Shorttale"
-                , "Gyvinlen Bronzefield"
-                , "Azi Moltenhammer"
-                , "Uzua Olddust"
-                , "Nemdo Stoutcrag"
-            };
+
+            var users = db.medlemsdata.AsNoTracking().ToList();
+            var postings = db.saldooplysning.AsNoTracking().ToList();
 
             foreach (var item in users)
             {
-                var names = item.Split(' ');
+                //var names = item.Split(' ');
                 var applicationUser = new ApplicationUser()
                 {
-                    Firstname = names[0],
-                    Lastname = names[1],
-                    UserName = $"{names[0]}@{names[1]}.tst",
-                    Email = $"{names[0]}@{names[1]}.tst"
+                    Firstname = item.fornavn,
+                    Lastname = item.efternavn,
+                    Streetaddress = item.adresse,
+                    PhoneNumber = item.telefonBil,
+                    Email = item.eMail,
+                    UserName = $"{item.dsfnr}@scansub.dk",
+                    AccountNumber = item.dsfnr
                 };
 
-                if (userManager.FindByEmailAsync(applicationUser.Email).GetAwaiter().GetResult() == null)
+                if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
                 {
-                    userManager.CreateAsync(applicationUser, "User123*").GetAwaiter().GetResult();
-                    userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
-                    userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
+                    var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+                    if (createUserResult.Succeeded)
+                    {
+                        if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+                            applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+
+                        userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
+                        userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", item.status ? "true" : "false")).GetAwaiter().GetResult();
+
+                        if (item.status)
+                            userManager.AddToRoleAsync(applicationUser, Userroles.Member).GetAwaiter().GetResult();
+
+                        var accountentries = postings.Where(x => x.dsfnr == item.dsfnr).Select(x => new ApplicationUserAccountEntry()
+                        {
+                            AccountType = AccountTypeEnum.EventAccountType,
+                            Amount = x.pris,
+                            Description = $"{x.tekst}",
+                            PostingDate = x.dato,
+                            ApplicationUser = applicationUser,
+                        });
+
+                        db.ApplicationUserAccountEntry.AddRange(accountentries);
+
+                        applicationUser.OldAccountImported = true;
+
+                        db.SaveChangesAsync().GetAwaiter().GetResult();
+                    }
                 }
             }
 
@@ -294,3 +258,78 @@ namespace ClubScansub.Data
         //}
     }
 }
+
+
+//var users = new string[]
+//{
+//    "Urs Lancaster"
+//    , "Duval Snape"
+//    , "Jervis Lindsay"
+//    , "Townsend Langdon"
+//    , "Grischa Knottley"
+//    , "Ramsey Thackeray"
+//    , "Cheney Penny"
+//    , "Aubry Landon"
+//    , "Mayne Garrick"
+//    , "Karl Whiteley"
+//    , "Berdine Stevenson"
+//    , "Elfie Paddley"
+//    , "Heide Reeve"
+//    , "Albertyna Payton"
+//    , "Odila Snowdon"
+//    , "Daniella Adlam"
+//    , "Louanne Blackwood"
+//    , "Norae Burton"
+//    , "Isabella Fulton"
+//    , "Maryam Swale"
+//    , "Dueath Sparkwood"
+//    , "Saetdis Boldcrown"
+//    , "Pethemar Whiteburst"
+//    , "Saeazhen Firelight"
+//    , "Lelomir Cinderflare"
+//    , "Kaenas Eagerstalker"
+//    , "Erinian Strongveil"
+//    , "Selron Darkswitch"
+//    , "Noral Violetrest"
+//    , "Lenin Richbane"
+//    , "Zanuzen Sunstalker"
+//    , "Inetven Phoenixlove"
+//    , "Yaash Highkind"
+//    , "Taeath Longrest"
+//    , "Tymarrin Sparkflame"
+//    , "Zantheol Azuresmile"
+//    , "Artheon Highsense"
+//    , "Perrodan Whitegaze"
+//    , "Ithiran Violetbirth"
+//    , "Celoedanis Highreaver"
+//    , "Novidine Rightstrider"
+//    , "Ellean Somberburst"
+//    , "Narel Coldtwist"
+//    , "Emenna Tindertrail"
+//    , "Olisalia Sparkdepth"
+//    , "Cainara Slimshield"
+//    , "Samisa Grimveil"
+//    , "Jisia Ancientburn"
+//    , "Lyraden Goldtrick"
+//    , "Emedana Lighthide"
+//    , "Urom Doomblade"
+//    , "Thegus Firstgem"
+//    , "Drormolann Fusefall"
+//    , "Bigarn Frozenshout"
+//    , "Magnihm Highshaper"
+//    , "Hugrik Dimgift"
+//    , "Arginas Hardtoe"
+//    , "Giliuth Caskkind"
+//    , "Byndenn Cragshield"
+//    , "Brognohr Truegrace"
+//    , "Konmy Blankforce"
+//    , "Mitass Slowbuster"
+//    , "Dammegu Vaststone"
+//    , "Yhmagus Warcave"
+//    , "Nashi Cragbraid"
+//    , "Anovio Shorttale"
+//    , "Gyvinlen Bronzefield"
+//    , "Azi Moltenhammer"
+//    , "Uzua Olddust"
+//    , "Nemdo Stoutcrag"
+//};

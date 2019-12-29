@@ -16,28 +16,38 @@
 
                 <h5 class="text-info">Konto</h5>
 
+                <div class="form-group input-group form-group-sm form-group-sm">
+                    <div class="input-group-prepend">
+                        <label asp-for="Input.UserName" class="col-form-label input-group-text" style="width:150px;"></label>
+                    </div>
+                    <input asp-for="Input.UserName" class="form-control" autocomplete="off" />
+                    <div class="input-group-append">
+                        <label class="col-form-label input-group-text">@@scansub.dk</label>
+                    </div>
+                    <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                </div>
 
                 <div class="form-group input-group form-group-sm form-group-sm">
                     <div class="input-group-prepend">
                         <label asp-for="Input.Email" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.Email" class="form-control" />
+                    <input asp-for="Input.Email" class="form-control" autocomplete="off"/>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-group input-group form-group-sm">
-                    <div class="input-group-prepend">
-                        <label asp-for="Input.Password" class="col-form-label input-group-text" style="width:150px;"></label>
-                    </div>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="form-group input-group form-group-sm">
-                    <div class="input-group-prepend">
-                        <label asp-for="Input.ConfirmPassword" class="col-form-label input-group-text" style="width:150px;"></label>
-                    </div>
-                    <input asp-for="Input.ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                </div>
+                @*<div class="form-group input-group form-group-sm">
+            <div class="input-group-prepend">
+                <label asp-for="Input.Password" class="col-form-label input-group-text" style="width:150px;"></label>
+            </div>
+            <input asp-for="Input.Password" class="form-control" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="form-group input-group form-group-sm">
+            <div class="input-group-prepend">
+                <label asp-for="Input.ConfirmPassword" class="col-form-label input-group-text" style="width:150px;"></label>
+            </div>
+            <input asp-for="Input.ConfirmPassword" class="form-control" />
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+        </div>*@
 
                 <div class="form-group input-group form-group-sm border-top mt-4 pt-4">
                     <h5 class="text-info">Personlige oplysinger</h5>
@@ -47,7 +57,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.Firstname" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.Firstname" class="form-control" />
+                    <input asp-for="Input.Firstname" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.Firstname" class="text-danger"></span>
                 </div>
 
@@ -55,7 +65,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.Lastname" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.Lastname" class="form-control" />
+                    <input asp-for="Input.Lastname" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.Lastname" class="text-danger"></span>
                 </div>
 
@@ -64,7 +74,7 @@
                         <label asp-for="Input.Streetaddress" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
 
-                    <input asp-for="Input.Streetaddress" class="form-control" />
+                    <input asp-for="Input.Streetaddress" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.Streetaddress" class="text-danger"></span>
                 </div>
 
@@ -72,7 +82,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.PostalCode" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.PostalCode" class="form-control" />
+                    <input asp-for="Input.PostalCode" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
                 </div>
 
@@ -80,7 +90,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.City" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.City" class="form-control" />
+                    <input asp-for="Input.City" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.City" class="text-danger"></span>
                 </div>
 
@@ -88,7 +98,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.Country" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.Country" class="form-control" />
+                    <input asp-for="Input.Country" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.Country" class="text-danger"></span>
                 </div>
 
@@ -96,7 +106,7 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.PhoneNumber" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.PhoneNumber" class="form-control" />
+                    <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                 </div>
 
@@ -104,14 +114,12 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.DayOfbirth" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.DayOfbirth" class="form-control" />
+                    <input asp-for="Input.DayOfbirth" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.DayOfbirth" class="text-danger"></span>
                 </div>
 
                 <div class="form-group d-flex justify-content-between">
-                    <a asp-action="Index" asp-controller="Home" asp-area="" class="btn btn-outline-danger btn-sm form-control col-3"><i class="fas fa-ban"></i>&nbsp;Annuller</a>
-
-                    <button type="submit" class="btn btn-outline-success btn-sm form-control col-3"><i class="fas fa-save"></i>&nbsp;Gem</button>
+                    <button type="submit" class="btn btn-outline-success btn-sm form-control col-3"><i class="fas fa-save"></i>&nbsp;Opret bruger</button>
                 </div>
             </div>
         </div>

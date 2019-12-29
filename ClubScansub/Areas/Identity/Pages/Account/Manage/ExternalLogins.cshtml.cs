@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClubScansub.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -80,7 +81,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetLinkLoginCallbackAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User) as ApplicationUser;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -96,6 +97,12 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
+            }
+
+            if (string.IsNullOrEmpty(user.PhotoUrl))
+            {
+                user.PhotoUrl = $"http://graph.facebook.com/{info.ProviderKey}/picture?type=square&width=50";
+                await _userManager.UpdateAsync(user);
             }
 
             // Clear the existing external cookie to ensure a clean login process

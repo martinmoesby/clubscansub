@@ -28,18 +28,14 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
 
             //Get Members only
-            var m_usrs = await um.GetUsersInRoleAsync(Userroles.Member);
-            var p_users = await um.GetUsersInRoleAsync(Userroles.Divepro);
-            var a_users = await um.GetUsersInRoleAsync(Userroles.Administrator);
-            var owner = await um.GetUsersInRoleAsync(Userroles.Owner);
+            //var m_usrs = await um.GetUsersInRoleAsync(Userroles.Member);
+            //var p_users = await um.GetUsersInRoleAsync(Userroles.Divepro);
+            //var a_users = await um.GetUsersInRoleAsync(Userroles.Administrator);
+            //var owner = await um.GetUsersInRoleAsync(Userroles.Owner);
 
             var currentUser = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
 
-            var members = await db.ApplicationUsers.Where(x => m_usrs.Any(s => x.Id == s.Id) ||
-                                                               p_users.Any(p => x.Id == p.Id) ||
-                                                               a_users.Any(a => x.Id == a.Id) ||
-                                                               owner.Any(o => x.Id == o.Id)
-                                                               ).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
+            var members = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
 
             var locations = await db.Divelocations.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
             var certificates = await db.Certificates.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
