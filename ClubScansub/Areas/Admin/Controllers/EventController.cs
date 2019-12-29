@@ -182,7 +182,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (ev_user != null)
             {
                 db.EventUsers.Remove(ev_user);
-                var user = await db.ApplicationUsers.FirstOrDefaultAsync(x=>x.Id == userid);
+                var user = await db.ApplicationUsers
+                    .Include(x=>x.AccountTransactions)
+                        .ThenInclude(x=>x.Event)
+                    .FirstOrDefaultAsync(x=>x.Id == userid);
+
                 var ev = await db.Events.FindAsync(eventid);
                 decimal refundFactor = 1m;
 
@@ -197,7 +201,11 @@ namespace ClubScansub.Areas.Admin.Controllers
                     var smsSendResult = await smsSender.SendSmsAsync(user.PhoneNumber, $"Du er blevet afmeldt turen '{ev.Title}' d. {ev.StartDateAndTime.ToShortDateString()}. Du er blevet refunderet {refundFactor *100} % af din betaling for turen");
                 }
 
-                var accountEntry = await db.ApplicationUserAccountEntry.Include(x=>x.Event).FirstOrDefaultAsync(x => x.Event.Id == eventid);
+                var accountEntry = user.AccountTransactions
+                    .Where(x=>x.Event != null && x.AccountType == AccountTypeEnum.EventAccountType)
+                    .OrderBy(x=>x.PostingDate)
+                    .FirstOrDefault(x => x.Event.Id == eventid);
+
                 if (accountEntry != null)
                 {
                     var newEntry = new ApplicationUserAccountEntry
@@ -222,8 +230,6 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddUserToEvent(int eventId, string userId)
         {
-            // TODO - add user to Course and withdraw payment from users CourseAccountBalance
-            // TODO - remove user from SignUps
 
             var @event = await db.Events
                 .Include(x => x.Participants)
@@ -235,7 +241,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
             {
-                AccountType = AccountTypeEnum.CourseAccountType,
+                AccountType = AccountTypeEnum.EventAccountType,
                 Amount = -@event.Price,
                 Description = $"Betaling for {@event.Title}",
                 PostingDate = DateTime.Now,
