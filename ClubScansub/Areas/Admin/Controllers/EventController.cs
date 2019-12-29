@@ -103,23 +103,29 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Edit(PageModel pageModel)
         {
 
             if (ModelState.IsValid)
             {
                 
-                db.Attach(_PageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                db.Attach(pageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index", new { eventtype = _PageModel.Event.EventType });
+                return RedirectToAction("Index", new { eventtype = pageModel.Event.EventType });
             }
 
-            _PageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == _PageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
-            _PageModel.Event.Divelocation = await db.Divelocations.FindAsync(_PageModel.Event.Divelocation.Id);
+            //_PageModel.Event = pageModel.Event;
+            pageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
+            pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
+            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
+            {
+                Text = x.Name,
+                Value = x.Id
+            }).ToListAsync();
 
             ViewBag.StatusMessage = StatusMessage;
 
-            return View(_PageModel.Event);
+            return View(pageModel);
 
         }
 
