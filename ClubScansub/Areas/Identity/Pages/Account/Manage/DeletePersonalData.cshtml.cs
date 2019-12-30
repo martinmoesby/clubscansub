@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using ClubScansub.Models;
+using ClubScansub.Service;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -13,15 +18,21 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
+        private IEmailSender _emailSender;
+        private ISmsSender _smsSender;
 
         public DeletePersonalDataModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+            ILogger<DeletePersonalDataModel> logger,
+            IEmailSender emailSender,
+            ISmsSender smsSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _smsSender = smsSender;
+            _emailSender = emailSender;
         }
 
         [BindProperty]
@@ -82,13 +93,27 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             var userId = await _userManager.GetUserIdAsync(user);
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException($"Unexpected error occurred deleteing user with ID '{userId}'.");
+                //throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
+                foreach (var item in result.Errors)
+                {
+                    ModelState.AddModelError(item.Code, item.Description);
+                }
+                ModelState.AddModelError(string.Empty, "Kontakt Dykkerklubben for hjælp til at slette din konto");
+
+                return Page();
             }
 
             await _signInManager.SignOutAsync();
 
             _logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
 
+            var admins = await _userManager.GetUsersInRoleAsync(Userroles.Administrator);
+            foreach (var item in admins)
+            {
+                await _smsSender.SendSmsAsync(item.PhoneNumber, $"{user.UserName}' har ikke ønsket at være medlem længere og har slettet deres konto.");
+                await _emailSender.SendEmailAsync(item.Email, "Bruger udmelding", $"{user.UserName}' har ikke ønsket at være medlem længere og har slettet deres konto. Med venlig hilsen Klub siden");
+            }
+            
             return Redirect("~/");
         }
     }

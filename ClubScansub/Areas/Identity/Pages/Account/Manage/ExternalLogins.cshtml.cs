@@ -60,7 +60,14 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             if (!result.Succeeded)
             {
                 var userId = await _userManager.GetUserIdAsync(user);
-                throw new InvalidOperationException($"Unexpected error occurred removing external login for user with ID '{userId}'.");
+                StatusMessage = $"Fejl: Sletningen  af tilknytningen returnerede følgende fejl: ";
+                foreach (var item in result.Errors)
+                {
+                    StatusMessage += $"{item.Description}. ";
+                }
+
+                return RedirectToPage();
+                //throw new InvalidOperationException($"Unexpected error occurred removing external login for user with ID '{userId}'.");
             }
 
             await _signInManager.RefreshSignInAsync(user);
@@ -90,13 +97,20 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             var info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
             if (info == null)
             {
-                throw new InvalidOperationException($"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
+                StatusMessage = $"Unexpected error occurred loading external login info for user with ID '{user.Id}'.";
+                return RedirectToPage();
             }
 
             var result = await _userManager.AddLoginAsync(user, info);
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException($"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
+                StatusMessage = $"Fejl: Tilknytningen returnerede følgende fejl: ";
+                foreach (var item in result.Errors)
+                {
+                    StatusMessage += $"{item.Description}. ";
+                }
+                
+                return RedirectToPage();
             }
 
             if (string.IsNullOrEmpty(user.PhotoUrl))
