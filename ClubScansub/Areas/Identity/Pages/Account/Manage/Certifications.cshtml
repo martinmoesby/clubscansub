@@ -7,7 +7,7 @@
 <div class="row justify-content-between">
 
     <h5><i class="fas fa-award"></i>&nbsp;Certificeringer</h5>
-    @if (User.IsInRole(Userroles.Member))
+    @if (User.IsInRole(Userroles.User))
     {
         <a asp-action="Index" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-info btn-sm"><i class="fas fa-award"></i>&nbsp;Certifikat-detaljer</a>
     }
@@ -21,14 +21,15 @@
             <div class="input-group">
                 <select class="form-control" asp-items="Model.Certificates" asp-for="SelectedCertificate"></select>
                 <div class="input-group-append">
-                    @if (User.IsInRole(Userroles.Member))
-                    {
-                        <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
-                    } else
-                    {
-                        <span class="btn btn-outline-info btn-sm" title="Du skal være registreret som medlem af klubben, før du kan tilføje certifikater til din profil"><i class="fas fa-ban mr-1"></i>Kun for medlemmer</span> 
-                    }
-                    </div>
+                    <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
+                    @*@if (User.IsInRole(Userroles.User))
+        {
+            <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
+        } else
+        {
+            <span class="btn btn-outline-info btn-sm" title="Du skal være registreret som medlem af klubben, før du kan tilføje certifikater til din profil"><i class="fas fa-ban mr-1"></i>Kun for medlemmer</span>
+        }*@
+                </div>
             </div>
         </form>
     </div>

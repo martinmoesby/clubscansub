@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClubScansub.Areas.Members.Controllers
 {
     [Area("Members")]
-    [Authorize(Roles = Userroles.Member)]
+    [Authorize(Roles = Userroles.User)]
     public class CertificateController : BaseController
     {
 

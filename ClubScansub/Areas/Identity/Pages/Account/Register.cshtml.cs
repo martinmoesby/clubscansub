@@ -118,7 +118,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                     DayOfbirth = Input.DayOfbirth,
                     City = Input.City,
                     PhoneNumber = Input.PhoneNumber,
-                    AccountNumber= Input.UserName
+                    AccountNumber = Input.UserName,
+                    OldAccountImported = true
                 };
 
                 var randomPassword = RandomGenerator.GenerateString(8);
