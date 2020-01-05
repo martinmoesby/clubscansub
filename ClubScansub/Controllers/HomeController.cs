@@ -91,7 +91,7 @@ namespace ClubScansub.Controllers
             var result = data.Select(v => new {
                 id = $"eventId:{v.Id}",
                 title = v.Title,
-                //description = v.Details,
+                description = v.Details,
                 start = v.StartDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 end = v.EndDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 classNames = DefaultClassNames.ToArray()

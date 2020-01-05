@@ -15,7 +15,7 @@
 <div class="container-fluid d-flex">
 
 
-    <div class="col-9 d-inline mh-100 h-100" style="height:800px;min-height:800px;">
+    <div class="col-9 d-inline mh-100 h-100" >
         <div id="calendar"></div>
     </div>
 
@@ -163,6 +163,7 @@
         </div>
     </div>
 
+</div>
     @section Scripts {
         <script src="~/lib/fullcalendar/core/main.js"></script>
         <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
@@ -171,6 +172,8 @@
         <script src="~/lib/fullcalendar/timegrid/main.js"></script>
         <script src="~/lib/fullcalendar/list/main.js"></script>
         <script src="~/lib/fullcalendar/core/locales/da.js"></script>
+        <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+        <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
         <script>
 
     let calendarEl = document.getElementById("calendar");
@@ -320,7 +323,7 @@
         height:"parent",
         contentHeight: "auto",
         handleWindowResize: true,
-        aspectRatio: 2,
+        //aspectRatio: 1.35,
         views: {
             dayGrid: {
                 titleFormat: { year: 'numeric', month: 'long' }
@@ -380,6 +383,15 @@
         },
         eventDrop: function (dropInfo) {
             moveEvent(dropInfo)
+        },
+        eventRender: function (info) {
+            var tooltip = new Tooltip(info.el, {
+                title: info.event.extendedProps.description,
+                //placement: 'top',
+                //trigger: 'hover',
+                //container: 'body'
+            });
+            console.log(info);
         }
     });
 

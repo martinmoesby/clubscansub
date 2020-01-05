@@ -239,6 +239,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
             if (template.Sessions.Count > 0)
             {
+                course.StartDateAndTime += template.Sessions.FirstOrDefault().DefaultStartTime;
                 course.CourseSessions = new List<CourseSession>();
 
                 foreach (var item in template.Sessions.OrderBy(x => x.SessionNumber))
@@ -265,6 +266,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                     currentWeekDay = currentDate.DayOfWeek;
                 }
             }
+
+            course.EndDateAndTime = course.CourseSessions.Last().DateTime + course.CourseSessions.Last().Duration;
 
             db.Courses.Add(course);
             db.SaveChanges();

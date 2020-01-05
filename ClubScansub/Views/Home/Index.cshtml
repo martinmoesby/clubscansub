@@ -15,52 +15,52 @@
     <div class="row">
         <div class="d-inline-flex justify-content-start mb-3 mr-1 p-3 col">
 
-                @*<div class="form-check form-check-inline p-2 rounded small">
+            @*<div class="form-check form-check-inline p-2 rounded small">
                     <input class="form-check-input" type="checkbox" id="allevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="allcheckedChanged('events')">
                     <label class="form-check-label" for="allevents">Alle</label>
                 </div>*@
 
-                <div class="form-check form-check-inline bg-boat p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="boatevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('boat')">
-                    <label class="form-check-label" for="boatevents">Bådture</label>
-                </div>
+            <div class="form-check form-check-inline bg-boat p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="boatevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('boat')">
+                <label class="form-check-label" for="boatevents">Bådture</label>
+            </div>
 
-                <div class="form-check form-check-inline bg-beach p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="beachevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('beach')">
-                    <label class="form-check-label" for="beachevents">Stranddyk</label>
-                </div>
+            <div class="form-check form-check-inline bg-beach p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="beachevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('beach')">
+                <label class="form-check-label" for="beachevents">Stranddyk</label>
+            </div>
 
-                <div class="form-check form-check-inline bg-club p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="clubevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('club')">
-                    <label class="form-check-label" for="clubevents">Klubture</label>
-                </div>
+            <div class="form-check form-check-inline bg-club p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="clubevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('club')">
+                <label class="form-check-label" for="clubevents">Klubture</label>
+            </div>
 
-                <div class="form-check form-check-inline bg-other p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="otherevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('other')">
-                    <label class="form-check-label" for="otherevents">Andet</label>
-                </div>
+            <div class="form-check form-check-inline bg-other p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="otherevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('other')">
+                <label class="form-check-label" for="otherevents">Andet</label>
+            </div>
 
-                @*</div>
+            @*</div>
 
-        <div class="d-flex justify-content-start mb-3 mr-1 p-3 border rounded col-2">*@
-                <div class="form-check form-check-inline bg-travel p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="travelevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('travel')">
-                    <label class="form-check-label" for="travelevents">Rejser</label>
-                </div>
+                <div class="d-flex justify-content-start mb-3 mr-1 p-3 border rounded col-2">*@
+            <div class="form-check form-check-inline bg-travel p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="travelevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('travel')">
+                <label class="form-check-label" for="travelevents">Rejser</label>
+            </div>
 
-                <div class="form-check form-check-inline bg-liveaboard p-2 rounded small">
-                    <input class="form-check-input events" type="checkbox" id="liveaboardevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('liveaboard')">
-                    <label class="form-check-label" for="liveaboardevents">Liveaboards</label>
-                </div>
+            <div class="form-check form-check-inline bg-liveaboard p-2 rounded small">
+                <input class="form-check-input events" type="checkbox" id="liveaboardevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('liveaboard')">
+                <label class="form-check-label" for="liveaboardevents">Liveaboards</label>
+            </div>
 
         </div>
 
         <div class="d-flex justify-content-start mb-3 p-3 col">
 
             @*<div class="form-check form-check-inline p-2 rounded small">
-                <input class="form-check-input" type="checkbox" id="allcourses" @(Model.CalendarType == "courses" ? "checked" : "") onchange="allcheckedChanged('courses')">
-                <label class="form-check-label" for="allcourses">Alle</label>
-            </div>*@
+                    <input class="form-check-input" type="checkbox" id="allcourses" @(Model.CalendarType == "courses" ? "checked" : "") onchange="allcheckedChanged('courses')">
+                    <label class="form-check-label" for="allcourses">Alle</label>
+                </div>*@
 
             <div class="form-check form-check-inline bg-basecourse p-2 border rounded small">
                 <input class="form-check-input courses" type="checkbox" id="basecoursesevents" @(Model.CalendarType == "courses" ? "checked" : "") onchange="eventsCheckedChanged('basecourses')">
@@ -93,26 +93,26 @@
             </div>
         }
 
-            </div>
-            <div id="calendar"></div>
+    </div>
+    <div id="calendar"></div>
 
-            <div>
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog-centered modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header bg-light text-black-50 justify-content-between">
-                                <h5 class="modal-title" id="myModalTitle"></h5>
-                                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
-                            </div>
-                            <div class="modal-body" id="myModalContent">
+    <div>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog-centered modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-light text-black-50 justify-content-between">
+                        <h5 class="modal-title" id="myModalTitle"></h5>
+                        <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body" id="myModalContent">
 
 
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/lib/fullcalendar/core/main.js"></script>
@@ -122,6 +122,7 @@
     <script src="~/lib/fullcalendar/timegrid/main.js"></script>
     <script src="~/lib/fullcalendar/list/main.js"></script>
     <script src="~/lib/fullcalendar/core/locales/da.js"></script>
+    <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
 
     <script>
         /// Documenttation on fullCalendar plugin :
@@ -252,7 +253,7 @@
                 coursesSource.forEach(function (item) {
                     defaultEventSources.push(item);
                 });
-                
+
                 break;
             default:
                 defaultSources.forEach(function (item) {
@@ -366,8 +367,15 @@
                         $("#myModal").modal('show');
                     }
                 });
-            }
-
+            },
+            eventRender: function (info) {
+            var tooltip = new Tooltip(info.el, {
+                title: info.event.extendedProps.description,
+                placement: 'top',
+                trigger: 'hover',
+                container: 'body'
+            });
+        }
         });
 
         document.addEventListener('DOMContentLoaded', function () {
