@@ -24,10 +24,7 @@
               integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
     </environment>
 
-    <link rel="stylesheet"
-          href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
-          integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
-          crossorigin="anonymous" />
+    <script src="https://kit.fontawesome.com/1138205eac.js" crossorigin="anonymous"></script>
     <link href="~/lib/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
     @Html.Raw(JavaScriptSnippet.FullScript)
@@ -199,6 +196,24 @@
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pl-5 pr-5 pb-3">
             @RenderBody()
+
+            <div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog-centered modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light text-black-50 justify-content-between">
+                                <h5 class="modal-title" id="myModalTitle"></h5>
+                                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="modal-body" id="myModalContent">
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 

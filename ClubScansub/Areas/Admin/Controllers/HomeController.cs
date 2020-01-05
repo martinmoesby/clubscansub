@@ -153,14 +153,40 @@ namespace ClubScansub.Areas.Admin.Controllers
             else
             {
                 var item = await db.CourseSessions.FindAsync(itemId);
-                var beginTime = item.DateTime.TimeOfDay;
-                item.DateTime = startdate.Add(beginTime);
+                var beginTime = startdate.TimeOfDay;
+                item.DateTime = startdate;
             }
             await db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Planner), new { ActiveDate = startdate });
 
         }
+
+        public async Task<IActionResult> Resize(string id, DateTime startdate, DateTime enddate)
+        {
+            var idItems = id.Split(":");
+            int itemId = int.Parse(idItems[1]);
+            string itemType = idItems[0];
+
+            if (itemType == "eventId")
+            {
+                var item = await db.Events.FindAsync(itemId);
+
+                item.StartDateAndTime = startdate;
+                item.EndDateAndTime = enddate;
+            }
+            else
+            {
+                var item = await db.CourseSessions.FindAsync(itemId);
+                item.DateTime = startdate;
+                item.Duration = enddate - startdate;
+            }
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Planner), new { ActiveDate = startdate });
+
+        }
+
 
         private void CreateEvent(int divelocationId, DateTime eventdate)
         {

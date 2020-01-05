@@ -1,0 +1,119 @@
+﻿@model CourseSession
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="container">
+    <form asp-action="DeleteSession" asp-controller="Course" asp-area="Admin" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Divelocation.Id" />
+        <input type="hidden" asp-for="Address.Id" />
+        <input type="hidden" asp-for="Course.Id" />
+        <div class="row  justify-content-between mb-2">
+            <div class="col">
+
+                @if (Model.Sessiontype == CourseSessionTypeEnum.OpenWaterSession)
+                {<div>
+                        <h5>Dykkersted:</h5>
+                        @if (Model.Divelocation != null)
+                        {
+                            <label asp-for="Divelocation.Name" class="col-form-label col-form-label-sm" />
+                            if (Model.Divelocation.Image != null)
+                            {
+                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
+                                <img class="img rounded" src="@(imgSource)" alt="" height="64" style="height:64px" />
+                            }
+                            else
+                            {
+                                <p class="small">Intet billede indlæst</p>
+                            }
+                        }
+
+                        else
+                        {
+                            <p class="small">Intet dykkersted angivet</p>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <h5>Adresse:</h5>
+                        @if (Model.Address != null)
+                        {
+                            @Model.Address.Name
+                            <p class="small text-muted">
+                                @Model.Address.Streetname<br />
+                                @Model.Address.Zipcode  @Model.Address.City <br />
+                                @Model.Address.Country
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="small">Ingen adresse angivet</p>
+                        }
+
+                    </div>
+                }
+            </div>
+
+            <div class="col">
+                <h5>Kursister:</h5>
+                @foreach (var item in Model.Course.Participants)
+                {
+                    <span class="btn btn-outline-primary mr-2">@item.ApplicationUser.Name</span>
+                }
+            </div>
+
+            <div class="col">
+                <h5>Instruktører:</h5>
+                @foreach (var item in Model.SessionInstructors)
+                {
+                    <span class="btn btn-outline-secondary mr-2">@item.Instructor.Name</span>
+                }
+            </div>
+        </div>
+
+
+
+        <div class="row justify-content-between border-info border-top pt-2">
+
+            <div class="col-3 form-group form-group-sm">
+                <label asp-for="Sessiontype"></label><br />
+                <input class="form-control form-control-sm form-control-plaintext" asp-for="Sessiontype" readonly />
+            </div>
+
+            <div class="col-3 form-group form-group-sm">
+                <label asp-for="SessionName"></label><br />
+                <input asp-for="SessionName" class="form-control form-control-sm form-control-plaintext" readonly />
+            </div>
+
+            <div class="col-6 form-group form-group-sm">
+                <label asp-for="SessionDescription"></label><br />
+                <input asp-for="SessionDescription" class="form-control form-control-sm form-control-plaintext" readonly />
+            </div>
+
+        </div>
+
+        <div class="row justify-content-start mb-2">
+            <div class=" col-3 form-group form-group-sm">
+                <label asp-for="DateTime"></label>
+                <input asp-for="DateTime" class="form-control form-control-sm form-control-plaintext" readonly />
+            </div>
+
+            <div class="col-2 form-group form-group-sm">
+                <label asp-for="Duration"></label>
+                <input asp-for="Duration" class="form-control form-control-sm form-control-plaintext" readonly />
+            </div>
+
+        </div>
+
+        <div class="row justify-content-between pt-2">
+
+            <button class="col-3 btn btn-sm btn-outline-info mr-2" data-dismiss="modal" type="button"><i class="fas fa-ban mr-2"></i>Annuller</button>
+            <button class="col-3 btn btn-sm btn-outline-danger ml-2" type="submit"><i class="fas fa-trash mr-2"></i>Ja - Slet denne kursussession</button>
+
+        </div>
+
+    </form>
+</div>

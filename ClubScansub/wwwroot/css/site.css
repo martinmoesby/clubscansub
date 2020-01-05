@@ -152,6 +152,7 @@ body {
 .calendar-event {
     font-size: .75rem;
     cursor: pointer;
+    word-wrap:break-word;
 }
 
 textarea.tinymce {

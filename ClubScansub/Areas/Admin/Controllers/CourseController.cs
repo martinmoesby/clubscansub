@@ -26,6 +26,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             this.smsSender = smsSender;
             this.emailSender = emailSender;
             _PageModel = new PageModel();
+            _NewSessionPageModel = new NewSessionPageModel();
         }
         public class PageModel
         {
@@ -34,11 +35,25 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         }
 
+        public class NewSessionPageModel
+        {
+            public int CourseId { get; set; }
+            public int SelectedAddressId { get; set; }
+            public int SelectedDivesiteId { get; set; }
+
+            public CourseSession Session { get; set; }
+            public List<SelectListItem> DiveLocations { get; set; }
+            public List<SelectListItem> Addresses { get; set; }
+        }
+
         [TempData]
         public string StatusMessage { get; set; }
 
         [BindProperty]
         public PageModel _PageModel { get; set; }
+
+        [BindProperty]
+        public NewSessionPageModel _NewSessionPageModel { get; set; }
 
         public IActionResult Index(CourseTypeEnum courseType = CourseTypeEnum.BaseCourse)
         {
@@ -233,6 +248,154 @@ namespace ClubScansub.Areas.Admin.Controllers
             await db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), new { courseType });
+        }
+
+
+        public async Task<IActionResult> GetSession ( int Id, bool isDelete)
+        {
+            var session = await db.CourseSessions
+                .Include(x=>x.Course).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
+                .Include(x=>x.CourseSessionTemplate)
+                .Include(x=>x.SessionInstructors).ThenInclude(x=>x.Instructor)
+                .Include(x=>x.Address)
+                .Include(x=>x.Divelocation)
+                .FirstOrDefaultAsync(x=>x.Id == Id);
+
+            if (string.IsNullOrEmpty(session.SessionName)) session.SessionName = session.CourseSessionTemplate.Name;
+            if (string.IsNullOrEmpty(session.SessionDescription)) session.SessionDescription = session.CourseSessionTemplate.Description;
+
+            var partialView = isDelete ? "_DeleteSessionPartial" : "_EditSessionPartial";
+            return PartialView(partialView, session);
+        }
+
+        public async Task<IActionResult> AddSession(int id)
+        {
+            _NewSessionPageModel.CourseId = id;
+            _NewSessionPageModel.SelectedDivesiteId = 0;
+            _NewSessionPageModel.SelectedAddressId = 0;
+            _NewSessionPageModel.Session = new CourseSession()
+            {
+                Divelocation = null,
+                Address = null,
+            };
+            _NewSessionPageModel.DiveLocations = await db.Divelocations.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            _NewSessionPageModel.Addresses = await db.Divelocations.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            
+            
+            return PartialView("_AddSessionPartial", _NewSessionPageModel);
+        }
+        [HttpPost, ActionName("AddSession")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSession()
+        {
+            //var course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
+
+            //if (course == null)
+            //{
+            //    return NotFound();
+            //}
+            _NewSessionPageModel.Session.Course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
+            _NewSessionPageModel.Session.Address = await db.Addresses.FindAsync(_NewSessionPageModel.SelectedAddressId);
+            _NewSessionPageModel.Session.Divelocation = await db.Divelocations.FindAsync(_NewSessionPageModel.SelectedDivesiteId);
+
+            await db.CourseSessions.AddAsync(_NewSessionPageModel.Session);
+            await db.SaveChangesAsync();
+            return RedirectToAction(nameof(Edit), new { id = _NewSessionPageModel.CourseId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSession(CourseSession session)
+        {
+            //TODO: Update database with new session details 
+            var existingSession = await db.CourseSessions
+                .Include(x=>x.Course).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
+                .Include(x => x.SessionInstructors).ThenInclude(x => x.Instructor)
+                .Include(x => x.Address)
+                .Include(x => x.Divelocation)
+                .FirstOrDefaultAsync(x => x.Id == session.Id);
+
+            if (existingSession.DateTime != session.DateTime)
+            {
+                var smsMessage = $"Kursusdagen for kurset {existingSession.Course.CourseName} d. {existingSession.DateTime.ToLongDateString()} kl. {existingSession.DateTime.ToShortTimeString()} er blevet flyttet til  d. {session.DateTime.ToLongDateString()} kl. {session.DateTime.ToShortTimeString()}. Kontakt DK Diver for yderligere information";
+                existingSession.DateTime = session.DateTime;
+
+                if (existingSession.Course.Participants?.Count() > 0)
+                {
+                    var notifyresult = await smsSender.SendMultipleSmsAsync(existingSession.Course.Participants.Select(x => x.ApplicationUser), smsMessage);     //TODO: Notify students and instructors about the change
+
+                    foreach (var item in notifyresult)
+                    {
+                        StatusMessage += item.GetErrorInfo();
+                    }
+                }
+
+                if (existingSession.SessionInstructors?.Count() > 0)
+                {
+                    var notifyresult = await smsSender.SendMultipleSmsAsync(existingSession.Course.Participants.Select(x => x.ApplicationUser), smsMessage);     //TODO: Notify students and instructors about the change
+
+                    foreach (var item in notifyresult)
+                    {
+                        StatusMessage += item.GetErrorInfo();
+                    }
+
+                }
+            }
+
+            existingSession.Duration = session.Duration;
+            existingSession.SessionDescription = session.SessionDescription;
+            existingSession.SessionName = session.SessionName;
+
+            //if (existingSession.Divelocation?.Id != session.Divelocation.Id)
+            //{
+            //    existingSession.Divelocation.Id = session.Divelocation.Id;
+            //    // TODO: Notify students and instructors
+            //}
+            //if (existingSession.Address?.Id != session.Address.Id)
+            //{
+            //    existingSession.Address.Id = session.Address.Id;
+            //    // TODO: Notify students and instructors
+            //}
+
+            await db.SaveChangesAsync();
+            return RedirectToAction(nameof(Edit), new { id = session.Course.Id });
+        }
+
+        [HttpPost,ActionName("DeleteSession")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSession(CourseSession session)
+        {
+            //TODO: Get the session and instructors and participants to be able to notify of the changed schedule
+            var existingSession = await db.CourseSessions
+                .Include(x=>x.Course).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
+                .Include(x => x.SessionInstructors).ThenInclude(x => x.Instructor)
+                .FirstOrDefaultAsync(x => x.Id == session.Id);
+
+            var smsMessage = $"Kursusdagen for kurset {existingSession.Course.CourseName} d. {existingSession.DateTime.ToLongDateString()} kl. {existingSession.DateTime.ToShortTimeString()} er blevet aflyst. Kontakt DK Diver for yderligere information";
+
+            if (existingSession.Course.Participants?.Count() > 0)
+            {
+                var notifyresult = await smsSender.SendMultipleSmsAsync(existingSession.Course.Participants.Select(x => x.ApplicationUser), smsMessage);     //TODO: Notify students and instructors about the change
+
+                foreach (var item in notifyresult)
+                {
+                    StatusMessage += item.GetErrorInfo();
+                }
+            }
+
+            if (existingSession.SessionInstructors?.Count() >0 )
+            {
+                var notifyresult = await smsSender.SendMultipleSmsAsync(existingSession.Course.Participants.Select(x => x.ApplicationUser), smsMessage);     //TODO: Notify students and instructors about the change
+
+                foreach (var item in notifyresult)
+                {
+                    StatusMessage += item.GetErrorInfo();
+                }
+
+            }
+            db.CourseSessions.Remove(existingSession);
+            await db.SaveChangesAsync();
+            return RedirectToAction(nameof(Edit), new { id = existingSession.Course.Id });
         }
 
         [HttpGet]
