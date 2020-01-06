@@ -99,7 +99,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             
             _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem()
             {
-                Text = x.Name,
+                Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
             }).ToListAsync();
             

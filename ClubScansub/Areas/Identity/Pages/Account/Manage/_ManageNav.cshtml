@@ -2,7 +2,7 @@
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
-    <ul class="nav nav-pills flex-column w-75 p-3">
+    <ul class="nav nav-pills flex-column w-75">
         <li class="nav-item mb-1"><a class="btn btn-outline-info nav-link text-left @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index" title="Håndtering af din profil"><i class="fas fa-user"></i>&nbsp;Profil</a></li>
         <li class="nav-item mb-1"><a class="btn btn-outline-info nav-link text-left @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword" title="Skifte kodeord - hvis du har en lokal konto"><i class="fas fa-key"></i>&nbsp;Kodeord</a></li>
         @if (hasExternalLogins)
