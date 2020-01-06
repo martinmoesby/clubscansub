@@ -2,10 +2,14 @@
 @model AccountBalanceModel
 @{
 }
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+
+
 <h5><i class="fas fa-coins"></i>&nbsp;Turkonto</h5>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="overflow-auto">
-    @if (Model.AccountTransactions.Count() == 0)
+    @*@if (Model.AccountTransactions.Count() == 0)
     {
         <h6><i class="fas fa-coins"></i>&nbsp;Ingen transaktioner</h6>
         @if (!Model.ApplicationUser.OldAccountImported)
@@ -14,8 +18,8 @@
         }
     }
     else
-    {
-        <table class="col-auto table small">
+    {*@
+        <table class="col-auto table small" id="transactionTable">
             <thead>
                 <tr>
                     <td colspan="3">
@@ -25,21 +29,36 @@
                 <tr>
                     <th>Dato</th>
                     <th>Beskrivelse</th>
+                    <th>Fakt. nr.</th>
+                    <th>Tur/Begivenhed</th>
                     <th>Beløb</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.AccountTransactions)
+                @foreach (var item in Model.AccountTransactions.OrderBy(x=>x.PostingDate))
                 {
                     <tr>
-                        <td>@item.PostingDate</td>
+                        <td>@item.PostingDate.GetValueOrDefault().Date</td>
                         <td>@item.Description</td>
-                        <td>
-                            @item.Amount
-                        </td>
+                        <td>@item.InvoiceNumber</td>
+                        <td>@item.Event?.Title @item.Event?.StartDateAndTime</td>
+                        <td>@item.Amount</td>
                     </tr>
                 }
             </tbody>
         </table>
-    }
+    @*  *@
 </div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#transactionTable").DataTable();
+        });
+
+
+    </script>
+}

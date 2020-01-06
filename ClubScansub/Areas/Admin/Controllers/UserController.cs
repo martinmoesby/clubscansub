@@ -30,12 +30,6 @@ namespace ClubScansub.Areas.Admin.Controllers
         [BindProperty]
         public UserIndexViewModel IndexPageVM { get; set; }
 
-        public class UserAccountTransactions
-        {
-            public string userId { get; set; }
-            public AccountTypeEnum AccountType { get; set; }
-        }
-
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -247,13 +241,6 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             return RedirectToAction("Edit", new { id = certificate.User.Id });
         }
-
-        public IActionResult ShowTransactions(string userId, AccountTypeEnum accountType)
-        {
-            var pageModel = new UserAccountTransactions { AccountType = accountType, userId = userId };
-            return PartialView("_AccountDetails", pageModel);
-        }
-
         public async Task<JsonResult> _GetTransActions(string userId, AccountTypeEnum accountType)
         {
             var data = await db.ApplicationUsers
@@ -262,17 +249,21 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var transactions = data.AccountTransactions
                 .Where(x => x.AccountType == accountType)
-                .Select(x=> new
+                .OrderBy(x => x.PostingDate)
+                .Select(x => new
                 {
-                    PostingDate = x.PostingDate.GetValueOrDefault().ToShortDateString(),
+                    x.PostingDate,
                     x.Description,
-                    Amount = x.Amount.ToString(),
-                    x.InvoiceNumber,
+                    x.Amount,
+                    InvoiceNumber = x.InvoiceNumber ?? "",
+                    Title = x.Event?.Title ?? "",
                 });
+                
 
             return new JsonResult(transactions, new JsonSerializerSettings()
             {
                 Formatting = Formatting.Indented,
+                DateFormatString = "yyyy-MM-dd"
 
             });
 

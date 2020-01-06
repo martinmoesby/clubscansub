@@ -230,10 +230,10 @@
                 $("#myModalContent").html(`
 <table id='dataTable' class='display' width='100%'>
     <thead>
-        <th>PostingDate</th>
-        <th>Description</th>
-        <th>InvoiceNumber</th>
-        <th>Amount</th>
+        <th>Dato</th>
+        <th>Beskrivelse</th>
+        <th>Beløb</th> 
+        <th>Begivenhed<th>
     </thead>
 </table>
 `);
@@ -246,8 +246,9 @@
                 "columns": [
                     { "data": "PostingDate" },
                     { "data": "Description" },
-                    { "data": "InvoiceNumber" },
-                    { "data": "Amount" }
+                    { "data": "Amount" },
+                    { "data": "Title" },
+                    { "data": "InvoiceNumber" }, 
                 ]
                 });
 
