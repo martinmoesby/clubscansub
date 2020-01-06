@@ -228,7 +228,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [HttpPost, ActionName("AddUserToEvent")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddUserToEvent(int eventId, string userId)
+        public async Task<IActionResult> AddUserToEvent(int eventId, string userId, bool doCreateAccountTransaction = false)
         {
 
             var @event = await db.Events
@@ -239,15 +239,18 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             @event.Participants.Add(new EventUser() { ApplicationUserId = userId });
 
-            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+            if (doCreateAccountTransaction)
             {
-                AccountType = AccountTypeEnum.EventAccountType,
-                Amount = -@event.Price,
-                Description = $"Betaling for {@event.Title}",
-                PostingDate = DateTime.Now,
-                Event = @event,
-                ApplicationUser = applicationUser
-            });
+                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                {
+                    AccountType = AccountTypeEnum.EventAccountType,
+                    Amount = -@event.Price,
+                    Description = $"Betaling for {@event.Title}",
+                    PostingDate = DateTime.Now,
+                    Event = @event,
+                    ApplicationUser = applicationUser
+                });
+            }
 
             if (applicationUser.PhoneNumberConfirmed)
             {

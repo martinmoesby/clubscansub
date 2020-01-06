@@ -16,8 +16,8 @@ namespace ClubScansub.Utility
                 $"Dit kodeord blive tilsendt på en SMS af sikkerhedsmæssige årsager, så hvis du ikke har opgivet et mobiltelefon i din registreringsformular, " +
                 $"bedes du henvende dig i butikken eller på nedenstående telefonnummer.<br/>" +
                 $"<<br/>" +
-                $"Du kan ændre dit password ved at logge ind på www.scansub.dk og gå til min 'Min konto' i øverste højre hjørne.<br/>" +
-                $"Her kan du så administrere kodeord, kontakoplysninger smat tilknytte en facebook-konto så du fremover kan logge på med denne. <br/>" +
+                $"Du kan ændre dit password ved at logge ind på <a href='http://kalender.scansub.dk'>kalender.scansub.dk</a> og gå til min 'Min konto' i øverste højre hjørne.<br/>" +
+                $"Her kan du så administrere kodeord, kontaktoplysninger samt tilknytte en facebook-konto så du fremover kan logge på med denne. <br/>" +
                 $"Husk at få verificeret dit tlf. nr. samt din mail adresse" +
                 $"";
             return text;
@@ -58,7 +58,7 @@ namespace ClubScansub.Utility
             $"Eller du kan indsætte penge på din konto ved at henvende dig i vores forretning.<br/>" +
             $"<br/>" +
             $"3.<br/>" +
-            $"Eller du kan gå ind i vores internet butik<br/>" +
+            $"Eller du kan gå ind i vores <a href='http://www.dkdiver.dk'>internet butik</a>  <br/>" +
             $"- under ture, rejser og klub<br/>" +
             $"- vælg varen der hedder indsæt på Turkonto til 1 kr.<br/>" +
             $"- Husk at rette varen, til det stk.antal du ønsker at indsætte på Turkontoen<br/>" +
@@ -83,7 +83,7 @@ namespace ClubScansub.Utility
 
         public static string EventTerms()
         {
-            return $"Du kan tilmelde dig aktiviteter online ved at logge på din konto på www.scansub.dk<br/>" +
+            return $"Du kan tilmelde dig aktiviteter online ved at logge på din konto på <a href='http://kalender.scansub.dk'>kalender.scansub.dk</a><br/>" +
             $"Du kan kun tilmelde dig aktiviteter, hvis du har dækning på din turkonto.<br/>" +
             $"<br/>" +
             $"Under menupunktet 'Klubmedlem' kan du følge med i dine tilmeldinger og status på de aktiviteter, du har tilmeldt dig.<br/>" +

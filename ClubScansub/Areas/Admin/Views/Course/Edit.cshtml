@@ -3,15 +3,12 @@
     ViewData["Title"] = "Administrer kursus";
 }
 
-<div class="justify-content-between mb-5">
-    <h1 class="display-4">@Model.Course.CourseName d. @Html.FormatValue(Model.Course.StartDateAndTime, "{0:d}")</h1>
-</div>
-
 <partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 
 <div class="container">
+    <h1 class="display-4 mb-4">@Model.Course.CourseName d. @Html.FormatValue(Model.Course.StartDateAndTime, "{0:d}")</h1>
 
-    <div class="row">
+    <div class="row mb-3">
 
         <div class="col-md-6 col-12">
             <h5><i class="fas fa-info-circle"></i>&nbsp;Kursus</h5>
@@ -22,7 +19,7 @@
                 <input type="hidden" asp-for="Course.EventType" />
                 <input type="hidden" asp-for="Course.EndDateAndTime" />
 
-                <div class="form-group input-group col-12 btn b">
+                <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Type:</span>
                     </div>
@@ -68,8 +65,8 @@
                 </div>
 
                 <div class="form-group col-12 d-flex justify-content-between mt-3">
-                    <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
-                    <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.Course.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
+                    <button class="btn btn-outline-success btn-sm" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
+                    <a class="btn btn-outline-info btn-sm" asp-action="Index" asp-route-eventtype="@Model.Course.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
                 </div>
 
             </form>
@@ -77,72 +74,83 @@
 
         <div class="col-md-6 col-12">
 
-            <div class="row justify-content-between mb-1">
+            <div class="row">
+                <div class="col">
+
+                    <h5><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</h5>
+
+                    <form method="post" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id">
+
+                        <div class="form-group input-group">
+                            <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded" onchange="checkSelectedUserForCourse()">
+                                <option value="-1">Vælg bruger...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" name="doCreateAccountTransaction" type="checkbox" id="doCreateAccountTransaction" value="true" />
+                            <label class="form-check-label" for="doCreateAccountTransaction">Træk beløb fra kursuskonto</label>
+                        </div>
+
+                        <div class="text-right my-3">
+                            <button type="submit" class="btn btn-sm btn-outline-success" disabled id="addUserToCourseButton"><i class="fas fa-user-plus mr-2"></i>Tilmeld bruger</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="row">
                 <div class="col">
                     <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
+                    <div class="card-group">
 
+                        <div class="card">
 
-                    <ul class="list-group">
-                        @if (Model.Course.Participants.Count() == 0 && Model.Course.FixedParticipants == 0 && Model.Course.Signups.Count() == 0)
-                        {
-                            <li class="list-group-item m-1 col">
-                                <span class="btn btn-outline-dark ">
-                                    <i class="fas fa-ban"></i>&nbsp;Ingen tilmeldinger
-                                </span>
-                            </li>
+                            <div class="card-header">Skrevet op</div>
 
-                        }
-                        else
-                        {
-                            <li class="list-group-item col">
-                                Skrevet op:
-                            </li>
-                            foreach (var item in Model.Course.Signups)
-                            {
-                                <li class="list-group-item col">
-                                    <a class="btn btn-outline-success btn-sm" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
+                            <div class="card-body">
+                                @foreach (var item in Model.Course.Signups)
+                                {
+                                    <a class="btn btn-sm m-1 btn-outline-success" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
                                         <i class="fas fa-user-plus"></i>&nbsp;@item.ApplicationUser.Name
                                     </a>
-                                </li>
-                            }
-                            <li class="list-group-item col">
-                                Tilmeldte:
-                            </li>
-                            foreach (var item in Model.Course.Participants)
-                            {
-                                <li class="list-group-item col">
-                                    <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card">
+
+                            <div class="card-header">Tilmeldte</div>
+
+                            <div class="card-body">
+                                @foreach (var item in Model.Course.Participants)
+                                {
+                                    <a class="btn btn-sm m-1 btn-outline-danger" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
                                         <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
                                     </a>
-                                </li>
-                            }
-                        }
-                    </ul>
-
-                    <div class="col-12 border-top mt-3">
-                        <form method="post" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id">
-                            <div class="form-group">
-                                <label class="text-black-50 small">Tilføj bruger til kursus</label>
-                                <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded"></select>
+                                }
                             </div>
-                            <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
-                        </form>
+                        </div>
                     </div>
 
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-    <div class="row justify-content-between">
-        <h5 class="mt-3 mb-2"><i class="fas fa-calendar-alt mr-2"></i>Kursus dage</h5>
-        <button class="btn btn-sm btn-outline-primary" onclick="addSession(@Model.Course.Id)"><i class="fas fa-plus mx-1"></i>Tilføj Session</button>
+
+    <div class="col-12 justify-content-between">
+        <h5><i class="fas fa-calendar-alt mr-2"></i>Kursus dage</h5>
+        <button class="btn btn-sm btn-outline-primary" onclick="addSession(@Model.Course.Id)"><i class="fas fa-plus mx-1"></i>Tilføj kursusdag</button>
     </div>
+
     @foreach (var item in Model.Course.CourseSessions)
     {
         <div class="row d-flex justify-content-between m-2 border-top">
             <div class="col-2 small">
-                <p><i class="fas fa-calendar-day mr-2"></i>@item.DateTime.ToString("dd. MMMM yyyy")
+                <p>
+                    <i class="fas fa-calendar-day mr-2"></i>@item.DateTime.ToString("dd. MMMM yyyy")
                 </p>
                 <p class="small text-muted">
                     fra kl. @item.DateTime.ToString("HH:mm")
@@ -185,10 +193,19 @@
             </div>
         </div>
     }
+
 </div>
 
 @section Scripts {
-<script>
+    <script>
+
+    function checkSelectedUserForCourse() {
+
+        var selectedUserId = $("#userId").val();
+
+        document.getElementById("addUserToCourseButton").disabled = selectedUserId == "-1";
+
+    }
 
     var sessionDetails = '@Url.Action("GetSession", "Course", new { Area = "Admin" })';
 
@@ -201,12 +218,13 @@
             cache: false,
             datatype: "json",
             success: function (data) {
-                $("#myModalTitle").text("Rediger kursusdag");
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-success");
+                $("#myModalTitle").text("Tilføj kursusdag");
                 $("#myModalContent").html(data);
                 $("#myModal").modal('show');
             },
             error: function () {
-                $(".modal-header").removeClass("bg-info").addClass("bg-danger");
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
                 $("#myModalTitle").text("Fejl");
                 $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
                 $("#myModal").modal('show');
@@ -223,12 +241,13 @@
             cache: false,
             datatype: "json",
             success: function (data) {
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-info");
                 $("#myModalTitle").text("Rediger kursusdag");
                 $("#myModalContent").html(data);
                 $("#myModal").modal('show');
             },
             error: function () {
-                $(".modal-header").removeClass("bg-info").addClass("bg-danger");
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
                 $("#myModalTitle").text("Fejl");
                 $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
                 $("#myModal").modal('show');
@@ -245,18 +264,19 @@
             cache: false,
             datatype: "json",
             success: function (data) {
-                $("#myModalTitle").text("Slet kursus dag");
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
+                $("#myModalTitle").text("Slet kursus dag?");
                 $("#myModalContent").html(data);
                 $("#myModal").modal('show');
 
             },
             error: function () {
-                $(".modal-header").removeClass("bg-info").addClass("bg-danger");
+                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
                 $("#myModalTitle").text("Fejl");
                 $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
                 $("#myModal").modal('show');
             }
         });
     }
-</script>
+    </script>
 }

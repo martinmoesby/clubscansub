@@ -3,15 +3,14 @@
     ViewData["Title"] = "Administrer begivenhed";
 }
 
-<div class="justify-content-between">
-    <h1 class="display-4">@(string.IsNullOrEmpty(Model.Event.Title) ? Model.Event.Divelocation.Name : Model.Event.Title) d. @Html.FormatValue(Model.Event.StartDateAndTime, "{0:d}")</h1>
-
-</div>
-
 <partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 
 <div class="container">
-    <div class="row">
+    <h1 class="display-4 mb-4">@(string.IsNullOrEmpty(Model.Event.Title) ? Model.Event.Divelocation.Name : Model.Event.Title) d. @Html.FormatValue(Model.Event.StartDateAndTime, "{0:d}")</h1>
+
+
+
+    <div class="row mb-3">
 
         <div class="col-md-6 col-12">
             <h5><i class="fas fa-calendar-alt"></i>&nbsp;Detaljer</h5>
@@ -87,11 +86,11 @@
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Pris:</span>
-                        
+
                     </div>
                     <input class="form-control" asp-for="Event.Price" asp-format="{0:N0}" />
                 </div>
-                
+
 
                 <div class="form-group d-flex justify-content-between">
                     <div class="form-group input-group col-6">
@@ -117,8 +116,8 @@
                 <div asp-validation-summary="All" class="text-danger"></div>
 
                 <div class="form-group col-12 d-flex justify-content-between mt-3">
-                    <button class="btn btn-outline-success" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
-                    <a class="btn btn-outline-info" asp-action="Index" asp-route-eventtype="@Model.Event.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
+                    <button class="btn btn-outline-success btn-sm" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
+                    <a class="btn btn-outline-info btn-sm" asp-action="Index" asp-route-eventtype="@Model.Event.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
                 </div>
 
             </form>
@@ -126,55 +125,79 @@
         </div>
 
         <div class="col-md-6 col-12">
-            <div class="row justify-content-between mb-1">
+
+            <div class="row">
                 <div class="col">
+                    <h5><i class="fas fa-user-plus mr-2"></i>Tilmeld bruger til tur</h5>
+
+                    <form method="post" asp-action="AddUserToEvent" asp-route-eventId="@Model.Event.Id">
+
+                        <div class="form-group input-group">
+                            <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded" onchange="checkSelectedUserForEvent()">
+                                <option value="-1">Vælg bruger...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" name="doCreateAccountTransaction" type="checkbox" id="doCreateAccountTransaction_checkbox" value="true" />
+                            <label class="form-check-label" for="doCreateAccountTransaction_checkbox">Træk beløb fra turkonto</label>
+                        </div>
+
+                        <div class="text-right my-3">
+                            <button type="submit" id="addUserToEventButton" class="btn btn-sm btn-outline-success" disabled><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+
                     <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
-                </div>
-                <div class="col text-right">
-                    <a asp-action="FixedUser" asp-route-isadding="true" asp-route-eventid="@Model.Event.Id" class="btn btn-outline-info btn-sm"><i class="fas fa-user-plus"></i>&nbsp;Spær en plads</a>
-                </div>
-            </div>
-            <ul class="list-group">
-                @if (Model.Event.Participants.Count() == 0 && Model.Event.FixedParticipants == 0)
-                {
-                    <li class="list-group-item m-1 col">
-                        <span class="btn btn-outline-dark ">
-                            <i class="fas fa-ban"></i>&nbsp;Ingen tilmeldinger
-                        </span>
-                    </li>
 
-                }
-                else
-                {
-                    for (int i = 0; i < Model.Event.FixedParticipants; i++)
-                    {
-                        <li class="list-group-item col">
-                            <a asp-action="FixedUser" asp-route-isadding="false" asp-route-eventid="@Model.Event.Id" class="btn btn-outline-info btn-sm">
-                                <i class="fas fa-user-minus"></i>&nbsp;Dk Diver
-                            </a>
-                        </li>
-                    }
+                    <a asp-action="FixedUser" asp-route-isadding="true" asp-route-eventid="@Model.Event.Id" class="btn btn-sm text-info" title="Spær en plads"><i class="fas fa-user-plus"></i></a>
 
-                    foreach (var item in Model.Event.Participants)
-                    {
-                        <li class="list-group-item col">
-                            <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
-                                <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
-                            </a>
-                        </li>
-                    }
-                }
-            </ul>
+                    <div class="card-group">
 
-            <div class="col-12 border-top mt-3">
-                <form method="post" asp-action="AddUserToEvent" asp-route-eventId="@Model.Event.Id">
-                    <div class="form-group">
-                        <label class="text-black-50 small">Tilføj bruger til begivenhed</label>
-                        <select type="text" class="form-control selectpicker" name="userId" id="userId" asp-items="Model.UsersList" data-live-search="true" data-style="btn btn-outline-light text-dark border rounded"></select>
+                        <div class="card">
+
+                            <div class="card-header justify-content-between">
+                                Reserveret
+                            </div>
+
+                            <div class="card-body">
+                                @for (int i = 0; i < Model.Event.FixedParticipants; i++)
+                                {
+                                    <a asp-action="FixedUser" asp-route-isadding="false" asp-route-eventid="@Model.Event.Id" class="btn btn-outline-info btn-sm m-1">
+                                        <i class="fas fa-user-minus"></i>&nbsp;Dk Diver
+                                    </a>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card">
+
+                            <div class="card-header">Tilmeldte</div>
+
+                            <div class="card-body">
+                                @foreach (var item in Model.Event.Participants)
+                                {
+                                    <a class="btn btn-outline-danger btn-sm" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
+                                        <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
+                                    </a>
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
-                </form>
+
+                </div>
+
             </div>
+
+
 
         </div>
     </div>
@@ -183,5 +206,13 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        function checkSelectedUserForEvent() {
 
-    }
+            var selectedUserId = $("#userId").val();
+
+            document.getElementById("addUserToEventButton").disabled = selectedUserId == "-1";
+
+        }
+    </script>
+}

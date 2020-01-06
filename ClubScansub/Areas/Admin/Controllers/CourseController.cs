@@ -275,6 +275,8 @@ namespace ClubScansub.Areas.Admin.Controllers
             _NewSessionPageModel.SelectedAddressId = 0;
             _NewSessionPageModel.Session = new CourseSession()
             {
+                DateTime = DateTime.Now.AddDays(1).Date.AddHours(8),
+                Duration = new TimeSpan(4,0,0),
                 Divelocation = null,
                 Address = null,
             };
@@ -288,12 +290,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSession()
         {
-            //var course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
 
-            //if (course == null)
-            //{
-            //    return NotFound();
-            //}
             _NewSessionPageModel.Session.Course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
             _NewSessionPageModel.Session.Address = await db.Addresses.FindAsync(_NewSessionPageModel.SelectedAddressId);
             _NewSessionPageModel.Session.Divelocation = await db.Divelocations.FindAsync(_NewSessionPageModel.SelectedDivesiteId);
@@ -446,7 +443,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             return RedirectToAction(nameof(Edit), new { id = courseId });
         }
 
-        public async Task<IActionResult> AddUserToCourse(int courseId, string userId)
+        public async Task<IActionResult> AddUserToCourse(int courseId, string userId, bool doCreateAccountTransaction = false)
         {
             // TODO - add user to Course and withdraw payment from users CourseAccountBalance
             // TODO - remove user from SignUps
@@ -462,16 +459,19 @@ namespace ClubScansub.Areas.Admin.Controllers
             course.Signups.Remove(courseSignup);
             course.Participants.Add(new EventUser() { ApplicationUserId = userId });
 
-            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+            if (doCreateAccountTransaction)
             {
-                AccountType = AccountTypeEnum.CourseAccountType,
-                Amount = -course.Price,
-                Description = $"Betaling for Kursus {course.CourseName}",
-                PostingDate = DateTime.Now,
-                Event  = course,
-                ApplicationUser = applicationUser
-            });
-            
+                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                {
+                    AccountType = AccountTypeEnum.CourseAccountType,
+                    Amount = -course.Price,
+                    Description = $"Betaling for Kursus {course.CourseName}",
+                    PostingDate = DateTime.Now,
+                    Event = course,
+                    ApplicationUser = applicationUser
+                });
+            }
+
             if (applicationUser.PhoneNumberConfirmed)
             {
                 var smsMessage = $"Hej {applicationUser.Firstname}," +

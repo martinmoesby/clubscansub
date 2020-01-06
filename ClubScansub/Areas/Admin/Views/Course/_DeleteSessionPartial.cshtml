@@ -61,7 +61,7 @@
                 <h5>Kursister:</h5>
                 @foreach (var item in Model.Course.Participants)
                 {
-                    <span class="btn btn-outline-primary mr-2">@item.ApplicationUser.Name</span>
+                    <p class="text-primary">@item.ApplicationUser.Name</p>
                 }
             </div>
 
@@ -69,7 +69,7 @@
                 <h5>Instruktører:</h5>
                 @foreach (var item in Model.SessionInstructors)
                 {
-                    <span class="btn btn-outline-secondary mr-2">@item.Instructor.Name</span>
+                   <p class="text-secondary mr-2">@item.Instructor.Name</p>
                 }
             </div>
         </div>
