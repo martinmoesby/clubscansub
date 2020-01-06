@@ -7,12 +7,12 @@
 <partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 <div class="container">
 
-    <partial name="_IndexPageHeaderPartial" model="@pageTitle" />
+    <h1 class="display-4 text-info mb-3">@pageTitle</h1>
 
     @if (Model.Count() == 0)
     {
-        <h4 class="text-info">Ingen Kurser</h4>
-        <p>Tryk på 'Ny' for at planlægge et nyt kursus</p>
+        <h4 class="text-info mb-3">Ingen Kurser</h4>
+        <p>Brug <a asp-action="Planner" asp-controller="Home" asp-area="Admin" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>for at planlægge et nyt kursus</p>
     }
     else
     {
@@ -29,6 +29,9 @@
                         <label>Kursus start</label>
                     </th>
                     <th class="align-top">
+                        <label>Kursus slut</label>
+                    </th>
+                    <th class="align-top">
                         <label>Tilmeldte</label>
                         <br />
                         <small>(skrevet op / tilmeldt)</small>
@@ -38,22 +41,23 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.OrderBy(x=>x.StartDateAndTime))
                 {
                 <tr>
                     <td class="small">@item.Id</td>
                     <td class="small">@item.CourseName</td>
-                    <td class="small">@item.StartDateAndTime.ToString("dd-MM-yyyy")</td>
+                    <td class="small">@item.StartDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
+                    <td class="small">@item.EndDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
                     <td class="small">(@item.Signups.Count / @item.Participants.Count) af @item.MinParticipants - @item.MaxParticipants</td>
                     <td class="small">@item.CourseSessions.Count</td>
                     <td class="small">
                         @if (!item.IsCancelled)
                         {
-                            <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
+                        <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
                         }
                         else
                         {
-                            <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                        <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
                         }
                     </td>
                 </tr>

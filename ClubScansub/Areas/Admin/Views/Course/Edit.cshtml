@@ -17,7 +17,6 @@
 
                 <input type="hidden" asp-for="Course.Id" />
                 <input type="hidden" asp-for="Course.EventType" />
-                <input type="hidden" asp-for="Course.EndDateAndTime" />
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
@@ -37,7 +36,14 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Start:</span>
                     </div>
-                    <input type="date" class="form-control" readonly asp-for="Course.StartDateAndTime" placeholder="" />
+                    <input type="datetime-local" class="form-control" asp-for="Course.StartDateAndTime" placeholder="" />
+                </div>
+                
+                <div class="form-group input-group col-9">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="width:120px;">Slut:</span>
+                    </div>
+                    <input type="datetime-local" class="form-control" asp-for="Course.EndDateAndTime" placeholder="" />
                 </div>
 
                 <div class="form-group d-flex justify-content-between">
@@ -145,7 +151,7 @@
         <button class="btn btn-sm btn-outline-primary" onclick="addSession(@Model.Course.Id)"><i class="fas fa-plus mx-1"></i>Tilføj kursusdag</button>
     </div>
 
-    @foreach (var item in Model.Course.CourseSessions)
+    @foreach (var item in Model.Course.CourseSessions.OrderBy(x=>x.DateTime))
     {
         <div class="row d-flex justify-content-between m-2 border-top">
             <div class="col-2 small">

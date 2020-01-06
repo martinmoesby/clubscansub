@@ -290,13 +290,22 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSession()
         {
-
-            _NewSessionPageModel.Session.Course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
+            _NewSessionPageModel.Session.Course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId); 
             _NewSessionPageModel.Session.Address = await db.Addresses.FindAsync(_NewSessionPageModel.SelectedAddressId);
             _NewSessionPageModel.Session.Divelocation = await db.Divelocations.FindAsync(_NewSessionPageModel.SelectedDivesiteId);
 
             await db.CourseSessions.AddAsync(_NewSessionPageModel.Session);
             await db.SaveChangesAsync();
+
+            var course = await db.Courses.FindAsync(_NewSessionPageModel.CourseId);
+
+            var maxEndDate = await db.CourseSessions.Where(x=>x.Course == course).MaxAsync(x => x.DateTime.Add(x.Duration));
+            var minEndDate = await db.CourseSessions.Where(x => x.Course == course).MinAsync(x => x.DateTime);
+            course.StartDateAndTime = minEndDate;
+            course.EndDateAndTime = maxEndDate;
+
+            await db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Edit), new { id = _NewSessionPageModel.CourseId });
         }
 
@@ -355,6 +364,16 @@ namespace ClubScansub.Areas.Admin.Controllers
             //}
 
             await db.SaveChangesAsync();
+
+            var course = await db.Courses.FindAsync(session.Course.Id);
+
+            var maxEndDate = await db.CourseSessions.Where(x => x.Course == course).MaxAsync(x => x.DateTime.Add(x.Duration));
+            var minEndDate = await db.CourseSessions.Where(x => x.Course == course).MinAsync(x => x.DateTime);
+            course.StartDateAndTime = minEndDate;
+            course.EndDateAndTime = maxEndDate;
+
+            await db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Edit), new { id = session.Course.Id });
         }
 
@@ -392,6 +411,17 @@ namespace ClubScansub.Areas.Admin.Controllers
             }
             db.CourseSessions.Remove(existingSession);
             await db.SaveChangesAsync();
+
+            var course = await db.Courses.FindAsync(session.Course.Id);
+
+            var maxEndDate = await db.CourseSessions.Where(x => x.Course == course).MaxAsync(x => x.DateTime.Add(x.Duration));
+            var minEndDate = await db.CourseSessions.Where(x => x.Course == course).MinAsync(x => x.DateTime);
+            course.StartDateAndTime = minEndDate;
+
+            course.EndDateAndTime = maxEndDate;
+
+            await db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Edit), new { id = existingSession.Course.Id });
         }
 
