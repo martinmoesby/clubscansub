@@ -22,7 +22,7 @@ namespace ClubScansub.Models
 
 
         [DataType(DataType.Currency)]
-        [Column(TypeName ="money")]
+        [Column(TypeName ="decimal")]
         public decimal DefaultPrice { get; set; }
         public CourseTypeEnum CourseType { get; set; }
         public virtual ICollection<CourseSessionTemplate> Sessions { get; set; }

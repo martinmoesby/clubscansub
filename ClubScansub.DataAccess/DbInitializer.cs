@@ -36,6 +36,11 @@ namespace ClubScansub.Data
                 roleManager.CreateAsync(new IdentityRole(Userroles.User)).GetAwaiter().GetResult();
             }
 
+            if (!roleManager.RoleExistsAsync(Userroles.Student).Result)
+            {
+                roleManager.CreateAsync(new IdentityRole(Userroles.Student)).GetAwaiter().GetResult();
+            }
+
             var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@scansub.dk");
 
             if (owner == null)

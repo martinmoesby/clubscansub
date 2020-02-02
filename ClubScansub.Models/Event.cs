@@ -31,12 +31,12 @@ namespace ClubScansub.Models
         public int MaxParticipants { get; set; }
 
         [DataType(DataType.Currency)]
-        [Column(TypeName = "money")]
+        [Column(TypeName = "decimal")]
         [Display(Name = "Pris")]
         public decimal Price { get; set; }
 
         [DataType(DataType.Currency)]
-        [Column(TypeName = "money")]
+        [Column(TypeName = "decimal")]
         public decimal Deposit { get; set; }
 
         [Display(Name = "Starttidspunkt")]

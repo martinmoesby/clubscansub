@@ -34,8 +34,6 @@ namespace ClubScansub.Data
         public DbSet<medlemsdata> medlemsdata { get; private set; }
         public DbSet<saldooplysning> saldooplysning { get; private set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -16,6 +16,8 @@
 
                 <h5 class="text-info">Konto</h5>
 
+
+
                 <div class="form-group input-group form-group-sm form-group-sm">
                     <div class="input-group-prepend">
                         <label asp-for="Input.UserName" class="col-form-label input-group-text" style="width:150px;"></label>
@@ -31,9 +33,23 @@
                     <div class="input-group-prepend">
                         <label asp-for="Input.Email" class="col-form-label input-group-text" style="width:150px;"></label>
                     </div>
-                    <input asp-for="Input.Email" class="form-control" autocomplete="off"/>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="off" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
+
+                <div class="form-group input-group form-group-sm form-group-sm">
+                    <div class="input-group-prepend">
+                        <label asp-for="Input.CreateAsUserRole" class="col-form-label input-group-text" style="width:150px;"></label>
+                    </div>
+                    <select asp-for="Input.CreateAsUserRole" class="form-control" autocomplete="off">
+                        <option value=""> -- Vælg rolle -- </option>
+                        <option value="Student">Kursist</option>
+                        <option value="User">Basis medlem</option>
+                        <option value="Member">Premium medlem</option>
+                    </select>
+                    <span asp-validation-for="Input.CreateAsUserRole" class="text-danger"></span>
+                </div>
+
                 @*<div class="form-group input-group form-group-sm">
             <div class="input-group-prepend">
                 <label asp-for="Input.Password" class="col-form-label input-group-text" style="width:150px;"></label>

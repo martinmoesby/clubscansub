@@ -16,8 +16,8 @@ namespace ClubScansub.Models
 
         [MaxLength(20, ErrorMessage = "Short name cannot be longer than 20 chars")]
         [Display(Name = "Kalde Navn")]
-        [Required]
         public string ShortName { get; set; }
+
         [Display(Name ="Beskrivelse")]
         public string Description { get; set; }
 

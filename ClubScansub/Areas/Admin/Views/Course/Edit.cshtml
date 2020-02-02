@@ -118,7 +118,7 @@
                             <div class="card-body">
                                 @foreach (var item in Model.Course.Signups)
                                 {
-                                    <a class="btn btn-sm m-1 btn-outline-success" asp-action="AddUserToCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
+                                    <a class="btn btn-sm m-1 btn-outline-success" asp-action="AddUserToCourse" asp-route-doCreateAccountTransaction="true" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
                                         <i class="fas fa-user-plus"></i>&nbsp;@item.ApplicationUser.Name
                                     </a>
                                 }

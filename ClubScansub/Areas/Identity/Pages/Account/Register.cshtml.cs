@@ -69,7 +69,13 @@ namespace ClubScansub.Areas.Identity.Pages.Account
 
             [Required]
             [DataType(DataType.PhoneNumber)]
+            [Display(Name ="Mobiltelefon")]
             public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "Du skal angive en bruger rolle")]
+            [Display(Name = "Bruger type")]
+            public string CreateAsUserRole { get; set; }
+
 
             [PersonalData]
             [Display(Name = "Fornavn")]
@@ -119,56 +125,77 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                     City = Input.City,
                     PhoneNumber = Input.PhoneNumber,
                     AccountNumber = Input.UserName,
-                    OldAccountImported = true
+                    OldAccountImported = true                    
                 };
 
                 var randomPassword = RandomGenerator.GenerateString(8);
+                string passwordMessage = "";
+                string mailMessage = "";
 
                 var result = await _userManager.CreateAsync(user, randomPassword);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, Userroles.User);
-                    
+                    if (Input.CreateAsUserRole == Userroles.Student)
+                    {
+                        await _userManager.AddToRoleAsync(user, Userroles.Student);
+
+                        passwordMessage = $"Hej {Input.Firstname}," +
+                            $"Tillykke. Så er du blevet som kursist hos Dykkerklubben Scansub. " +
+                            $"Dit kodeord er '{randomPassword}' og du kan nu logge på sitet og evt. tilknytte din facebook-konto. " +
+                            $"Husk at dit kodeord er personligt og må ikke overdrages til andre. " +
+                            $"Du kan skifte dit kodeord under 'Min Konto' -> 'Kodeord' " +
+                            $"" +
+                            $"Med venlig hilsen " +
+                            $"Scansub DK Diver";
+
+                        mailMessage = Texts.StudentWelcomeMail(Input.Firstname, Input.UserName) +
+                            Texts.StudentTerms() +
+                            Texts.RegardsText();
+                    }
+
+                    if (Input.CreateAsUserRole == Userroles.User)
+                    {
+                        await _userManager.AddToRoleAsync(user, Userroles.User);
+                        passwordMessage = $"Hej {Input.Firstname}," +
+                            $"Tillykke. Så er dit basis medlemsskab hos Dykkerklubben Scansub blevet oprettet. " +
+                            $"Dit kodeord er '{randomPassword}' og du kan nu logge på sitet og evt. tilknytte din facebook-konto. " +
+                            $"Husk at dit kodeord er personligt og må ikke overdrages til andre. " +
+                            $"Du kan skifte dit kodeord under 'Min Konto' -> 'Kodeord' " +
+                            $"" +
+                            $"Med venlig hilsen " +
+                            $"Scansub DK Diver";
+                        mailMessage = Texts.WelcomeMail(Input.Firstname, Input.UserName) +
+                            Texts.EventAccountTerms() +
+                            Texts.DepositText() +
+                            Texts.EventTerms() +
+                            Texts.RegardsText();
+                    }
+
+                    if (Input.CreateAsUserRole == Userroles.Member)
+                    {
+                        await _userManager.AddToRoleAsync(user, Userroles.User);
+                        await _userManager.AddToRoleAsync(user, Userroles.Member);
+                        passwordMessage = $"Hej {Input.Firstname}," +
+                            $"Tillykke. Så er dit premium medlemsskab hos Dykkerklubben Scansub blevet oprettet. " +
+                            $"Dit kodeord er '{randomPassword}' og du kan nu logge på sitet og evt. tilknytte din facebook-konto. " +
+                            $"Husk at dit kodeord er personligt og må ikke overdrages til andre. " +
+                            $"Du kan skifte dit kodeord under 'Min Konto' -> 'Kodeord' " +
+                            $"" +
+                            $"Med venlig hilsen " +
+                            $"Scansub DK Diver";
+                        mailMessage = Texts.WelcomeMail(Input.Firstname, Input.UserName) +
+                            Texts.EventAccountTerms() +
+                            Texts.DepositText() +
+                            Texts.EventTerms() +
+                            Texts.RegardsText();
+                    }
+
                     _logger.LogInformation("User created a new account with password.");
 
-                    var mailMessage = Texts.WelcomeMail(Input.Firstname, Input.UserName) +
-                        Texts.EventAccountTerms() +
-                        Texts.DepositText() +
-                        Texts.EventTerms() +
-                        Texts.RegardsText();
-
-                        //$"Tillykke. Så er din klubkonto hos Dykkerklubben Scansub blevet oprettet.<br/>" +
-                        //$"Dit login er <h2>{Input.UserName}@scansub.dk</h2> og du kan nu logge på sitet og evt. tilknytte din facebook-konto. <br />" +
-                        //$"Dit kodeord bliver sendt i en anden mail af sikkerhedsmæssige årsager. <br/>" +
-                        //$"Husk at dit login er personligt og må ikke overdrages til andre. <br />" +
-                        //$"Dit medlemskab er oprettet som et basis medlemsskab - se hvilke fordele du får på www.dkdiver.dk <br />" +
-                        //$"<br />" +
-                        //$"<br />" +
-                        //$"Med venlig hilsen <br />Scansub DK Diver";
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Dit Basis medlemskab er blevet oprettet",mailMessage);
-
-                    var passwordMessage = $"Hej {Input.Firstname}," +
-                        $"Tillykke. Så er dit basis medlemsskab hos Dykkerklubben Scansub blevet oprettet. " +
-                        $"Dit kodeord er '{randomPassword}' og du kan nu logge på sitet og evt. tilknytte din facebook-konto. " +
-                        $"Husk at dit kodeord er personligt og må ikke overdrages til andre. " +
-                        $"Du kan skifte dit kodeord under 'Min Konto' -> 'Kodeord' " +
-                        $"" +
-                        $"Med venlig hilsen " +
-                        $"Scansub DK Diver";
+                    await _emailSender.SendEmailAsync(Input.Email, "Din brugerkonto er blevet oprettet",mailMessage);
 
                     await _smsSender.SendSmsAsync(Input.PhoneNumber, passwordMessage);
-
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //var callbackUrl = Url.Page(
-                    //    "/Account/ConfirmEmail",
-                    //    pageHandler: null,
-                    //    values: new { userId = user.Id, code = code },
-                    //    protocol: Request.Scheme);
-
-                    //if (!User.IsInRole(Userroles.Administrator) && !User.IsInRole(Userroles.Owner))
-                    //    await _signInManager.SignInAsync(user, isPersistent: false);
 
                     return LocalRedirect(returnUrl);
                 }

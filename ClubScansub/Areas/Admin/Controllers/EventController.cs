@@ -36,6 +36,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             public Event Event { get; set; }
             public IEnumerable<SelectListItem> UsersList { get; set; }
+            public IEnumerable<SelectListItem> CertificatesList { get; set; }
 
         }
 
@@ -84,17 +85,31 @@ namespace ClubScansub.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var eventItem = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).Include(x => x.Divelocation).FirstOrDefaultAsync(x => x.Id == id);
+            var eventItem = await db.Events
+                .Include(x => x.Participants)
+                    .ThenInclude(x => x.ApplicationUser)
+                   .Include(x => x.Divelocation)
+                   .Include(x=>x.RequiredCertificate)
+                   .FirstOrDefaultAsync(x => x.Id == id);
 
             if (eventItem == null)
                 return NotFound();
 
             _PageModel.Event = eventItem;
 
+            //if (eventItem.RequiredCertificate != null)
+            //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;
+
             _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
             {
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
+            }).ToListAsync();
+
+            _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem() 
+            {
+                Text = $"{x.ShortName} ({x.DepthLimit} m.)",
+                Value = x.Id.ToString()
             }).ToListAsync();
 
             return View(_PageModel);
@@ -105,9 +120,13 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PageModel pageModel)
         {
+            if (pageModel.Event.RequiredCertificate != null)
+                pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.Event.RequiredCertificate.Id);
 
             if (ModelState.IsValid)
             {
+                //if (pageModel.SelectedCertificate != null)
+                //    pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.SelectedCertificate);
                 
                 db.Attach(pageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();

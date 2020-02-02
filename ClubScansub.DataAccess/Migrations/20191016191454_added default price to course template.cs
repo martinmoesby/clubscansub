@@ -9,7 +9,7 @@ namespace ClubScansub.Data.Migrations
             migrationBuilder.AddColumn<decimal>(
                 name: "DefaultPrice",
                 table: "CourseTemplate",
-                type: "money",
+                type: "decimal",
                 nullable: false,
                 defaultValue: 0m);
         }

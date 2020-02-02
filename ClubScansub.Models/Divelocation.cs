@@ -34,7 +34,7 @@ namespace ClubScansub.Models
         public double Latitude { get; set; }
 
         [Display(Name="Normal pris")]
-        [Column(TypeName ="numeric(18,0)")]
+        [Column(TypeName ="decimal")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage ="Der skal angives dyk-type")]
