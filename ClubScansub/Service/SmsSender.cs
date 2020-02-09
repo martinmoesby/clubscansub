@@ -63,7 +63,7 @@ namespace ClubScansub.Service
             {
                 foreach (var item in users)
                 {
-                    if (item.PhoneNumberConfirmed)
+                    if (item.PhoneNumberConfirmed && !string.IsNullOrEmpty(item.PhoneNumber))
                     {
                         responses.Add(await SendSmsAsync(item.PhoneNumber, message));
                     }

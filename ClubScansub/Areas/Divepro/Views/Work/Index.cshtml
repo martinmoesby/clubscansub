@@ -48,7 +48,8 @@
                         {
                             <div class="row">
                                 <div class="col-11">
-                                    <p>@session.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") : <strong>@session.CourseSessionTemplate.Description</strong></p>
+                                    <p>@session.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") : <strong>@(!string.IsNullOrEmpty(session.SessionDescription) ? session.SessionDescription : session.CourseSessionTemplate!= null ? session.CourseSessionTemplate.Description : "Ingen beskrivelse af sessionen")</strong>
+                                    </p>
                                 </div>
                                 <div class="col-1 text-right">
                                     @if (session.SessionInstructors.Select(x => x.Instructor.Id).Contains(User.GetIdentityId()))

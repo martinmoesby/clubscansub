@@ -83,9 +83,9 @@ namespace ClubScansub.Areas.Members.Controllers
             var endpointCourseSessionTemplateAddress = endPoint.CourseSessionTemplate?.Address;
             var endAddress = "";
 
-            if (endPointAddress == null)
-            {
-                if (endpointDiveLocationAdress== null)
+            //if (endPointAddress == null)
+            //{
+                if (endpointDiveLocationAdress == null)
                 {
                     if (endpointCourseSessionTemplateAddress == null)
                     {
@@ -104,12 +104,13 @@ namespace ClubScansub.Areas.Members.Controllers
                     endLocation.longitude = endpointDiveLocationAdress.Longitude;
                     endAddress = $"{endpointDiveLocationAdress.Streetname},{endpointDiveLocationAdress.City},{endpointDiveLocationAdress.Country}";
                 }
-            } else
-            {
-                endLocation.latitude = endPointAddress.Latitude;
-                endLocation.longitude = endPointAddress.Longitude;
-                endAddress = $"{endPointAddress.Streetname},{endPointAddress.City},{endPointAddress.Country}";
-            }
+            
+            //else
+            //{
+            //    endLocation.latitude = endPointAddress.Latitude;
+            //    endLocation.longitude = endPointAddress.Longitude;
+            //    endAddress = $"{endPointAddress.Streetname},{endPointAddress.City},{endPointAddress.Country}";
+            //}
 
 
             var user = await db.ApplicationUsers.FindAsync(User.GetIdentityId());

@@ -32,6 +32,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             public Course Course { get; set; }
             public IEnumerable<SelectListItem> UsersList { get; set; }
+            public IEnumerable<SelectListItem> DiveLocations { get; set; }
 
         }
 
@@ -91,6 +92,9 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(x=>x.SessionInstructors)
                 .Include(x => x.CourseSessions)
                     .ThenInclude(x => x.Address)
+                .Include(x => x.CourseSessions)
+                    .ThenInclude(x => x.Divelocation)
+                        .ThenInclude(x=>x.MeetingLocation)
                 .Include(x=>x.Signups)
                     .ThenInclude(c=>c.ApplicationUser)
                 .Include(x=>x.Participants)
@@ -102,7 +106,9 @@ namespace ClubScansub.Areas.Admin.Controllers
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
             }).ToListAsync();
-            
+
+            _PageModel.DiveLocations = await db.Divelocations.OrderBy(x => x.Name).Select(x => new SelectListItem() { Value = x.Id.ToString(), Text = x.Name }).ToListAsync();
+
             ViewBag.StatusMessage = StatusMessage;
 
             return View(_PageModel);
@@ -504,14 +510,14 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             if (applicationUser.PhoneNumberConfirmed)
             {
-                var smsMessage = $"Hej {applicationUser.Firstname}," +
-                    $"Du er nu blevet tilmeldt kurset {course.CourseName} med start d. {course.StartDateAndTime}." +
-                    $"Dit kursus materiale er tilgængeligt på www.divessi.com og i DiveSSI-appen" +
-                    $"Det er en fordel, hvis du har gennemgået materialet inden den 1. kursusaften begynder." +
-                    $"" +
-                    $"Vi glæder os rgtig meget til at se dig." +
-                    $"" +
-                    $"Med venlig hilsen " +
+                var smsMessage = $"Hej {applicationUser.Firstname},\n\n" +
+                    $"Du er nu blevet tilmeldt kurset \n\n{course.CourseName}\n\n med start \n\nd. {course.StartDateAndTime}.\n" +
+                    $"Dit kursus materiale er tilgængeligt på www.divessi.com og i DiveSSI-appen\n" +
+                    $"Det er en fordel, hvis du har gennemgået materialet inden den 1. kursusaften begynder.\n" +
+                    $"\n" +
+                    $"Vi glæder os rgtig meget til at se dig.\n" +
+                    $"\n" +
+                    $"Med venlig hilsen\n" +
                     $"Scansub DK Diver";
 
                 await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);
@@ -543,6 +549,46 @@ namespace ClubScansub.Areas.Admin.Controllers
             return RedirectToAction(nameof(Edit), new { id = courseId });
         }
         
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeSessionLocation(int CourseId, int SessionId, int LocationId)
+        {
+            var session = await db.CourseSessions.FindAsync(SessionId);
+            var location = await db.Divelocations.Include(x=>x.MeetingLocation).FirstOrDefaultAsync(x=>x.Id == LocationId);
+
+            session.Divelocation = location;
+
+            await db.SaveChangesAsync();
+
+            var users = await db.Courses.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == CourseId);
+            var instructors = await db.CourseSessions.Include(x => x.SessionInstructors).ThenInclude(x=>x.Instructor).FirstOrDefaultAsync(x => x.Id == SessionId);
+            var notifyusers = users.Participants.Select(x=>x.ApplicationUser).ToList();
+            notifyusers.AddRange(instructors.SessionInstructors.Select(x => x.Instructor));
+
+            var userSmsString = $"Skift af Dykkersted.\n\nMødestedet for kursusdagen d. {session.DateTime} er blevet skiftet til \n\n" +
+                $"\"{location.Name}\" \n\n" +
+                $"Vi skal nu mødes: \n" +
+                $"{location.MeetingLocation.Name}\n" +
+                $"{location.MeetingLocation.Streetname}\n" +
+                $"{location.MeetingLocation.Zipcode} {location.MeetingLocation.City}\n\n" +
+                $"Du kan finde en Rutebeskrivelse under 'Mine kurser' på kursuskalenderen\n\n" +
+                $"kalender.klubscansub.dk \n\n" +
+                $"Med venlig hilsen\n" +
+                $"Dk Diver";
+
+            var responses = await smsSender.SendMultipleSmsAsync(notifyusers, userSmsString);
+
+            if (responses.Any(x => x.IsSuccessStatusCode == false))
+            {
+                StatusMessage = "FEJL:" + string.Join(',', responses.Where(x => x.IsSuccessStatusCode == false).Select(x => x.GetErrorMessage()));
+            } else
+            {
+                StatusMessage = "Alle brugere og instruktører er har fået beksed via SMS";
+            }
+
+            return RedirectToAction(nameof(Edit), new { id = CourseId });
+
+        }
 
         //public async Task<JsonResult> FindUsersAsyn(string searchstring)
         //{

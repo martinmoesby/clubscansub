@@ -38,7 +38,7 @@
                     </div>
                     <input type="datetime-local" class="form-control" asp-for="Course.StartDateAndTime" placeholder="" />
                 </div>
-                
+
                 <div class="form-group input-group col-9">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Slut:</span>
@@ -151,59 +151,93 @@
         <button class="btn btn-sm btn-outline-primary" onclick="addSession(@Model.Course.Id)"><i class="fas fa-plus mx-1"></i>Tilføj kursusdag</button>
     </div>
 
-    @foreach (var item in Model.Course.CourseSessions.OrderBy(x=>x.DateTime))
+    @foreach (var item in Model.Course.CourseSessions.OrderBy(x => x.DateTime))
     {
-        <div class="row d-flex justify-content-between m-2 border-top">
-            <div class="col-2 small">
-                <p>
-                    <i class="fas fa-calendar-day mr-2"></i>@item.DateTime.ToString("dd. MMMM yyyy")
-                </p>
-                <p class="small text-muted">
-                    fra kl. @item.DateTime.ToString("HH:mm")
-                    til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm") (ca.)
+<div class="row d-flex justify-content-between m-2 border-top">
+    <div class="col-2 small">
+        <p>
+            <i class="fas fa-calendar-day mr-2"></i>@item.DateTime.ToString("dd. MMMM yyyy")
+        </p>
+        <p class="small text-muted">
+            fra kl. @item.DateTime.ToString("HH:mm")
+            til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm") (ca.)
+        </p>
+    </div>
+
+    <div class="col-2 small">
+        <p>@item.SessionName</p>
+        <span class="small text-muted"> @item.SessionDescription</span>
+
+        <p>Adresse:</p>
+        @if (item.Address != null)
+        {
+            <p class="small text-muted">
+                @item.Address.Name
+                @item.Address.Streetname<br />
+                @item.Address.Zipcode  @item.Address.City <br />
+                @item.Address.Country
+            </p>
+        }
+        else
+        {
+            <p class="small text-muted">Ingen adresse angivet</p>
+        }
+
+    </div>
+
+    <div class="col-3 small">
+        @if (item.Sessiontype != CourseSessionTypeEnum.AcademicSession)
+        {
+            <div>
+                Dykkersted:
+                <p class="text-muted small">
+                    @(item.Divelocation != null ? item.Divelocation.Name : "Intet dykkersted")
                 </p>
             </div>
-
-            <div class="col-2 small">
-                <p>@item.SessionName</p>
-                <span class="small text-muted"> @item.SessionDescription</span>
-            </div>
-
-            <div class="col-2 small">
-                <p>Adresse:</p>
-                @if (item.Address != null)
+            <div>
+                Mødested:
+                @if (item.Divelocation.MeetingLocation != null)
                 {
                     <p class="small text-muted">
-                        @item.Address.Name
-                        @item.Address.Streetname<br />
-                        @item.Address.Zipcode  @item.Address.City <br />
-                        @item.Address.Country
+                        @item.Divelocation.MeetingLocation.Name<br />
+                        @item.Divelocation.MeetingLocation.Streetname<br />
+                        @item.Divelocation.MeetingLocation.Zipcode @item.Divelocation.MeetingLocation.City<br />
                     </p>
                 }
-                else
-                {
-                    <p class="small text-muted">Ingen adresse angivet</p>
-                }
             </div>
 
-            <div class="col-4 small">
-                <p>Instruktører:</p>
-                <partial name="~/Areas/Divepro/Views/Shared/_InstructorSignups.cshtml" model="@item.SessionInstructors" />
-            </div>
+            <form asp-action="ChangeSessionLocation" method="post">
+                <input type="hidden" name="SessionId" value="@item.Id" />
+                <input type="hidden" name="CourseId" value="@Model.Course.Id" />
 
-            <div class="col pt-2 text-right">
-                <div class="btn-group btn-group-sm">
-                    <button class="btn btn-sm btn-outline-primary" onclick="editSession(@item.Id)"><i class="fas fa-edit mx-1"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSession(@item.Id)"><i class="fas fa-trash-alt mx-1"></i></button>
-                </div>
-            </div>
+                <select class="form-control" asp-items="@Model.DiveLocations" asp-for="@item.Divelocation.Id" name="LocationId">
+                    <option>Vælg Dykkersted</option>
+                </select>
+                <button class="btn-link btn btn-sm" type="submit">Skift dykkersted</button>
+            </form>
+
+        }
+    </div>
+
+    <div class="col-3 small">
+        <p>Instruktører:</p>
+        <partial name="~/Areas/Divepro/Views/Shared/_InstructorSignups.cshtml" model="@item.SessionInstructors" />
+    </div>
+
+    <div class="col pt-2 text-right">
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-sm btn-outline-primary" onclick="editSession(@item.Id)"><i class="fas fa-edit mx-1"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteSession(@item.Id)"><i class="fas fa-trash-alt mx-1"></i></button>
         </div>
-    }
+    </div>
 
 </div>
+    }
 
-@section Scripts {
-    <script>
+
+
+            @section Scripts {
+                <script>
 
     function checkSelectedUserForCourse() {
 
@@ -215,28 +249,28 @@
 
     var sessionDetails = '@Url.Action("GetSession", "Course", new { Area = "Admin" })';
 
-        function addSession(id) {
-        $.ajax({
-            type: "GET",
-            url: '@Url.Action("AddSession", "Course", new { Area = "Admin" })',
-            contentType: "application/json;charset=utf-8",
-            data: { "id": id },
-            cache: false,
-            datatype: "json",
-            success: function (data) {
-                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-success");
-                $("#myModalTitle").text("Tilføj kursusdag");
-                $("#myModalContent").html(data);
-                $("#myModal").modal('show');
-            },
-            error: function () {
-                $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
-                $("#myModalTitle").text("Fejl");
-                $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
-                $("#myModal").modal('show');
-            }
-        });
-    }
+    function addSession(id) {
+    $.ajax({
+        type: "GET",
+        url: '@Url.Action("AddSession", "Course", new { Area = "Admin" })',
+        contentType: "application/json;charset=utf-8",
+        data: { "id": id },
+        cache: false,
+        datatype: "json",
+        success: function (data) {
+            $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-success");
+            $("#myModalTitle").text("Tilføj kursusdag");
+            $("#myModalContent").html(data);
+            $("#myModal").modal('show');
+        },
+        error: function () {
+            $(".modal-header").removeClass("bg-danger").removeClass("bg-success").removeClass("bg-light").removeClass("bg-info").addClass("bg-danger");
+            $("#myModalTitle").text("Fejl");
+            $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
+            $("#myModal").modal('show');
+        }
+    });
+}
 
     function editSession(id) {
         $.ajax({
@@ -284,5 +318,5 @@
             }
         });
     }
-    </script>
-}
+                </script>
+            }
