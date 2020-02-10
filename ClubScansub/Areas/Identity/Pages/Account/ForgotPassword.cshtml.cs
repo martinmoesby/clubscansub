@@ -29,15 +29,15 @@ namespace ClubScansub.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Display(Name = "Brugernummer")]
+            public string UserName { get; set; }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
+                var user = await _userManager.FindByNameAsync($"{Input.UserName}@scansub.dk");
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -54,9 +54,15 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                     protocol: Request.Scheme);
 
                 await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    user.Email,
+                    "Nulstilling af Kodeord Password",
+                    $"Du har bedt om at få nulstillet dit kodeord. Såfremt du ikke har bedt om dette, bedes du slette denne email med det samme." +
+                    $"<br/>" +
+                    $"Nulstlling af dit kodeord kan ske ved at <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>klikke her</a>.<br/>" +
+                    $"<br/>" +
+                    $"Med venlig hilsen</br>" +
+                    $"<br/>" +
+                    $"DK Diver");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

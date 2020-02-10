@@ -44,7 +44,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name ="Ja tak, jeg vil gerne sleete min konto")]
+            [Display(Name ="Ja tak, jeg vil gerne slette min konto")]
             //[Range(typeof(bool),"true","true", ErrorMessage = "Vi kan ikke slette din konto, uden at du indvilliger i ovenstående")]
             public bool Aggreed { get; set; }
         }
@@ -111,7 +111,11 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             foreach (var item in admins)
             {
                 await _smsSender.SendSmsAsync(item.PhoneNumber, $"{user.UserName}' har ikke ønsket at være medlem længere og har slettet deres konto.");
-                await _emailSender.SendEmailAsync(item.Email, "Bruger udmelding", $"{user.UserName}' har ikke ønsket at være medlem længere og har slettet deres konto. Med venlig hilsen Klub siden");
+                await _emailSender.SendEmailAsync(item.Email, "Bruger udmelding", $"{user.UserName}' har ikke ønsket at være medlem længere og har slettet deres konto<br/>" +
+                    $"<br/>" +
+                    $"Med venlig hilsen<br/>" +
+                    $"<br/>" +
+                    $"Klubkalenderen");
             }
             
             return Redirect("~/");
