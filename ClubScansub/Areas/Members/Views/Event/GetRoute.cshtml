@@ -6,8 +6,7 @@
 <div class="container mb-2">
 
     <h3 class="display-4 text-info"><i class="fas fa-map-marked-alt mr-2"></i>Kørselsbeskrivelse</h3>
-    <input id="endLat" type="hidden" asp-for="End.latitude" readonly />
-    <input id="endLong" type="hidden" asp-for="End.longitude" readonly />
+
 
     @*<div id="askPermission">
             Can w use your location? (Click no to enter manually)
@@ -23,10 +22,20 @@
 
             </div>
             <div class="col-12">
-                Til:<br /><input id="manualEndAddress" type="text" asp-for="EndAddress" readonly class="form-control" />
+                Til:<br />
+                <input id="EndAddressName" type="text" asp-for="EndName" readonly  class="form-control" />
+                <input id="manualEndAddress" type="text" asp-for="EndAddress" readonly class="form-control" />
+            </div>
+            <div class="form-group row justify-content-center hide">
+                <div class="col-4">
+                    <input id="endLat" class="form-control form-control-sm" asp-for="End.latitude" readonly />
+                </div>
+                <div class="col-4">
+                    <input id="endLong" class="form-control form-control-sm" asp-for="End.longitude" readonly />
+                </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row ">
             <div class="col d-inline-flex justify-content-between">
                 <div>
                     <button id="getManualDirection" type="button" value="Hent rute" class="btn btn-sm btn-outline-primary"><i class="fas fa-map-marked-alt"></i>&nbsp;Rute</button>
@@ -60,6 +69,12 @@
             var map = null;
             var directionsManager = null;
             var location = null;
+            var endLocation = {
+                coords: {
+                    latitude: null,
+                    longitude: null
+                }
+            };
 
             //var store_location = "Støvlestræde, Albertslund, Danmark";
 
@@ -87,6 +102,7 @@
             $("#getManualDirection").click(function () {
                 loadMap();
                 showPosition(null);
+
             });
 
             function showManualEntry() {
@@ -121,20 +137,20 @@
             }
 
             function createDirectionsManager() {
-                var displayMessage;
+
                 if (!directionsManager) {
                     directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
                     displayMessage = "Directions Module loaded\n";
                     displayMessage += "Directions Manager loaded";
                 }
-
-                console.log(displayMessage);
+                
 
                 directionsManager.clearAll();
 
                 //directionsManager.resetDirections();
                 directionsErrorEventObj = Microsoft.Maps.Events.addHandler(directionsManager, 'directionsError', directionsError);
                 directionsUpdatedEventObj = Microsoft.Maps.Events.addHandler(directionsManager, 'directionsUpdated', directionsUpdated);
+
                 createDrivingRoute(location);
             }
 
@@ -168,8 +184,22 @@
                     directionsManager.addWaypoint(fromWayPoint);
                 }
 
-                var toWayPoint = new Microsoft.Maps.Directions.Waypoint({ address: $("#manualEndAddress").val() });
-                //var toWayPoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(coords.latitude, coords.longitude) });
+                var toWayPoint = undefined;
+
+                var latitude = $("#endLat").val();
+                var longitude = $("#endLong").val();
+
+                endLocation.coords.longitude = longitude;
+                endLocation.coords.latitude = latitude;
+
+                if (endLocation.coords.latitude == "" && endLocation.coords.longitude == "")
+                {
+                    toWayPoint = new Microsoft.Maps.Directions.Waypoint({ address: $("#manualEndAddress").val() });
+                }
+                else
+                {
+                    toWayPoint = new Microsoft.Maps.Directions.Waypoint({ address: $("#EndAddressName").val(),  location: new Microsoft.Maps.Location(endLocation.coords.latitude, endLocation.coords.longitude) });
+                }
 
                 directionsManager.addWaypoint(toWayPoint);
 

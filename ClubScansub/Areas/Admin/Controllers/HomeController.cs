@@ -197,6 +197,9 @@ namespace ClubScansub.Areas.Admin.Controllers
             item.EventType = location.DefaultEventType;
 
             item.StartDateAndTime = eventdate.Add(location.DefaultStartTime);
+            item.MinParticipants = location.MinParticipants;
+            item.MaxParticipants = location.MaxParticipants;
+
             item.EndDateAndTime = item.StartDateAndTime.Add(location.DefaultDuration);
             item.Address = location.MeetingLocation;
 
@@ -212,19 +215,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 {
                     case EventTypeEnum.Bådtur:
                         item.Title = $"Bådtur til {location.Name}.";
-                        item.MaxParticipants = 10;
                         break;
                     case EventTypeEnum.Stranddyk:
                         item.Title = $"Strandtur til {location.Name}.";
-                        item.MaxParticipants = 50;
                         break;
                     case EventTypeEnum.Rejse:
                         item.Title = $"Rejse til {location.Name}.";
-                        item.MaxParticipants = 12;
                         break;
                     case EventTypeEnum.Liveaboard:
                         item.Title = $"Liveaboard tur til {location.Name}";
-                        item.MaxParticipants = 20;
                         break;
                     case EventTypeEnum.Klubture:
                     default:

@@ -39,7 +39,9 @@ namespace ClubScansub.Models
 
         public virtual ICollection<Event> Events { get; set; }
 
+        [Display(Name = "Breddegrad")]
         public string Latitude { get; set; }
+        [Display(Name = "Længdegrad")] 
         public string Longitude { get; set; }
 
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }

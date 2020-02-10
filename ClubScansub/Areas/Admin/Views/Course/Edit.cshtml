@@ -172,7 +172,7 @@
         @if (item.Address != null)
         {
             <p class="small text-muted">
-                @item.Address.Name
+                @item.Address.Name<br />
                 @item.Address.Streetname<br />
                 @item.Address.Zipcode  @item.Address.City <br />
                 @item.Address.Country
@@ -196,7 +196,7 @@
             </div>
             <div>
                 Mødested:
-                @if (item.Divelocation.MeetingLocation != null)
+                @if (item.Divelocation?.MeetingLocation != null)
                 {
                     <p class="small text-muted">
                         @item.Divelocation.MeetingLocation.Name<br />

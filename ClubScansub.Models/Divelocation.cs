@@ -22,7 +22,7 @@ namespace ClubScansub.Models
         public string Description { get; set; }
 
         [Required(ErrorMessage ="Der skal angives en min. dybde")]
-        [Range(1, int.MaxValue, ErrorMessage = "Mini-dybde skal være over 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "Min-dybde skal være over 1")]
         [Display(Name = "Min. dybde")]
         public int MinDepth { get; set; }
 
@@ -30,6 +30,13 @@ namespace ClubScansub.Models
         [Range(1,int.MaxValue,ErrorMessage ="Max-dybde skal være over 1")]
         [Display(Name = "Max. dybde")]
         public int MaxDepth { get; set; }
+
+        [Display(Name = "Min. deltagere")]
+        public int MinParticipants { get; set; }
+
+        [Display(Name = "Max. deltagere")]
+        public int MaxParticipants { get; set; }
+
         public double Longitude { get; set; }
         public double Latitude { get; set; }
 
@@ -38,9 +45,13 @@ namespace ClubScansub.Models
         public decimal Price { get; set; }
 
         [Required(ErrorMessage ="Der skal angives dyk-type")]
+        [Display(Name = "Dyk type")]
         public DiveTypeEnum DiveType { get; set; }
+        
+        [Display(Name = "Billede")] 
         public byte[] Image { get; set; }
-    
+
+        [Display(Name = "Mødested")]
         public virtual Address MeetingLocation { get; set; }
 
         [Display(Name = "Min. certificering")]
@@ -53,6 +64,7 @@ namespace ClubScansub.Models
         [Display(Name = "Normal varighed")]
         public TimeSpan DefaultDuration { get; set; }
 
+        [Display(Name = "Tur type")] 
         public EventTypeEnum DefaultEventType { get; set; }
         
         public virtual ICollection<Event> Events { get; set; }

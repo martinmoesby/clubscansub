@@ -42,6 +42,24 @@
 
                 </div>
 
+                <!-- Divelocation.Min and Max participants-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Divelocation.MinParticipants" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MinParticipants" class="form-control" placeholder="Min. deltagere" />
+                    </div>
+                    <div class="col-4 text-right">
+                        <label asp-for="Divelocation.MaxParticipants" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MaxParticipants" class="form-control" placeholder="Max. deltagere" />
+                    </div>
+                    <span asp-validation-for="Divelocation.MinParticipants" class="text-danger"></span>
+                    <span asp-validation-for="Divelocation.MaxParticipants" class="text-danger"></span>
+                </div>
+
                 <!-- Divelocation.Certification-->
                 <div class="form-group row">
                     <div class="col-4">
@@ -84,7 +102,8 @@
                         <label asp-for="Divelocation.Price" class="col-form-label"></label>
                     </div>
                     <div class="col-6">
-                        <input asp-for="Divelocation.Price" class="form-control" placeholder="Angiv en standard pris" />
+                        @*<input asp-for="Divelocation.Price" class="form-control" placeholder="Angiv en standard pris" />*@
+                        <input class="form-control" asp-for="Divelocation.Price" asp-format="{0:N0}" />
                     </div>
                     <span asp-validation-for="Divelocation.Price" class="text-danger"></span>
                 </div>
@@ -224,10 +243,18 @@
                 <div class="form-group row">
                     <div class="col-3 offset-4"><button type="button" onclick="geocodeMap()" class="btn btn-sm btn-outline-info mb-2"><i class="fas fa-search"></i>&nbsp;Find...</button> </div>
                     <div class="col-12">
-                        <div id="meetLocationMap" class="map" style="height:300px;"></div>
+                        <div id="meetLocationMap" class="map border rounded p-3" style="height:300px;"></div>
                         <div id="geocodeAddress">
-                            <input id="latitude" class="form-control" asp-for="Divelocation.MeetingLocation.Latitude" type="hidden"/>
-                            <input id="longitude" class="form-control" asp-for="Divelocation.MeetingLocation.Longitude" type="hidden"/>
+                            <div class="form-group row justify-content-end small">
+                                <div class="col-4">
+                                    <label asp-for="Divelocation.MeetingLocation.Latitude"></label>
+                                    <input id="latitude" class="form-control form-control-sm" asp-for="Divelocation.MeetingLocation.Latitude" readonly />
+                                </div>
+                                <div class="col-4">
+                                    <label asp-for="Divelocation.MeetingLocation.Longitude"></label>
+                                    <input id="longitude" class="form-control form-control-sm" asp-for="Divelocation.MeetingLocation.Longitude" readonly />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -267,8 +294,15 @@
                     $('#addressStreetname').val(data.streetname);
                     $('#addressName').val(data.name);
                     $('#addressCountry').val(data.country);
+                    $('#longitude').val(data.longitude);
+                    $('#latitude').val(data.latitude);
 
-                    geocodeMap();
+                    if (data.latitude != "" && data.longitude != "") {
+                        centerMap(data.latitude,data.longitude);
+                    } else {
+                        geocodeMap();
+                    }
+
                 }
             })
         }

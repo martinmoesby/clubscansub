@@ -82,29 +82,33 @@ namespace ClubScansub.Areas.Members.Controllers
             var endpointDiveLocationAdress = endPoint.Divelocation?.MeetingLocation;
             var endpointCourseSessionTemplateAddress = endPoint.CourseSessionTemplate?.Address;
             var endAddress = "";
+            var endLocationName = "Mødested";
 
             //if (endPointAddress == null)
             //{
-                if (endpointDiveLocationAdress == null)
+            if (endpointDiveLocationAdress == null)
+            {
+                if (endpointCourseSessionTemplateAddress == null)
                 {
-                    if (endpointCourseSessionTemplateAddress == null)
-                    {
-                        StatusMessage = "Ingen adresse på mødested/Dykkersted";
-                        return RedirectToAction(nameof(Index));
-                    } else
-                    {
-                        endLocation.latitude = endpointCourseSessionTemplateAddress.Latitude;
-                        endLocation.longitude = endpointCourseSessionTemplateAddress.Longitude;
-                        endAddress = $"{endpointCourseSessionTemplateAddress.Streetname},{endpointCourseSessionTemplateAddress.City},{endpointCourseSessionTemplateAddress.Country}";
-                    }
+                    StatusMessage = "Ingen adresse på mødested/Dykkersted";
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    endLocation.latitude = endpointDiveLocationAdress.Latitude;
-                    endLocation.longitude = endpointDiveLocationAdress.Longitude;
-                    endAddress = $"{endpointDiveLocationAdress.Streetname},{endpointDiveLocationAdress.City},{endpointDiveLocationAdress.Country}";
+                    endLocation.latitude = endpointCourseSessionTemplateAddress.Latitude;
+                    endLocation.longitude = endpointCourseSessionTemplateAddress.Longitude;
+                    endAddress = $"{endpointCourseSessionTemplateAddress.Streetname},{endpointCourseSessionTemplateAddress.City},{endpointCourseSessionTemplateAddress.Country}";
+                    endLocationName = endpointCourseSessionTemplateAddress.Name;
                 }
-            
+            }
+            else
+            {
+                endLocation.latitude = endpointDiveLocationAdress.Latitude;
+                endLocation.longitude = endpointDiveLocationAdress.Longitude;
+                endAddress = $"{endpointDiveLocationAdress.Streetname},{endpointDiveLocationAdress.City},{endpointDiveLocationAdress.Country}";
+                endLocationName = endpointDiveLocationAdress.Name;
+            }
+
             //else
             //{
             //    endLocation.latitude = endPointAddress.Latitude;
@@ -125,6 +129,7 @@ namespace ClubScansub.Areas.Members.Controllers
             var model = new Models.Structs.RoutePoints()
             {
                 End = endLocation,
+                EndName = endLocationName,
                 StartAddress = startAddress,
                 EndAddress = endAddress
             };

@@ -37,6 +37,7 @@ namespace ClubScansub.Models
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
+        [Display(Name = "Depositum")] 
         public decimal Deposit { get; set; }
 
         [Display(Name = "Starttidspunkt")]
