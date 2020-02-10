@@ -144,6 +144,12 @@ body {
     /*border: 1px solid #000 !important;*/
 }
 
+.ellipsis {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
 #calendar {
     font-size:0.8rem;
     min-height:640px;

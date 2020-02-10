@@ -118,8 +118,8 @@
                             <div class="card-body">
                                 @foreach (var item in Model.Course.Signups)
                                 {
-                                    <a class="btn btn-sm m-1 btn-outline-success" asp-action="AddUserToCourse" asp-route-doCreateAccountTransaction="true" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
-                                        <i class="fas fa-user-plus"></i>&nbsp;@item.ApplicationUser.Name
+                                    <a class="btn btn-sm mb-1 form-control btn-outline-success small text-left ellipsis" asp-action="AddUserToCourse" asp-route-doCreateAccountTransaction="true" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Tilmeld bruger og træk betaling fra Kursus konto">
+                                        <i class="fas fa-user-plus mr-2"></i>@item.ApplicationUser.Firstname
                                     </a>
                                 }
                             </div>
@@ -132,8 +132,8 @@
                             <div class="card-body">
                                 @foreach (var item in Model.Course.Participants)
                                 {
-                                    <a class="btn btn-sm m-1 btn-outline-danger" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
-                                        <i class="fas fa-user-minus"></i>&nbsp;@item.ApplicationUser.Name
+                                    <a class="btn btn-sm mb-1 form-control btn-outline-danger small text-left ellipsis" asp-action="RemoveUserFromCourse" asp-route-courseId="@Model.Course.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra kursus og returner betaling">
+                                        <i class="fas fa-user-minus mr-2"></i>@item.ApplicationUser.Firstname
                                     </a>
                                 }
                             </div>
