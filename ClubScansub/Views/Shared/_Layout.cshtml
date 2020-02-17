@@ -31,10 +31,12 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-light border-bottom border-light mb-5">
-            <div class="container-fluid">
-                <div class="navbar-brand">
-                    <h5 class="text-dark bg-light badge badge-pill pb-3">
+
+        <div class="jumbotron-fluid">
+            <div class="row justify-content-between align-content-between m-3 ">
+
+                <div class="col">
+                    <h5 class="text-dark">
                         <a asp-action="Index" asp-area="" asp-controller="Home" class="text-info h3">
                             @{if (clubInfo.Logo != null)
                                 {
@@ -48,25 +50,35 @@
                             }
                         </a>
                     </h5>
-
                 </div>
-                <button class="navbar-toggler text-dark" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+
+                <div class="col-2">
+                    <partial name="_LoginPartial" />
+                </div>
+
+            </div>
+        </div>
+
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark mb-5 border-dark border-bottom border-top">
+            <div class="container-fluid">
+
+                <button class="navbar-toggler text-light" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <partial name="_LoginPartial" />
+                    
                     <ul class="navbar-nav flex-grow-1">
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark btn btn-light btn-sm" asp-area="" asp-controller="Home" asp-action="Index">Kalender</a>
+                            <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="Index">Kalender</a>
                         </li>
 
                         @if (User.IsInRole(Userroles.User) || User.IsInRole(Userroles.Student))
                         {
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="memberDropdown"
                                    role="button"
@@ -89,7 +101,7 @@
                         @if (User.IsInRole(Userroles.Divepro))
                         {
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="diveproDropdown"
                                    role="button"
@@ -107,7 +119,7 @@
                         {
 
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="usersDropdown"
                                    role="button"
@@ -130,7 +142,7 @@
                             </li>
 
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="divesitesDropdown"
                                    role="button"
@@ -152,7 +164,7 @@
                             </li>
 
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="templatesDropdown"
                                    role="button"
@@ -171,7 +183,7 @@
                             </li>
 
                             <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                    href="#"
                                    id="certificateDropdown"
                                    role="button"
@@ -187,12 +199,8 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="btn btn-outline-primary" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>
+                                <a class="btn btn-outline-light" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>
                             </li>
-
-
-
-
 
                         }
                     </ul>

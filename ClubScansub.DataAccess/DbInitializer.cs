@@ -2,6 +2,7 @@
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace ClubScansub.Data
@@ -142,6 +143,45 @@ namespace ClubScansub.Data
                         db.SaveChangesAsync().GetAwaiter().GetResult();
                     }
                 }
+                else
+                {
+                    //User already imported - only import new accountentries
+                    var user = db.ApplicationUsers.FirstOrDefault(x=>x.UserName == applicationUser.UserName);
+
+                    if (user != null)
+                    {
+                        var cutdate = db.ApplicationUserAccountEntry.Include(x => x.ApplicationUser).Where(x => x.ApplicationUser.UserName == applicationUser.UserName).Max(x => x.PostingDate) ?? new System.DateTime(1900,1,1);
+                        var newaccountentries = postings.Where(x => x.dsfnr == item.dsfnr && x.dato > cutdate).Select(x => new ApplicationUserAccountEntry()
+                        {
+                            AccountType = AccountTypeEnum.EventAccountType,
+                            Amount = x.pris,
+                            Description = $"{x.tekst}",
+                            PostingDate = x.dato,
+                            ApplicationUser = user
+
+                        });
+                        db.ApplicationUserAccountEntry.AddRange(newaccountentries);
+
+                        db.SaveChangesAsync().GetAwaiter().GetResult();
+
+                        //if (user.Balance != item.saldo)
+                        //{
+                        //    var newentry = new ApplicationUserAccountEntry()
+                        //    {
+                        //        AccountType = AccountTypeEnum.EventAccountType,
+                        //        Amount = item.saldo - user.Balance,
+                        //        Description = $"Saldojustering ",
+                        //        PostingDate = DateTime.Now,
+                        //        ApplicationUser = user
+
+                        //    };
+                        //    db.ApplicationUserAccountEntry.Add(newentry);
+
+                        //    db.SaveChangesAsync().GetAwaiter().GetResult();
+                        //}
+                    }
+                }
+
             }
 
         }

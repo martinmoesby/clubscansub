@@ -29,6 +29,8 @@ namespace ClubScansub.App_Data.ScansubModels
         public string password { get; set; }
 
         public string dsfnr { get; set; }
+
+        public decimal saldo { get; set; }
     }
 
 }

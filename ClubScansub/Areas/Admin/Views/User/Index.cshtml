@@ -2,22 +2,23 @@
 @{
     ViewData["Title"] = Model.MemberType;
 }
+    @*<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />*@
 
-    <div class="container">
+<div class="container">
 
-        <div class="row">
-            <div class="col-6">
-                <h1 class="display-4 text-info">@(Model.MemberType)s</h1>
-            </div>
-            <div class="col-6 text-right">
-                <a class="btn btn-outline-info btn-sm" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="/Admin/User"><i class="fas fa-user-plus"></i>&nbsp;Opret bruger...</a>
-            </div>
+    <div class="row">
+        <div class="col-6">
+            <h1 class="display-4 text-info">@(Model.MemberType)s</h1>
         </div>
-        
-        <hr />
-        
+        <div class="col-6 text-right">
+            <a class="btn btn-outline-info btn-sm" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="/Admin/User"><i class="fas fa-user-plus"></i>&nbsp;Opret bruger...</a>
+        </div>
+    </div>
 
-        <form asp-action="Index">
+    <hr />
+
+
+    <form asp-action="Index">
 
             <input type="hidden" asp-for="Pager.CurrentPage" />
             <input type="hidden" asp-for="Pager.urlParam" />
@@ -39,22 +40,22 @@
 
         </form>
 
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Medl. nr.</th>
-                    <th>Navn</th>
-                    <th>Email</th>
-                    <th>Telefonnummer</th>
-                    <th class="text-center">Cert / godkendte</th>
-                    <th class="text-right">Turkonto</th>
-                    <th class="text-right">Kursuskonto</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="myTable">
-                @foreach (var user in Model.Users)
-                {
+    <table class="table table-sm display" id="usersTable" width='100%'>
+        <thead>
+            <tr>
+                <th>Medl. nr.</th>
+                <th>Navn</th>
+                <th>Email</th>
+                <th>Telefonnummer</th>
+                <th class="text-center">Cert / godkendte</th>
+                <th class="text-right">Turkonto</th>
+                <th class="text-right">Kursuskonto</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @foreach (var user in Model.Users)
+            {
                 <tr>
                     <td class="small">
                         @if (user.LockoutEnd > DateTime.Now)
@@ -79,16 +80,36 @@
                         <partial name="_EditDetailsDeleteButtonsPartial" model="@user.Id" />
                     </td>
                 </tr>
-                }
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
 
-    </div>
+</div>
 
 @section Scripts {
-
+    @*<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>*@
     <script>
+
         $(document).ready(function () {
+            @*url = "@Url.Action("GetMembers","User", new { Area= "Admin" })";
+            var memberType = '@Model.MemberType';
+
+            $("#usersTable").DataTable({
+                ajax: {
+                    url: url + "?Membertype=" + memberType,
+                    dataSrc:''
+                },
+                "columns": [
+                    { "data": "AccountNumber" },
+                    { "data": "Name" },
+                    { "data": "Email" },
+                    { "data": "PhoneNumber" },
+                    { "data": "Balance" }, 
+                    { "data": "CourseAccountBalance" }, 
+                ]
+                });
+            *@
+
             $("#myInput").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
                 $("#myTable tr").filter(function () {

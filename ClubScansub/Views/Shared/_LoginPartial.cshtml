@@ -7,7 +7,7 @@
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext db;
 
-<ul class="navbar-nav">
+<ul class="navbar-nav text-dark">
     @if (SignInManager.IsSignedIn(User))
     {
         var appUser = await db.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
@@ -44,8 +44,8 @@
             </a>
 
             <div class="dropdown-menu dropdown-menu-right">
-                <span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Funktioner:</span>
-                <div class="dropdown-divider"></div>
+                @*<span class="dropdown-item dropdown-header"><i class="far fa-user"></i>&nbsp;Funktioner:</span>
+                <div class="dropdown-divider"></div>*@
                 <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="fas fa-user"></i>&nbsp;Min konto</a>
                 <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Manage/Certifications"><i class="fas fa-award"></i>&nbsp;Mine Certifikater</a>
                 <a class="dropdown-item small" asp-area="Members" asp-action="Index" asp-controller="Event"><i class="fas fa-calendar-alt"></i>&nbsp;Mine ture</a>

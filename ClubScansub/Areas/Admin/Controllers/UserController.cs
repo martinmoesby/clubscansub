@@ -44,7 +44,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var userSearchResult = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(c=>c.Certificates)
                 .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id)               
-                ).OrderBy(x=>x.AccountNumber).ToListAsync();
+                ).OrderBy(x=>int.Parse(x.AccountNumber)).ToListAsync();
 
             IndexPageVM.Pager = new Pager
             {
@@ -161,6 +161,13 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<JsonResult> GetMembers()
         {
             var members = await um.GetUsersInRoleAsync(Userroles.Member);
+            return Json(await db.ApplicationUsers.Where(x => members.Any(s => x.Id == s.Id)).ToListAsync());
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetMembers(string Membertype)
+        {
+            var members = await um.GetUsersInRoleAsync(Membertype);
             return Json(await db.ApplicationUsers.Where(x => members.Any(s => x.Id == s.Id)).ToListAsync());
         }
 
