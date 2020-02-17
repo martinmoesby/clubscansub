@@ -346,7 +346,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var e = await db.Events.Include(x=>x.Participants).FirstOrDefaultAsync(x=>x.Id == id);
+            var e = await db.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).FirstOrDefaultAsync(x=>x.Id == id);
             var eventtype = e.EventType;
 
             foreach (var item in e.Participants)
@@ -372,7 +372,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 }
             }
 
-            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Turen '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. Du er blevet refunderet 100% af din betaling for turen");
+            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Begivenheden '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. \n\nEvt. pris er blevet indstat på din turkonto\n\nMed venlig hilsen\nKlub Scansub");
 
             if (smsSendResult.Any(x=>!x.IsSuccessStatusCode))
             {
