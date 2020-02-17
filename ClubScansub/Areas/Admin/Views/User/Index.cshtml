@@ -69,8 +69,28 @@
                         &nbsp;@user.AccountNumber
                     </td>
                     <td class="small">@user.Name</td>
-                    <td class="small">@user.Email</td>
-                    <td class="small">@user.PhoneNumber</td>
+                    <td class="small">
+                        @if (user.EmailConfirmed)
+                        {
+                            <i class="far fa-envelope text-success" title="E-mail er blevet valideret"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-envelope-open text-danger" title="E-mail er IKKE blevet valideret"></i>
+                        }
+                        @user.Email
+                    </td>
+                    <td class="small">
+                        @if (user.PhoneNumberConfirmed)
+                        {
+                            <i class="fas fa-phone text-success" title="Telefon er blevet valideret"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-phone text-danger" title="Telefon er IKKE blevet valideret"></i>
+                        }
+                        @user.PhoneNumber
+                    </td>
                     <td class="text-center small">
                         <span class="text-danger">@(user.Certificates.Count - @user.Certificates.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates.Count(x => x.IsVerified)</span>
                     </td>
