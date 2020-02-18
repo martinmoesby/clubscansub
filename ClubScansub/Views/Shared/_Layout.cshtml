@@ -2,7 +2,7 @@
 @using ClubScansub.Utility;
 @inject ClubScansub.Data.ApplicationDbContext db
 
-@{ 
+@{
     var clubInfo = db.ClubSettings.SingleOrDefault();
 }
 
@@ -65,13 +65,19 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    
+
                     <ul class="navbar-nav flex-grow-1">
 
                         <li class="nav-item">
-                            <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="Index">Kalender</a>
+                            <a class="nav-link text-light btn btn-dark btn-sm"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Index">Kalender</a>
                         </li>
+                        <li class="nav-item">
 
+                            <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="DiveGuide">Dykkerguide</a>
+                        </li>
                         @if (User.IsInRole(Userroles.User) || User.IsInRole(Userroles.Student))
                         {
                             <li class="nav-item dropdown mx-2">
@@ -236,7 +242,8 @@
             <span>
                 <a asp-area="" asp-controller="Home" asp-action="Privacy"><span class="text-info">Privatlivsindstillinger</span></a>
                 @*&nbsp;<span class="text-info">|</span>&nbsp;
-                    <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info">Betingelser</span></a>*@
+                    <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info">Betingelser</span></a>*@<span class="text-info"></span>
+                <a asp-area="" asp-controller="Home" asp-action="Terms"><span class="text-info"></span></a>
             </span>
             <span><i class="fab fa-superpowers"></i>&nbsp;Powered by Diveclub Manager</span>
         </div>

@@ -337,6 +337,13 @@ namespace ClubScansub.Controllers
             return View(db.ClubSettings.SingleOrDefault());
         }
 
+        public async Task<IActionResult> DiveGuide()
+        {
+            var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
+
+            return View(data);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

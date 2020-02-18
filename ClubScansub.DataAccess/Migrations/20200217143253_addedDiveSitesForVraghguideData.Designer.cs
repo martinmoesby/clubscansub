@@ -4,14 +4,16 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200217143253_addedDiveSitesForVraghguideData")]
+    partial class addedDiveSitesForVraghguideData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -490,11 +492,11 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<decimal>("Latitude");
+                    b.Property<float>("Latitude");
 
                     b.Property<int>("LocationType");
 
-                    b.Property<decimal>("Longitude");
+                    b.Property<float>("Longitude");
 
                     b.Property<int>("MaxDivers");
 
