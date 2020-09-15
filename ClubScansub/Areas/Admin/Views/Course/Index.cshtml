@@ -7,7 +7,7 @@
 <partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
 <div class="container">
 
-    <h1 class="display-4 text-info mb-3">@pageTitle</h1>
+    <h1 class="display-4 text-info mb-3 text-nowrap">@pageTitle</h1>
 
     @if (Model.Count() == 0)
     {
@@ -41,28 +41,43 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.OrderBy(x=>x.StartDateAndTime))
+                @foreach (var item in Model.OrderBy(x => x.StartDateAndTime))
                 {
-                <tr>
-                    <td class="small">@item.Id</td>
-                    <td class="small">@item.CourseName</td>
-                    <td class="small">@item.StartDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
-                    <td class="small">@item.EndDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
-                    <td class="small">(@item.Signups.Count / @item.Participants.Count) af @item.MinParticipants - @item.MaxParticipants</td>
-                    <td class="small">@item.CourseSessions.Count</td>
-                    <td class="small">
-                        @if (!item.IsCancelled)
-                        {
-                        <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
-                        }
-                        else
-                        {
-                        <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
-                        }
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="small">@item.Id</td>
+                        <td class="small">@item.CourseName</td>
+                        <td class="small">@item.StartDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
+                        <td class="small">@item.EndDateAndTime.ToString("dd-MM-yyyy HH:mm")</td>
+                        <td class="small">(@item.Signups.Count / @item.Participants.Count) af @item.MinParticipants - @item.MaxParticipants</td>
+                        <td class="small">@item.CourseSessions.Count</td>
+                        <td class="small">
+                            @if (!item.IsCancelled)
+                            {
+                                <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
+                            }
+                            else
+                            {
+                                <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                            }
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
     }
+
+    <div class="row">
+
+        <div class="col-4">
+            @if (ViewBag.IsCompleteCourses)
+            {
+                <a class="btn btn-sm btn-outline-success" asp-action="Index" asp-route-coursetype="@ViewBag.CourseType">Se aktive...</a>
+            }
+            else
+            {
+                <a class="btn btn-sm btn-outline-secondary" asp-action="CompletedCourseIndex" asp-route-coursetype="@ViewBag.Coursetype">Se afsluttede...</a>
+            }
+        </div>
+
+    </div>
 </div>

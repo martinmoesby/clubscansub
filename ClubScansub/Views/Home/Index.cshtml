@@ -12,13 +12,17 @@
 <div class="container-fluid">
     <partial name="_StatusMessage" model="Model.Statusmessage" />
 
-    <div class="row">
-        <div class="d-flex justify-content-start col">
 
-            @*<div class="form-check form-check-inline px-2 py-1 rounded small">
-            <input class="form-check-input" type="checkbox" id="allevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="allcheckedChanged('events')">
-            <label class="form-check-label" for="allevents">Alle</label>
-        </div>*@
+
+    <div class="row">
+        <div class="col-lg-7 col-12 justify-content-start">
+
+            <a class="btn btn-outline-success btn-sm border-0" asp-area="" asp-controller="Home" asp-action="Index" asp-route-events="trips">Alle</a>
+
+            @*<div class="form-check form-check-inline bg-boat px-2 py-1 rounded small">
+                <input class="form-check-input" type="checkbox" id="allevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="allcheckedChanged('events')">
+        <label class="form-check-label" for="allevents">Alle</label>
+            </div>*@
 
             <div class="form-check form-check-inline bg-boat px-2 py-1 rounded small">
                 <input class="form-check-input events" type="checkbox" id="boatevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('boat')">
@@ -40,9 +44,6 @@
                 <label class="form-check-label ellipsis" for="otherevents">Andet</label>
             </div>
 
-            @*</div>
-
-        <div class="d-flex justify-content-start mb-3 mr-1 p-3 border rounded col-2">*@
             <div class="form-check form-check-inline bg-travel px-2 py-1 rounded small">
                 <input class="form-check-input events" type="checkbox" id="travelevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('travel')">
                 <label class="form-check-label ellipsis" for="travelevents">Rejser</label>
@@ -52,21 +53,23 @@
                 <input class="form-check-input events" type="checkbox" id="liveaboardevents" @(Model.CalendarType == "trips" ? "checked" : "") onchange="eventsCheckedChanged('liveaboard')">
                 <label class="form-check-label ellipsis" for="liveaboardevents">Liveaboards</label>
             </div>
+
             @if (User.IsInRole(Userroles.Divepro))
             {
-            <div class="form-check form-check-inline bg-internal px-2 py-1 border rounded small">
-                <input class="form-check-input" type="checkbox" id="internalevents" onchange="eventsCheckedChanged('internal')" value="false">
-                <label class="form-check-label ellipsis" for="internalevents">Divepros only</label>
-            </div>
+                <div class="form-check form-check-inline bg-internal px-2 py-1 border rounded small">
+                    <input class="form-check-input" type="checkbox" id="internalevents" onchange="eventsCheckedChanged('internal')" value="false">
+                    <label class="form-check-label ellipsis" for="internalevents">Divepros only</label>
+                </div>
             }
         </div>
 
-        <div class="d-flex justify-content-end col">
+        <div class="col-lg-5 justify-content-lg-end text-lg-right col-12 mt-lg-0 mt-2">
 
             @*<div class="form-check form-check-inline px-2 py-1 rounded small">
-                    <input class="form-check-input" type="checkbox" id="allcourses" @(Model.CalendarType == "courses" ? "checked" : "") onchange="allcheckedChanged('courses')">
-                    <label class="form-check-label" for="allcourses">Alle</label>
-                </div>*@
+            <input class="form-check-input" type="checkbox" id="allcourses" @(Model.CalendarType == "courses" ? "checked" : "") onchange="allcheckedChanged('courses')">
+            <label class="form-check-label" for="allcourses">Alle</label>
+        </div>*@
+            <a class="btn btn-outline-success btn-sm border-0" asp-area="" asp-controller="Home" asp-action="Index" asp-route-events="courses">Alle</a>
 
             <div class="form-check form-check-inline bg-basecourse px-2 py-1 border rounded small">
                 <input class="form-check-input courses" type="checkbox" id="basecoursesevents" @(Model.CalendarType == "courses" ? "checked" : "") onchange="eventsCheckedChanged('basecourses')">
@@ -90,6 +93,16 @@
         </div>
 
     </div>
+    
+    <div class="row justify-content-between mb-2">
+        <div class="col-sm-6 col-12">
+
+        </div>
+        <div class="col-sm-6 col-12 text-right">
+
+        </div>
+    </div>
+
     <div class="mt-3" id="calendar"></div>
 
 

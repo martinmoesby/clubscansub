@@ -48,7 +48,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Index(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
         {
             var @events = await db.Events
-                .Where(x=>x.EventType == eventtype && x.IsCancelled == false)
+                .Where(x=>x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.Divelocation)
                 .ToListAsync();
@@ -76,9 +76,52 @@ namespace ClubScansub.Areas.Admin.Controllers
                     ViewBag.Pagetitle = "Andre begivenheder";
                     break;
             }
-
+            ViewBag.EventType = eventtype;
+            ViewBag.IsClosedEvents = false;
             ViewBag.StatusMessage = StatusMessage;
             return View(events);
+
+        }
+
+        public async Task<IActionResult> ClosedEvents(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
+        {
+            var @events = await db.Events
+                .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime <= DateTime.Now)
+                .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x => x.Divelocation)
+                .ToListAsync();
+            
+            ViewBag.Pagetitle = "Afsluttede ";
+
+            switch (eventtype)
+            {
+                case EventTypeEnum.Bådtur:
+                    ViewBag.Pagetitle += "Bådture";
+                    break;
+                case EventTypeEnum.Stranddyk:
+                    ViewBag.Pagetitle += "Stranddyk";
+                    break;
+                case EventTypeEnum.Rejse:
+                    ViewBag.Pagetitle += "Dykkerture";
+                    break;
+                case EventTypeEnum.Liveaboard:
+                    ViewBag.Pagetitle += "Liveaboard ferie";
+                    break;
+                case EventTypeEnum.Klubture:
+                    ViewBag.Pagetitle += "Andre klubture";
+                    break;
+                case EventTypeEnum.Other:
+                default:
+                    ViewBag.Pagetitle += "Andre begivenheder";
+                    break;
+            }
+
+            ViewBag.EventType = eventtype;
+            
+            ViewBag.IsClosedEvents = true;
+
+            ViewBag.StatusMessage = StatusMessage;
+            return View("Index",events);
 
         }
 
@@ -163,6 +206,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             item.Divelocation = location;
             item.RequiredCertificate = certificate;
+            item.DeeplinkId = Guid.NewGuid();
 
             if (string.IsNullOrEmpty(item.Title))
             {

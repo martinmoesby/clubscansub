@@ -58,28 +58,61 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         public IActionResult Index(CourseTypeEnum courseType = CourseTypeEnum.BaseCourse)
         {
+            ViewBag.Pagetitle = "Kommende eller igangværende ";
 
             switch (courseType)
             {
                 case CourseTypeEnum.BaseCourse:
-                    ViewBag.Pagetitle = "Basis kurser";
+                    ViewBag.Pagetitle += "Basis kurser";
                     break;
                 case CourseTypeEnum.TechCourse:
-                    ViewBag.Pagetitle = "Tekniske kurser";
+                    ViewBag.Pagetitle += "Tekniske kurser";
                     break;
                 case CourseTypeEnum.ProCourse:
-                    ViewBag.Pagetitle = "Pro Kurser";
+                    ViewBag.Pagetitle += "Pro Kurser";
                     break;
                 case CourseTypeEnum.SpecialtyCourse:
-                    ViewBag.Pagetitle = "Specialer";
+                    ViewBag.Pagetitle += "Specialer";
                     break;
                 default:
-                    ViewBag.Pagetitle = "Andre kurser";
+                    ViewBag.Pagetitle += "Andre kurser";
                     break;
             }
 
             ViewBag.StatusMessage = StatusMessage;
-            return View(db.Courses.Where(x=>x.CourseType == courseType).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
+            ViewBag.IsCompleteCourses = false;
+            ViewBag.CourseType = courseType;
+            return View(db.Courses.Where(x=>x.CourseType == courseType && x.StartDateAndTime > DateTime.Now).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
+
+        }
+
+        public IActionResult CompletedCourseIndex(CourseTypeEnum courseType = CourseTypeEnum.BaseCourse)
+        {
+            ViewBag.Pagetitle = "Afsluttede ";
+
+            switch (courseType)
+            {
+                case CourseTypeEnum.BaseCourse:
+                    ViewBag.Pagetitle += "Basis kurser";
+                    break;
+                case CourseTypeEnum.TechCourse:
+                    ViewBag.Pagetitle += "Tekniske kurser";
+                    break;
+                case CourseTypeEnum.ProCourse:
+                    ViewBag.Pagetitle += "Pro Kurser";
+                    break;
+                case CourseTypeEnum.SpecialtyCourse:
+                    ViewBag.Pagetitle += "Specialer";
+                    break;
+                default:
+                    ViewBag.Pagetitle += "Andre kurser";
+                    break;
+            }
+
+            ViewBag.StatusMessage = StatusMessage;
+            ViewBag.IsCompleteCourses = true;
+            ViewBag.CourseType = courseType;
+            return View("Index", db.Courses.Where(x => x.CourseType == courseType && x.StartDateAndTime <= DateTime.Now).Include(x => x.CourseSessions).Include(x => x.Participants).Include(x => x.Signups));
 
         }
 
@@ -143,7 +176,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                 MaxParticipants = courseviewmodel.Course.MaxParticipants,
                 StartDateAndTime = courseviewmodel.Course.StartDateAndTime,
                 Price = courseviewmodel.Course.Price,
-                EventType = EventTypeEnum.NotAnEvent
+                EventType = EventTypeEnum.NotAnEvent,
+                DeeplinkId = Guid.NewGuid()
             };
 
             var currentDate = course.StartDateAndTime;

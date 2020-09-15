@@ -32,10 +32,11 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-light box-shadow mb-5">
-            <div class="container-fluid">
-                <div class="navbar-brand">
-                    <h5 class="text-dark bg-light badge badge-pill pb-1">
+        <div class="jumbotron-fluid">
+            <div class="row justify-content-between align-content-between m-3 ">
+
+                <div class="col">
+                    <h5 class="text-dark">
                         <a asp-action="Index" asp-area="" asp-controller="Home" class="text-info h3">
                             @{if (clubInfo.Logo != null)
                                 {
@@ -50,26 +51,42 @@
                         </a>
                         <br />Adminstration
                     </h5>
-
-
                 </div>
+                <partial name="_LoginPartial" />
+
+            </div>
+        </div>
+
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark mb-5 border-dark border-bottom border-top">
+            <div class="container-fluid">
+                @*<div class="navbar-brand">
+                    <h5 class="text-dark bg-light badge badge-pill pb-1">
+                        <a asp-action="Index" asp-area="" asp-controller="Home" class="text-info h3">
+                            @{if (clubInfo.Logo != null)
+                                {
+                                    var imgSource = $"data:image;base64,{Convert.ToBase64String(clubInfo.Logo)}";
+                                    <img class="img rounded" src="@(imgSource)" alt="" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/alpha-flag-hi.png" height="55" alt="" title="Click to go back to homepage" />@clubInfo.Name
+                                }
+                            }
+                        </a>
+
+                    </h5>
+
+
+                </div>*@
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
 
-                    <partial name="_LoginPartial" />
-
-
                     <ul class="navbar-nav flex-grow-1">
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark btn btn-light btn-sm" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Home</a>
-                        </li>
-
                         <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                            <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                href="#"
                                id="usersDropdown"
                                role="button"
@@ -78,17 +95,21 @@
                                aria-expanded="false">Brugere</a>
 
                             <div class="dropdown-menu" aria-labelledby="usersDropdown">
-                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin">Brugere</a>
-                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Member">Medlemmer</a>
-                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Divepro">Instruktører</a>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Student"><i class="fas fa-user-graduate mr-2"></i>Kursister</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Administrator">Administratorer</a>
-                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Owner">Ejer</a>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin"><i class="far fa-user mr-2"></i>Brugere</a>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Member"><i class="fas fa-user mr-2"></i>Medlemmer</a>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Divepro"><i class="fas fa-chalkboard-teacher mr-2"></i>Instruktører</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Administrator"><i class="fas fa-user-cog mr-2"></i>Administratorer</a>
+                                <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Owner"><i class="fas fa-user-shield mr-2"></i>Ejer</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-user-plus mr-2"></i>Ny...</a>
                             </div>
                         </li>
 
                         <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                            <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                href="#"
                                id="divesitesDropdown"
                                role="button"
@@ -110,7 +131,7 @@
                         </li>
 
                         <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                            <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                href="#"
                                id="templatesDropdown"
                                role="button"
@@ -129,7 +150,7 @@
                         </li>
 
                         <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-dark btn btn-light btn-sm"
+                            <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
                                href="#"
                                id="certificateDropdown"
                                role="button"
@@ -145,10 +166,12 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="btn btn-outline-primary" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt"></i>&nbsp;Planner</a>
+                            <a class="btn btn-outline-light" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>
                         </li>
 
                     </ul>
+
+
                 </div>
             </div>
         </nav>
@@ -157,6 +180,22 @@
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pl-5 pr-5 pb-3">
             @RenderBody()
+            <div>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog-centered modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light text-black-50 justify-content-between">
+                                <h5 class="modal-title" id="myModalTitle"></h5>
+                                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="modal-body" id="myModalContent">
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -175,6 +214,8 @@
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&setMkt=da-DK&setLang=da&UR=DK&key=Am0MRTxgaifeEFyXMSZw5AWlnAaMTVOcK2xBxt2c9gVbGJjc0zIK7lOldalP4biR' async defer></script>
+
     </environment>
     <environment exclude="Development">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
@@ -189,6 +230,8 @@
                 crossorigin="anonymous"
                 integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
         </script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&setMkt=da-DK&setLang=da&UR=DK&key=Anv6_xU3GX5rnzLtJ6EZbiHF2vRnfONCI9fVn43ibVRDJD-ol9rFRmOb5aGKDLAC' async defer></script>
+
     </environment>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap-select/dist/js/bootstrap-select.js"></script>

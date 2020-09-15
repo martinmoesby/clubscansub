@@ -1,6 +1,8 @@
 using ClubScansub.Utility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -77,6 +79,8 @@ namespace ClubScansub.Models
         [NotMapped]
         [Display(Name = "Manglende deltagere")]
         public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants;
+
+        public Guid DeeplinkId { get; set; }
 
     }
 }

@@ -2,7 +2,7 @@
 @using ClubScansub.Utility;
 @inject ClubScansub.Data.ApplicationDbContext db
 
-@{ 
+@{
     var clubInfo = db.ClubSettings.SingleOrDefault();
 }
 
@@ -41,11 +41,11 @@
                             @{if (clubInfo.Logo != null)
                                 {
                                     var imgSource = $"data:image;base64,{Convert.ToBase64String(clubInfo.Logo)}";
-                                    <img class="img rounded" src="@(imgSource)" alt="" />
+                                <img class="img rounded" src="@(imgSource)" alt="" />
                                 }
                                 else
                                 {
-                                    <img src="~/images/alpha-flag-hi.png" height="55" alt="" title="Click to go back to homepage" />@clubInfo.Name
+                                <img src="~/images/alpha-flag-hi.png" height="55" alt="" title="Click to go back to homepage" />@clubInfo.Name
                                 }
                             }
                         </a>
@@ -55,7 +55,7 @@
 
             </div>
         </div>
-
+        @*
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark mb-5 border-dark border-bottom border-top">
             <div class="container-fluid">
 
@@ -65,151 +65,186 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    
-                    <ul class="navbar-nav flex-grow-1">
 
-                        <li class="nav-item">
-                            <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="Index">Kalender</a>
-                        </li>
+        <ul class="navbar-nav flex-grow-1">
+           <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                       asp-area="" asp-controller="Home" asp-action="Index" asp-route-events="trips"
+                       id="calendarDropdown"
+                       role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="false">Kalender</a>
+                    <div class="dropdown-menu" aria-labelledby="calendarDropdown">
+                        <a class="dropdown-item small" asp-area="" asp-controller="Home" asp-route-events="courses" asp-action="Index">Alle kurser</a>
+                        <a class="dropdown-item small" asp-area="" asp-controller="Home" asp-route-events="trips" asp-action="Index">Alle ture</a>
 
-                        @if (User.IsInRole(Userroles.User) || User.IsInRole(Userroles.Student))
+                    </div>
+                </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="Index" asp-route-events="trips">Kalender</a>
+            </li>
+
+            <li class="nav-item">
+                        <a class="nav-link text-light btn btn-dark btn-sm" asp-area="" asp-controller="Home" asp-action="Index" asp-route-events="courses">Kursuskalender</a>
+                    </li>
+
+                @if (User.IsInRole(Userroles.User))
+                {
+                <li class="nav-item">
+                    <a class="nav-link text-light btn btn-dark btn-sm" asp-area="Members" asp-controller="Event" asp-action="Index">Mine ture</a>
+                </li>
+                }
+
+                @if (User.IsInRole(Userroles.Student))
+                {
+                <li class="nav-item">
+                    <a class="nav-link text-light btn btn-dark btn-sm" asp-area="Members" asp-controller="Event" asp-action="CourseIndex">Mine kurser</a>
+                </li>
+                }
+
+                @if (User.IsInRole(Userroles.Student) || User.IsInRole(Userroles.User))
+                {
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                       href="#"
+                       id="memberDropdown"
+                       role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="false">Klubmedlem</a>
+                    <div class="dropdown-menu" aria-labelledby="memberDropdown">
+                        @if (User.IsInRole(Userroles.User))
                         {
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="memberDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Klubmedlem</a>
-                                <div class="dropdown-menu" aria-labelledby="memberDropdown">
-                                    @if (User.IsInRole(Userroles.User))
-                                    {
-                                        <a class="dropdown-item small" asp-area="Members" asp-controller="Event" asp-action="Index">Mine ture</a>
-                                    }
-                                    @if (User.IsInRole(Userroles.Student))
-                                    {
-                                        <a class="dropdown-item small" asp-area="Members" asp-controller="Event" asp-action="CourseIndex">Mine kurser</a>
-                                    }
-                                </div>
-                            </li>
-
+                        <a class="dropdown-item small" asp-area="Members" asp-controller="Event" asp-action="Index">Mine ture</a>
                         }
-                        @if (User.IsInRole(Userroles.Divepro))
+                        @if (User.IsInRole(Userroles.Student))
                         {
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="diveproDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Divepro</a>
-                                <div class="dropdown-menu" aria-labelledby="diveproDropdown">
-                                    <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="Index">Tilgængelige Kurser</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="MyWorkplan">Min undervisninsplan</a>
-                                </div>
-                            </li>
+                        <a class="dropdown-item small" asp-area="Members" asp-controller="Event" asp-action="CourseIndex">Mine kurser</a>
                         }
-                        @if (User.IsInRole(Userroles.Administrator))
+                    </div>
+                </li>
+                }
+
+
+
+                    @if (User.IsInRole(Userroles.Divepro))
+                        {
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                           href="#"
+                           id="diveproDropdown"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">Divepro</a>
+                        <div class="dropdown-menu" aria-labelledby="diveproDropdown">
+                            <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="Index">Tilgængelige Kurser</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-area="Divepro" asp-controller="Work" asp-action="MyWorkplan">Min undervisninsplan</a>
+                        </div>
+                    </li>
+                        }
+                    @if (User.IsInRole(Userroles.Administrator))
                         {
 
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="usersDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Brugere</a>
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                           href="#"
+                           id="usersDropdown"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">Brugere</a>
 
-                                <div class="dropdown-menu" aria-labelledby="usersDropdown">
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Student"><i class="fas fa-user-graduate mr-2"></i>Kursister</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin"><i class="far fa-user mr-2"></i>Brugere</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Member"><i class="fas fa-user mr-2"></i>Medlemmer</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Divepro"><i class="fas fa-chalkboard-teacher mr-2"></i>Instruktører</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Administrator"><i class="fas fa-user-cog mr-2"></i>Administratorer</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Owner"><i class="fas fa-user-shield mr-2"></i>Ejer</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-user-plus mr-2"></i>Ny...</a>
-                                </div>
-                            </li>
+                        <div class="dropdown-menu" aria-labelledby="usersDropdown">
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Student"><i class="fas fa-user-graduate mr-2"></i>Kursister</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin"><i class="far fa-user mr-2"></i>Brugere</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Member"><i class="fas fa-user mr-2"></i>Medlemmer</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Divepro"><i class="fas fa-chalkboard-teacher mr-2"></i>Instruktører</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Administrator"><i class="fas fa-user-cog mr-2"></i>Administratorer</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="User" asp-area="Admin" asp-route-membertype="@ClubScansub.Utility.Userroles.Owner"><i class="fas fa-user-shield mr-2"></i>Ejer</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-user-plus mr-2"></i>Ny...</a>
+                        </div>
+                    </li>
 
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="divesitesDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Turkalender</a>
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                           href="#"
+                           id="divesitesDropdown"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">Turkalender</a>
 
-                                <div class="dropdown-menu" aria-labelledby="divesitesDropdown">
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Divesite" asp-area="Admin">Dykkersteder</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Bådtur">Bådture</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Stranddyk">Strandture</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Klubture">Klubture</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Other">Andet</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Rejse">Rejser</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Liveaboard">Live Aboards</a>
-                                </div>
-                            </li>
+                        <div class="dropdown-menu" aria-labelledby="divesitesDropdown">
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Divesite" asp-area="Admin">Dykkersteder</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Bådtur">Bådture</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Stranddyk">Strandture</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Klubture">Klubture</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Other">Andet</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Rejse">Rejser</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Event" asp-area="Admin" asp-route-eventtype="@ClubScansub.Utility.EventTypeEnum.Liveaboard">Live Aboards</a>
+                        </div>
+                    </li>
 
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="templatesDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Kursuskalender</a>
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                           href="#"
+                           id="templatesDropdown"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">Kursuskalender</a>
 
-                                <div class="dropdown-menu" aria-labelledby="templatesDropdown">
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Template" asp-area="Admin">Kursus skabeloner</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.BaseCourse">Basis kurser</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.SpecialtyCourse">Specialer</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.TechCourse">Tekniske kurser</a>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.ProCourse">Pro kurser</a>
-                                </div>
-                            </li>
+                        <div class="dropdown-menu" aria-labelledby="templatesDropdown">
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Template" asp-area="Admin">Kursus skabeloner</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.BaseCourse">Basis kurser</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.SpecialtyCourse">Specialer</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.TechCourse">Tekniske kurser</a>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Course" asp-area="Admin" asp-route-coursetype="@CourseTypeEnum.ProCourse">Pro kurser</a>
+                        </div>
+                    </li>
 
-                            <li class="nav-item dropdown mx-2">
-                                <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
-                                   href="#"
-                                   id="certificateDropdown"
-                                   role="button"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">Certifikater</a>
+                    <li class="nav-item dropdown mx-2">
+                        <a class="nav-link dropdown-toggle text-light btn btn-dark btn-sm"
+                           href="#"
+                           id="certificateDropdown"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">Certifikater</a>
 
-                                <div class="dropdown-menu" aria-labelledby="certificateDropdown">
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Certificate" asp-area="Admin">Certifikater</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item small" asp-action="Index" asp-controller="Diveorganization" asp-area="Admin">Dykkerorganisationer</a>
-                                </div>
-                            </li>
+                        <div class="dropdown-menu" aria-labelledby="certificateDropdown">
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Certificate" asp-area="Admin">Certifikater</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" asp-action="Index" asp-controller="Diveorganization" asp-area="Admin">Dykkerorganisationer</a>
+                        </div>
+                    </li>
 
-                            <li class="nav-item">
-                                <a class="btn btn-outline-light" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>
-                            </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light" asp-action="Planner" asp-controller="Home" asp-area="Admin"><i class="fas fa-calendar-alt mr-2"></i>Planner</a>
+                    </li>
 
                         }
                     </ul>
-                </div>
+
             </div>
+        </div>
         </nav>
+            *@
     </header>
     <div class="container-fluid">
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pl-5 pr-5 pb-3">
             @RenderBody()
-
             <div>
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog-centered modal-dialog" role="document">

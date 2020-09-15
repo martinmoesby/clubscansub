@@ -2,6 +2,7 @@
 using ClubScansub.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ClubScansub.Data
 {
@@ -32,7 +33,10 @@ namespace ClubScansub.Data
 
 
         public DbSet<medlemsdata> medlemsdata { get; private set; }
-        public DbSet<saldooplysning> saldooplysning { get; private set; }
+        public DbSet<kursistdata> kursistdata { get; private set; }
+
+        //public DbSet<saldooplysning> saldooplysning { get; private set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -125,6 +129,11 @@ namespace ClubScansub.Data
                 .HasOne(x => x.Divelocation)
                 .WithMany(x => x.Events)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Event>()
+                .Property(x => x.DeeplinkId)
+                .HasDefaultValue(Guid.NewGuid());
+
 
         }
     }

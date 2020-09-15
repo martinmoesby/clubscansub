@@ -177,19 +177,19 @@
                     <hr />
                     @if (@Model.Divelocation.MeetingLocation != null)
                     {
-                    @Model.Divelocation.MeetingLocation.Name<br />
-                    @Model.Divelocation.MeetingLocation.Streetname<br />
+                        @Model.Divelocation.MeetingLocation.Name<br />
+                        @Model.Divelocation.MeetingLocation.Streetname<br />
 
-                    <span>@Model.Divelocation.MeetingLocation.Zipcode</span>
+                        <span>@Model.Divelocation.MeetingLocation.Zipcode</span>
 
-                    <span class="ml-2">@Model.Divelocation.MeetingLocation.City</span>
+                        <span class="ml-2">@Model.Divelocation.MeetingLocation.City</span>
 
-                    <input type="hidden" value="@Model.Divelocation.MeetingLocation.Latitude" id="latitude" />
-                    <input type="hidden" readonly value="@Model.Divelocation.MeetingLocation.Longitude" id="longitude" />
+                        <input type="hidden" value="@Model.Divelocation.MeetingLocation.Latitude" id="latitude" />
+                        <input type="hidden" readonly value="@Model.Divelocation.MeetingLocation.Longitude" id="longitude" />
                     }
                     else
                     {
-                    <p>Ikke angivet mødested for Dykkerlokation</p>
+                        <p>Ikke angivet mødested for Dykkerlokation</p>
                     }
 
                     <div id="meetLocationMap" class="rounded border map mt-2" style="height:300px;"></div>
@@ -205,33 +205,33 @@
                         {
                             for (int i = 0; i < Model.FixedParticipants; i++)
                             {
-                    <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
-                    <br />
+                                <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
+                                <br />
                             }
 
                             foreach (var user in Model.Participants)
                             {
-                    <div class="row small justify-content-between">
-                        <div class="col-6 text-success ellipsis">
-                            <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
-                        </div>
-                        @if (User.IsInRole(Userroles.Divepro))
-                        {
-                            <div class="col-6 text-info ellipsis">
-                               <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
-                            </div>
-                        }
-                    </div>
+                                <div class="row small justify-content-between">
+                                    <div class="col-6 text-success ellipsis">
+                                        <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
+                                    </div>
+                                    @if (User.IsInRole(Userroles.Divepro))
+                                    {
+                                        <div class="col-6 text-info ellipsis">
+                                            <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
+                                        </div>
+                                    }
+                                </div>
                             }
                         }
                         else
                         {
-                    <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
+                            <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
                         }
                     }
                     else
                     {
-                    <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
+                        <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
                     }
                 </div>
             </div>
@@ -251,14 +251,44 @@
 
                 </div>
             </div>
+            @if (User.IsInRole(Userroles.Administrator))
+            {
+            <div class="card mt-3">
+                <div class="card-header">Deeplink</div>
+                <div class="card-body small">
+                    <input hidden type="text" id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" readonly disabled/>
+                    <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyDeeplink()"><i class="fas fa-copy mr-2"></i>Kopier link</button>
+                </div>
+            </div>
+            }
         </div>
 
-        @*<div class="col-12 col-sm-5">
-                <div class="card">
-                    <div class="card-body small">
-
-                    </div>
-                </div>
-            </div>*@
     </div>
 </div>
+
+<script>
+    function copyDeeplink() {
+        /* Get the text field */
+        var copyText = document.getElementById("deeplink");
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+
+
+        /* Alert the copied text */
+        alert("Copied the text: " + copyText.value);
+
+        copyText.blur();
+
+        if (window.getSelection) { // All browsers, except IE <=8
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) { // IE <=8
+            document.selection.empty();
+        }
+
+    }
+</script>

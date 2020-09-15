@@ -14,6 +14,8 @@ using Nager.Date;
 using ClubScansub.Utility;
 using ClubScansub.Service;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ClubScansub.Controllers
 {
@@ -36,8 +38,9 @@ namespace ClubScansub.Controllers
         public string StatusMessage { get; set; }
 
         public HomeIndexViewModel PageModel { get; set; }
-        public async Task<IActionResult> Index(string showcalendar = "trips")
+        public async Task<IActionResult> Index(string events = "trips")
         {
+
             PageModel = new HomeIndexViewModel()
             {
                 UpcomingEvents = await db.Events
@@ -49,9 +52,48 @@ namespace ClubScansub.Controllers
                     .OrderBy(x=>x.StartDateAndTime)
                     .ToListAsync(),
                 Statusmessage = StatusMessage,
-                CalendarType = showcalendar
+                CalendarType = events
             };
             return View(PageModel);
+        }
+
+
+        [Route("DL/{id}")]
+        public async Task<IActionResult>DL(string id)
+        {
+            var guid = new Guid(id);
+
+            var @event = await db.Events.FirstOrDefaultAsync(c => c.DeeplinkId == guid);
+
+            if (@event == null)
+                return RedirectToAction(nameof(Index));
+
+            if (@event.GetType() == typeof(Event))
+            {
+                @event = await db.Events
+                    .Include(x => x.RequiredCertificate)
+                    .Include(x => x.Participants)
+                        .ThenInclude(x => x.ApplicationUser)
+                    .Include(x => x.Divelocation)
+                        .ThenInclude(x => x.MeetingLocation)
+                    .FirstOrDefaultAsync(x => x.DeeplinkId == guid);
+
+                return View( @event);
+            }
+
+            if (@event.GetType() == typeof(Course))
+            {
+                var course = await db.Courses
+                    .Include(x => x.CourseSessions).ThenInclude(x => x.CourseSessionTemplate)
+                    .Include(x => x.CourseTemplate)
+                    .Include(x => x.Signups).ThenInclude(x => x.ApplicationUser)
+                    .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                    .FirstOrDefaultAsync(x => x.DeeplinkId == guid);
+
+                return View(course);
+            }
+            return RedirectToAction(nameof(Index));
+
         }
 
         [HttpGet]

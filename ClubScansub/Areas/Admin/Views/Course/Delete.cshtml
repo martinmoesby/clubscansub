@@ -119,8 +119,8 @@
                     <br />
                 </div>
                 <div class="col-5">
-                    @item.CourseSessionTemplate.Name<br />
-                    <span class="text-muted small"> @item.CourseSessionTemplate.Description</span>
+                    @item.CourseSessionTemplate?.Name<br />
+                    <span class="text-muted small"> @item.CourseSessionTemplate?.Description</span>
                 </div>
                 <div class="col-3 pt-2">
                     <partial name="~/Areas/Divepro/Views/Shared/_InstructorSignups.cshtml" model="@item.SessionInstructors" />

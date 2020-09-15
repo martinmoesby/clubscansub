@@ -36,7 +36,7 @@ namespace ClubScansub.Areas.Members.Controllers
         public async Task<IActionResult> Index()
         {
             Events = await db.EventUsers.Include(x=>x.Event)
-                .Where(x=> !x.Event.IsCancelled && x.ApplicationUserId == User.GetIdentityId() && x.Event.EventType != EventTypeEnum.NotAnEvent)
+                .Where(x=> !x.Event.IsCancelled && x.ApplicationUserId == User.GetIdentityId() && x.Event.EventType != EventTypeEnum.NotAnEvent && x.Event.StartDateAndTime > DateTime.Now)
                 .Select(x=>x.Event).Include(x=>x.Participants)
                 .OrderBy(x=>x.StartDateAndTime).ThenBy(x=>x.Id)
                 .ToListAsync();
@@ -51,7 +51,7 @@ namespace ClubScansub.Areas.Members.Controllers
 
             Courses = await db.Courses
                 .Include(x=>x.Participants)
-                .Where(x => events.Contains(x.Id) || signups.Contains(x.Id))
+                .Where(x => (events.Contains(x.Id) || signups.Contains(x.Id)) && x.EndDateAndTime > DateTime.Now)
                 .Include(x => x.CourseSessions)
                     .ThenInclude(x=>x.CourseSessionTemplate)
                         .ThenInclude(x=>x.Address)

@@ -87,7 +87,8 @@ namespace ClubScansub.Data
 
             if (!clubInfo.IsOldMemberDatabaseImported)
             {
-                importUsers();
+                //importUsers();
+                importKursister();
                 clubInfo.IsOldMemberDatabaseImported = true;
                 await db.SaveChangesAsync();
             }
@@ -97,7 +98,6 @@ namespace ClubScansub.Data
         {
 
             var users = db.medlemsdata.AsNoTracking().ToList();
-            var postings = db.saldooplysning.AsNoTracking().ToList();
 
             foreach (var item in users)
             {
@@ -127,16 +127,14 @@ namespace ClubScansub.Data
                         if (item.status)
                             userManager.AddToRoleAsync(applicationUser, Userroles.Member).GetAwaiter().GetResult();
 
-                        var accountentries = postings.Where(x => x.dsfnr == item.dsfnr).Select(x => new ApplicationUserAccountEntry()
+                        db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
                         {
                             AccountType = AccountTypeEnum.EventAccountType,
-                            Amount = x.pris,
-                            Description = $"{x.tekst}",
-                            PostingDate = x.dato,
+                            Description = "Saldotransport fra gammelt system",
+                            Amount = item.saldo,
+                            PostingDate = DateTime.Now,
                             ApplicationUser = applicationUser,
                         });
-
-                        db.ApplicationUserAccountEntry.AddRange(accountentries);
 
                         applicationUser.OldAccountImported = true;
 
@@ -150,35 +148,26 @@ namespace ClubScansub.Data
 
                     if (user != null)
                     {
-                        var cutdate = db.ApplicationUserAccountEntry.Include(x => x.ApplicationUser).Where(x => x.ApplicationUser.UserName == applicationUser.UserName).Max(x => x.PostingDate) ?? new System.DateTime(1900,1,1);
-                        var newaccountentries = postings.Where(x => x.dsfnr == item.dsfnr && x.dato > cutdate).Select(x => new ApplicationUserAccountEntry()
+                        var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Saldotransport fra gammelt system" && x.AccountType == AccountTypeEnum.EventAccountType);
+                        if (!openingEntry)
                         {
-                            AccountType = AccountTypeEnum.EventAccountType,
-                            Amount = x.pris,
-                            Description = $"{x.tekst}",
-                            PostingDate = x.dato,
-                            ApplicationUser = user
+                            var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.EventAccountType);
+                            
+                            if (accountEntries != null || accountEntries.Count() > 0) 
+                                db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
 
-                        });
-                        db.ApplicationUserAccountEntry.AddRange(newaccountentries);
 
-                        db.SaveChangesAsync().GetAwaiter().GetResult();
+                            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                            {
+                                AccountType = AccountTypeEnum.EventAccountType,
+                                Description = "Saldotransport fra gammelt system",
+                                Amount = item.saldo,
+                                PostingDate = DateTime.Now,
+                                ApplicationUser = user,
+                            });
 
-                        //if (user.Balance != item.saldo)
-                        //{
-                        //    var newentry = new ApplicationUserAccountEntry()
-                        //    {
-                        //        AccountType = AccountTypeEnum.EventAccountType,
-                        //        Amount = item.saldo - user.Balance,
-                        //        Description = $"Saldojustering ",
-                        //        PostingDate = DateTime.Now,
-                        //        ApplicationUser = user
-
-                        //    };
-                        //    db.ApplicationUserAccountEntry.Add(newentry);
-
-                        //    db.SaveChangesAsync().GetAwaiter().GetResult();
-                        //}
+                            db.SaveChangesAsync().GetAwaiter().GetResult();
+                        }
                     }
                 }
 
@@ -186,6 +175,86 @@ namespace ClubScansub.Data
 
         }
 
+        private void importKursister()
+        {
+
+            var users = db.kursistdata.AsNoTracking().ToList();
+
+            foreach (var item in users)
+            {
+                //var names = item.Split(' ');
+                var applicationUser = new ApplicationUser()
+                {
+                    Firstname = item.fornavn,
+                    Lastname = item.efternavn,
+                    Streetaddress = item.adresse,
+                    PhoneNumber = item.telefonBil,
+                    Email = item.eMail,
+                    UserName = $"{item.dsfnr}@scansub.dk",
+                    AccountNumber = item.dsfnr
+                };
+
+                if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
+                {
+                    var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+                    if (createUserResult.Succeeded)
+                    {
+                        if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+                            applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+
+                        userManager.AddToRoleAsync(applicationUser, Userroles.Student).GetAwaiter().GetResult();
+                        userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
+
+
+                        db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                        {
+                            AccountType = AccountTypeEnum.CourseAccountType,
+                            Description = "Kursussaldo fra gammelt system",
+                            Amount = item.saldo,
+                            PostingDate = DateTime.Now,
+                            ApplicationUser = applicationUser,
+                        });
+
+                        applicationUser.OldAccountImported = true;
+
+                        db.SaveChangesAsync().GetAwaiter().GetResult();
+                    }
+                }
+                else
+                {
+                    //User already imported - only import new accountentries
+                    var user = db.ApplicationUsers.FirstOrDefault(x => x.UserName == applicationUser.UserName);
+
+                    if (user != null)
+                    {
+                        userManager.AddToRoleAsync(user, Userroles.Student).GetAwaiter().GetResult();
+
+                        var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Kursussaldo fra gammelt system" && x.AccountType == AccountTypeEnum.CourseAccountType);
+                        if (!openingEntry)
+                        {
+                            var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.CourseAccountType);
+
+                            if (accountEntries != null || accountEntries.Count() > 0)
+                                db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+
+
+                            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                            {
+                                AccountType = AccountTypeEnum.CourseAccountType,
+                                Description = "Kursussaldo fra gammelt system",
+                                Amount = item.saldo,
+                                PostingDate = DateTime.Now,
+                                ApplicationUser = user,
+                            });
+
+                            db.SaveChangesAsync().GetAwaiter().GetResult();
+                        }
+                    }
+                }
+
+            }
+
+        }
         //private void seedDB()
         //{
 
