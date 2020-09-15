@@ -87,7 +87,7 @@ namespace ClubScansub.Data
 
             if (!clubInfo.IsOldMemberDatabaseImported)
             {
-                //importUsers();
+                importUsers();
                 importKursister();
                 clubInfo.IsOldMemberDatabaseImported = true;
                 await db.SaveChangesAsync();
