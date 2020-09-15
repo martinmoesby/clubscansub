@@ -5,6 +5,8 @@
     <UserSecretsId>aspnet-ClubScansub-42EACBEB-5800-4102-AB3C-AD61B718C3F2</UserSecretsId>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <ApplicationInsightsResourceId>/subscriptions/9dbcb4ef-67d3-4d91-a2b2-33d73c1debf0/resourcegroups/tp365development/providers/microsoft.insights/components/ClubScansub</ApplicationInsightsResourceId>
+    <AssemblyVersion>1.0.22832.0</AssemblyVersion>
+    <FileVersion>1.0.22832.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

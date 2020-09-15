@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Site>
+@{
+    ViewData["Title"] = "Dive guide";
+    var pageTitle = "Dykkersteder";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+
+<div class="container">
+
+    <partial name="_IndexPageHeaderPartialNoCreateButton" model="@pageTitle" />
+
+    <table id="dataTable" class="table table-sm">
+        <thead>
+            <tr>
+                <th><label asp-for="@Model.First().LocationType"></label></th>
+                <th>
+                    <label asp-for="@Model.First().Id"></label>
+                </th>
+                <th>
+                    <label asp-for="@Model.First().Name"></label>
+                </th>
+                <th>
+                    <label asp-for="@Model.First().Description"></label>
+                </th>
+                <th>
+                    <label>Breddegrad</label>
+                </th>
+                <th>
+                    <label>Længdegrad</label>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model)
+            {
+                <tr>
+                    <td>@location.LocationType</td>
+                    <td>@location.Id</td>
+                    <td>@location.Name</td>
+                    <td>@Html.Raw(location.Description)</td>
+                    <td>@location.Latitude</td>
+                    <td>@location.Longitude</td>
+                    <td><input type="checkbox" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script language="javascript">
+
+        $(document).ready(function() {
+            $("#dataTable").DataTable();
+        });
+
+    </script>
+
+}

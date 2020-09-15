@@ -2,11 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyVersion>1.0.22832.0</AssemblyVersion>
+    <FileVersion>1.0.22832.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Migrations\20191016185442_Added Default Price to a course template.cs" />
     <Compile Remove="Migrations\20191016185442_Added Default Price to a course template.Designer.cs" />
+    <Compile Remove="Migrations\20200218123303_changedSiteModel.cs" />
+    <Compile Remove="Migrations\20200218123303_changedSiteModel.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
