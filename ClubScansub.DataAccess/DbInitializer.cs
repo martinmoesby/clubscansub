@@ -87,174 +87,174 @@ namespace ClubScansub.Data
 
             if (!clubInfo.IsOldMemberDatabaseImported)
             {
-                importUsers();
-                importKursister();
+                //importUsers();
+                //importKursister();
                 clubInfo.IsOldMemberDatabaseImported = true;
                 await db.SaveChangesAsync();
             }
         }
 
-        private void importUsers()
-        {
+        //private void importUsers()
+        //{
 
-            var users = db.medlemsdata.AsNoTracking().ToList();
+        //    var users = db.medlemsdata.AsNoTracking().ToList();
 
-            foreach (var item in users)
-            {
-                //var names = item.Split(' ');
-                var applicationUser = new ApplicationUser()
-                {
-                    Firstname = item.fornavn,
-                    Lastname = item.efternavn,
-                    Streetaddress = item.adresse,
-                    PhoneNumber = item.telefonBil,
-                    Email = item.eMail,
-                    UserName = $"{item.dsfnr}@scansub.dk",
-                    AccountNumber = item.dsfnr
-                };
+        //    foreach (var item in users)
+        //    {
+        //        //var names = item.Split(' ');
+        //        var applicationUser = new ApplicationUser()
+        //        {
+        //            Firstname = item.fornavn,
+        //            Lastname = item.efternavn,
+        //            Streetaddress = item.adresse,
+        //            PhoneNumber = item.telefonBil,
+        //            Email = item.eMail,
+        //            UserName = $"{item.dsfnr}@scansub.dk",
+        //            AccountNumber = item.dsfnr
+        //        };
 
-                if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
-                {
-                    var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
-                    if (createUserResult.Succeeded)
-                    {
-                        if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
-                            applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+        //        if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
+        //        {
+        //            var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+        //            if (createUserResult.Succeeded)
+        //            {
+        //                if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+        //                    applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
 
-                        userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
-                        userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", item.status ? "true" : "false")).GetAwaiter().GetResult();
+        //                userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
+        //                userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", item.status ? "true" : "false")).GetAwaiter().GetResult();
 
-                        if (item.status)
-                            userManager.AddToRoleAsync(applicationUser, Userroles.Member).GetAwaiter().GetResult();
+        //                if (item.status)
+        //                    userManager.AddToRoleAsync(applicationUser, Userroles.Member).GetAwaiter().GetResult();
 
-                        db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
-                        {
-                            AccountType = AccountTypeEnum.EventAccountType,
-                            Description = "Saldotransport fra gammelt system",
-                            Amount = item.saldo,
-                            PostingDate = DateTime.Now,
-                            ApplicationUser = applicationUser,
-                        });
+        //                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                {
+        //                    AccountType = AccountTypeEnum.EventAccountType,
+        //                    Description = "Saldotransport fra gammelt system",
+        //                    Amount = item.saldo,
+        //                    PostingDate = DateTime.Now,
+        //                    ApplicationUser = applicationUser,
+        //                });
 
-                        applicationUser.OldAccountImported = true;
+        //                applicationUser.OldAccountImported = true;
 
-                        db.SaveChangesAsync().GetAwaiter().GetResult();
-                    }
-                }
-                else
-                {
-                    //User already imported - only import new accountentries
-                    var user = db.ApplicationUsers.FirstOrDefault(x=>x.UserName == applicationUser.UserName);
+        //                db.SaveChangesAsync().GetAwaiter().GetResult();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //User already imported - only import new accountentries
+        //            var user = db.ApplicationUsers.FirstOrDefault(x=>x.UserName == applicationUser.UserName);
 
-                    if (user != null)
-                    {
-                        var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Saldotransport fra gammelt system" && x.AccountType == AccountTypeEnum.EventAccountType);
-                        if (!openingEntry)
-                        {
-                            var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.EventAccountType);
+        //            if (user != null)
+        //            {
+        //                var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Saldotransport fra gammelt system" && x.AccountType == AccountTypeEnum.EventAccountType);
+        //                if (!openingEntry)
+        //                {
+        //                    var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.EventAccountType);
                             
-                            if (accountEntries != null || accountEntries.Count() > 0) 
-                                db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+        //                    if (accountEntries != null || accountEntries.Count() > 0) 
+        //                        db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
 
 
-                            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
-                            {
-                                AccountType = AccountTypeEnum.EventAccountType,
-                                Description = "Saldotransport fra gammelt system",
-                                Amount = item.saldo,
-                                PostingDate = DateTime.Now,
-                                ApplicationUser = user,
-                            });
+        //                    db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                    {
+        //                        AccountType = AccountTypeEnum.EventAccountType,
+        //                        Description = "Saldotransport fra gammelt system",
+        //                        Amount = item.saldo,
+        //                        PostingDate = DateTime.Now,
+        //                        ApplicationUser = user,
+        //                    });
 
-                            db.SaveChangesAsync().GetAwaiter().GetResult();
-                        }
-                    }
-                }
+        //                    db.SaveChangesAsync().GetAwaiter().GetResult();
+        //                }
+        //            }
+        //        }
 
-            }
+        //    }
 
-        }
+        //}
 
-        private void importKursister()
-        {
+        //private void importKursister()
+        //{
 
-            var users = db.kursistdata.AsNoTracking().ToList();
+        //    var users = db.kursistdata.AsNoTracking().ToList();
 
-            foreach (var item in users)
-            {
-                //var names = item.Split(' ');
-                var applicationUser = new ApplicationUser()
-                {
-                    Firstname = item.fornavn,
-                    Lastname = item.efternavn,
-                    Streetaddress = item.adresse,
-                    PhoneNumber = item.telefonBil,
-                    Email = item.eMail,
-                    UserName = $"{item.dsfnr}@scansub.dk",
-                    AccountNumber = item.dsfnr
-                };
+        //    foreach (var item in users)
+        //    {
+        //        //var names = item.Split(' ');
+        //        var applicationUser = new ApplicationUser()
+        //        {
+        //            Firstname = item.fornavn,
+        //            Lastname = item.efternavn,
+        //            Streetaddress = item.adresse,
+        //            PhoneNumber = item.telefonBil,
+        //            Email = item.eMail,
+        //            UserName = $"{item.dsfnr}@scansub.dk",
+        //            AccountNumber = item.dsfnr
+        //        };
 
-                if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
-                {
-                    var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
-                    if (createUserResult.Succeeded)
-                    {
-                        if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
-                            applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+        //        if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
+        //        {
+        //            var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+        //            if (createUserResult.Succeeded)
+        //            {
+        //                if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+        //                    applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
 
-                        userManager.AddToRoleAsync(applicationUser, Userroles.Student).GetAwaiter().GetResult();
-                        userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
-
-
-                        db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
-                        {
-                            AccountType = AccountTypeEnum.CourseAccountType,
-                            Description = "Kursussaldo fra gammelt system",
-                            Amount = item.saldo,
-                            PostingDate = DateTime.Now,
-                            ApplicationUser = applicationUser,
-                        });
-
-                        applicationUser.OldAccountImported = true;
-
-                        db.SaveChangesAsync().GetAwaiter().GetResult();
-                    }
-                }
-                else
-                {
-                    //User already imported - only import new accountentries
-                    var user = db.ApplicationUsers.FirstOrDefault(x => x.UserName == applicationUser.UserName);
-
-                    if (user != null)
-                    {
-                        userManager.AddToRoleAsync(user, Userroles.Student).GetAwaiter().GetResult();
-
-                        var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Kursussaldo fra gammelt system" && x.AccountType == AccountTypeEnum.CourseAccountType);
-                        if (!openingEntry)
-                        {
-                            var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.CourseAccountType);
-
-                            if (accountEntries != null || accountEntries.Count() > 0)
-                                db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+        //                userManager.AddToRoleAsync(applicationUser, Userroles.Student).GetAwaiter().GetResult();
+        //                userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
 
 
-                            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
-                            {
-                                AccountType = AccountTypeEnum.CourseAccountType,
-                                Description = "Kursussaldo fra gammelt system",
-                                Amount = item.saldo,
-                                PostingDate = DateTime.Now,
-                                ApplicationUser = user,
-                            });
+        //                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                {
+        //                    AccountType = AccountTypeEnum.CourseAccountType,
+        //                    Description = "Kursussaldo fra gammelt system",
+        //                    Amount = item.saldo,
+        //                    PostingDate = DateTime.Now,
+        //                    ApplicationUser = applicationUser,
+        //                });
 
-                            db.SaveChangesAsync().GetAwaiter().GetResult();
-                        }
-                    }
-                }
+        //                applicationUser.OldAccountImported = true;
 
-            }
+        //                db.SaveChangesAsync().GetAwaiter().GetResult();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //User already imported - only import new accountentries
+        //            var user = db.ApplicationUsers.FirstOrDefault(x => x.UserName == applicationUser.UserName);
 
-        }
+        //            if (user != null)
+        //            {
+        //                userManager.AddToRoleAsync(user, Userroles.Student).GetAwaiter().GetResult();
+
+        //                var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Kursussaldo fra gammelt system" && x.AccountType == AccountTypeEnum.CourseAccountType);
+        //                if (!openingEntry)
+        //                {
+        //                    var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.CourseAccountType);
+
+        //                    if (accountEntries != null || accountEntries.Count() > 0)
+        //                        db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+
+
+        //                    db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                    {
+        //                        AccountType = AccountTypeEnum.CourseAccountType,
+        //                        Description = "Kursussaldo fra gammelt system",
+        //                        Amount = item.saldo,
+        //                        PostingDate = DateTime.Now,
+        //                        ApplicationUser = user,
+        //                    });
+
+        //                    db.SaveChangesAsync().GetAwaiter().GetResult();
+        //                }
+        //            }
+        //        }
+
+        //    }
+
+        //}
         //private void seedDB()
         //{
 

@@ -92,7 +92,7 @@
                         @user.PhoneNumber
                     </td>
                     <td class="text-center small">
-                        <span class="text-danger">@(user.Certificates.Count - @user.Certificates.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates.Count(x => x.IsVerified)</span>
+                        <span class="text-danger">@(user.Certificates?.Count - @user.Certificates?.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates?.Count(x => x.IsVerified)</span>
                     </td>
                     <td class="text-right small">@Html.FormatValue(user.Balance, "{0:N2}")</td>
                     <td class="text-right small">@Html.FormatValue(user.CourseAccountBalance, "{0:N2}")</td>

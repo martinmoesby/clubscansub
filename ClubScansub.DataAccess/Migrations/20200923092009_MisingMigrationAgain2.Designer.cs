@@ -4,14 +4,16 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200923092009_MisingMigrationAgain2")]
+    partial class MisingMigrationAgain2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -351,7 +353,9 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<int?>("AddressId");
 
-                    b.Property<Guid>("DeeplinkId");
+                    b.Property<Guid>("DeeplinkId")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(new Guid("e38fe057-d692-493c-8093-94a6c4bfcc20"));
 
                     b.Property<decimal>("Deposit")
                         .HasColumnType("decimal");

@@ -381,9 +381,9 @@ namespace ClubScansub.Controllers
 
         public async Task<IActionResult> DiveGuide()
         {
-            var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
+            //var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
 
-            return View(data);
+            return View();//data;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

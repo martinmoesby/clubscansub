@@ -42,9 +42,12 @@ namespace ClubScansub.Areas.Admin.Controllers
             };
             var usersinrole = await um.GetUsersInRoleAsync(membertype);
 
-            var userSearchResult = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(c=>c.Certificates)
-                .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id)               
-                ).OrderBy(x=>int.Parse(x.AccountNumber)).ToListAsync();
+            var userSearchResult = await db.ApplicationUsers
+                .Include(x => x.AccountTransactions)
+                .Include(c => c.Certificates)
+                .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id))               
+                .OrderBy(x=>x.UserName)
+                .ToListAsync();
 
             IndexPageVM.Pager = new Pager
             {

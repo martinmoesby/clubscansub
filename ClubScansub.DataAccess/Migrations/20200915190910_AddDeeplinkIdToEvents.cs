@@ -19,7 +19,8 @@ namespace ClubScansub.Data.Migrations
                 name: "DeeplinkId",
                 table: "Event",
                 nullable: false,
-                defaultValue: new Guid("c759e9a1-52a4-454d-ad7f-e17911816013"));
+                defaultValue: Guid.NewGuid()
+            );
 
             //migrationBuilder.CreateTable(
             //    name: "kursistdata",
