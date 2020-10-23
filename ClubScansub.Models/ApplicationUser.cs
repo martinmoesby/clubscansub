@@ -53,7 +53,14 @@ namespace ClubScansub.Models
             {
                 try
                 {
-                    return string.Join(string.Empty, Firstname?.Split(' ').Select(x => x[0]).Concat(Lastname?.Split(' ').Select(x => x[0])).ToArray()); ;
+                    var names = Name.TrimEnd().Split(' ');
+
+                    var Init1 = names.First().Split().Select(x => x[0]);
+                    var init2 = names.Last().Split().Select(x=>x[0]);
+
+                    var initials = Init1.Concat(init2);
+
+                    return string.Join(string.Empty, initials);
                 }
                 catch (Exception)
                 {
