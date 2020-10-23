@@ -14,6 +14,20 @@
         isEligable = true;
         certName = Model.RequiredCertificate.ShortName;
     }
+
+    var paymentNote = "";
+    var paymentPrice = Model.Price;
+
+    if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+    {
+        paymentNote = "(gratis for Divepros)";
+        paymentPrice = 0;
+    }
+    else if ((Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other) && User.IsInRole(ClubScansub.Utility.Userroles.Member))
+    {
+        paymentNote = "(gratis for Premium medlemmer)";
+        paymentPrice = 0;
+    }
 }
 <div class="row mb-3">
 
@@ -21,43 +35,44 @@
         <div class="d-flex justify-content-start flex-column">
             <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
             <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
+            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(paymentPrice, "{0:n2}") @paymentNote</h4>
 
-            @if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+            @*@if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+        {
+        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}") (gratis for Divepros)</h4>
+        }
+        else if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
+        {
+
+            if (User.IsInRole(ClubScansub.Utility.Userroles.Member))
             {
-            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}") (gratis for Divepros)</h4>
-            }
-            else if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
-            {
-
-                if (User.IsInRole(ClubScansub.Utility.Userroles.Member))
-                {
-            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}") (gratis for Premium medlemmer)</h4>
-                }
-                else
-                {
-            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}")</h4>
-                }
-
+        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}") (gratis for Premium medlemmer)</h4>
             }
             else
             {
-            <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
+        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}")</h4>
             }
+
+        }
+        else
+        {
+        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
+        }*@
 
 
             <h4 class="text-info small"><i class="fas fa-award"></i>&nbsp;@(Model.RequiredCertificate != null ? Model.RequiredCertificate.ShortName : "Ikke krævet")</h4>
             <h4>
                 @if (Model.Participants.Count + Model.FixedParticipants == 0 || Model.IsCancelled)
                 {
-                <i class="fas fa-flag-checkered text-danger" title="Ingen tilmeldte"></i>
+                    <i class="fas fa-flag-checkered text-danger" title="Ingen tilmeldte"></i>
                 }
                 else if (Model.Participants.Count + Model.FixedParticipants < Model.MinParticipants)
                 {
-                <i class="fas fa-flag-checkered text-warning" title="Ikke nok tilmeldte"></i>
+                    <i class="fas fa-flag-checkered text-warning" title="Ikke nok tilmeldte"></i>
                 }
                 else
                 {
-                <i class="fas fa-flag-checkered text-success" title="Tilmeldte OK"></i>
+                    <i class="fas fa-flag-checkered text-success" title="Tilmeldte OK"></i>
                 }
             </h4>
 
