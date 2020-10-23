@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
+using ClubScansub.Data;
 using ClubScansub.Models;
+using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,11 +24,16 @@ namespace ClubScansub.Areas.Identity.Pages.Account
     public class RequestMembershipModel : PageModel
     {
         private readonly IEmailSender _emailSender;
+        private readonly ISmsSender _smsSender;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public RequestMembershipModel(
-            IEmailSender emailSender)
+            IEmailSender emailSender, ISmsSender smsSender, UserManager<IdentityUser> userManager)
         {
             _emailSender = emailSender;
+            _smsSender = smsSender;
+            _userManager = userManager;
+
         }
 
         [BindProperty]
@@ -102,11 +113,16 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                     $"<br/><br/>Med venlig hilsen " +
                     $"<br/>Vores Klubkalender";
 
+                var admins = await _userManager.GetUsersInRoleAsync(Userroles.Administrator);
+                await _smsSender.SendMultipleSmsAsync(admins, mailMesage.Replace("<br/>","\n"));
 
-                //await _emailSender.SendEmailAsync("info@dkdiver.dk", "Ny medlemsforespørgsel", mailMesage);
+                foreach (var admin in admins)
+                {
+                    await _emailSender.SendEmailAsync(admin.Email, "Ny medlemsforespørgsel", mailMesage);
+                }
 
                 if (Input.WithCopyToSelf )
-                    await _emailSender.SendEmailAsync(Input.Email, "Ny medlemsforespørgsel", mailMesage);
+                    await _emailSender.SendEmailAsync(Input.Email, "Kopi af Ny medlemsforespørgsel", mailMesage);
 
                 return RedirectToPage("./RequestSend");
             }

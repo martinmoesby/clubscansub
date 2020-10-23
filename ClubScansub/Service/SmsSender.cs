@@ -56,7 +56,7 @@ namespace ClubScansub.Service
             return response;
         }
 
-        public async Task<IEnumerable<MailjetResponse>> SendMultipleSmsAsync(IEnumerable<ApplicationUser> users, string message)
+        public async Task<IEnumerable<MailjetResponse>> SendMultipleSmsAsync(IEnumerable<IdentityUser> users, string message)
         {
             ICollection<MailjetResponse> responses = new List<MailjetResponse>();
             if (users.Count() > 0)
@@ -69,7 +69,7 @@ namespace ClubScansub.Service
                     }
                     else
                     {
-                        var o = new { ErrorMessage = $"User: {item.Name}, Phonenumber: {item.PhoneNumber}, Error : Phone not confirmed", User = item };
+                        var o = new { ErrorMessage = $"User: {item.UserName}, Phonenumber: {item.PhoneNumber}, Error : Phone not confirmed", User = item };
                         JObject jObj = JObject.Parse(JsonConvert.SerializeObject(o, new JsonSerializerSettings()
                         {
                             PreserveReferencesHandling = PreserveReferencesHandling.Objects,

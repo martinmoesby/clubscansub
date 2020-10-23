@@ -120,7 +120,7 @@ namespace ClubScansub.Areas.Members.Controllers
             var user = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
             if (string.IsNullOrEmpty(user.Streetaddress) && string.IsNullOrEmpty(user.City) && string.IsNullOrEmpty(user.Country))
             {
-                StatusMessage = "Du manlger at angive din adresse, før vi kan lave en rutebeskrivlese";
+                StatusMessage = "Du mangler at angive din adresse, før vi kan lave en rutebeskrivlese";
                 return LocalRedirect("/Identity/Account/Manage");
             }
 

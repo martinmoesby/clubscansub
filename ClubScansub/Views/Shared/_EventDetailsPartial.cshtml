@@ -36,30 +36,6 @@
             <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
             <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
             <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(paymentPrice, "{0:n2}") @paymentNote</h4>
-
-            @*@if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
-        {
-        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}") (gratis for Divepros)</h4>
-        }
-        else if (Model.EventType == EventTypeEnum.Stranddyk || Model.EventType == EventTypeEnum.Other)
-        {
-
-            if (User.IsInRole(ClubScansub.Utility.Userroles.Member))
-            {
-        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}") (gratis for Premium medlemmer)</h4>
-            }
-            else
-            {
-        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(0, "{0:n2}")</h4>
-            }
-
-        }
-        else
-        {
-        <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(Model.Price, "{0:n2}")</h4>
-        }*@
-
-
             <h4 class="text-info small"><i class="fas fa-award"></i>&nbsp;@(Model.RequiredCertificate != null ? Model.RequiredCertificate.ShortName : "Ikke krævet")</h4>
             <h4>
                 @if (Model.Participants.Count + Model.FixedParticipants == 0 || Model.IsCancelled)
@@ -84,7 +60,7 @@
         <div class="row mb-2">
             <div class="col-6">
                 <h4>
-                    <button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>
+                    @*<button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>*@
                     @Model.Divelocation.Name
                 </h4>
                 <p>Dybde: @Model.Divelocation.MinDepth til @Model.Divelocation.MaxDepth m.</p>
@@ -182,12 +158,13 @@
                 }
             }
         </div>
+
 </div>
 
-<div class="collapse mt-3 w-100" id="collapse">
+<div class="mt-3 w-100">
     <div class="row d-flex justify-content-between mb-2">
 
-        <div class="col-12 col-lg-5 order-lg-1">
+        <div class="col-12 col-lg-4 order-lg-1">
 
             <div class="card">
                 <div class="card-header">Mødetid og sted:</div>
@@ -215,7 +192,10 @@
                     <div id="meetLocationMap" class="rounded border map mt-2" style="height:300px;"></div>
                 </div>
             </div>
-            <br />
+
+        </div>
+
+        <div class="col-12 col-lg-4 order-lg-3">
             <div class="card">
                 <div class="card-header">Deltagere:</div>
                 <div class="card-body">
@@ -225,43 +205,39 @@
                         {
                             for (int i = 0; i < Model.FixedParticipants; i++)
                             {
-                                <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
-                                <br />
+                    <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
+                    <br />
                             }
 
                             foreach (var user in Model.Participants)
                             {
-                                <div class="row small justify-content-between">
-                                    <div class="col-6 text-success ellipsis">
-                                        <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
-                                    </div>
-                                    @if (User.IsInRole(Userroles.Divepro))
+                    <div class="row small justify-content-between">
+                        <div class="col-6 text-success ellipsis">
+                            <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
+                        </div>
+                        @if (User.IsInRole(Userroles.Divepro))
                                     {
-                                        <div class="col-6 text-info ellipsis">
-                                            <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
-                                        </div>
+                        <div class="col-6 text-info ellipsis">
+                            <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
+                        </div>
                                     }
-                                </div>
+                    </div>
                             }
                         }
                         else
                         {
-                            <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
+                    <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
                         }
                     }
                     else
                     {
-                        <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
+                    <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
                     }
                 </div>
             </div>
-
         </div>
 
-        <div class="col-12 col-lg-5 order-lg-3">
-        </div>
-
-        <div class="col-12 col-lg-7 order-lg-2">
+        <div class="col-12 col-lg-4 order-lg-2">
             <div class="card">
                 <div class="card-header">@Model.Divelocation.Name</div>
                 <div class="card-body small">
