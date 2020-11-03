@@ -236,9 +236,24 @@ namespace ClubScansub.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEventDetails(string id)
         {
+            int itemId = 0;
+            string itemType="";
+
+
             var idItems = id.Split(":");
-            int itemId = int.Parse(idItems[1]);
-            string itemType = idItems[0];
+            if (idItems.Length > 1)
+            {
+                itemId = int.Parse(idItems[1]);
+                itemType = idItems[0];
+            } else
+
+            itemId = int.Parse(id);
+
+            var e = await db.Events.FindAsync(itemId);
+            if (e is Event)
+                itemType = "eventId";
+            else
+                itemType = "sessionId";
 
             if (itemType == "sessionId")
             {
@@ -280,7 +295,7 @@ namespace ClubScansub.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
             
             if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
             {
@@ -309,7 +324,7 @@ namespace ClubScansub.Controllers
             item.Participants.Add(eventUser);
             await db.SaveChangesAsync();
 
-            StatusMessage = $"Du er blevet tilmeldt '{item.Title}'";
+            StatusMessage = $"Du er blevet tilmeldt '{item.Title}' d. {item.StartDateAndTime.ToShortDateString()}";
 
             if (item.RequiredCertificate != null && !user.Certificates.Any(x => x.Certificate.Id == item.RequiredCertificate.Id))
                 StatusMessage += $" men - ADVARSEL: Du har ikke det krævede certifikat '{item.RequiredCertificate.Name}', så det kan blive en lang, trist dag uden dykning. Sørg for at opdatere dine certifikater under din profil og medbring dit certifikat til turen.";
@@ -379,12 +394,12 @@ namespace ClubScansub.Controllers
             return View(db.ClubSettings.SingleOrDefault());
         }
 
-        public async Task<IActionResult> DiveGuide()
-        {
-            //var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
+        //public async Task<IActionResult> DiveGuide()
+        //{
+        //    //var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
 
-            return View();//data;
-        }
+        //    return View();//data;
+        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

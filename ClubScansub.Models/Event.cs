@@ -60,7 +60,10 @@ namespace ClubScansub.Models
         public bool IsInternal { get; set; }
 
         [Display(Name = "Gratis for Instruktører?")]
-        public bool IsFreeForDivepros { get; set; } 
+        public bool IsFreeForDivepros { get; set; }
+        
+        //[Display(Name = "Gratis for Premium?")]
+        //public bool IsFreeForPremiumMembers { get; set; }
 
         public virtual Certificate RequiredCertificate { get; set; }
 
