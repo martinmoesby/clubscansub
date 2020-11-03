@@ -44,6 +44,9 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
         public bool IsOldAccountImported { get; set; }
 
         [TempData]
+        public string ErrorMessage { get; set; }
+
+        [TempData]
         public string StatusMessage { get; set; }
 
         [BindProperty]

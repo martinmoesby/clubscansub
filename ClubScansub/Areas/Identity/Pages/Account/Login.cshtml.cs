@@ -82,7 +82,15 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                 }
                 if (result.Succeeded)
                 {
+
                     _logger.LogInformation("User logged in.");
+                    var user = await _signInManager.UserManager.FindByNameAsync($"{Input.Email}@scansub.dk");
+                    if (!user.EmailConfirmed || !user.PhoneNumberConfirmed)
+                    {
+                        ErrorMessage = "Advarsel: Du mangler at verificere din email og/eller dit telefonnummer. Det betyder at du evt. ikke automatisk får informationer vedr. ture på sms eller email";
+                        return RedirectToPage("./Manage/Index");
+                    }
+                        
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

@@ -27,6 +27,5 @@ namespace ClubScansub.Areas.Admin.ViewModels
         public CreateCourseViewModel NewCourse { get; set; }
 
         public ApplicationUser AppUser { get; set; }
-
     }
 }

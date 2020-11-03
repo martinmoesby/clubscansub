@@ -118,6 +118,14 @@ namespace ClubScansub.Areas.Identity.Pages.Account
             {
 
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                var user = await _signInManager.GetExternalLoginInfoAsync();
+
+                //if (!user. || user.PhoneNumberConfirmed)
+                //{
+                //    ErrorMessage = "Du mangler at verificere din email og/eller dit telefonnummer";
+                //    return RedirectToPage("/Identity/Account/Manage");
+                //}
+
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)

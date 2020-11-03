@@ -24,6 +24,9 @@ namespace ClubScansub.Areas.Admin.Controllers
             this.um = um;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         public async Task<IActionResult> Index()
         {
 
@@ -46,7 +49,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                 NewEvent = new CreateEventViewModel(),
                 NewCourse = new CreateCourseViewModel(),
                 NewTransaction = new CreateUserAccountTransactionViewModel(),
-                AppUser = currentUser
+                AppUser = currentUser,
+                Statusmessage = StatusMessage
             };
 
             pageModel.NewTransaction.Entry = new ApplicationUserAccountEntry() { PostingDate = new DateTime() };

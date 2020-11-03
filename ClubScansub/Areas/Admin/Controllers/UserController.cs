@@ -118,7 +118,8 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                StatusMessage = "Der er sket en fejl.";
+                StatusMessage = $"Der er sket en fejl. {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}";
+
                 return RedirectToAction("Index", "Home");
             }
 
