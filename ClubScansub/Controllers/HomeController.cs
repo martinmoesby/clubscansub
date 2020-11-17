@@ -406,5 +406,23 @@ namespace ClubScansub.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        #region API
+
+        [HttpGet("/boattrips")]
+        public async Task<ActionResult> GetBoattrips(DateTime start, DateTime end)
+        {
+            var data = await db.Events.Where(x => start <= x.StartDateAndTime && x.StartDateAndTime <= end)
+                .Include(x => x.Participants)
+                    .ThenInclude(x => x.ApplicationUser)
+                .ToListAsync();
+            if (data != null)
+                return Json(data);
+
+            return NotFound();
+        }
+
+        #endregion
     }
 }
