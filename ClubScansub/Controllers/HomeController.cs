@@ -57,7 +57,6 @@ namespace ClubScansub.Controllers
             return View(PageModel);
         }
 
-
         [Route("DL/{id}")]
         public async Task<IActionResult>DL(string id)
         {
@@ -410,13 +409,27 @@ namespace ClubScansub.Controllers
 
         #region API
 
-        [HttpGet("/boattrips")]
-        public async Task<ActionResult> GetBoattrips(DateTime start, DateTime end)
+        [HttpGet("/events")]
+        public async Task<ActionResult> GetBoattrips()
         {
-            var data = await db.Events.Where(x => start <= x.StartDateAndTime && x.StartDateAndTime <= end)
+            var start = DateTime.Now;
+
+            var data = await db.Events.Where(x => x.StartDateAndTime > start  && x.EventType == EventTypeEnum.Bådtur)
+                .Include(x => x.Divelocation)
+                    .ThenInclude(x => x.MeetingLocation)
                 .Include(x => x.Participants)
-                    .ThenInclude(x => x.ApplicationUser)
-                .ToListAsync();
+                //.ThenInclude(x => x.ApplicationUser)
+                .Select(x=> new
+                {
+                    Id = x.Id,
+                    Name= x.Title,
+                    Date = x.StartDateAndTime.ToShortDateString(),
+                    Time = x.StartDateAndTime.ToShortTimeString(),
+                    Seats = x.MaxParticipants,
+                    AvailableSeats = x.MaxParticipants - x.Participants.Count,
+                    Url = Url.Action("DL","Home",new { id = x.DeeplinkId }, Request.Scheme)
+
+                }).ToListAsync();
             if (data != null)
                 return Json(data);
 

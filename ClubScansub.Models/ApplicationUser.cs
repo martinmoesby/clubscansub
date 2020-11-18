@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -86,8 +87,10 @@ namespace ClubScansub.Models
         [Display(Name = "Certifikater")]
         public virtual ICollection<UserCertificat> Certificates { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<EventUser> Events { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<CourseSignup> Courses { get; set; }
 
         public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }

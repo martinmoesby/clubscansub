@@ -1,4 +1,5 @@
 using ClubScansub.Utility;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -67,6 +68,7 @@ namespace ClubScansub.Models
         [Display(Name = "Tur type")] 
         public EventTypeEnum DefaultEventType { get; set; }
         
+        [JsonIgnore]
         public virtual ICollection<Event> Events { get; set; }
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }
     }
