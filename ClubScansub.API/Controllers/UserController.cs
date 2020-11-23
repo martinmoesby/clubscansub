@@ -1,4 +1,6 @@
 ﻿using ClubScansub.Data;
+using ClubScansub.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,72 +9,116 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClubScansub.API.Controllers
+namespace ClubScansub.API
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/user")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
-        private readonly SignInManager<IdentityUser> signinManager;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IConfiguration configuration;
 
-        public UserController(SignInManager<IdentityUser> signinManager, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        private UserManager<IdentityUser> userManager;
+        private SignInManager<IdentityUser> signinManager;
+        private readonly IConfiguration config;
+
+        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signinManager, IConfiguration config)
+            : base(db)
         {
-            this.signinManager = signinManager;
             this.userManager = userManager;
-            this.configuration = configuration;
+            this.signinManager = signinManager;
+            this.config = config;
         }
 
+        //[RequireHttps]
+        [Route("signin")]
         [HttpPost]
-        public async Task<object> Signin(string username, string password)
+        public async Task<ActionResult> Login([FromBody] LoginModel model)
         {
-            var signinResult = await signinManager.PasswordSignInAsync(username, password,false, false);
-
-            if(signinResult.Succeeded)
+            var signin = await signinManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+            if (!signin.Succeeded)
             {
-                var user = await userManager.Users.SingleOrDefaultAsync(x => x.UserName == username);
-
-                return await GenerateJwtTokenAsync(username, user);
-
+                return Unauthorized("INVALID_CREDENTIALS");
             }
 
-            throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
+            var appUser = userManager.Users.Single(r => r.UserName == model.Email);
+            var user = await db.ApplicationUsers.Include(x=>x.AccountTransactions).SingleAsync(x=>x.Id == appUser.Id);
+
+            var token = GenerateJwtToken(model.Email, appUser);
+
+            var userInfo = new
+            {
+                username = $"{user.Firstname} {user.Lastname}",
+                isSignedIn = true,
+                isPremium = await userManager.IsInRoleAsync(appUser, Userroles.Member),
+                isDivePro = await userManager.IsInRoleAsync(appUser, Userroles.Divepro),
+                accountBalance = user.Balance
+            };
+
+            return Json(new { token, userInfo });
 
         }
 
+
+        [Authorize]
+        [Route("myprofile")]
         [HttpGet]
-        public async Task<List<IdentityUser>> AllUsers()
+        public async Task<ActionResult> RefreshUserInfo()
         {
-            return await userManager.Users.ToListAsync();
+            var user = await db.ApplicationUsers.Include(x => x.AccountTransactions).SingleAsync(x => x.Id == userManager.GetUserId(User));
+            
+            if (user == null)
+                return NotFound();
+
+            var userInfo = new
+            {
+                username = $"{user.Firstname} {user.Lastname}",
+                isSignedIn = true,
+                isPremium = await userManager.IsInRoleAsync(user, Userroles.Member),
+                isDivePro = await userManager.IsInRoleAsync(user, Userroles.Divepro),
+                accountBalance = user.Balance
+            };
+
+            return Json(userInfo);
         }
 
-        private async Task<object> GenerateJwtTokenAsync(string email, IdentityUser user)
+        public class LoginModel
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
+
+        private object GenerateJwtToken(string email, IdentityUser appUser)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                new Claim(JwtRegisteredClaimNames.FamilyName, appUser.UserName),
+                new Claim(JwtRegisteredClaimNames.UniqueName, appUser.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, new Guid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, appUser.Id),
+                new Claim("IsPremium", userManager.IsInRoleAsync(appUser, Userroles.Member).GetAwaiter().GetResult().ToString()),
+                new Claim("IsDivePro", userManager.IsInRoleAsync(appUser, Userroles.Divepro).GetAwaiter().GetResult().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(Convert.ToDouble(configuration["JwtExpireDays"]));
+            var expires = DateTime.Now.AddDays(Convert.ToDouble(config["JwtExpireDays"]));
 
             var token = new JwtSecurityToken(
-                configuration["JwtIssuer"],
-                configuration["JwtIssuer"],
-                claims,
-                expires: expires,
-                signingCredentials: creds
-            );
+                    config["JwtIssuer"],
+                    config["JwtIssuer"],
+                    claims,
+                    null,
+                    expires,
+                    creds
+                );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

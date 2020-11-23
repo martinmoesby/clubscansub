@@ -65,6 +65,7 @@ namespace ClubScansub.API
             })
             .AddDefaultTokenProviders()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
             // ===== Add Jwt Authentication ========
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services
@@ -104,8 +105,9 @@ namespace ClubScansub.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
+  
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

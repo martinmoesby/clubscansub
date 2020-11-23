@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.Utility", "Club
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.DataAccess", "ClubScansub.DataAccess\ClubScansub.DataAccess.csproj", "{94B2D374-F79E-40CF-8ED1-EF9990B740B1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.API", "ClubScansub.API\ClubScansub.API.csproj", "{47577FF1-6966-42F4-BFC5-526A30D5ECD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{94B2D374-F79E-40CF-8ED1-EF9990B740B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94B2D374-F79E-40CF-8ED1-EF9990B740B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94B2D374-F79E-40CF-8ED1-EF9990B740B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47577FF1-6966-42F4-BFC5-526A30D5ECD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47577FF1-6966-42F4-BFC5-526A30D5ECD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47577FF1-6966-42F4-BFC5-526A30D5ECD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47577FF1-6966-42F4-BFC5-526A30D5ECD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

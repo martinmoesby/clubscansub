@@ -36,11 +36,11 @@ namespace ClubScansub.Models
 
         //public virtual Club Club { get; set; }
 
-        [JsonIgnore]
-        public virtual ICollection<Divelocation> Divelocations { get; set; }
+        //[JsonIgnore]
+        //public ICollection<Divelocation> Divelocations { get; set; }
 
-        [JsonIgnore]
-        public virtual ICollection<Event> Events { get; set; }
+        //[JsonIgnore]
+        //public virtual ICollection<Event> Events { get; set; }
 
         [Display(Name = "Breddegrad")]
         public string Latitude { get; set; }

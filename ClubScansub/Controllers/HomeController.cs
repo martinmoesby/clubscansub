@@ -125,7 +125,7 @@ namespace ClubScansub.Controllers
             }
 
             var data = await db.Events
-                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled && !x.IsInternal)
+                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsInternal)
                     .OrderBy(x => x.StartDateAndTime)
                     .ToListAsync();
 
@@ -135,10 +135,21 @@ namespace ClubScansub.Controllers
                 description = v.Details,
                 start = v.StartDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 end = v.EndDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
-                classNames = DefaultClassNames.ToArray()
+                classNames = defineCLassNames(v)
             }); 
 
             return new JsonResult(result);//, JsonRequestBehavior = }
+        }
+
+        private string[] defineCLassNames(Event i)
+        {
+            if (DefaultClassNames.Contains("cancelled"))
+                DefaultClassNames.Remove("cancelled");
+
+            if (i.IsCancelled)
+                DefaultClassNames.Add("cancelled");
+
+            return DefaultClassNames.ToArray();
         }
 
         [HttpGet]
@@ -407,35 +418,5 @@ namespace ClubScansub.Controllers
         }
 
 
-        #region API
-
-        [HttpGet("/events")]
-        public async Task<ActionResult> GetBoattrips()
-        {
-            var start = DateTime.Now;
-
-            var data = await db.Events.Where(x => x.StartDateAndTime > start  && x.EventType == EventTypeEnum.Bådtur)
-                .Include(x => x.Divelocation)
-                    .ThenInclude(x => x.MeetingLocation)
-                .Include(x => x.Participants)
-                //.ThenInclude(x => x.ApplicationUser)
-                .Select(x=> new
-                {
-                    Id = x.Id,
-                    Name= x.Title,
-                    Date = x.StartDateAndTime.ToShortDateString(),
-                    Time = x.StartDateAndTime.ToShortTimeString(),
-                    Seats = x.MaxParticipants,
-                    AvailableSeats = x.MaxParticipants - x.Participants.Count,
-                    Url = Url.Action("DL","Home",new { id = x.DeeplinkId }, Request.Scheme)
-
-                }).ToListAsync();
-            if (data != null)
-                return Json(data);
-
-            return NotFound();
-        }
-
-        #endregion
     }
 }
