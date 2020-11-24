@@ -61,7 +61,7 @@
             <div class="col-6">
                 <h4>
                     @*<button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>*@
-                    @Model.Divelocation.Name
+                    @Model.Divelocation?.Name
                 </h4>
                 <p>Dybde: @Model.Divelocation.MinDepth til @Model.Divelocation.MaxDepth m.</p>
                 <div class="text-black-50 text-truncate font-weight-light small" style="max-width:250px;">@Model.Divelocation.Description</div>

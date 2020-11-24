@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using ClubScansub.Data;
@@ -27,22 +28,40 @@ namespace ClubScansub.API
         }
         #region Public end points
         
-        [Route("events")]
-        public async Task<ActionResult> Get()
+        [Route("events/{eventtype}")]
+        public async Task<ActionResult> Get(string eventtype)
         {
+
+            EventTypeEnum type = (EventTypeEnum)Enum.Parse(typeof(EventTypeEnum), eventtype);
+
+            int monthsAhead = type == EventTypeEnum.Klubture ? 3 : 12;
 
             decimal balance = 0.0m;
             bool isSignedIn = false;
+            bool isDivePro = false;
+            bool userShouldPay = true;
 
             ApplicationUser user = null;
             ICollection<EventUser> userevents = new List<EventUser>();
 
             if (User.Identity.IsAuthenticated)
             {
-                user = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(x=>x.Events).SingleAsync(x => x.Id == userManager.GetUserId(User));
-                balance = user.Balance;
-                isSignedIn = true;
-                userevents = user.Events;
+                if (User.HasClaim("isPremium","True") && type== EventTypeEnum.Klubture)
+                    userShouldPay = false;
+
+                if (User.HasClaim("isDivePro", "True"))
+                    isDivePro = true;
+
+                if (userManager.GetUserId(User) != null)
+                {
+                    user = await db.ApplicationUsers
+                        .Include(x => x.Events)
+                        .Include(x => x.AccountTransactions)
+                        .SingleAsync(x => x.Id == userManager.GetUserId(User));
+                    balance = user.Balance;
+                    isSignedIn = true;
+                    userevents = user.Events;
+                }
             }
 
             try
@@ -52,17 +71,18 @@ namespace ClubScansub.API
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Where(x => x.IsCancelled == false &&
                         (x.MaxParticipants - x.FixedParticipants - x.Participants.Count) > 0 &&
-                        x.StartDateAndTime > DateTime.Now &&
-                        (x.EventType == Utility.EventTypeEnum.Bådtur || x.EventType == Utility.EventTypeEnum.Stranddyk))
+                        (x.StartDateAndTime > DateTime.Now && x.StartDateAndTime < DateTime.Now.AddMonths(monthsAhead)) &&
+                        (x.EventType == type))
                 .OrderBy(x => x.StartDateAndTime)
                 .Select(x => new
                 {
                     Id = x.Id.ToString(),
                     Name = x.Title,
                     x.Details,
-                    Date = x.StartDateAndTime.ToShortDateString(),
-                    Time = x.StartDateAndTime.ToShortTimeString(),
+                    Date = x.StartDateAndTime,
+                    //Time = x.StartDateAndTime.TimeOfDay.ToString(),
                     Participants = x.Participants.Count,
+                    ParticipantUsers = x.Participants.Count > 0 ? x.Participants.Select(x => new { x.ApplicationUser.Name, x.ApplicationUser.PhoneNumber, x.ApplicationUser.Id, x.ApplicationUser.Email }) : null,
                     x.MinParticipants,
                     x.MaxParticipants,
                     x.FixedParticipants,
@@ -74,10 +94,11 @@ namespace ClubScansub.API
                     x.Divelocation.DiveType,
                     x.Divelocation.MinDepth,
                     x.Divelocation.MaxDepth,
-                    x.Price,
+                    Price = userShouldPay ? x.Price : 0,
                     AlreadySignedUp = x.Participants.Any(p=> userevents.Contains(p)),
-                    HasFunds = x.Price > balance ? false : true,
-                    isSignedIn
+                    HasFunds = x.Price > balance && userShouldPay ? false : true,
+                    isSignedIn,
+                    isDivePro
                 })
                 .ToListAsync();
 
@@ -179,8 +200,7 @@ namespace ClubScansub.API
             {
                 Id = x.EventId.ToString(),
                 Name = x.Event.Title,
-                Date = x.Event.StartDateAndTime.ToShortDateString(),
-                Time = x.Event.StartDateAndTime.ToShortTimeString(),
+                Date = x.Event.StartDateAndTime,
                 Participants = x.Event.Participants.Count + x.Event.FixedParticipants,
                 x.Event.MinParticipants,
                 x.Event.MaxParticipants,
@@ -188,7 +208,9 @@ namespace ClubScansub.API
                 FreeSpots = x.Event.MaxParticipants - x.Event.FixedParticipants - x.Event.Participants.Count,
                 RequiredSpots = (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count) < 0 ? 0 : (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count),
                 x.Event.Divelocation.Image,
-                x.Event.Divelocation.MeetingLocation
+                x.Event.Divelocation.MeetingLocation,
+                x.Event.Divelocation.MinDepth,
+                x.Event.Divelocation.MaxDepth
             });
 
             return Json(result);

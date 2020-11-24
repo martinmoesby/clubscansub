@@ -259,11 +259,12 @@ namespace ClubScansub.Controllers
 
             itemId = int.Parse(id);
 
-            var e = await db.Events.FindAsync(itemId);
-            if (e is Event)
-                itemType = "eventId";
-            else
-                itemType = "sessionId";
+            //var e = await db.Events.FindAsync(itemId);
+
+            //if (e is Course)
+            //    itemType = "sessionId";
+            //else
+            //    itemType = "eventId";
 
             if (itemType == "sessionId")
             {
