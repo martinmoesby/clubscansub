@@ -192,25 +192,30 @@ namespace ClubScansub.API
 
             var eventplan = await db.EventUsers
                 .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
-                .Include(x=>x.Event).ThenInclude(x=>x.Participants)
+                .Include(x=>x.Event).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
                 .Where(x => x.ApplicationUser == user && x.Event.StartDateAndTime > DateTime.Now)
                 .ToListAsync();
 
-            var result = eventplan.Select(x => new
+            var result = eventplan.OrderBy(x=>x.Event.StartDateAndTime).Select(x => new
             {
                 Id = x.EventId.ToString(),
                 Name = x.Event.Title,
                 Date = x.Event.StartDateAndTime,
+                x.Event.Details,
                 Participants = x.Event.Participants.Count + x.Event.FixedParticipants,
+                ParticipantUsers = x.Event.Participants.Count > 0 ? x.Event.Participants.Select(x => new { x.ApplicationUser.Name, x.ApplicationUser.PhoneNumber, x.ApplicationUser.Id, x.ApplicationUser.Email }) : null,
                 x.Event.MinParticipants,
                 x.Event.MaxParticipants,
                 x.Event.FixedParticipants,
                 FreeSpots = x.Event.MaxParticipants - x.Event.FixedParticipants - x.Event.Participants.Count,
                 RequiredSpots = (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count) < 0 ? 0 : (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count),
                 x.Event.Divelocation.Image,
+                x.Event.Divelocation.Description,
                 x.Event.Divelocation.MeetingLocation,
                 x.Event.Divelocation.MinDepth,
-                x.Event.Divelocation.MaxDepth
+                x.Event.Divelocation.MaxDepth,
+                isSignedIn = true,
+                isDivePro = User.HasClaim("isDivePro", "True")
             });
 
             return Json(result);

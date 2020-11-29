@@ -93,8 +93,9 @@ namespace ClubScansub.Models
         [JsonIgnore]
         public virtual ICollection<CourseSignup> Courses { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
-
+        [JsonIgnore]
         public virtual ICollection<CourseSessionInstructor> InstructorSessions { get; set; }
 
 
