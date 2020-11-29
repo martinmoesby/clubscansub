@@ -29,10 +29,10 @@
                     <tr>
                         <td class="small">@item.CourseSession.Course.CourseName</td>
                         <td class="small">@item.CourseSession.Sessiontype</td>
-                        <td class="small">@item.CourseSession.CourseSessionTemplate.Description</td>
+                        <td class="small">@(string.IsNullOrEmpty(item.CourseSession.SessionDescription) ? item.CourseSession.CourseSessionTemplate?.Description : item.CourseSession.SessionDescription )</td>
                         <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
                         <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
-                        <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.CourseSessionTemplate.DefaultDuration).ToString("HH:mm")</td>
+                        <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.Duration != null ? item.CourseSession.Duration : (item.CourseSession.CourseSessionTemplate?.DefaultDuration).GetValueOrDefault()).ToString("HH:mm")</td>
                     </tr>
                 }
             </tbody>
@@ -55,14 +55,14 @@
             <tbody>
                 @foreach (var item in Model.Where(x => !x.InstructorApproved).OrderBy(x => x.CourseSession.DateTime))
                 {
-                    <tr>
-                        <td class="small">@item.CourseSession.Course.CourseName</td>
-                        <td class="small">@item.CourseSession.Sessiontype</td>
-                        <td class="small">@item.CourseSession.CourseSessionTemplate.Description</td>
-                        <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
-                        <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
-                        <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.CourseSessionTemplate.DefaultDuration).ToString("HH:mm")</td>
-                    </tr>
+                <tr>
+                    <td class="small">@item.CourseSession.Course.CourseName</td>
+                    <td class="small">@item.CourseSession.Sessiontype</td>
+                    <td class="small">@(string.IsNullOrEmpty(item.CourseSession.SessionDescription) ? item.CourseSession.CourseSessionTemplate?.Description : item.CourseSession.SessionDescription)</td>
+                    <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
+                    <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
+                    <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.Duration != null ? item.CourseSession.Duration : (item.CourseSession.CourseSessionTemplate?.DefaultDuration).GetValueOrDefault()).ToString("HH:mm")</td>
+                </tr>
                 }
             </tbody>
         </table>

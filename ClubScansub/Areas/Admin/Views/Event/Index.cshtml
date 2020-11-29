@@ -9,6 +9,7 @@
 
     <partial name="_IndexPageHeaderPartial" model="@pageTitle" />
 
+
     @if (Model.Count() == 0)
     {
         <h4 class="text-info">Ingen begivenheder</h4>
@@ -39,8 +40,8 @@
                         <label asp-for="@Model.First().IsInternal"></label>
                     </th>
                     @*<th>
-                        <label asp-for="@Model.First().IsFreeForDivepros"></label>
-                    </th>*@
+                            <label asp-for="@Model.First().IsFreeForDivepros"></label>
+                        </th>*@
                     <th></th>
                 </tr>
             </thead>
@@ -53,7 +54,7 @@
                         <td class="small">@item.StartDateAndTime.ToShortDateString() kl. @item.StartDateAndTime.ToShortTimeString()</td>
                         @if (item.Divelocation != null)
                         {
-                            <td class="small">@item.Divelocation.Name)</td>
+                            <td class="small">@item.Divelocation.Name</td>
                             <td class="small">@item.Divelocation.MinDepth til @item.Divelocation.MaxDepth m.</td>
                         }
                         else
@@ -67,8 +68,8 @@
                             <input type="checkbox" asp-for="@item.IsInternal" readonly disabled />
                         </td>
                         @*<td>
-                            <input type="checkbox" asp-for="@item.IsFreeForDivepros" readonly disabled />
-                        </td>*@
+                                <input type="checkbox" asp-for="@item.IsFreeForDivepros" readonly disabled />
+                            </td>*@
                         <td class="small">
                             @if (!item.IsCancelled)
                             {
@@ -85,4 +86,18 @@
         </table>
 
     }
+    <div class="row">
+
+        <div class="col-4">
+            @if (ViewBag.IsClosedEvents)
+            {
+                <a class="btn btn-sm btn-outline-success" asp-action="Index" asp-route-eventtype="@ViewBag.EventType">Se aktive...</a>
+            }
+            else
+            {
+                <a class="btn btn-sm btn-outline-secondary" asp-action="ClosedEvents" asp-route-eventtype="@ViewBag.EventType">Se afsluttede...</a>
+            }
+        </div>
+
+    </div>
 </div>

@@ -19,70 +19,6 @@ namespace ClubScansub.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ClubScansub.App_Data.ScansubModels.medlemsdata", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Certifikat");
-
-                    b.Property<string>("adresse");
-
-                    b.Property<string>("cpr");
-
-                    b.Property<string>("dsfnr");
-
-                    b.Property<string>("eMail");
-
-                    b.Property<string>("efternavn");
-
-                    b.Property<string>("fornavn");
-
-                    b.Property<bool>("jstatus");
-
-                    b.Property<string>("navn");
-
-                    b.Property<string>("password");
-
-                    b.Property<double>("post");
-
-                    b.Property<bool>("status");
-
-                    b.Property<string>("telefonBil");
-
-                    b.Property<string>("telefonprivat");
-
-                    b.Property<string>("tlf");
-
-                    b.HasKey("id");
-
-                    b.ToTable("medlemsdata");
-                });
-
-            modelBuilder.Entity("ClubScansub.App_Data.ScansubModels.saldooplysning", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("dato");
-
-                    b.Property<string>("dsfnr");
-
-                    b.Property<string>("password");
-
-                    b.Property<decimal>("pris");
-
-                    b.Property<string>("tekst");
-
-                    b.Property<int>("turid");
-
-                    b.HasKey("id");
-
-                    b.ToTable("saldooplysning");
-                });
-
             modelBuilder.Entity("ClubScansub.Models.Address", b =>
                 {
                     b.Property<int>("Id")
@@ -158,7 +94,6 @@ namespace ClubScansub.Data.Migrations
                         .HasMaxLength(50);
 
                     b.Property<string>("ShortName")
-                        .IsRequired()
                         .HasMaxLength(20);
 
                     b.HasKey("Id");
@@ -173,6 +108,8 @@ namespace ClubScansub.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("AddressId");
+
+                    b.Property<bool>("IsOldMemberDatabaseImported");
 
                     b.Property<byte[]>("Logo");
 
@@ -208,6 +145,10 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int?>("DivelocationId");
 
                     b.Property<TimeSpan>("Duration");
+
+                    b.Property<string>("SessionDescription");
+
+                    b.Property<string>("SessionName");
 
                     b.Property<int>("Sessiontype");
 
@@ -298,7 +239,7 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int>("CourseType");
 
                     b.Property<decimal>("DefaultPrice")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal");
 
                     b.Property<byte[]>("Image");
 
@@ -345,16 +286,20 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<int>("MaxDepth");
 
+                    b.Property<int>("MaxParticipants");
+
                     b.Property<int?>("MeetingLocationId");
 
                     b.Property<int>("MinDepth");
+
+                    b.Property<int>("MinParticipants");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150);
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric(18,0)");
+                        .HasColumnType("decimal");
 
                     b.HasKey("Id");
 
@@ -406,8 +351,10 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<int?>("AddressId");
 
+                    b.Property<Guid>("DeeplinkId");
+
                     b.Property<decimal>("Deposit")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal");
 
                     b.Property<string>("Details");
 
@@ -433,7 +380,7 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int>("MinParticipants");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal");
 
                     b.Property<int?>("RequiredCertificateId");
 

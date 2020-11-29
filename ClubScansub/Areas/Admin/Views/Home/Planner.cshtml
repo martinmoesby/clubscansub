@@ -15,7 +15,7 @@
 <div class="container-fluid d-flex">
 
 
-    <div class="col-9 d-inline mh-100 h-100" style="height:800px;min-height:800px;">
+    <div class="col-9 d-inline mh-100 h-100" >
         <div id="calendar"></div>
     </div>
 
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <div>
+    @*<div>
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog-centered modal-dialog" role="document">
                 <div class="modal-content">
@@ -161,8 +161,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
 
+</div>
     @section Scripts {
         <script src="~/lib/fullcalendar/core/main.js"></script>
         <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
@@ -171,6 +172,8 @@
         <script src="~/lib/fullcalendar/timegrid/main.js"></script>
         <script src="~/lib/fullcalendar/list/main.js"></script>
         <script src="~/lib/fullcalendar/core/locales/da.js"></script>
+        <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+        <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
         <script>
 
     let calendarEl = document.getElementById("calendar");
@@ -212,6 +215,7 @@
 
     var dropurl = "@Url.Action("Create", "Home", new { area = "Admin" })";
     var moveUrl = "@Url.Action("Move", "Home", new { area = "Admin" })";
+    var resizeUrl = "@Url.Action("Resize", "Home", new { area = "Admin" })";
 
     var boatSource = {
         // Bådture
@@ -320,7 +324,7 @@
         height:"parent",
         contentHeight: "auto",
         handleWindowResize: true,
-        aspectRatio: 2,
+        //aspectRatio: 1.35,
         views: {
             dayGrid: {
                 titleFormat: { year: 'numeric', month: 'long' }
@@ -341,8 +345,8 @@
         ],
         slotDuration: '00:30:00',
         slotLabelInterval: '01:00:00',
-        minTime: '08:00:00',
-        maxTime: '22:00:00',
+        minTime: '00:00:00',
+        maxTime: '23:59:00',
         showNonCurrentDates: true,
         fixedWeekCount: true,
         windowResizeDelay: 500,
@@ -379,7 +383,18 @@
             return dropEvent(dropInfo);
         },
         eventDrop: function (dropInfo) {
-            moveEvent(dropInfo)
+            moveEvent(dropInfo);
+        },
+        eventResize: function (dropInfo) {
+            resizeEvent(dropInfo);
+        },
+        eventRender: function (info) {
+            var tooltip = new Tooltip(info.el, {
+                title: info.event.extendedProps.description,
+                placement: 'top',
+                trigger: 'hover',
+                container: 'body'
+            });
         }
     });
 
@@ -387,51 +402,74 @@
         calendar.render();
     });
 
-    function moveEvent(dropInfo) {
+            function moveEvent(dropInfo) {
 
-        var newDate = new Date(dropInfo.event.start);
-        var dateStr = newDate.toISOString();
-        var id = dropInfo.event.id;
+                var newDate = new Date(dropInfo.event.start.toISOString());
+                var dateStr = newDate.toISOString();
+                var id = dropInfo.event.id;
 
-        $.ajax({
-            url: moveUrl,
-            data: {
-                startdate: dateStr,
-                id: id
-            },
-            success: function (data) {
-                console.log(data);
-            },
-            failure: function (data) {
-                console.log(data);
+                $.ajax({
+                    url: moveUrl,
+                    data: {
+                        startdate: dateStr,
+                        id: id
+                    },
+                    success: function () {
+                        //calendar.refetchEvents();
+                    },
+                    failure: function (data) {
+                        console.log(data);
+                    }
+                });
+
+            };
+
+
+            function dropEvent(dropInfo) {
+                var droppedElement = dropInfo.draggedEl;
+                var type = droppedElement.dataset["type"];
+                var id = droppedElement.dataset["eventid"];
+
+                $.ajax({
+                    url: dropurl,
+                    data: {
+                        startdate: dropInfo.dateStr,
+                        id: id,
+                        type: type
+                    },
+                    success: function () {
+                        calendar.refetchEvents()
+
+                    },
+                    failure: function (data) {
+                        console.log(data);
+                    }
+                });
+            };
+
+            function resizeEvent(dropInfo) {
+
+                var newDate = new Date(dropInfo.event.start);
+                var newEndDate = new Date(dropInfo.event.end);
+                var dateStr = newDate.toISOString();
+                var dateEndStr = newEndDate.toISOString();
+                var id = dropInfo.event.id;
+
+                $.ajax({
+                    url: resizeUrl,
+                    data: {
+                        startdate: dateStr,
+                        enddate:dateEndStr,
+                        id: id
+                    },
+                    success: function () {
+                         //calendar.refetchEvents();
+                    },
+                    failure: function (data) {
+                        console.log(data);
+                    }
+                });
             }
-        });
-
-    };
-
-
-    function dropEvent(dropInfo) {
-        var droppedElement = dropInfo.draggedEl;
-        var type = droppedElement.dataset["type"];
-        var id = droppedElement.dataset["eventid"];
-
-        $.ajax({
-            url: dropurl,
-            data: {
-                startdate: dropInfo.dateStr,
-                id: id,
-                type: type
-            },
-            success: function (data) {
-                calendar.refetchEvents()
-                console.log(data);
-            },
-            failure: function (data) {
-                console.log(data);
-            }
-        });
-    };
-
 
         </script>
     }

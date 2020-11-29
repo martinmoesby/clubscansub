@@ -1,4 +1,5 @@
 ﻿using ClubScansub.Utility;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +22,6 @@ namespace ClubScansub.Models
         public string Description { get; set; }
 
         [Column(TypeName ="decimal(18,2)")]
-        [Range(1,double.MaxValue, ErrorMessage = "Beløbet skal mindst være 1")]
         [Display(Name ="Beløb", Description ="Det beløb der skal haves eller indsættes på brugerens konto")]
                 
         public decimal Amount { get; set; }
@@ -30,7 +30,10 @@ namespace ClubScansub.Models
         public string InvoiceNumber { get; set; }
 
         public AccountTypeEnum AccountType { get; set; }
+        
+        [JsonIgnore]
         public virtual ApplicationUser ApplicationUser { get; set; }
+        [JsonIgnore]
         public virtual Event Event { get; set; }
 
     }

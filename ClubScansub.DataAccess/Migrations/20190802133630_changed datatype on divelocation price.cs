@@ -9,7 +9,7 @@ namespace ClubScansub.Data.Migrations
             migrationBuilder.AlterColumn<decimal>(
                 name: "Price",
                 table: "Divelocation",
-                type: "numeric(18,2)",
+                type: "decimal",
                 nullable: false,
                 oldClrType: typeof(double));
         }

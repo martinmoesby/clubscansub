@@ -30,26 +30,34 @@
             <div class="col-6">
                 <h4>
                     <button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>
-                    @Model.CourseName
+                    @Model.CourseName                
+                    
+                    @if (User.IsInRole(Userroles.Administrator))
+                    {
+                        <input hidden type="text" id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" readonly disabled />
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyDeeplink()"><i class="fas fa-copy mr-2"></i>Kopier link</button>
+                    }
+
                 </h4>
                 <p>
                     Start dato: <strong>@Model.CourseSessions.Min(x => x.DateTime).ToString("dd. MMMM yyyy kl. HH:mm") </strong>
                     <br />
                     Slut dato: <strong> @Model.CourseSessions.Max(x => x.DateTime.Add(x.Duration)).ToString("dd. MMMM yyyy kl. HH:mm") </strong>
-                </p>            
-                
-                <div class="text-black text-truncate font-weight-lighter small">
-                    @Model.CourseTemplate.TemplateName<br />
-                    @Model.CourseTemplate.Sessions.Count dage fordelt på
+                </p>
 
-                    @Model.CourseTemplate.AcademicSessions teoriaftener, <br />
-                    @Model.CourseTemplate.PoolSessions svømmehalsdage og <br />
-                    @Model.CourseTemplate.OpenWaterSessions dage med dykning i åbent vand.
+                <div class="text-black text-truncate font-weight-lighter small">
+                    @Model.CourseTemplate?.TemplateName<br />
+                    @Model.CourseTemplate?.Sessions?.Count dage fordelt på
+
+                    @Model.CourseTemplate?.AcademicSessions teoriaftener, <br />
+                    @Model.CourseTemplate?.PoolSessions svømmehalsdage og <br />
+                    @Model.CourseTemplate?.OpenWaterSessions dage med dykning i åbent vand.
 
                 </div>
-            </div>
+
+                </div>
             <div class="col-4">
-                @{if (Model.CourseTemplate.Image != null)
+                @{if (Model.CourseTemplate?.Image != null)
                     {
                         var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.CourseTemplate.Image)}";
                         <img class="img rounded" src="@(imgSource)" alt="" height="192" style="height:192px" />
@@ -191,7 +199,7 @@
                         {
                             <li class="list-group-item">
                                     <p>@item.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") til kl. @item.DateTime.Add(item.Duration).ToString("HH:mm")</p>
-                                    <strong>@item.CourseSessionTemplate.Description</strong>
+                                    <strong>@item.CourseSessionTemplate?.Description</strong>
                             </li>
                         }
                     </ul>
@@ -203,3 +211,29 @@
     </div>
 </div>
 
+<script>
+    function copyDeeplink() {
+        /* Get the text field */
+        var copyText = document.getElementById("deeplink");
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+
+
+        /* Alert the copied text */
+        alert("Copied the text: " + copyText.value);
+
+        copyText.blur();
+
+        if (window.getSelection) { // All browsers, except IE <=8
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) { // IE <=8
+            document.selection.empty();
+        }
+
+    }
+</script>

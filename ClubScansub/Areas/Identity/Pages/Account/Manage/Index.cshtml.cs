@@ -44,6 +44,9 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
         public bool IsOldAccountImported { get; set; }
 
         [TempData]
+        public string ErrorMessage { get; set; }
+
+        [TempData]
         public string StatusMessage { get; set; }
 
         [BindProperty]
@@ -169,7 +172,6 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             appUser.Country = Input.Country;
             appUser.DayOfbirth = Input.DayOfbirth;
             appUser.PhoneNumber = Input.PhoneNumber;
-            appUser.AccountNumber = Input.AccountNumber;
 
             await db.SaveChangesAsync();
 

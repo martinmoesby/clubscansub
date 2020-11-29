@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClubScansub.Areas.Members.Controllers
 {
     [Area("Members")]
-    [Authorize(Roles = Userroles.Member)]
+    [Authorize(Roles = Userroles.User)]
     public class CertificateController : BaseController
     {
 
@@ -76,7 +76,9 @@ namespace ClubScansub.Areas.Members.Controllers
             db.Entry(certificat).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             await db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return Redirect("/Identity/Account/Manage/Certifications");
+
+            //return RedirectToAction(nameof(Index));
         }
 
         [HttpGet, ActionName("Delete")]
@@ -101,7 +103,9 @@ namespace ClubScansub.Areas.Members.Controllers
 
             await db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return Redirect("/Identity/Account/Manage/Certifications");
+
+//            return RedirectToAction(nameof(Index));
 
         }
     }

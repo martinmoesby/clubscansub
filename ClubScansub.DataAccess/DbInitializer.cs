@@ -2,6 +2,7 @@
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace ClubScansub.Data
@@ -36,16 +37,21 @@ namespace ClubScansub.Data
                 roleManager.CreateAsync(new IdentityRole(Userroles.User)).GetAwaiter().GetResult();
             }
 
-            var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@site.local");
+            if (!roleManager.RoleExistsAsync(Userroles.Student).Result)
+            {
+                roleManager.CreateAsync(new IdentityRole(Userroles.Student)).GetAwaiter().GetResult();
+            }
 
-            if ( owner == null)
+            var owner = db.Users.FirstOrDefault(x => x.UserName == "admin@scansub.dk");
+
+            if (owner == null)
             {
                 var user = new ApplicationUser
                 {
                     Firstname = "Site",
                     Lastname = "Admin",
                     Email = "admin@site.local",
-                    UserName = "admin@site.local",
+                    UserName = "admin@scansub.dk",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false
@@ -72,111 +78,183 @@ namespace ClubScansub.Data
                 clubInfo.Tagline = "gode oplevelser under overfladen - og over";
                 clubInfo.Address = new Address();
                 clubInfo.Address.Name = "Klubben";
+                clubInfo.IsOldMemberDatabaseImported = false;
 
                 db.ClubSettings.Add(clubInfo);
                 await db.SaveChangesAsync();
 
             }
-            //seedUsers();
-        }
 
-        private void seedUsers()
-        {
-            var users = new string[]
+            if (!clubInfo.IsOldMemberDatabaseImported)
             {
-                "Urs Lancaster"
-                , "Duval Snape"
-                , "Jervis Lindsay"
-                , "Townsend Langdon"
-                , "Grischa Knottley"
-                , "Ramsey Thackeray"
-                , "Cheney Penny"
-                , "Aubry Landon"
-                , "Mayne Garrick"
-                , "Karl Whiteley"
-                , "Berdine Stevenson"
-                , "Elfie Paddley"
-                , "Heide Reeve"
-                , "Albertyna Payton"
-                , "Odila Snowdon"
-                , "Daniella Adlam"
-                , "Louanne Blackwood"
-                , "Norae Burton"
-                , "Isabella Fulton"
-                , "Maryam Swale"
-                , "Dueath Sparkwood"
-                , "Saetdis Boldcrown"
-                , "Pethemar Whiteburst"
-                , "Saeazhen Firelight"
-                , "Lelomir Cinderflare"
-                , "Kaenas Eagerstalker"
-                , "Erinian Strongveil"
-                , "Selron Darkswitch"
-                , "Noral Violetrest"
-                , "Lenin Richbane"
-                , "Zanuzen Sunstalker"
-                , "Inetven Phoenixlove"
-                , "Yaash Highkind"
-                , "Taeath Longrest"
-                , "Tymarrin Sparkflame"
-                , "Zantheol Azuresmile"
-                , "Artheon Highsense"
-                , "Perrodan Whitegaze"
-                , "Ithiran Violetbirth"
-                , "Celoedanis Highreaver"
-                , "Novidine Rightstrider"
-                , "Ellean Somberburst"
-                , "Narel Coldtwist"
-                , "Emenna Tindertrail"
-                , "Olisalia Sparkdepth"
-                , "Cainara Slimshield"
-                , "Samisa Grimveil"
-                , "Jisia Ancientburn"
-                , "Lyraden Goldtrick"
-                , "Emedana Lighthide"
-                , "Urom Doomblade"
-                , "Thegus Firstgem"
-                , "Drormolann Fusefall"
-                , "Bigarn Frozenshout"
-                , "Magnihm Highshaper"
-                , "Hugrik Dimgift"
-                , "Arginas Hardtoe"
-                , "Giliuth Caskkind"
-                , "Byndenn Cragshield"
-                , "Brognohr Truegrace"
-                , "Konmy Blankforce"
-                , "Mitass Slowbuster"
-                , "Dammegu Vaststone"
-                , "Yhmagus Warcave"
-                , "Nashi Cragbraid"
-                , "Anovio Shorttale"
-                , "Gyvinlen Bronzefield"
-                , "Azi Moltenhammer"
-                , "Uzua Olddust"
-                , "Nemdo Stoutcrag"
-            };
-
-            foreach (var item in users)
-            {
-                var names = item.Split(' ');
-                var applicationUser = new ApplicationUser()
-                {
-                    Firstname = names[0],
-                    Lastname = names[1],
-                    UserName = $"{names[0]}@{names[1]}.tst",
-                    Email = $"{names[0]}@{names[1]}.tst"
-                };
-
-                if (userManager.FindByEmailAsync(applicationUser.Email).GetAwaiter().GetResult() == null)
-                {
-                    userManager.CreateAsync(applicationUser, "User123*").GetAwaiter().GetResult();
-                    userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
-                    userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
-                }
+                //importUsers();
+                //importKursister();
+                clubInfo.IsOldMemberDatabaseImported = true;
+                await db.SaveChangesAsync();
             }
-
         }
 
+        //private void importUsers()
+        //{
+
+        //    var users = db.medlemsdata.AsNoTracking().ToList();
+
+        //    foreach (var item in users)
+        //    {
+        //        //var names = item.Split(' ');
+        //        var applicationUser = new ApplicationUser()
+        //        {
+        //            Firstname = item.fornavn,
+        //            Lastname = item.efternavn,
+        //            Streetaddress = item.adresse,
+        //            PhoneNumber = item.telefonBil,
+        //            Email = item.eMail,
+        //            UserName = $"{item.dsfnr}@scansub.dk",
+        //            AccountNumber = item.dsfnr
+        //        };
+
+        //        if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
+        //        {
+        //            var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+        //            if (createUserResult.Succeeded)
+        //            {
+        //                if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+        //                    applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+
+        //                userManager.AddToRoleAsync(applicationUser, Userroles.User).GetAwaiter().GetResult();
+        //                userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", item.status ? "true" : "false")).GetAwaiter().GetResult();
+
+        //                if (item.status)
+        //                    userManager.AddToRoleAsync(applicationUser, Userroles.Member).GetAwaiter().GetResult();
+
+        //                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                {
+        //                    AccountType = AccountTypeEnum.EventAccountType,
+        //                    Description = "Saldotransport fra gammelt system",
+        //                    Amount = item.saldo,
+        //                    PostingDate = DateTime.Now,
+        //                    ApplicationUser = applicationUser,
+        //                });
+
+        //                applicationUser.OldAccountImported = true;
+
+        //                db.SaveChangesAsync().GetAwaiter().GetResult();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //User already imported - only import new accountentries
+        //            var user = db.ApplicationUsers.FirstOrDefault(x=>x.UserName == applicationUser.UserName);
+
+        //            if (user != null)
+        //            {
+        //                var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Saldotransport fra gammelt system" && x.AccountType == AccountTypeEnum.EventAccountType);
+        //                if (!openingEntry)
+        //                {
+        //                    var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.EventAccountType);
+                            
+        //                    if (accountEntries != null || accountEntries.Count() > 0) 
+        //                        db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+
+
+        //                    db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                    {
+        //                        AccountType = AccountTypeEnum.EventAccountType,
+        //                        Description = "Saldotransport fra gammelt system",
+        //                        Amount = item.saldo,
+        //                        PostingDate = DateTime.Now,
+        //                        ApplicationUser = user,
+        //                    });
+
+        //                    db.SaveChangesAsync().GetAwaiter().GetResult();
+        //                }
+        //            }
+        //        }
+
+        //    }
+
+        //}
+
+        //private void importKursister()
+        //{
+
+        //    var users = db.kursistdata.AsNoTracking().ToList();
+
+        //    foreach (var item in users)
+        //    {
+        //        //var names = item.Split(' ');
+        //        var applicationUser = new ApplicationUser()
+        //        {
+        //            Firstname = item.fornavn,
+        //            Lastname = item.efternavn,
+        //            Streetaddress = item.adresse,
+        //            PhoneNumber = item.telefonBil,
+        //            Email = item.eMail,
+        //            UserName = $"{item.dsfnr}@scansub.dk",
+        //            AccountNumber = item.dsfnr
+        //        };
+
+        //        if (userManager.FindByNameAsync(applicationUser.UserName).GetAwaiter().GetResult() == null)
+        //        {
+        //            var createUserResult = userManager.CreateAsync(applicationUser, item.password).GetAwaiter().GetResult();
+        //            if (createUserResult.Succeeded)
+        //            {
+        //                if (string.IsNullOrEmpty(applicationUser.SecurityStamp))
+        //                    applicationUser.SecurityStamp = System.Guid.NewGuid().ToString();
+
+        //                userManager.AddToRoleAsync(applicationUser, Userroles.Student).GetAwaiter().GetResult();
+        //                userManager.AddClaimAsync(applicationUser, new System.Security.Claims.Claim("IsPremiumMember", "false")).GetAwaiter().GetResult();
+
+
+        //                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                {
+        //                    AccountType = AccountTypeEnum.CourseAccountType,
+        //                    Description = "Kursussaldo fra gammelt system",
+        //                    Amount = item.saldo,
+        //                    PostingDate = DateTime.Now,
+        //                    ApplicationUser = applicationUser,
+        //                });
+
+        //                applicationUser.OldAccountImported = true;
+
+        //                db.SaveChangesAsync().GetAwaiter().GetResult();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //User already imported - only import new accountentries
+        //            var user = db.ApplicationUsers.FirstOrDefault(x => x.UserName == applicationUser.UserName);
+
+        //            if (user != null)
+        //            {
+        //                userManager.AddToRoleAsync(user, Userroles.Student).GetAwaiter().GetResult();
+
+        //                var openingEntry = db.ApplicationUserAccountEntry.Any(x => x.ApplicationUser == user && x.Description == "Kursussaldo fra gammelt system" && x.AccountType == AccountTypeEnum.CourseAccountType);
+        //                if (!openingEntry)
+        //                {
+        //                    var accountEntries = db.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == user && x.AccountType == AccountTypeEnum.CourseAccountType);
+
+        //                    if (accountEntries != null || accountEntries.Count() > 0)
+        //                        db.ApplicationUserAccountEntry.RemoveRange(accountEntries);
+
+
+        //                    db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+        //                    {
+        //                        AccountType = AccountTypeEnum.CourseAccountType,
+        //                        Description = "Kursussaldo fra gammelt system",
+        //                        Amount = item.saldo,
+        //                        PostingDate = DateTime.Now,
+        //                        ApplicationUser = user,
+        //                    });
+
+        //                    db.SaveChangesAsync().GetAwaiter().GetResult();
+        //                }
+        //            }
+        //        }
+
+        //    }
+
+        //}
         //private void seedDB()
         //{
 
@@ -294,3 +372,78 @@ namespace ClubScansub.Data
         //}
     }
 }
+
+
+//var users = new string[]
+//{
+//    "Urs Lancaster"
+//    , "Duval Snape"
+//    , "Jervis Lindsay"
+//    , "Townsend Langdon"
+//    , "Grischa Knottley"
+//    , "Ramsey Thackeray"
+//    , "Cheney Penny"
+//    , "Aubry Landon"
+//    , "Mayne Garrick"
+//    , "Karl Whiteley"
+//    , "Berdine Stevenson"
+//    , "Elfie Paddley"
+//    , "Heide Reeve"
+//    , "Albertyna Payton"
+//    , "Odila Snowdon"
+//    , "Daniella Adlam"
+//    , "Louanne Blackwood"
+//    , "Norae Burton"
+//    , "Isabella Fulton"
+//    , "Maryam Swale"
+//    , "Dueath Sparkwood"
+//    , "Saetdis Boldcrown"
+//    , "Pethemar Whiteburst"
+//    , "Saeazhen Firelight"
+//    , "Lelomir Cinderflare"
+//    , "Kaenas Eagerstalker"
+//    , "Erinian Strongveil"
+//    , "Selron Darkswitch"
+//    , "Noral Violetrest"
+//    , "Lenin Richbane"
+//    , "Zanuzen Sunstalker"
+//    , "Inetven Phoenixlove"
+//    , "Yaash Highkind"
+//    , "Taeath Longrest"
+//    , "Tymarrin Sparkflame"
+//    , "Zantheol Azuresmile"
+//    , "Artheon Highsense"
+//    , "Perrodan Whitegaze"
+//    , "Ithiran Violetbirth"
+//    , "Celoedanis Highreaver"
+//    , "Novidine Rightstrider"
+//    , "Ellean Somberburst"
+//    , "Narel Coldtwist"
+//    , "Emenna Tindertrail"
+//    , "Olisalia Sparkdepth"
+//    , "Cainara Slimshield"
+//    , "Samisa Grimveil"
+//    , "Jisia Ancientburn"
+//    , "Lyraden Goldtrick"
+//    , "Emedana Lighthide"
+//    , "Urom Doomblade"
+//    , "Thegus Firstgem"
+//    , "Drormolann Fusefall"
+//    , "Bigarn Frozenshout"
+//    , "Magnihm Highshaper"
+//    , "Hugrik Dimgift"
+//    , "Arginas Hardtoe"
+//    , "Giliuth Caskkind"
+//    , "Byndenn Cragshield"
+//    , "Brognohr Truegrace"
+//    , "Konmy Blankforce"
+//    , "Mitass Slowbuster"
+//    , "Dammegu Vaststone"
+//    , "Yhmagus Warcave"
+//    , "Nashi Cragbraid"
+//    , "Anovio Shorttale"
+//    , "Gyvinlen Bronzefield"
+//    , "Azi Moltenhammer"
+//    , "Uzua Olddust"
+//    , "Nemdo Stoutcrag"
+//};

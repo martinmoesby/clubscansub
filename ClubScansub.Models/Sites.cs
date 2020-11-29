@@ -7,9 +7,23 @@ using System.Threading.Tasks;
 
 namespace ClubScansub.Models
 {
+
+    public enum LocationType
+    {
+        Andet = 1,
+        BekræftetPos = 2,
+        BjærgetVrag = 3,
+        Boplads = 4,
+        Fiskeplads = 5,
+        Naturdyk = 6,
+        SikkerPos = 7,
+        UsikkerPos = 8
+    }
+
     [Table("Site")]
     public class Site : BaseModel
     {
+
         [Required]
         [MaxLength(50,ErrorMessage ="Name cannot be longer than 50 chars")]
         public string Name { get; set; }
@@ -21,10 +35,11 @@ namespace ClubScansub.Models
 
         public string Country { get; set; }
 
-        public float Longitude { get; set; }
-        public float Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public decimal Latitude { get; set; }
 
-        [Required]
+        public LocationType LocationType { get; set; }
+
         public int MaxDivers { get; set; }
 
     }

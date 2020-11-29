@@ -7,7 +7,7 @@
 <div class="row justify-content-between">
 
     <h5><i class="fas fa-award"></i>&nbsp;Certificeringer</h5>
-    @if (User.IsInRole(Userroles.Member))
+    @if (User.IsInRole(Userroles.User))
     {
         <a asp-action="Index" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-info btn-sm"><i class="fas fa-award"></i>&nbsp;Certifikat-detaljer</a>
     }
@@ -21,21 +21,22 @@
             <div class="input-group">
                 <select class="form-control" asp-items="Model.Certificates" asp-for="SelectedCertificate"></select>
                 <div class="input-group-append">
-                    @if (User.IsInRole(Userroles.Member))
-                    {
-                        <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
-                    } else
-                    {
-                        <span class="btn btn-outline-info btn-sm" title="Du skal være registreret som medlem af klubben, før du kan tilføje certifikater til din profil"><i class="fas fa-ban mr-1"></i>Kun for medlemmer</span> 
-                    }
-                    </div>
+                    <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
+                    @*@if (User.IsInRole(Userroles.User))
+        {
+            <button type="submit" class="btn btn-outline-info btn-sm input-group-btn"><i class="fas fa-plus mr-1"></i>Tilføj</button>
+        } else
+        {
+            <span class="btn btn-outline-info btn-sm" title="Du skal være registreret som medlem af klubben, før du kan tilføje certifikater til din profil"><i class="fas fa-ban mr-1"></i>Kun for medlemmer</span>
+        }*@
+                </div>
             </div>
         </form>
     </div>
 
 </div>
 
-<div class="row">
+@*<div class="row">
     <ul class="list-group">
         @foreach (var item in Model.ApplicationUser.Certificates)
         {
@@ -44,4 +45,50 @@
             </li>
         }
     </ul>
+</div>*@
+<div class="row">
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="small">Udstedt d.</th>
+                <th class="small">Certifikat</th>
+                <th class="small">Navn</th>
+                <th class="small">Forside</th>
+                <th class="small">Bagside</th>
+                <th class="small"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cert in Model.ApplicationUser.Certificates)
+            {
+                <tr>
+                    <td class="small">@cert.IssuedDate.ToLongDateString()</td>
+                    <td class="small">@cert.Certificate.ShortName</td>
+                    <td class="small">@cert.Certificate.Name</td>
+                    <td class="small">
+                        @if (cert.FrontSideImage != null)
+                        {
+                            <img src="@( $"data:image;base64,{Convert.ToBase64String(cert.FrontSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
+                        }
+                    </td>
+                    <td class="small">
+                        @if (cert.BackSideImage != null)
+                        {
+                            <img src="@( $"data:image;base64,{Convert.ToBase64String(cert.BackSideImage)}")" class="img-fluid img-thumbnail rounded" style="height:100px;" />
+                        }
+                    </td>
+                    <td class="small">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-action="Edit" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-primary text-primary btn-sm" asp-route-id="@cert.Id.ToString()"><i class="fas fa-edit"></i></a>
+                            @*<a asp-action="Details" class="btn btn-outline-success text-success" asp-route-id="@Model"><i class="fas fa-list-alt"></i></a>*@
+                            <a asp-action="Delete" asp-controller="Certificate" asp-area="Members" class="btn btn-outline-danger text-danger btn-sm" asp-route-id="@cert.Id.ToString()"><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
 </div>

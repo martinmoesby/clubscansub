@@ -1,6 +1,8 @@
 using ClubScansub.Utility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -31,12 +33,13 @@ namespace ClubScansub.Models
         public int MaxParticipants { get; set; }
 
         [DataType(DataType.Currency)]
-        [Column(TypeName = "money")]
+        [Column(TypeName = "decimal")]
         [Display(Name = "Pris")]
         public decimal Price { get; set; }
 
         [DataType(DataType.Currency)]
-        [Column(TypeName = "money")]
+        [Column(TypeName = "decimal")]
+        [Display(Name = "Depositum")] 
         public decimal Deposit { get; set; }
 
         [Display(Name = "Starttidspunkt")]
@@ -57,7 +60,10 @@ namespace ClubScansub.Models
         public bool IsInternal { get; set; }
 
         [Display(Name = "Gratis for Instruktører?")]
-        public bool IsFreeForDivepros { get; set; } 
+        public bool IsFreeForDivepros { get; set; }
+        
+        //[Display(Name = "Gratis for Premium?")]
+        //public bool IsFreeForPremiumMembers { get; set; }
 
         public virtual Certificate RequiredCertificate { get; set; }
 
@@ -76,6 +82,8 @@ namespace ClubScansub.Models
         [NotMapped]
         [Display(Name = "Manglende deltagere")]
         public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants;
+
+        public Guid DeeplinkId { get; set; }
 
     }
 }

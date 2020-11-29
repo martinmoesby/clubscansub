@@ -42,8 +42,10 @@ namespace ClubScansub
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                //options.UseMySql(Configuration.GetConnectionString("MySQLConnection"));
+            });
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => {
 
@@ -55,9 +57,9 @@ namespace ClubScansub
 
                 options.Password = new PasswordOptions
                 {
-                    RequireDigit = true,
+                    RequireDigit = false,
                     RequiredLength = 3,
-                    RequiredUniqueChars = 3,
+                    //RequiredUniqueChars = 3,
                     RequireLowercase = false,
                     RequireNonAlphanumeric = false,
                     RequireUppercase = false

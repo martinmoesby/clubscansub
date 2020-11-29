@@ -39,6 +39,24 @@
                     <span asp-validation-for="Divelocation.MaxDepth" class="text-danger"></span>
                 </div>
 
+                <!-- Divelocation.Min and Max participants-->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Divelocation.MinParticipants" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MinParticipants" class="form-control" placeholder="Min. deltagere" />
+                    </div>
+                    <div class="col-4 text-right">
+                        <label asp-for="Divelocation.MaxParticipants" class="col-form-label"></label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" asp-for="Divelocation.MaxParticipants" class="form-control" placeholder="Max. deltagere" />
+                    </div>
+                    <span asp-validation-for="Divelocation.MinParticipants" class="text-danger"></span>
+                    <span asp-validation-for="Divelocation.MaxParticipants" class="text-danger"></span>
+                </div>
+
                 <!-- Divelocation.Certification-->
                 <div class="form-group row">
                     <div class="col-4">
@@ -135,11 +153,11 @@
                         @{if (Model.Divelocation.Image != null)
                             {
                                 var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
-                            <img class="img-fluid rounded rounded-circle" src="@(imgSource)" alt="" />
+                                <img class="img-fluid rounded rounded-circle" src="@(imgSource)" alt="" />
                             }
                             else
                             {
-                            <p class="">Intet billede indlæst</p>
+                                <p class="">Intet billede indlæst</p>
                             }
                         }
                     </div>

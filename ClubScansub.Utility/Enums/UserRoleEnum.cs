@@ -11,6 +11,7 @@ namespace ClubScansub.Utility
         public const string Divepro = "Divepro";
         public const string Member = "Member";
         public const string User = "User";
+        public const string Student = "Student";
     }
 
 }

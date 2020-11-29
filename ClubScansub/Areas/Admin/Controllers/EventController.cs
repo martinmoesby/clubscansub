@@ -4,9 +4,12 @@ using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,12 +20,27 @@ namespace ClubScansub.Areas.Admin.Controllers
     {
         private readonly UserManager<IdentityUser> um;
         private readonly ISmsSender smsSender;
-        public EventController(ApplicationDbContext db, UserManager<IdentityUser> um, ISmsSender smsSender)
+        private readonly IEmailSender emailSender;
+
+        public EventController(ApplicationDbContext db, UserManager<IdentityUser> um, ISmsSender smsSender, IEmailSender emailSender)
             : base(db)
         {
             this.um = um;
             this.smsSender = smsSender;
+            this.emailSender = emailSender;
+
+            _PageModel = new PageModel();
         }
+
+        public class PageModel
+        {
+            public Event Event { get; set; }
+            public IEnumerable<SelectListItem> UsersList { get; set; }
+            public IEnumerable<SelectListItem> CertificatesList { get; set; }
+
+        }
+
+        public PageModel _PageModel { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -30,7 +48,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Index(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
         {
             var @events = await db.Events
-                .Where(x=>x.EventType == eventtype && x.IsCancelled == false)
+                .Where(x=>x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.Divelocation)
                 .ToListAsync();
@@ -58,40 +76,118 @@ namespace ClubScansub.Areas.Admin.Controllers
                     ViewBag.Pagetitle = "Andre begivenheder";
                     break;
             }
-
+            ViewBag.EventType = eventtype;
+            ViewBag.IsClosedEvents = false;
             ViewBag.StatusMessage = StatusMessage;
             return View(events);
+
+        }
+
+        public async Task<IActionResult> ClosedEvents(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
+        {
+            var @events = await db.Events
+                .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime <= DateTime.Now)
+                .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x => x.Divelocation)
+                .ToListAsync();
+            
+            ViewBag.Pagetitle = "Afsluttede ";
+
+            switch (eventtype)
+            {
+                case EventTypeEnum.Bådtur:
+                    ViewBag.Pagetitle += "Bådture";
+                    break;
+                case EventTypeEnum.Stranddyk:
+                    ViewBag.Pagetitle += "Stranddyk";
+                    break;
+                case EventTypeEnum.Rejse:
+                    ViewBag.Pagetitle += "Dykkerture";
+                    break;
+                case EventTypeEnum.Liveaboard:
+                    ViewBag.Pagetitle += "Liveaboard ferie";
+                    break;
+                case EventTypeEnum.Klubture:
+                    ViewBag.Pagetitle += "Andre klubture";
+                    break;
+                case EventTypeEnum.Other:
+                default:
+                    ViewBag.Pagetitle += "Andre begivenheder";
+                    break;
+            }
+
+            ViewBag.EventType = eventtype;
+            
+            ViewBag.IsClosedEvents = true;
+
+            ViewBag.StatusMessage = StatusMessage;
+            return View("Index",events);
 
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var eventItem = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).Include(x => x.Divelocation).FirstOrDefaultAsync(x => x.Id == id);
+            var eventItem = await db.Events
+                .Include(x => x.Participants)
+                    .ThenInclude(x => x.ApplicationUser)
+                   .Include(x => x.Divelocation)
+                   .Include(x=>x.RequiredCertificate)
+                   .FirstOrDefaultAsync(x => x.Id == id);
 
             if (eventItem == null)
                 return NotFound();
 
-            return View(eventItem);
+            _PageModel.Event = eventItem;
+
+            //if (eventItem.RequiredCertificate != null)
+            //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;
+
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
+            {
+                Text = $"{x.Name} ({x.AccountNumber})",
+                Value = x.Id
+            }).ToListAsync();
+
+            _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem() 
+            {
+                Text = $"{x.ShortName} ({x.DepthLimit} m.)",
+                Value = x.Id.ToString()
+            }).ToListAsync();
+
+            return View(_PageModel);
 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Event item)
+        public async Task<IActionResult> Edit(PageModel pageModel)
         {
+            if (pageModel.Event.RequiredCertificate != null)
+                pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.Event.RequiredCertificate.Id);
 
             if (ModelState.IsValid)
             {
+                //if (pageModel.SelectedCertificate != null)
+                //    pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.SelectedCertificate);
                 
-                db.Attach(item).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                db.Attach(pageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index", new { eventtype = item.EventType });
+                return RedirectToAction("Index", new { eventtype = pageModel.Event.EventType });
             }
 
-            item.Participants = await db.EventUsers.Where(x => x.EventId == item.Id).Include(x => x.ApplicationUser).ToListAsync();
-            item.Divelocation = await db.Divelocations.FindAsync(item.Divelocation.Id);
-            return View(item);
+            //_PageModel.Event = pageModel.Event;
+            pageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
+            pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
+            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
+            {
+                Text = x.Name,
+                Value = x.Id
+            }).ToListAsync();
+
+            ViewBag.StatusMessage = StatusMessage;
+
+            return View(pageModel);
 
         }
 
@@ -110,6 +206,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             item.Divelocation = location;
             item.RequiredCertificate = certificate;
+            item.DeeplinkId = Guid.NewGuid();
 
             if (string.IsNullOrEmpty(item.Title))
             {
@@ -148,7 +245,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (ev_user != null)
             {
                 db.EventUsers.Remove(ev_user);
-                var user = await db.ApplicationUsers.FirstOrDefaultAsync(x=>x.Id == userid);
+                var user = await db.ApplicationUsers
+                    .Include(x=>x.AccountTransactions)
+                        .ThenInclude(x=>x.Event)
+                    .FirstOrDefaultAsync(x=>x.Id == userid);
+
                 var ev = await db.Events.FindAsync(eventid);
                 decimal refundFactor = 1m;
 
@@ -163,7 +264,11 @@ namespace ClubScansub.Areas.Admin.Controllers
                     var smsSendResult = await smsSender.SendSmsAsync(user.PhoneNumber, $"Du er blevet afmeldt turen '{ev.Title}' d. {ev.StartDateAndTime.ToShortDateString()}. Du er blevet refunderet {refundFactor *100} % af din betaling for turen");
                 }
 
-                var accountEntry = await db.ApplicationUserAccountEntry.Include(x=>x.Event).FirstOrDefaultAsync(x => x.Event.Id == eventid);
+                var accountEntry = user.AccountTransactions
+                    .Where(x=>x.Event != null && x.AccountType == AccountTypeEnum.EventAccountType)
+                    .OrderBy(x=>x.PostingDate)
+                    .FirstOrDefault(x => x.Event.Id == eventid);
+
                 if (accountEntry != null)
                 {
                     var newEntry = new ApplicationUserAccountEntry
@@ -182,6 +287,73 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             return RedirectToAction("Edit", new { id = eventid });
 
+        }
+
+        [HttpPost, ActionName("AddUserToEvent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddUserToEvent(int eventId, string userId, bool doCreateAccountTransaction = false)
+        {
+
+            var @event = await db.Events
+                .Include(x => x.Participants)
+                .FirstOrDefaultAsync(x => x.Id == eventId);
+
+            var applicationUser = await db.ApplicationUsers.FindAsync(userId);
+
+            @event.Participants.Add(new EventUser() { ApplicationUserId = userId });
+
+            if (doCreateAccountTransaction)
+            {
+                db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+                {
+                    AccountType = AccountTypeEnum.EventAccountType,
+                    Amount = -@event.Price,
+                    Description = $"Betaling for {@event.Title}",
+                    PostingDate = DateTime.Now,
+                    Event = @event,
+                    ApplicationUser = applicationUser
+                });
+            }
+
+            if (applicationUser.PhoneNumberConfirmed)
+            {
+                var smsMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt turen {@event.Title} d. {@event.StartDateAndTime}." +
+                    $"" +
+                    $"" +
+                    $"" +
+                    $"Vi glæder os rgtig meget til at se dig." +
+                    $"" +
+                    $"Med venlig hilsen " +
+                    $"Scansub DK Diver";
+
+                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået beksed via SMS";
+            }
+
+            if (applicationUser.EmailConfirmed)
+            {
+                var mailMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du er nu blevet tilmeldt turen {@event.Title} med start d. {@event.StartDateAndTime}.<br />" +
+                    $"" +
+                    $"" +
+                    $"<br />" +
+                    $"Vi glæder os rgtig meget til at se dig.<br/>" +
+                    $"<br />" +
+                    $"<br/><br/>Med venlig hilsen <br/><br/> Scansub DK Diver";
+
+                await emailSender.SendEmailAsync(applicationUser.Email, $"Tilmelding til {@event.Title}", mailMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået besked vial mail";
+            }
+
+            if (!applicationUser.EmailConfirmed && !applicationUser.PhoneNumberConfirmed)
+            {
+                StatusMessage = $"Fejl: {applicationUser.Firstname} har hverken valideret sin email eller sit telefonr. så det har ikke været muligt at give elektronisk besked.";
+            }
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Edit), new { id = eventId });
         }
 
         [HttpGet]
@@ -218,7 +390,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var e = await db.Events.Include(x=>x.Participants).FirstOrDefaultAsync(x=>x.Id == id);
+            var e = await db.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).FirstOrDefaultAsync(x=>x.Id == id);
             var eventtype = e.EventType;
 
             foreach (var item in e.Participants)
@@ -244,7 +416,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 }
             }
 
-            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Turen '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. Du er blevet refunderet 100% af din betaling for turen");
+            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Begivenheden '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. \n\nEvt. pris er blevet indstat på din turkonto\n\nMed venlig hilsen\nKlub Scansub");
 
             if (smsSendResult.Any(x=>!x.IsSuccessStatusCode))
             {

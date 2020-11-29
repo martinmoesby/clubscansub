@@ -16,6 +16,10 @@ namespace ClubScansub.Models.Structs
         public string StartAddress {get; set;}
         public string EndAddress { get; set; }
 
+        public string StartName { get; set; }
+
+        public string EndName { get; set; }
+
         public MapCoordinates Start { get; set; }
         public MapCoordinates End { get; set; }
     }

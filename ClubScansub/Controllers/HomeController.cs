@@ -14,6 +14,8 @@ using Nager.Date;
 using ClubScansub.Utility;
 using ClubScansub.Service;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ClubScansub.Controllers
 {
@@ -36,8 +38,9 @@ namespace ClubScansub.Controllers
         public string StatusMessage { get; set; }
 
         public HomeIndexViewModel PageModel { get; set; }
-        public async Task<IActionResult> Index(string showcalendar = "trips")
+        public async Task<IActionResult> Index(string events = "trips")
         {
+
             PageModel = new HomeIndexViewModel()
             {
                 UpcomingEvents = await db.Events
@@ -49,9 +52,47 @@ namespace ClubScansub.Controllers
                     .OrderBy(x=>x.StartDateAndTime)
                     .ToListAsync(),
                 Statusmessage = StatusMessage,
-                CalendarType = showcalendar
+                CalendarType = events
             };
             return View(PageModel);
+        }
+
+        [Route("DL/{id}")]
+        public async Task<IActionResult>DL(string id)
+        {
+            var guid = new Guid(id);
+
+            var @event = await db.Events.FirstOrDefaultAsync(c => c.DeeplinkId == guid);
+
+            if (@event == null)
+                return RedirectToAction(nameof(Index));
+
+            if (@event.GetType() == typeof(Event))
+            {
+                @event = await db.Events
+                    .Include(x => x.RequiredCertificate)
+                    .Include(x => x.Participants)
+                        .ThenInclude(x => x.ApplicationUser)
+                    .Include(x => x.Divelocation)
+                        .ThenInclude(x => x.MeetingLocation)
+                    .FirstOrDefaultAsync(x => x.DeeplinkId == guid);
+
+                return View( @event);
+            }
+
+            if (@event.GetType() == typeof(Course))
+            {
+                var course = await db.Courses
+                    .Include(x => x.CourseSessions).ThenInclude(x => x.CourseSessionTemplate)
+                    .Include(x => x.CourseTemplate)
+                    .Include(x => x.Signups).ThenInclude(x => x.ApplicationUser)
+                    .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                    .FirstOrDefaultAsync(x => x.DeeplinkId == guid);
+
+                return View(course);
+            }
+            return RedirectToAction(nameof(Index));
+
         }
 
         [HttpGet]
@@ -84,20 +125,31 @@ namespace ClubScansub.Controllers
             }
 
             var data = await db.Events
-                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsCancelled && !x.IsInternal)
+                    .Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end && x.EventType == eventtype && !x.IsInternal)
                     .OrderBy(x => x.StartDateAndTime)
                     .ToListAsync();
 
             var result = data.Select(v => new {
                 id = $"eventId:{v.Id}",
                 title = v.Title,
-                //description = v.Details,
+                description = v.Details,
                 start = v.StartDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 end = v.EndDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
-                classNames = DefaultClassNames.ToArray()
+                classNames = defineCLassNames(v)
             }); 
 
             return new JsonResult(result);//, JsonRequestBehavior = }
+        }
+
+        private string[] defineCLassNames(Event i)
+        {
+            if (DefaultClassNames.Contains("cancelled"))
+                DefaultClassNames.Remove("cancelled");
+
+            if (i.IsCancelled)
+                DefaultClassNames.Add("cancelled");
+
+            return DefaultClassNames.ToArray();
         }
 
         [HttpGet]
@@ -113,7 +165,7 @@ namespace ClubScansub.Controllers
             var result = data.Select(v => new {
                 id = $"eventId:{v.Id}",
                 title = v.Title,
-                //description = v.Details,
+                description = v.Details,
                 start = v.StartDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 end = v.EndDateAndTime.ToString("yyyy-MM-dd hh:mm:ss"),
                 classNames = DefaultClassNames.ToArray()
@@ -194,9 +246,25 @@ namespace ClubScansub.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEventDetails(string id)
         {
+            int itemId = 0;
+            string itemType="";
+
+
             var idItems = id.Split(":");
-            int itemId = int.Parse(idItems[1]);
-            string itemType = idItems[0];
+            if (idItems.Length > 1)
+            {
+                itemId = int.Parse(idItems[1]);
+                itemType = idItems[0];
+            } else
+
+            itemId = int.Parse(id);
+
+            //var e = await db.Events.FindAsync(itemId);
+
+            //if (e is Course)
+            //    itemType = "sessionId";
+            //else
+            //    itemType = "eventId";
 
             if (itemType == "sessionId")
             {
@@ -238,7 +306,7 @@ namespace ClubScansub.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Stranddyk || item.EventType == EventTypeEnum.Other) && User.IsInRole(Userroles.Member));
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
             
             if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
             {
@@ -267,7 +335,7 @@ namespace ClubScansub.Controllers
             item.Participants.Add(eventUser);
             await db.SaveChangesAsync();
 
-            StatusMessage = $"Du er blevet tilmeldt '{item.Title}'";
+            StatusMessage = $"Du er blevet tilmeldt '{item.Title}' d. {item.StartDateAndTime.ToShortDateString()}";
 
             if (item.RequiredCertificate != null && !user.Certificates.Any(x => x.Certificate.Id == item.RequiredCertificate.Id))
                 StatusMessage += $" men - ADVARSEL: Du har ikke det krævede certifikat '{item.RequiredCertificate.Name}', så det kan blive en lang, trist dag uden dykning. Sørg for at opdatere dine certifikater under din profil og medbring dit certifikat til turen.";
@@ -337,10 +405,19 @@ namespace ClubScansub.Controllers
             return View(db.ClubSettings.SingleOrDefault());
         }
 
+        //public async Task<IActionResult> DiveGuide()
+        //{
+        //    //var data = await db.Divesites.Where(x => x.LocationType == LocationType.BekræftetPos).ToListAsync();
+
+        //    return View();//data;
+        //}
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
     }
 }

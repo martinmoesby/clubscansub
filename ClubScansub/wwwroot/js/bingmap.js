@@ -24,28 +24,32 @@ function GetMap(includeClick) {
 
     if (lat !== "" && lon !== "") {
 
+        centerMap(lat,lon);
 
-        var location = new Microsoft.Maps.Location(lat, lon);
-
-        var pushpinName = "Mødested";
-
-        if ($('#addressName').val() !== "") {
-            pushpinName = $('#addressName').val();
-        }
-
-
-        addPushpin(location,pushpinName);
-
-
-        map.setView({
-            center: location,
-            zoom: 15
-        });
     } else {
 
         geocodeMap();
     }
 
+}
+function centerMap(lat, lon) {
+
+    var location = new Microsoft.Maps.Location(lat, lon);
+
+    var pushpinName = "Mødested";
+
+    if ($('#addressName').val() !== "") {
+        pushpinName = $('#addressName').val();
+    }
+
+
+    addPushpin(location, pushpinName);
+
+
+    map.setView({
+        center: location,
+        zoom: 15
+    });
 }
 
 function geocodeMap() {

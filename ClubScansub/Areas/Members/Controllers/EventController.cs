@@ -36,7 +36,7 @@ namespace ClubScansub.Areas.Members.Controllers
         public async Task<IActionResult> Index()
         {
             Events = await db.EventUsers.Include(x=>x.Event)
-                .Where(x=> !x.Event.IsCancelled && x.ApplicationUserId == User.GetIdentityId() && x.Event.EventType != EventTypeEnum.NotAnEvent)
+                .Where(x=> !x.Event.IsCancelled && x.ApplicationUserId == User.GetIdentityId() && x.Event.EventType != EventTypeEnum.NotAnEvent && x.Event.StartDateAndTime > DateTime.Now)
                 .Select(x=>x.Event).Include(x=>x.Participants)
                 .OrderBy(x=>x.StartDateAndTime).ThenBy(x=>x.Id)
                 .ToListAsync();
@@ -51,7 +51,7 @@ namespace ClubScansub.Areas.Members.Controllers
 
             Courses = await db.Courses
                 .Include(x=>x.Participants)
-                .Where(x => events.Contains(x.Id) || signups.Contains(x.Id))
+                .Where(x => (events.Contains(x.Id) || signups.Contains(x.Id)) && x.EndDateAndTime > DateTime.Now)
                 .Include(x => x.CourseSessions)
                     .ThenInclude(x=>x.CourseSessionTemplate)
                         .ThenInclude(x=>x.Address)
@@ -82,40 +82,45 @@ namespace ClubScansub.Areas.Members.Controllers
             var endpointDiveLocationAdress = endPoint.Divelocation?.MeetingLocation;
             var endpointCourseSessionTemplateAddress = endPoint.CourseSessionTemplate?.Address;
             var endAddress = "";
+            var endLocationName = "Mødested";
 
-            if (endPointAddress == null)
+            //if (endPointAddress == null)
+            //{
+            if (endpointDiveLocationAdress == null)
             {
-                if (endpointDiveLocationAdress== null)
+                if (endpointCourseSessionTemplateAddress == null)
                 {
-                    if (endpointCourseSessionTemplateAddress == null)
-                    {
-                        StatusMessage = "Ingen adresse på mødested/Dykkersted";
-                        return RedirectToAction(nameof(Index));
-                    } else
-                    {
-                        endLocation.latitude = endpointCourseSessionTemplateAddress.Latitude;
-                        endLocation.longitude = endpointCourseSessionTemplateAddress.Longitude;
-                        endAddress = $"{endpointCourseSessionTemplateAddress.Streetname},{endpointCourseSessionTemplateAddress.City},{endpointCourseSessionTemplateAddress.Country}";
-                    }
+                    StatusMessage = "Ingen adresse på mødested/Dykkersted";
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    endLocation.latitude = endpointDiveLocationAdress.Latitude;
-                    endLocation.longitude = endpointDiveLocationAdress.Longitude;
-                    endAddress = $"{endpointDiveLocationAdress.Streetname},{endpointDiveLocationAdress.City},{endpointDiveLocationAdress.Country}";
+                    endLocation.latitude = endpointCourseSessionTemplateAddress.Latitude;
+                    endLocation.longitude = endpointCourseSessionTemplateAddress.Longitude;
+                    endAddress = $"{endpointCourseSessionTemplateAddress.Streetname},{endpointCourseSessionTemplateAddress.City},{endpointCourseSessionTemplateAddress.Country}";
+                    endLocationName = endpointCourseSessionTemplateAddress.Name;
                 }
-            } else
-            {
-                endLocation.latitude = endPointAddress.Latitude;
-                endLocation.longitude = endPointAddress.Longitude;
-                endAddress = $"{endPointAddress.Streetname},{endPointAddress.City},{endPointAddress.Country}";
             }
+            else
+            {
+                endLocation.latitude = endpointDiveLocationAdress.Latitude;
+                endLocation.longitude = endpointDiveLocationAdress.Longitude;
+                endAddress = $"{endpointDiveLocationAdress.Streetname},{endpointDiveLocationAdress.City},{endpointDiveLocationAdress.Country}";
+                endLocationName = endpointDiveLocationAdress.Name;
+            }
+
+            //else
+            //{
+            //    endLocation.latitude = endPointAddress.Latitude;
+            //    endLocation.longitude = endPointAddress.Longitude;
+            //    endAddress = $"{endPointAddress.Streetname},{endPointAddress.City},{endPointAddress.Country}";
+            //}
 
 
             var user = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
             if (string.IsNullOrEmpty(user.Streetaddress) && string.IsNullOrEmpty(user.City) && string.IsNullOrEmpty(user.Country))
             {
-                StatusMessage = "Du manlger at angive din adresse, før vi kan lave en rutebeskrivlese";
+                StatusMessage = "Du mangler at angive din adresse, før vi kan lave en rutebeskrivlese";
                 return LocalRedirect("/Identity/Account/Manage");
             }
 
@@ -124,6 +129,7 @@ namespace ClubScansub.Areas.Members.Controllers
             var model = new Models.Structs.RoutePoints()
             {
                 End = endLocation,
+                EndName = endLocationName,
                 StartAddress = startAddress,
                 EndAddress = endAddress
             };

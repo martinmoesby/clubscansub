@@ -143,6 +143,17 @@ body {
     color: #000 !important;
     /*border: 1px solid #000 !important;*/
 }
+.cancelled {
+    text-decoration:line-through !important;
+    background-color:rgba(62, 62, 62, 0.33) !important;
+    opacity:0.6 !important
+}
+
+.ellipsis {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
 
 #calendar {
     font-size:0.8rem;
@@ -152,6 +163,7 @@ body {
 .calendar-event {
     font-size: .75rem;
     cursor: pointer;
+    word-wrap:break-word;
 }
 
 textarea.tinymce {

@@ -24,22 +24,21 @@ namespace ClubScansub.Areas.Admin.Controllers
             this.um = um;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         public async Task<IActionResult> Index()
         {
 
             //Get Members only
-            var m_usrs = await um.GetUsersInRoleAsync(Userroles.Member);
-            var p_users = await um.GetUsersInRoleAsync(Userroles.Divepro);
-            var a_users = await um.GetUsersInRoleAsync(Userroles.Administrator);
-            var owner = await um.GetUsersInRoleAsync(Userroles.Owner);
+            //var m_usrs = await um.GetUsersInRoleAsync(Userroles.Member);
+            //var p_users = await um.GetUsersInRoleAsync(Userroles.Divepro);
+            //var a_users = await um.GetUsersInRoleAsync(Userroles.Administrator);
+            //var owner = await um.GetUsersInRoleAsync(Userroles.Owner);
 
             var currentUser = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
 
-            var members = await db.ApplicationUsers.Where(x => m_usrs.Any(s => x.Id == s.Id) ||
-                                                               p_users.Any(p => x.Id == p.Id) ||
-                                                               a_users.Any(a => x.Id == a.Id) ||
-                                                               owner.Any(o => x.Id == o.Id)
-                                                               ).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
+            var members = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
 
             var locations = await db.Divelocations.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
             var certificates = await db.Certificates.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
@@ -50,7 +49,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                 NewEvent = new CreateEventViewModel(),
                 NewCourse = new CreateCourseViewModel(),
                 NewTransaction = new CreateUserAccountTransactionViewModel(),
-                AppUser = currentUser
+                AppUser = currentUser,
+                Statusmessage = StatusMessage
             };
 
             pageModel.NewTransaction.Entry = new ApplicationUserAccountEntry() { PostingDate = new DateTime() };
@@ -157,14 +157,40 @@ namespace ClubScansub.Areas.Admin.Controllers
             else
             {
                 var item = await db.CourseSessions.FindAsync(itemId);
-                var beginTime = item.DateTime.TimeOfDay;
-                item.DateTime = startdate.Add(beginTime);
+                var beginTime = startdate.TimeOfDay;
+                item.DateTime = startdate;
             }
             await db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Planner), new { ActiveDate = startdate });
 
         }
+
+        public async Task<IActionResult> Resize(string id, DateTime startdate, DateTime enddate)
+        {
+            var idItems = id.Split(":");
+            int itemId = int.Parse(idItems[1]);
+            string itemType = idItems[0];
+
+            if (itemType == "eventId")
+            {
+                var item = await db.Events.FindAsync(itemId);
+
+                item.StartDateAndTime = startdate;
+                item.EndDateAndTime = enddate;
+            }
+            else
+            {
+                var item = await db.CourseSessions.FindAsync(itemId);
+                item.DateTime = startdate;
+                item.Duration = enddate - startdate;
+            }
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Planner), new { ActiveDate = startdate });
+
+        }
+
 
         private void CreateEvent(int divelocationId, DateTime eventdate)
         {
@@ -175,6 +201,9 @@ namespace ClubScansub.Areas.Admin.Controllers
             item.EventType = location.DefaultEventType;
 
             item.StartDateAndTime = eventdate.Add(location.DefaultStartTime);
+            item.MinParticipants = location.MinParticipants;
+            item.MaxParticipants = location.MaxParticipants;
+
             item.EndDateAndTime = item.StartDateAndTime.Add(location.DefaultDuration);
             item.Address = location.MeetingLocation;
 
@@ -190,19 +219,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 {
                     case EventTypeEnum.Bådtur:
                         item.Title = $"Bådtur til {location.Name}.";
-                        item.MaxParticipants = 10;
                         break;
                     case EventTypeEnum.Stranddyk:
                         item.Title = $"Strandtur til {location.Name}.";
-                        item.MaxParticipants = 50;
                         break;
                     case EventTypeEnum.Rejse:
                         item.Title = $"Rejse til {location.Name}.";
-                        item.MaxParticipants = 12;
                         break;
                     case EventTypeEnum.Liveaboard:
                         item.Title = $"Liveaboard tur til {location.Name}";
-                        item.MaxParticipants = 20;
                         break;
                     case EventTypeEnum.Klubture:
                     default:
@@ -243,6 +268,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
             if (template.Sessions.Count > 0)
             {
+                course.StartDateAndTime += template.Sessions.FirstOrDefault().DefaultStartTime;
                 course.CourseSessions = new List<CourseSession>();
 
                 foreach (var item in template.Sessions.OrderBy(x => x.SessionNumber))
@@ -269,6 +295,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                     currentWeekDay = currentDate.DayOfWeek;
                 }
             }
+
+            course.EndDateAndTime = course.CourseSessions.Last().DateTime + course.CourseSessions.Last().Duration;
 
             db.Courses.Add(course);
             db.SaveChanges();

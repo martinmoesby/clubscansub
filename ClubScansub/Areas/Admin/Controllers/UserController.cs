@@ -10,6 +10,7 @@ using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ClubScansub.Areas.Admin.Controllers
 {
@@ -41,13 +42,16 @@ namespace ClubScansub.Areas.Admin.Controllers
             };
             var usersinrole = await um.GetUsersInRoleAsync(membertype);
 
-            var userSearchResult = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(c=>c.Certificates)
-                .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id)               
-                ).ToListAsync();
+            var userSearchResult = await db.ApplicationUsers
+                .Include(x => x.AccountTransactions)
+                .Include(c => c.Certificates)
+                .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id))               
+                .OrderBy(x=>x.UserName)
+                .ToListAsync();
 
             IndexPageVM.Pager = new Pager
             {
-                PageSize = 25,
+                PageSize = 100,
                 urlParam = $"/Admin/User/?page=:&searchText={searchText}&membertype={membertype}"
             };
 
@@ -75,7 +79,10 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(x=>x.Certificate)
                  .Include(c=>c.Certificates)   
                     .ThenInclude(c=>c.VerifiedBy)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(a=>a.AccountTransactions)
+                .FirstOrDefaultAsync(x => x.Id == id)
+                
+                ;
 
             if (user == null)
                 return NotFound(new NotFoundObjectResult($"User with id '{id}' wasn't found in the database"));
@@ -111,7 +118,8 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                StatusMessage = "Der er sket en fejl.";
+                StatusMessage = $"Der er sket en fejl. {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}";
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -130,13 +138,14 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [HttpPost,ActionName("MakeDeposit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTransaction(string userid, decimal amount, AccountTypeEnum accounttype)
+        public async Task<IActionResult> CreateTransaction(string userid, decimal amount, string invoicenumber, AccountTypeEnum accounttype)
         {
             var entry = new ApplicationUserAccountEntry
             {
                 Amount = amount,
                 AccountType = accounttype,
                 Description = $"Beløb Indsat af '{User.Identity.Name}'",
+                InvoiceNumber = invoicenumber,
                 PostingDate = DateTime.Now
             };
 
@@ -159,6 +168,13 @@ namespace ClubScansub.Areas.Admin.Controllers
             return Json(await db.ApplicationUsers.Where(x => members.Any(s => x.Id == s.Id)).ToListAsync());
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetMembers(string Membertype)
+        {
+            var members = await um.GetUsersInRoleAsync(Membertype);
+            return Json(await db.ApplicationUsers.Where(x => members.Any(s => x.Id == s.Id)).ToListAsync());
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUser(EditUserViewModel model)
@@ -168,6 +184,12 @@ namespace ClubScansub.Areas.Admin.Controllers
             user.PhoneNumber = model.User.PhoneNumber;
             user.Email = model.User.Email;
             user.AccountNumber = model.User.AccountNumber;
+            user.Firstname = model.User.Firstname;
+            user.Lastname = model.User.Lastname;
+            user.Streetaddress = model.User.Streetaddress;
+            user.PostalCode = model.User.PostalCode;
+            user.City = model.User.City;
+            user.Country = model.User.Country;
 
             await db.SaveChangesAsync();
 
@@ -229,6 +251,35 @@ namespace ClubScansub.Areas.Admin.Controllers
             await db.SaveChangesAsync();
 
             return RedirectToAction("Edit", new { id = certificate.User.Id });
+        }
+        public async Task<JsonResult> _GetTransActions(string userId, AccountTypeEnum accountType)
+        {
+            var data = await db.ApplicationUsers
+                .Include(x => x.AccountTransactions)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            var transactions = data.AccountTransactions
+                .Where(x => x.AccountType == accountType)
+                .OrderBy(x => x.PostingDate)
+                .Select(x => new
+                {
+                    x.PostingDate,
+                    x.Description,
+                    x.Amount,
+                    InvoiceNumber = x.InvoiceNumber ?? "",
+                    Title = x.Event?.Title ?? "",
+                });
+                
+
+            return new JsonResult(transactions, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+                DateFormatString = "yyyy-MM-dd"
+
+            });
+
+            //return JsonConvert.SerializeObject(transactions, Formatting.Indented);
+
         }
     }
 }

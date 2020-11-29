@@ -19,10 +19,9 @@ namespace ClubScansub.Models
         [Display(Name ="Standard varighed (uger)")]
         public string TemplateDurationInWeeks { get; set; }
 
-
-
         [DataType(DataType.Currency)]
-        [Column(TypeName ="money")]
+        [Column(TypeName ="decimal")]
+        [Display(Name = "Standard Pris")]
         public decimal DefaultPrice { get; set; }
         public CourseTypeEnum CourseType { get; set; }
         public virtual ICollection<CourseSessionTemplate> Sessions { get; set; }

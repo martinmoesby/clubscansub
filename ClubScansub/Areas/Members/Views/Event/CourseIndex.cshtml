@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<Course>
 @using ClubScansub.Extensions
 @{
-    ViewData["Title"] = "Mine Kurser";
+    ViewData["Title"] = "Mine igangværende kurser";
 }
 <div class="container">
 
-    <h1 class="display-4 mb-3 text-info"><i class="fas fa-calendar-alt"></i>&nbsp;@ViewData["Title"]</h1>
+    <h1 class="display-4 mb-3 text-dark"><i class="fas fa-calendar-alt"></i>&nbsp;@ViewData["Title"]</h1>
 
     <table class="table table-striped table-sm">
         <thead>
@@ -48,15 +48,15 @@
                                         
                                         <div class="col-md-6 col-12">
 
-                                            <strong>@session.CourseSessionTemplate.Name</strong>
+                                            <strong>@(!string.IsNullOrEmpty(session.SessionName) ? session.SessionName : session.CourseSessionTemplate?.Name )</strong>
                                             <br />
-                                            <span class="small text-muted">@session.CourseSessionTemplate.Description</span>
+                                            <span class="small text-muted">@session.SessionDescription</span>
                                         
                                         </div>
 
                                         <div class="col-md-3 col-6 small text-muted ">
 
-                                            <span class="text-dark"><strong>@session.CourseSessionTemplate.Address?.Name</strong></span>
+                                            <span class="text-dark"><strong>@(session.Divelocation != null ? session.Divelocation.Name : session.CourseSessionTemplate?.Address?.Name)</strong></span>
                                             <br />
                                             <span class="text-muted">
                                                 D. @session.DateTime.ToShortDateString() kl. @session.DateTime.ToShortTimeString() til @session.DateTime.Add(session.Duration).ToShortTimeString()

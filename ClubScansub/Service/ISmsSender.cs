@@ -11,7 +11,7 @@ namespace ClubScansub.Service
     public interface ISmsSender
     {
         Task<MailjetResponse> SendSmsAsync(string phonenumber, string message);
-        Task<IEnumerable<MailjetResponse>> SendMultipleSmsAsync(IEnumerable<ApplicationUser> users, string message);
+        Task<IEnumerable<MailjetResponse>> SendMultipleSmsAsync(IEnumerable<IdentityUser> users, string message);
 
     }
 }

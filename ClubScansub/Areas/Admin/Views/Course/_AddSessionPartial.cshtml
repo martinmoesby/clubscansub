@@ -1,0 +1,67 @@
+﻿@model ClubScansub.Areas.Admin.Controllers.CourseController.NewSessionPageModel
+
+<div class="container">
+    <form asp-action="AddSession" asp-controller="Course" asp-area="Admin" method="post">
+        <input type="hidden" asp-for="CourseId" />
+
+
+        <div class="row justify-content-between border-info border-top pt-2">
+
+            <div class="col-3 form-group form-group-sm">
+                <label asp-for="Session.Sessiontype"></label><br />
+                <select class="form-control form-control-sm" asp-for="Session.Sessiontype" asp-items="@Html.GetEnumSelectList<CourseSessionTypeEnum>()">
+                    <option>vælg sessions type</option>
+                </select>
+            </div>
+
+            <div class="col-3 form-group form-group-sm">
+                <label asp-for="Session.SessionName"></label><br />
+                <input asp-for="Session.SessionName" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-6 form-group form-group-sm">
+                <label asp-for="Session.SessionDescription"></label><br />
+                <input asp-for="Session.SessionDescription" class="form-control form-control-sm" />
+            </div>
+
+        </div>
+
+        <div class="row justify-content-start mb-2">
+            <div class=" col-3 form-group form-group-sm">
+                <label asp-for="Session.DateTime"></label>
+                <input asp-for="Session.DateTime" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-2 form-group form-group-sm">
+                <label asp-for="Session.Duration"></label>
+                <input asp-for="Session.Duration" class="form-control form-control-sm" />
+            </div>
+
+        </div>
+
+        <div class="row  justify-content-between mb-2">
+
+            <div class="col">
+                <h5>Dykkersted:</h5>
+                <select asp-for="SelectedDivesiteId" asp-items="Model.DiveLocations" class="form-control">
+                    <option value="-1">Vælg Dykkersted</option>
+                </select>
+            </div>
+
+            <div class="col">
+                <h5>Adresse:</h5>
+                <select asp-for="SelectedAddressId" asp-items="Model.Addresses" class="form-control">
+                    <option value="-1">Vælg adresse</option>
+                </select>
+            </div>
+
+        </div>            
+
+        <div class="row justify-content-between pt-2">
+            <button class="col-3 btn btn-sm btn-outline-success ml-2" type="submit"><i class="fas fa-save mr-2"></i>Gem ny kursusdag</button>
+            <button class="col-3 btn btn-sm btn-outline-danger mr-2" data-dismiss="modal" type="button"><i class="fas fa-ban mr-2"></i>Annuller</button>
+        </div>
+
+    </form>
+</div>
+

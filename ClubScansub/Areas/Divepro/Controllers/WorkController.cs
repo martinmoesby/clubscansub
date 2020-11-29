@@ -68,7 +68,9 @@ namespace ClubScansub.Areas.Divepro.Controllers
             //db.CourseSessionInstructors.Add(sessioninstructor);
             await db.SaveChangesAsync();
 
-            StatusMessage = $"Du har skrevet dig på som instruktør til {session.CourseSessionTemplate.Name} d. {session.DateTime.ToString("dd. MMMM yyyy")}";
+            var sessionDescription = session.CourseSessionTemplate != null ? session.CourseSessionTemplate.Name : session.SessionName;
+
+            StatusMessage = $"Du har skrevet dig på som instruktør til {sessionDescription} d. {session.DateTime.ToString("dd. MMMM yyyy")}";
 
             return RedirectToAction(nameof(Index));
 
@@ -86,11 +88,11 @@ namespace ClubScansub.Areas.Divepro.Controllers
 
             if (instructor.PhoneNumberConfirmed)
             {
-                await smsSender.SendSmsAsync(instructor.PhoneNumber, $"Du har undervisning på kurset {session.CourseSessionTemplate.Name} d. {session.DateTime}. Du kan se din fulde liste over dine kursusdage på klub-sitet under din profil - Min undervisningplan");
+                await smsSender.SendSmsAsync(instructor.PhoneNumber, $"Du har undervisning på kurset {session.SessionName} d. {session.DateTime}. Du kan se din fulde liste over dine kursusdage på klub-sitet under din profil - Min undervisningplan");
             }
             else
             {
-                StatusMessage = $"Du har aktiveret {instructor.Name} som instruktør på kurset {session.CourseSessionTemplate.Name} d. {session.DateTime}, men vedkommende har ikke fået en SMS- Husk at give vedkommende besked";
+                StatusMessage = $"Du har aktiveret {instructor.Name} som instruktør på kurset {session.SessionName} d. {session.DateTime}, men vedkommende har ikke fået en SMS- Husk at give vedkommende besked";
             }
 
             await db.SaveChangesAsync();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -53,7 +54,14 @@ namespace ClubScansub.Models
             {
                 try
                 {
-                    return string.Join(string.Empty, Firstname?.Split(' ').Select(x => x[0]).Concat(Lastname?.Split(' ').Select(x => x[0])).ToArray()); ;
+                    var names = Name.TrimEnd().Split(' ');
+
+                    var Init1 = names.First().Split().Select(x => x[0]);
+                    var init2 = names.Last().Split().Select(x=>x[0]);
+
+                    var initials = Init1.Concat(init2);
+
+                    return string.Join(string.Empty, initials);
                 }
                 catch (Exception)
                 {
@@ -79,12 +87,15 @@ namespace ClubScansub.Models
         [Display(Name = "Certifikater")]
         public virtual ICollection<UserCertificat> Certificates { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<EventUser> Events { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<CourseSignup> Courses { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
-
+        [JsonIgnore]
         public virtual ICollection<CourseSessionInstructor> InstructorSessions { get; set; }
 
 

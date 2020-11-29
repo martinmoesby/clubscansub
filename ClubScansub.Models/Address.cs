@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -35,11 +36,15 @@ namespace ClubScansub.Models
 
         //public virtual Club Club { get; set; }
 
-        public virtual ICollection<Divelocation> Divelocations { get; set; }
+        //[JsonIgnore]
+        //public ICollection<Divelocation> Divelocations { get; set; }
 
-        public virtual ICollection<Event> Events { get; set; }
+        //[JsonIgnore]
+        //public virtual ICollection<Event> Events { get; set; }
 
+        [Display(Name = "Breddegrad")]
         public string Latitude { get; set; }
+        [Display(Name = "Længdegrad")] 
         public string Longitude { get; set; }
 
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }

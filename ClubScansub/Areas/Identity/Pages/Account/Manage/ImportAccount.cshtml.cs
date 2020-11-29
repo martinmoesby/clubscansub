@@ -65,41 +65,41 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await userManager.GetUserAsync(User);
-            var appUser = await db.ApplicationUsers.FindAsync(user.Id);
+            //var user = await userManager.GetUserAsync(User);
+            //var appUser = await db.ApplicationUsers.FindAsync(user.Id);
 
 
-            var oldMember = db.medlemsdata.Where(x => x.dsfnr == Input.Usernumber && x.password == Input.Password).FirstOrDefault();
-            if (oldMember == null)
-            {
-                StatusMessage = "Ikke korrekt brugernavn eller kodeord, eller brugernummer ikke fundet";
-                Input.AlreadyImported = false;
-                return RedirectToPage();
-            }
+            //var oldMember = db.medlemsdata.Where(x => x.dsfnr == Input.Usernumber && x.password == Input.Password).FirstOrDefault();
+            //if (oldMember == null)
+            //{
+            //    StatusMessage = "Ikke korrekt brugernavn eller kodeord, eller brugernummer ikke fundet";
+            //    Input.AlreadyImported = false;
+            //    return RedirectToPage();
+            //}
 
-            if (oldMember.status)
-            {
-                await userManager.AddToRoleAsync(user, Userroles.Member);
-            }
+            //if (oldMember.status)
+            //{
+            //    await userManager.AddToRoleAsync(user, Userroles.Member);
+            //}
 
-            var saldodata = db.saldooplysning.Where(x => x.dsfnr == Input.Usernumber);
+            //var saldodata = db.saldooplysning.Where(x => x.dsfnr == Input.Usernumber);
 
-            appUser.AccountNumber = Input.Usernumber.ToString();
-            appUser.OldAccountImported = true;
+            //appUser.AccountNumber = Input.Usernumber.ToString();
+            //appUser.OldAccountImported = true;
 
-            foreach (var item in saldodata)
-            {
-                var entry = new ApplicationUserAccountEntry
-                {
-                    Amount = item.pris,
-                    AccountType = Utility.AccountTypeEnum.EventAccountType,
-                    Description = $"{item.tekst} (Importeret fra gammel system)",
-                    PostingDate = item.dato,
-                    ApplicationUser = appUser
-                };
-                db.ApplicationUserAccountEntry.Add(entry);
+            //foreach (var item in saldodata)
+            //{
+            //    var entry = new ApplicationUserAccountEntry
+            //    {
+            //        Amount = item.pris,
+            //        AccountType = Utility.AccountTypeEnum.EventAccountType,
+            //        Description = $"{item.tekst} (Importeret fra gammel system)",
+            //        PostingDate = item.dato,
+            //        ApplicationUser = appUser
+            //    };
+            //    db.ApplicationUserAccountEntry.Add(entry);
 
-            }
+            //}
 
             //if (user == null)
             //    return NotFound();

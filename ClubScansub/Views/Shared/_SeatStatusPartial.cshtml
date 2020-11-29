@@ -8,7 +8,7 @@
 
         @foreach (var user in Model.Participants)
         {
-            @if (user.ApplicationUser != null)
+            @if (user.ApplicationUser != null && User.Identity.IsAuthenticated)
             {
                 <i class="fas fa-user-check text-success" title="Plads taget af @user.ApplicationUser.Firstname"></i>
             }

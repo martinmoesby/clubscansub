@@ -2,6 +2,7 @@
 using ClubScansub.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ClubScansub.Data
 {
@@ -29,11 +30,10 @@ namespace ClubScansub.Data
         public DbSet<CourseSessionInstructor> CourseSessionInstructors { get; set; }
         public DbSet<ClubSettings> ClubSettings { get; set; }
         public DbSet<CourseSignup> CourseSignups { get; set; }
-
-
-        public DbSet<medlemsdata> medlemsdata { get; private set; }
-        public DbSet<saldooplysning> saldooplysning { get; private set; }
-
+        //public DbSet<Site> Divesites { get; set; }
+        //public DbSet<medlemsdata> medlemsdata { get; private set; }
+        //public DbSet<kursistdata> kursistdata { get; private set; }
+        //public DbSet<saldooplysning> saldooplysning { get; private set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -76,6 +76,12 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 if (existingAddress.Country != DiveLocationViewModel.Divelocation.MeetingLocation.Country)
                     existingAddress.Country = DiveLocationViewModel.Divelocation.MeetingLocation.Country;
+                
+                if (existingAddress.Latitude != DiveLocationViewModel.Divelocation.MeetingLocation.Latitude)
+                    existingAddress.Latitude = DiveLocationViewModel.Divelocation.MeetingLocation.Latitude;
+                
+                if (existingAddress.Longitude != DiveLocationViewModel.Divelocation.MeetingLocation.Longitude)
+                    existingAddress.Longitude = DiveLocationViewModel.Divelocation.MeetingLocation.Longitude;
 
                 DiveLocationViewModel.Divelocation.MeetingLocation = existingAddress;
             }

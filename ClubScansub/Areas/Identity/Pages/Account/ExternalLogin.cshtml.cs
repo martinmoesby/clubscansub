@@ -116,7 +116,16 @@ namespace ClubScansub.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
             if (result.Succeeded)
             {
+
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                var user = await _signInManager.GetExternalLoginInfoAsync();
+
+                //if (!user. || user.PhoneNumberConfirmed)
+                //{
+                //    ErrorMessage = "Du mangler at verificere din email og/eller dit telefonnummer";
+                //    return RedirectToPage("/Identity/Account/Manage");
+                //}
+
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -128,30 +137,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
                 LoginProvider = info.LoginProvider;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-                {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                        UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
-                        Firstname = info.Principal.FindFirstValue(ClaimTypes.Name),
-                        PhoneNumber = info.Principal.FindFirstValue(ClaimTypes.MobilePhone),
-                        Streetaddress = info.Principal.FindFirstValue(ClaimTypes.StreetAddress),
-                        PostalCode = info.Principal.FindFirstValue(ClaimTypes.PostalCode),
-                        City = "",
-                        Country = info.Principal.FindFirstValue(ClaimTypes.Country),
-                    };
-
-                    DateTime dob;
-
-                    if (DateTime.TryParse(info.Principal.FindFirstValue(ClaimTypes.DateOfBirth), out dob))
-                        Input.DayOfbirth = dob;
-
-                    if (LoginProvider == "Facebook")
-                        Input.PhotoUrl = $"http://graph.facebook.com/{info.ProviderKey}/picture?type=square&width=50";
-
-                }
-                return Page();
+                ErrorMessage = "Fejl: Du har ikke tilknyttet Ekstern login til din konto. Login med brugernavn /kodeord, og gå til 'Min konto' -> 'Eksterne konti' for at tilknytte Eksternt login til din konto";
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
         }
 
@@ -166,41 +153,41 @@ namespace ClubScansub.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                {
-                    UserName = Input.Email,
-                    Email = Input.Email,
-                    Streetaddress = Input.Streetaddress,
-                    PhotoUrl = Input.PhotoUrl,
-                    PostalCode = Input.PostalCode,
-                    Firstname = Input.Firstname,
-                    City = Input.City,
-                    Country = Input.Country,
-                    PhoneNumber = Input.PhoneNumber,
-                    DayOfbirth = Input.DayOfbirth
-                };
+            //if (ModelState.IsValid)
+            //{
+            //    var user = new ApplicationUser
+            //    {
+            //        UserName = Input.Email,
+            //        Email = Input.Email,
+            //        Streetaddress = Input.Streetaddress,
+            //        PhotoUrl = Input.PhotoUrl,
+            //        PostalCode = Input.PostalCode,
+            //        Firstname = Input.Firstname,
+            //        City = Input.City,
+            //        Country = Input.Country,
+            //        PhoneNumber = Input.PhoneNumber,
+            //        DayOfbirth = Input.DayOfbirth
+            //    };
                 
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
+            //    var result = await _userManager.CreateAsync(user);
+            //    if (result.Succeeded)
+            //    {
 
-                    await _userManager.AddToRoleAsync(user, Userroles.User);
+            //        await _userManager.AddToRoleAsync(user, Userroles.User);
 
-                    result = await _userManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+            //        result = await _userManager.AddLoginAsync(user, info);
+            //        if (result.Succeeded)
+            //        {
+            //            await _signInManager.SignInAsync(user, isPersistent: false);
+            //            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+            //            return LocalRedirect(returnUrl);
+            //        }
+            //    }
+            //    foreach (var error in result.Errors)
+            //    {
+            //        ModelState.AddModelError(string.Empty, error.Description);
+            //    }
+            //}
 
             LoginProvider = info.LoginProvider;
             ReturnUrl = returnUrl;

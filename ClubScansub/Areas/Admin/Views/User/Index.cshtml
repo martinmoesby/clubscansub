@@ -2,22 +2,23 @@
 @{
     ViewData["Title"] = Model.MemberType;
 }
+    @*<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />*@
 
-    <div class="container">
+<div class="container">
 
-        <div class="row">
-            <div class="col-6">
-                <h1 class="display-4 text-info">@(Model.MemberType)s</h1>
-            </div>
-            <div class="col-6 text-right">
-                <a class="btn btn-outline-info btn-sm" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="/Admin/User"><i class="fas fa-user-plus"></i>&nbsp;Opret bruger...</a>
-            </div>
+    <div class="row">
+        <div class="col-6">
+            <h1 class="display-4 text-info">@(Model.MemberType)s</h1>
         </div>
-        
-        <hr />
-        
+        <div class="col-6 text-right">
+            <a class="btn btn-outline-info btn-sm" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="/Admin/User"><i class="fas fa-user-plus"></i>&nbsp;Opret bruger...</a>
+        </div>
+    </div>
 
-        <form asp-action="Index">
+    <hr />
+
+
+    <form asp-action="Index">
 
             <input type="hidden" asp-for="Pager.CurrentPage" />
             <input type="hidden" asp-for="Pager.urlParam" />
@@ -25,38 +26,36 @@
             <input type="hidden" asp-for="MemberType" />
 
             <div class="col-12">
-                <div class="form-group form-inline">
-
-                    <div class="col-6 input-group">
-                        <input class="form-control form-control-sm" id="myInput" type="text" asp-for="SearchText" placeholder="Søg...">
-                        <div class="input-group-append">
-                            <button type="submit" class="input-group-text input-group-sm"><i class="fas fa-search"></i></button>
-                        </div>
+                <div class="input-group">
+                    <input class="form-control form-control-sm" id="myInput" type="text" asp-for="SearchText" placeholder="Søg...">
+                    <div class="input-group-append">
+                        <button type="submit" class="input-group-text input-group-sm"><i class="fas fa-search"></i></button>
                     </div>
-
-                    <div class="col-4 text-sm-right">
-                        <div class="btn-group" page-model="@Model.Pager" page-classes-enabled="true" page-class="btn btn-sm" page-class-selected="btn-outline-info active" page-size="Model.Pager.PageSize" page-class-normal="btn-outline-info"></div>
-                    </div>
-
                 </div>
             </div>
+
+            <div class="col-12 text-sm-center my-3">
+                <div class="btn-group" page-model="@Model.Pager" page-classes-enabled="true" page-class="btn btn-sm" page-class-selected="btn-outline-info active" page-size="Model.Pager.PageSize" page-class-normal="btn-outline-info"></div>
+            </div>
+
         </form>
 
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Navn</th>
-                    <th>Email</th>
-                    <th>Telefonnummer</th>
-                    <th class="text-center">Cert / godkendte</th>
-                    <th class="text-right">Turkonto</th>
-                    <th class="text-right">Kursuskonto</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="myTable">
-                @foreach (var user in Model.Users)
-                {
+    <table class="table table-sm display" id="usersTable" width='100%'>
+        <thead>
+            <tr>
+                <th>Medl. nr.</th>
+                <th>Navn</th>
+                <th>Email</th>
+                <th>Telefonnummer</th>
+                <th class="text-center">Cert / godkendte</th>
+                <th class="text-right">Turkonto</th>
+                <th class="text-right">Kursuskonto</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @foreach (var user in Model.Users)
+            {
                 <tr>
                     <td class="small">
                         @if (user.LockoutEnd > DateTime.Now)
@@ -67,12 +66,33 @@
                         {
                             <i class="text-success fas fa-user" title="Bruger konto aktiveret"></i>
                         }
-                        &nbsp;@user.Name
+                        &nbsp;@user.AccountNumber
                     </td>
-                    <td class="small">@user.Email</td>
-                    <td class="small">@user.PhoneNumber</td>
+                    <td class="small">@user.Name</td>
+                    <td class="small">
+                        @if (user.EmailConfirmed)
+                        {
+                            <i class="far fa-envelope text-success" title="E-mail er blevet valideret"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-envelope-open text-danger" title="E-mail er IKKE blevet valideret"></i>
+                        }
+                        @user.Email
+                    </td>
+                    <td class="small">
+                        @if (user.PhoneNumberConfirmed)
+                        {
+                            <i class="fas fa-phone text-success" title="Telefon er blevet valideret"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-phone text-danger" title="Telefon er IKKE blevet valideret"></i>
+                        }
+                        @user.PhoneNumber
+                    </td>
                     <td class="text-center small">
-                        <span class="text-danger">@(user.Certificates.Count - @user.Certificates.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates.Count(x => x.IsVerified)</span>
+                        <span class="text-danger">@(user.Certificates?.Count - @user.Certificates?.Count(x => x.IsVerified))</span>&nbsp;/&nbsp;<span class="text-success">@user.Certificates?.Count(x => x.IsVerified)</span>
                     </td>
                     <td class="text-right small">@Html.FormatValue(user.Balance, "{0:N2}")</td>
                     <td class="text-right small">@Html.FormatValue(user.CourseAccountBalance, "{0:N2}")</td>
@@ -80,16 +100,36 @@
                         <partial name="_EditDetailsDeleteButtonsPartial" model="@user.Id" />
                     </td>
                 </tr>
-                }
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
 
-    </div>
+</div>
 
 @section Scripts {
-
+    @*<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>*@
     <script>
+
         $(document).ready(function () {
+            @*url = "@Url.Action("GetMembers","User", new { Area= "Admin" })";
+            var memberType = '@Model.MemberType';
+
+            $("#usersTable").DataTable({
+                ajax: {
+                    url: url + "?Membertype=" + memberType,
+                    dataSrc:''
+                },
+                "columns": [
+                    { "data": "AccountNumber" },
+                    { "data": "Name" },
+                    { "data": "Email" },
+                    { "data": "PhoneNumber" },
+                    { "data": "Balance" }, 
+                    { "data": "CourseAccountBalance" }, 
+                ]
+                });
+            *@
+
             $("#myInput").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
                 $("#myTable tr").filter(function () {
