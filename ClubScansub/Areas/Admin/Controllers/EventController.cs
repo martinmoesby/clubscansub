@@ -431,5 +431,19 @@ namespace ClubScansub.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), new { eventtype });
 
         }
+
+        //[HttpPost, ActionName("CompleteDelete")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteDelete(int id)
+        {
+            var e = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == id);
+
+            var eventtype = e.EventType;
+            db.Remove(e);
+
+            await db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index), new { eventtype });
+
+        }
     }
 }

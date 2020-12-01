@@ -33,8 +33,8 @@
 
     <div class="col-auto mr-3">
         <div class="d-flex justify-content-start flex-column">
-            <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM")</h4>
-            <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("hh:mm")</h4>
+            <h4 class="text-info small"><i class="far fa-calendar-alt"></i>&nbsp;@Model.StartDateAndTime.ToString("d MMM yyyy")</h4>
+            <h4 class="text-info small"><i class="far fa-clock"></i>&nbsp;@Model.StartDateAndTime.ToString("HH:mm")</h4>
             <h4 class="text-info small"><i class="fas fa-coins"></i>&nbsp;&nbsp;@Html.FormatValue(paymentPrice, "{0:n2}") @paymentNote</h4>
             <h4 class="text-info small"><i class="fas fa-award"></i>&nbsp;@(Model.RequiredCertificate != null ? Model.RequiredCertificate.ShortName : "Ikke krævet")</h4>
             <h4>

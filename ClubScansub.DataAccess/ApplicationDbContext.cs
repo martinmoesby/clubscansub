@@ -11,6 +11,7 @@ namespace ClubScansub.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            
         }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
@@ -34,7 +35,6 @@ namespace ClubScansub.Data
         //public DbSet<medlemsdata> medlemsdata { get; private set; }
         //public DbSet<kursistdata> kursistdata { get; private set; }
         //public DbSet<saldooplysning> saldooplysning { get; private set; }
-
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

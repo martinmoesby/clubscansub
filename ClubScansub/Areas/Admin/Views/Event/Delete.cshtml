@@ -86,12 +86,21 @@
             </div>
         </div>
         <div class="row d-flex justify-content-between">
+            @if (Model.Participants.Count() == 0)
+            {
+                <div class="col-3 align-self-start">
+                    <a asp-action="CompleteDelete" asp-route-id="@Model.Id" class="btn btn-danger form-control"><i class="fas fa-trash"></i>&nbsp;Slet helt fra kalenderen!!</a>
+                </div>
+            }
+
             <div class="col-3">
-                <a asp-action="Index" class="btn btn-outline-success form-control"><i class="fas fa-ban"></i>&nbsp;Tilbage</a>
+                <a asp-action="Index" asp-route-eventtype="@Model.EventType" class="btn btn-outline-success form-control"><i class="fas fa-ban"></i>&nbsp;Tilbage</a>
             </div>
+
             <div class="col-3">
                 <button type="submit" class="btn btn-outline-danger form-control"><i class="fas fa-times"></i>&nbsp; Aflys begivenhed</button>
             </div>
+
         </div>
     </form>
 </div>
