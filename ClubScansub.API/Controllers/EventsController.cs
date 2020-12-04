@@ -28,6 +28,12 @@ namespace ClubScansub.API
         }
         #region Public end points
         
+        [Route("event/{id}")]
+        public async Task<ActionResult> Get(int id)
+        {
+            return Json(await db.Events.FindAsync(id));
+        }
+
         [Route("events/{eventtype}")]
         public async Task<ActionResult> Get(string eventtype)
         {
@@ -133,7 +139,7 @@ namespace ClubScansub.API
                 return RedirectToAction(nameof(Index));
             }
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && (User.IsInRole(Userroles.Member) || User.HasClaim("IsPremium","True")));
 
             if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
             {

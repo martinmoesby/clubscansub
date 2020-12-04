@@ -27,7 +27,10 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Type:</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="Event.EventType" readonly />
+                    <select class="form-control" asp-for="Event.EventType" asp-items="@Html.GetEnumSelectList<EventTypeEnum>()">
+
+                    </select>
+                    @*<input type="text" class="form-control" asp-for="Event.EventType" readonly />*@
                 </div>
 
                 <div class="form-group input-group col-12">
