@@ -20,10 +20,10 @@ namespace ClubScansub.Models
 
         public DateTime VerifiedDate { get; set; }
 
-        public virtual ApplicationUser VerifiedBy { get; set; }
+        public ApplicationUser VerifiedBy { get; set; }
 
-        public virtual ApplicationUser User { get; set; }
-        public virtual Certificate Certificate { get; set; }
+        public ApplicationUser User { get; set; }
+        public Certificate Certificate { get; set; }
 
     }
 }

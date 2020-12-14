@@ -23,10 +23,10 @@
         paymentNote = "(gratis for Divepros)";
         paymentPrice = 0;
     }
-    else if ((Model.EventType == EventTypeEnum.Other || Model.EventType == EventTypeEnum.Klubture) && User.IsInRole(ClubScansub.Utility.Userroles.Member))
+    else if (User.IsInRole(ClubScansub.Utility.Userroles.Member)) // (Model.EventType == EventTypeEnum.Other || Model.EventType == EventTypeEnum.Klubture) &&
     {
-        paymentNote = "(gratis for Premium medlemmer)";
-        paymentPrice = 0;
+        paymentNote = "(Pris for Prem. medl.)";
+        paymentPrice = Model.PremiumPrice;
     }
 }
 <div class="row mb-3">
@@ -127,12 +127,12 @@
         <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
             <i class="fas fa-user-plus mr-2"></i>Tilmeld dig gratis
         </a>
-                }
+                @*}
                 else if (Model.EventType == EventTypeEnum.Klubture && User.IsInRole(Userroles.Member))
                 {
         <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
             <i class="fas fa-user-plus mr-2"></i>Gratis for Premium medlemmer
-        </a>
+        </a>*@
                 }
                 else if (!hasFunds)
                 {

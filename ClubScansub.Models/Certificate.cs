@@ -26,9 +26,9 @@ namespace ClubScansub.Models
         public int? DepthLimit { get; set; }
 
 
-        public virtual ICollection<DiveorgCertificate> Diveorgs { get; set; }
+        public ICollection<DiveorgCertificate> Diveorgs { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<UserCertificat> UserCertificate { get; set; }
+        public ICollection<UserCertificat> UserCertificate { get; set; }
     }
 }

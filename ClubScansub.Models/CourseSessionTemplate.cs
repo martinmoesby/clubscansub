@@ -35,9 +35,9 @@ namespace ClubScansub.Models
         public bool UseDefaultWeekDay { get; set; }
 
         [Display(Name = "Standard mødested")]
-        public virtual Address Address { get; set; }
+        public Address Address { get; set; }
 
-        public virtual CourseTemplate CourseTemplate { get; set; }
+        public CourseTemplate CourseTemplate { get; set; }
 
     }
 }

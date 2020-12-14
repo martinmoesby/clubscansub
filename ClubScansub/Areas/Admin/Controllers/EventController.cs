@@ -299,6 +299,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(x => x.Id == eventId);
 
             var applicationUser = await db.ApplicationUsers.FindAsync(userId);
+            var userprice = await um.IsInRoleAsync(applicationUser, Userroles.Member) ? @event.PremiumPrice : @event.Price;
 
             @event.Participants.Add(new EventUser() { ApplicationUserId = userId });
 
@@ -307,7 +308,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
                 {
                     AccountType = AccountTypeEnum.EventAccountType,
-                    Amount = -@event.Price,
+                    Amount = -userprice,
                     Description = $"Betaling for {@event.Title}",
                     PostingDate = DateTime.Now,
                     Event = @event,
@@ -318,13 +319,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (applicationUser.PhoneNumberConfirmed)
             {
                 var smsMessage = $"Hej {applicationUser.Firstname}," +
-                    $"Du er nu blevet tilmeldt turen {@event.Title} d. {@event.StartDateAndTime}." +
-                    $"" +
-                    $"" +
-                    $"" +
-                    $"Vi glæder os rgtig meget til at se dig." +
-                    $"" +
-                    $"Med venlig hilsen " +
+                    $"Du er nu blevet tilmeldt turen {@event.Title} d. {@event.StartDateAndTime}.\n" +
+                    $"\n" +
+                    $"Vi glæder os rgtig meget til at se dig.\n" +
+                    $"\n" +
+                    $"Med venlig hilsen \n" +
                     $"Scansub DK Diver";
 
                 await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);

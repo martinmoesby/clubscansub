@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ClubScansub.Data;
+using ClubScansub.Service;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClubScansub.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Facebook;
+using System;
+using System.Collections.Generic;
+//using Microsoft.AspNetCore.Authentication.Facebook;
 using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using ClubScansub.Service;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using ClubScansub.App_Data;
 
 namespace ClubScansub
 {
@@ -74,7 +70,7 @@ namespace ClubScansub
 
             })
             .AddDefaultTokenProviders()
-            .AddDefaultUI(UIFramework.Bootstrap4)
+            .AddDefaultUI() // UIFramework.Bootstrap4)
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
@@ -98,7 +94,11 @@ namespace ClubScansub
                 })
                 ;
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options =>
+            {
+                // MvcOptions.EnableEndpointRouting = false
+                options.EnableEndpointRouting = false;
+            });
             services.AddApplicationInsightsTelemetry();
         }
 
@@ -113,7 +113,7 @@ namespace ClubScansub
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                //The default HSTS value is 30 days.You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 

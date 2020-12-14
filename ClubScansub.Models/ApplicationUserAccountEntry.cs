@@ -32,9 +32,9 @@ namespace ClubScansub.Models
         public AccountTypeEnum AccountType { get; set; }
         
         [JsonIgnore]
-        public virtual ApplicationUser ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         [JsonIgnore]
-        public virtual Event Event { get; set; }
+        public Event Event { get; set; }
 
     }
 }

@@ -82,7 +82,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.IsCompleteCourses = false;
             ViewBag.CourseType = courseType;
-            return View(db.Courses.Where(x=>x.CourseType == courseType && x.StartDateAndTime > DateTime.Now).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
+            return View(db.Courses.Where(x=>x.CourseType == courseType && x.EndDateAndTime > DateTime.Now).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
 
         }
 
@@ -112,7 +112,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.IsCompleteCourses = true;
             ViewBag.CourseType = courseType;
-            return View("Index", db.Courses.Where(x => x.CourseType == courseType && x.StartDateAndTime <= DateTime.Now).Include(x => x.CourseSessions).Include(x => x.Participants).Include(x => x.Signups));
+            return View("Index", db.Courses.Where(x => x.CourseType == courseType && x.EndDateAndTime <= DateTime.Now).Include(x => x.CourseSessions).Include(x => x.Participants).Include(x => x.Signups));
 
         }
 

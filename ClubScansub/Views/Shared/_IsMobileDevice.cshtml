@@ -1,0 +1,43 @@
+﻿@using DeviceDetectorNET;
+@using DeviceDetectorNET.Parser;
+@{
+    DeviceDetector.SetVersionTruncation(VersionTruncation.VERSION_TRUNCATION_NONE);
+    var userAgent = Context.Request.Headers["User-Agent"].ToString();
+
+    var dd = new DeviceDetector(userAgent);
+    dd.Parse();
+}
+
+@if (dd.IsMobile())
+{
+<div class="container mb-2 ">
+
+    <div class="col-8 p-2">
+
+        <div class="row">
+            <div class="col-5 text-right text-info font-italic small">
+                Prøv vores app. Hent den gratis her!
+            </div>
+            <div class="col-7">
+                @if (dd.GetOs().Matches.First().Name == "iOS")
+                {
+                    <a href="itms-apps://apps.apple.com/dk/app/clubscansub-kalender-app/id1541455836?l=da">
+                        <img src="~/images/download-on-the-app-store.png" border="0" height="50" />
+                    </a>
+                }
+                @if (dd.GetOs().Matches.First().Name == "Android")
+                {
+                    <a href="https://play.google.com/store/apps/details?id=com.martinmoesby.ClubScansubApp">
+                        <img src="~/images/GooglePlayStore.jpg" border="0" height="50"/>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+        &nbsp;
+    </div>
+
+</div>
+}

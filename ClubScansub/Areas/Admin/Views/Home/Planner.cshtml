@@ -208,10 +208,10 @@
         }
     });
 
-    var eventsUrl = '@Url.Action("GetEvents", "Home")';
-    var coursesUrl = '@Url.Action("GetCourses","Home")';
-    var holidayUrl = '@Url.Action("GetHolidays","Home")';
-    var editUrl = '@Url.Action("Edit","Home")'
+    var eventsUrl = '@Url.Action("GetEvents", "Home",new { area = "" } )';
+    var coursesUrl = '@Url.Action("GetCourses","Home", new { area = "" })';
+    var holidayUrl = '@Url.Action("GetHolidays","Home", new { area = "" })';
+    var editUrl = '@Url.Action("Edit","Home", new { area = "Admin" })'
 
     var dropurl = "@Url.Action("Create", "Home", new { area = "Admin" })";
     var moveUrl = "@Url.Action("Move", "Home", new { area = "Admin" })";

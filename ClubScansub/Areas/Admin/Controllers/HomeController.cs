@@ -38,7 +38,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var currentUser = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
 
-            var members = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
+            var members = await db.ApplicationUsers.OrderBy(x => x.Firstname).Select(x => new SelectListItem { Text = x.Name, Value = x.Id }).ToListAsync();
 
             var locations = await db.Divelocations.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
             var certificates = await db.Certificates.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString(), Selected = false }).ToListAsync();
@@ -203,12 +203,15 @@ namespace ClubScansub.Areas.Admin.Controllers
             item.StartDateAndTime = eventdate.Add(location.DefaultStartTime);
             item.MinParticipants = location.MinParticipants;
             item.MaxParticipants = location.MaxParticipants;
-
+            item.DeeplinkId = new Guid();
             item.EndDateAndTime = item.StartDateAndTime.Add(location.DefaultDuration);
             item.Address = location.MeetingLocation;
 
             if (item.Price == 0)
+            {
                 item.Price = location.Price;
+                item.PremiumPrice = item.EventType != EventTypeEnum.Klubture ? location.Price : 0;
+            }
 
             item.Divelocation = location;
             item.RequiredCertificate = certificate;

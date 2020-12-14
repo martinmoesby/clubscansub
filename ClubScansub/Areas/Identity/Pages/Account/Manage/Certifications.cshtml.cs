@@ -40,7 +40,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
 
             Certificates = await db.Certificates
-                .Where(x => !ownedCertificates.Any(c => x.Id == c.Id))
+                .Where(x => !ownedCertificates.Contains(x))
                 .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.ShortName }).ToListAsync();
 
             ApplicationUser = await db.ApplicationUsers.Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == User.GetIdentityId());

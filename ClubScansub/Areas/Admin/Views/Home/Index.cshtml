@@ -38,15 +38,21 @@
             $('#premiumInfo').hide();
         });
 
-        function selectedLocatationChanged() {
+        function selectedLocationOrEventtypeChanged() {
 
             var selecteddivelocationId = document.getElementById("locationid").value;
+            var type = document.getElementById('eventtype').value;
 
             $.getJSON({
                 url: '@Url.Action("GetLocationPrice","Event", new { area = "Admin" })',
                 data: { locationid: selecteddivelocationId },
                 success: function (data) {
                     document.getElementById("price").value = data;
+                    document.getElementById("premprice").value = 0;
+
+                    if (type != 4) {
+                        document.getElementById("premprice").value = data;
+                    }
                 }
             });
 
@@ -65,16 +71,26 @@
 
         }
 
-        function selectedEventtypeChanged () {
+        @*function selectedEventtypeChanged () {
 
+            var selecteddivelocationId = document.getElementById("locationid").value;
             var type = document.getElementById('eventtype').value;
-            if (type == 1) {
-                $('#premiumInfo').show();
 
-            } else {
-                $('#premiumInfo').hide();
-            }
-        }
+            $.getJSON({
+                url: '@Url.Action("GetLocationPrice","Event", new { area = "Admin" })',
+                data: { locationid: selecteddivelocationId },
+                success: function (data) {
+                    document.getElementById("price").value = data;
+                    document.getElementById("premprice").value = 0;
+
+                    if (type != 4) {
+                        document.getElementById("premprice").value = data;
+                    }
+                }
+            });
+
+
+        }*@
 
     </script>
 }

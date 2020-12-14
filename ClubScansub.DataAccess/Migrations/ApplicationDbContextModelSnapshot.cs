@@ -15,7 +15,7 @@ namespace ClubScansub.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -23,25 +23,33 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("City")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("Country")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<string>("Latitude");
+                    b.Property<string>("Latitude")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Longitude");
+                    b.Property<string>("Longitude")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("Streetname")
+                        .HasColumnType("nvarchar(150)")
                         .HasMaxLength(150);
 
                     b.Property<string>("Zipcode")
+                        .HasColumnType("nvarchar(10)")
                         .HasMaxLength(10);
 
                     b.HasKey("Id");
@@ -53,23 +61,30 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AccountType");
+                    b.Property<int>("AccountType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ApplicationUserId");
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
 
-                    b.Property<int?>("EventId");
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("InvoiceNumber");
+                    b.Property<string>("InvoiceNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("PostingDate");
+                    b.Property<DateTime?>("PostingDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -84,16 +99,21 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("DepthLimit");
+                    b.Property<int?>("DepthLimit")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("ShortName")
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
                     b.HasKey("Id");
@@ -105,21 +125,29 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AddressId");
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsOldMemberDatabaseImported");
+                    b.Property<bool>("IsOldMemberDatabaseImported")
+                        .HasColumnType("bit");
 
-                    b.Property<byte[]>("Logo");
+                    b.Property<byte[]>("Logo")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PrivacyText");
+                    b.Property<string>("PrivacyText")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tagline");
+                    b.Property<string>("Tagline")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TermsText");
+                    b.Property<string>("TermsText")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -132,25 +160,35 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AddressId");
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("CourseId");
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("CourseSessionTemplateId");
+                    b.Property<int?>("CourseSessionTemplateId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("DateTime");
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("DivelocationId");
+                    b.Property<int?>("DivelocationId")
+                        .HasColumnType("int");
 
-                    b.Property<TimeSpan>("Duration");
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time");
 
-                    b.Property<string>("SessionDescription");
+                    b.Property<string>("SessionDescription")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SessionName");
+                    b.Property<string>("SessionName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Sessiontype");
+                    b.Property<int>("Sessiontype")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -167,11 +205,14 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("ClubScansub.Models.CourseSessionInstructor", b =>
                 {
-                    b.Property<int>("CourseSessionId");
+                    b.Property<int>("CourseSessionId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("InstructorId");
+                    b.Property<string>("InstructorId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("InstructorApproved");
+                    b.Property<bool>("InstructorApproved")
+                        .HasColumnType("bit");
 
                     b.HasKey("CourseSessionId", "InstructorId");
 
@@ -184,27 +225,38 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AddressId");
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("CourseTemplateId");
+                    b.Property<int?>("CourseTemplateId")
+                        .HasColumnType("int");
 
-                    b.Property<TimeSpan>("DefaultDuration");
+                    b.Property<TimeSpan>("DefaultDuration")
+                        .HasColumnType("time");
 
-                    b.Property<TimeSpan>("DefaultStartTime");
+                    b.Property<TimeSpan>("DefaultStartTime")
+                        .HasColumnType("time");
 
-                    b.Property<int>("DefaultWeekday");
+                    b.Property<int>("DefaultWeekday")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SessionNumber");
+                    b.Property<string>("SessionNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SessionType");
+                    b.Property<int>("SessionType")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("UseDefaultWeekDay");
+                    b.Property<bool>("UseDefaultWeekDay")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -217,9 +269,11 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("ClubScansub.Models.CourseSignup", b =>
                 {
-                    b.Property<string>("ApplicationUserId");
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CourseId");
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
 
                     b.HasKey("ApplicationUserId", "CourseId");
 
@@ -232,28 +286,38 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AcademicSessions");
+                    b.Property<int>("AcademicSessions")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CourseType");
+                    b.Property<int>("CourseType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("DefaultPrice")
                         .HasColumnType("decimal");
 
-                    b.Property<byte[]>("Image");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<int>("MaxStudents");
+                    b.Property<int>("MaxStudents")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MinStudents");
+                    b.Property<int>("MinStudents")
+                        .HasColumnType("int");
 
-                    b.Property<int>("OpenWaterSessions");
+                    b.Property<int>("OpenWaterSessions")
+                        .HasColumnType("int");
 
-                    b.Property<int>("PoolSessions");
+                    b.Property<int>("PoolSessions")
+                        .HasColumnType("int");
 
-                    b.Property<string>("TemplateDurationInWeeks");
+                    b.Property<string>("TemplateDurationInWeeks")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TemplateName");
+                    b.Property<string>("TemplateName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -264,38 +328,54 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CertificateId");
+                    b.Property<int?>("CertificateId")
+                        .HasColumnType("int");
 
-                    b.Property<TimeSpan>("DefaultDuration");
+                    b.Property<TimeSpan>("DefaultDuration")
+                        .HasColumnType("time");
 
-                    b.Property<int>("DefaultEventType");
+                    b.Property<int>("DefaultEventType")
+                        .HasColumnType("int");
 
-                    b.Property<TimeSpan>("DefaultStartTime");
+                    b.Property<TimeSpan>("DefaultStartTime")
+                        .HasColumnType("time");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DiveType");
+                    b.Property<int>("DiveType")
+                        .HasColumnType("int");
 
-                    b.Property<byte[]>("Image");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<double>("Latitude");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
 
-                    b.Property<double>("Longitude");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
-                    b.Property<int>("MaxDepth");
+                    b.Property<int>("MaxDepth")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MaxParticipants");
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("MeetingLocationId");
+                    b.Property<int?>("MeetingLocationId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MinDepth");
+                    b.Property<int>("MinDepth")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MinParticipants");
+                    b.Property<int>("MinParticipants")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(150)")
                         .HasMaxLength(150);
 
                     b.Property<decimal>("Price")
@@ -312,13 +392,15 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("ClubScansub.Models.DiveorgCertificate", b =>
                 {
-                    b.Property<int>("DiveorganizationId");
+                    b.Property<int>("DiveorganizationId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CertificateId");
+                    b.Property<int>("CertificateId")
+                        .HasColumnType("int");
 
                     b.HasKey("DiveorganizationId", "CertificateId");
 
-                    b.HasAlternateKey("CertificateId", "DiveorganizationId");
+                    b.HasIndex("CertificateId");
 
                     b.ToTable("DiveorgCertificates");
                 });
@@ -327,15 +409,19 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("ShortName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
                     b.HasKey("Id");
@@ -347,46 +433,66 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AddressId");
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("DeeplinkId");
+                    b.Property<Guid>("DeeplinkId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Deposit")
                         .HasColumnType("decimal");
 
-                    b.Property<string>("Details");
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Discriminator")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DivelocationId");
+                    b.Property<int?>("DivelocationId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("EndDateAndTime");
+                    b.Property<DateTime>("EndDateAndTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("EventType");
+                    b.Property<int>("EventType")
+                        .HasColumnType("int");
 
-                    b.Property<int>("FixedParticipants");
+                    b.Property<int>("FixedParticipants")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsCancelled");
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsFreeForDivepros");
+                    b.Property<bool>("IsFreeForDivepros")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsInternal");
+                    b.Property<bool>("IsInternal")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("MaxParticipants");
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MinParticipants");
+                    b.Property<int>("MinParticipants")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PremiumPrice")
+                        .HasColumnType("decimal");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal");
 
-                    b.Property<int?>("RequiredCertificateId");
+                    b.Property<int?>("RequiredCertificateId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("StartDateAndTime");
+                    b.Property<DateTime>("StartDateAndTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -403,9 +509,11 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("ClubScansub.Models.EventUser", b =>
                 {
-                    b.Property<string>("ApplicationUserId");
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("EventId");
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
 
                     b.HasKey("ApplicationUserId", "EventId");
 
@@ -418,23 +526,32 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<byte[]>("BackSideImage");
+                    b.Property<byte[]>("BackSideImage")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<int?>("CertificateId");
+                    b.Property<int?>("CertificateId")
+                        .HasColumnType("int");
 
-                    b.Property<byte[]>("FrontSideImage");
+                    b.Property<byte[]>("FrontSideImage")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<bool>("IsVerified");
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("IssuedDate");
+                    b.Property<DateTime>("IssuedDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("VerifiedById");
+                    b.Property<string>("VerifiedById")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("VerifiedDate");
+                    b.Property<DateTime>("VerifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -450,15 +567,18 @@ namespace ClubScansub.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -475,14 +595,18 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -494,42 +618,57 @@ namespace ClubScansub.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessFailedCount");
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Discriminator")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<bool>("EmailConfirmed");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("LockoutEnabled");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("PasswordHash");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PhoneNumberConfirmed");
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("SecurityStamp");
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TwoFactorEnabled");
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -551,14 +690,18 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -569,14 +712,18 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderKey");
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderDisplayName");
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -587,9 +734,11 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("RoleId");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -600,13 +749,17 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -617,11 +770,14 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.HasBaseType("ClubScansub.Models.Event");
 
-                    b.Property<string>("CourseName");
+                    b.Property<string>("CourseName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CourseTemplateId");
+                    b.Property<int?>("CourseTemplateId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CourseType");
+                    b.Property<int>("CourseType")
+                        .HasColumnType("int");
 
                     b.HasIndex("CourseTemplateId");
 
@@ -634,25 +790,35 @@ namespace ClubScansub.Data.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
-                    b.Property<string>("AccountNumber");
+                    b.Property<string>("AccountNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("City");
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Country");
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DayOfbirth");
+                    b.Property<DateTime>("DayOfbirth")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Firstname");
+                    b.Property<string>("Firstname")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Lastname");
+                    b.Property<string>("Lastname")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("OldAccountImported");
+                    b.Property<bool>("OldAccountImported")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("PhotoUrl");
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PostalCode");
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Streetaddress");
+                    b.Property<string>("Streetaddress")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
@@ -700,12 +866,14 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.CourseSession", "CourseSession")
                         .WithMany("SessionInstructors")
                         .HasForeignKey("CourseSessionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ClubScansub.Models.ApplicationUser", "Instructor")
                         .WithMany("InstructorSessions")
                         .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.CourseSessionTemplate", b =>
@@ -724,12 +892,14 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Courses")
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ClubScansub.Models.Course", "Course")
                         .WithMany("Signups")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.Divelocation", b =>
@@ -739,7 +909,7 @@ namespace ClubScansub.Data.Migrations
                         .HasForeignKey("CertificateId");
 
                     b.HasOne("ClubScansub.Models.Address", "MeetingLocation")
-                        .WithMany("Divelocations")
+                        .WithMany()
                         .HasForeignKey("MeetingLocationId");
                 });
 
@@ -748,18 +918,20 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.Certificate", "Certificate")
                         .WithMany("Diveorgs")
                         .HasForeignKey("CertificateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ClubScansub.Models.Diveorganization", "Diveorg")
                         .WithMany("Certificates")
                         .HasForeignKey("DiveorganizationId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.Event", b =>
                 {
                     b.HasOne("ClubScansub.Models.Address", "Address")
-                        .WithMany("Events")
+                        .WithMany()
                         .HasForeignKey("AddressId");
 
                     b.HasOne("ClubScansub.Models.Divelocation", "Divelocation")
@@ -777,12 +949,14 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Events")
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ClubScansub.Models.Event", "Event")
                         .WithMany("Participants")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.UserCertificat", b =>
@@ -804,47 +978,53 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.Course", b =>

@@ -23,10 +23,10 @@ namespace ClubScansub.Models
         
         [Display(Name = "Kursusdag - beskrivelse")]
         public string SessionDescription { get; set; }
-        public virtual Course Course { get; set; }
-        public virtual Address Address { get; set; }
-        public virtual Divelocation Divelocation { get; set; }
-        public virtual CourseSessionTemplate CourseSessionTemplate { get; set; }
+        public Course Course { get; set; }
+        public Address Address { get; set; }
+        public Divelocation Divelocation { get; set; }
+        public CourseSessionTemplate CourseSessionTemplate { get; set; }
 
         [NotMapped]
         public int InstructorsRequired
@@ -64,7 +64,7 @@ namespace ClubScansub.Models
             }
         }
 
-        public virtual ICollection<CourseSessionInstructor> SessionInstructors { get; set; }
+        public ICollection<CourseSessionInstructor> SessionInstructors { get; set; }
 
     }
 }

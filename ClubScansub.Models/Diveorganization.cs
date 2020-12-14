@@ -22,6 +22,6 @@ namespace ClubScansub.Models
         [Required]
         public string ShortName { get; set; }
         public string Description { get; set; }
-        public virtual ICollection<DiveorgCertificate> Certificates { get; set;}
+        public ICollection<DiveorgCertificate> Certificates { get; set;}
     }
 }

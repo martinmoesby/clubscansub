@@ -24,7 +24,7 @@ namespace ClubScansub.Models
         [Display(Name = "Standard Pris")]
         public decimal DefaultPrice { get; set; }
         public CourseTypeEnum CourseType { get; set; }
-        public virtual ICollection<CourseSessionTemplate> Sessions { get; set; }
+        public ICollection<CourseSessionTemplate> Sessions { get; set; }
         
         [Display(Name ="Sessioner i klasseværelse")]        
         public int AcademicSessions { get; set; }
