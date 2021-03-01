@@ -179,7 +179,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             //_PageModel.Event = pageModel.Event;
             pageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
             pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
-            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Name).Select(x => new SelectListItem()
+            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x=>x.Lastname).Select(x => new SelectListItem()
             {
                 Text = x.Name,
                 Value = x.Id

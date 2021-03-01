@@ -134,7 +134,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(c=>c.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
             
-            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem()
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
