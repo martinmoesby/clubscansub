@@ -264,20 +264,29 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .OrderBy(x => x.PostingDate)
                 .Select(x => new
                 {
-                    x.PostingDate,
-                    x.Description,
-                    x.Amount,
-                    InvoiceNumber = x.InvoiceNumber ?? "",
-                    Title = x.Event?.Title ?? "",
+                    postingDate = x.PostingDate?.ToLocalTime().Date,
+                    description = x.Description,
+                    amount = x.Amount,
+                    title = x.Event?.Title ?? "",
+                    invoiceNumber = x.InvoiceNumber ?? "",
                 });
-                
 
-            return new JsonResult(transactions, new JsonSerializerSettings()
+            //var jsonSerializerSettings =  new Newtonsoft.Json.JsonSerializerSettings()
+            //{
+            //    Formatting = Formatting.Indented,
+            //    DateFormatString = "yyyy-MM-dd"
+            //});
+
+            var jsonSerializerSettings = new System.Text.Json.JsonSerializerOptions()
             {
-                Formatting = Formatting.Indented,
-                DateFormatString = "yyyy-MM-dd"
+                //WriteIndented = true,
+               
+            };
 
-            });
+            var result = Json(transactions, jsonSerializerSettings);
+
+            return new JsonResult(transactions, jsonSerializerSettings);
+
 
             //return JsonConvert.SerializeObject(transactions, Formatting.Indented);
 

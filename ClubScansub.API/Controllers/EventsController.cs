@@ -101,12 +101,18 @@ namespace ClubScansub.API
                     x.Divelocation.MinDepth,
                     x.Divelocation.MaxDepth,
                     Price = User.HasClaim("isPremium", "True") ? x.PremiumPrice : x.Price,
-                    AlreadySignedUp = x.Participants.Any(p=> userevents.Contains(p)),
+                    AlreadySignedUp = x.Participants.Single(p => p.ApplicationUser == user) != null,
                     HasFunds = x.Price > balance && userShouldPay ? false : true,
                     isSignedIn,
                     isDivePro
                 })
                 .ToListAsync();
+
+
+                //foreach (var item in data)
+                //{
+                //    item.AlreadySignedUp = userevents.Any(x=> x.EventId.ToString() == item.Id);
+                //}
 
                 return Json(data);
             }

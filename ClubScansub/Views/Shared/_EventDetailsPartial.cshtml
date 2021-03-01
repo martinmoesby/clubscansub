@@ -7,7 +7,6 @@
         .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
     bool isEligable = Model.RequiredCertificate == null;
-    bool hasFunds = currentUser?.Balance >= Model.Price;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
     {
@@ -28,6 +27,8 @@
         paymentNote = "(Pris for Prem. medl.)";
         paymentPrice = Model.PremiumPrice;
     }
+    bool hasFunds = currentUser?.Balance >= paymentPrice;
+
 }
 <div class="row mb-3">
 
@@ -110,65 +111,65 @@
         } else if (User.Identity.Name != null && User.IsInRole(ClubScansub.Utility.Userroles.User))
             {
 
-    if (Model.FreeSpots <= 0)
+                if (Model.FreeSpots <= 0)
                 {
-        <span class="rounded border small border-dark text-black-50 p-2">
-            <i class="fas fa-lightbulb mr-2" title="Turen er fyldt op"></i>Ikke flere pladser
-        </span>
+                    <span class="rounded border small border-dark text-black-50 p-2">
+                        <i class="fas fa-lightbulb mr-2" title="Turen er fyldt op"></i>Ikke flere pladser
+                    </span>
                 }
                 else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) != null)
                 {
-        <span class="rounded border border-success text-success p-2 small">
-            <i class="fas fa-user-check mr-2" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>Allerede tilmeldt
-        </span>
+                    <span class="rounded border border-success text-success p-2 small">
+                        <i class="fas fa-user-check mr-2" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>Allerede tilmeldt
+                    </span>
                 }
                 else if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
                 {
-        <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
-            <i class="fas fa-user-plus mr-2"></i>Tilmeld dig gratis
-        </a>
-                @*}
-                else if (Model.EventType == EventTypeEnum.Klubture && User.IsInRole(Userroles.Member))
-                {
-        <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
-            <i class="fas fa-user-plus mr-2"></i>Gratis for Premium medlemmer
-        </a>*@
+                    <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
+                        <i class="fas fa-user-plus mr-2"></i>Tilmeld dig gratis
+                    </a>
                 }
+                @*else if (Model.EventType == EventTypeEnum.Klubture && User.IsInRole(Userroles.Member))
+                {
+                    <a asp-action="Signup" class="btn btn-outline-success btn-sm" asp-route-id="@Model.Id" title="Tilmeld dig gratis">
+                        <i class="fas fa-user-plus mr-2"></i>Gratis for Premium medlemmer
+                    </a>
+                }*@
                 else if (!hasFunds)
                 {
-        <span class="rounded border border-warning text-warning p-2 small">
-            <i class="fas fa-exclamation-triangle mr-2" title="Du har ikke penge nok på din turkonto."></i>Lav turkonto
-        </span>
+                    <span class="rounded border border-warning text-warning p-2 small">
+                        <i class="fas fa-exclamation-triangle mr-2" title="Du har ikke penge nok på din turkonto."></i>Din turkonto er lav
+                    </span>
                 }
 
                 else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
                 {
                     if (!isEligable)
                     {
-        <span><i class="rounded-circle bg-warning text-white p-2 fas fa-award" title="Du mangler det krævede certifikat"></i>&nbsp; @certName</span>
-        <a asp-action="Signup" class="btn btn-outline-warning btn-sm small" asp-route-id="@Model.Id" title="Advarsel - du har ikke det krævede certifikat til denne tur, men tilmeld dig denne tur, hvis du har penge på turkontoen">
-            <i class="fas fa-user-plus mr-2"></i>Certifikat mangler
-        </a>
+                        <span><i class="rounded-circle bg-warning text-white p-2 fas fa-award" title="Du mangler det krævede certifikat"></i>&nbsp; @certName</span>
+                        <a asp-action="Signup" class="btn btn-outline-warning btn-sm small" asp-route-id="@Model.Id" title="Advarsel - du har ikke det krævede certifikat til denne tur, men tilmeld dig denne tur, hvis du har penge på turkontoen">
+                            <i class="fas fa-user-plus mr-2"></i>Certifikat mangler
+                        </a>
                     }
                     else
                     {
-        <a asp-action="Signup" class="btn btn-outline-success btn-sm small" asp-route-id="@Model.Id" title="Tilmeld dig">
-            <i class="fas fa-user-plus mr-2"></i>Tilmeld
-        </a>
+                        <a asp-action="Signup" class="btn btn-outline-success btn-sm small" asp-route-id="@Model.Id" title="Tilmeld dig">
+                            <i class="fas fa-user-plus mr-2"></i>Tilmeld
+                        </a>
                     }
                 }
                 else
                 {
-        <span class="rounded border border-dark text-black-50 small p-2">
-            <i title="Kan ikke afgøre tilstand" class="fas fa-question mr-2"></i>Ukendt tilstand
-        </span>
+                    <span class="rounded border border-dark text-black-50 small p-2">
+                        <i title="Kan ikke afgøre tilstand" class="fas fa-question mr-2"></i>Ukendt tilstand
+                    </span>
                 }
             }
             else
             {
-        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-info btn-sm small">
-             <i title="Du skal være logget ind og medlem for at tilmelde dig" class="fas fa-sign-in-alt mr-2"></i>Login for at tilmelde
-        </a>
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-info btn-sm small">
+                     <i title="Du skal være logget ind og medlem for at tilmelde dig" class="fas fa-sign-in-alt mr-2"></i>Login for at tilmelde
+                </a>
             }
     </div>
 

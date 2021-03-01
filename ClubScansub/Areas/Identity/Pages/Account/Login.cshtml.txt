@@ -1,0 +1,96 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form id="account" method="post">
+                <h4>Login med brugernavn og kodeord</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Input.Email"></label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Password"></label>
+                    <input asp-for="Input.Password" class="form-control" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="Input.RememberMe">
+                            <input asp-for="Input.RememberMe" />
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-info btn-sm"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind</button>
+                </div>
+                <div class="form-group">
+                    <p>
+                        <a id="forgot-password" class="btn btn-outline-info btn-sm" asp-page="./ForgotPassword"><i class="fas fa-question"></i>&nbsp;Glemt kodenord?</a>
+                    </p>
+                    <p>
+                        <a asp-page="./Register" class="btn btn-outline-info btn-sm" asp-route-returnUrl="@Model.ReturnUrl"><i class="fas fa-user-plus"></i>&nbsp;Opret ny bruger</a>
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+            <h4>Logge ind med din Facebook-konto</h4>
+            <hr />
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                            for details on setting up this ASP.NET application to support logging in via external services.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    var iconClass = "fab ";
+                                    if (provider.Name == "Facebook")
+                                    {
+                                        iconClass += "fa-facebook-f";
+                                    }
+                                    else if (provider.Name == "Google")
+                                    {
+                                        iconClass += "fa-google-plus-g";
+                                    }
+                                    else
+                                    {
+                                        iconClass = "far fa-user-circle";
+                                    }
+
+                                    <button type="submit" class="btn btn-outline-primary" style="width:200px;" name="provider" value="@provider.Name" title="Log på med din @provider.DisplayName account"><i class="@iconClass"></i>&nbsp;@provider.DisplayName</button>
+                                }
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
