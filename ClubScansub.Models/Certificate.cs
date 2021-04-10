@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,8 +25,10 @@ namespace ClubScansub.Models
         [Display(Name ="Maks. dybde")]
         public int? DepthLimit { get; set; }
 
-        public virtual ICollection<DiveorgCertificate> Diveorgs { get; set; }
 
-        public virtual ICollection<UserCertificat> UserCertificate { get; set; }
+        public ICollection<DiveorgCertificate> Diveorgs { get; set; }
+
+        [JsonIgnore]
+        public ICollection<UserCertificat> UserCertificate { get; set; }
     }
 }

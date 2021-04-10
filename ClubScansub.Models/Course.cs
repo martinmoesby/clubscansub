@@ -17,10 +17,10 @@ namespace ClubScansub.Models
     
         public string CourseName { get; set; }
         public CourseTypeEnum CourseType { get; set; }
-        public virtual ICollection<CourseSession> CourseSessions { get; set; }
-        public virtual CourseTemplate CourseTemplate { get; set; }
+        public ICollection<CourseSession> CourseSessions { get; set; }
+        public CourseTemplate CourseTemplate { get; set; }
 
-        public virtual ICollection<CourseSignup> Signups { get; set; }
+        public ICollection<CourseSignup> Signups { get; set; }
 
 
         [NotMapped]

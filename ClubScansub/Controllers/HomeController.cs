@@ -1,21 +1,20 @@
-﻿using System;
+﻿using ClubScansub.Data;
+using ClubScansub.Extensions;
+using ClubScansub.Models;
+using ClubScansub.Models.ViewModels;
+using ClubScansub.Service;
+using ClubScansub.Utility;
+using DeviceDetectorNET;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Nager.Date;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using ClubScansub.Models;
-using ClubScansub.Data;
-using ClubScansub.Models.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using ClubScansub.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Nager.Date;
-using ClubScansub.Utility;
-using ClubScansub.Service;
-using Microsoft.AspNetCore.Identity;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ClubScansub.Controllers
 {
@@ -300,20 +299,22 @@ namespace ClubScansub.Controllers
             var item = await db.Events.Include(x=>x.Participants).Include(x=>x.RequiredCertificate).FirstAsync(x=>x.Id==id);
             var user = await db.ApplicationUsers.Include(x=>x.AccountTransactions).Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == User.GetIdentityId());
 
+            var userPrice = User.IsInRole(Userroles.Member) ? item.PremiumPrice : item.Price;
+
             if (item == null || user == null)
             {
                 StatusMessage = $"Der skete en fejl: Bruger eller begivenhed ikke genkendt.";
                 return RedirectToAction(nameof(Index));
             }
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
-            
+            var isPaymentRequired = true; // !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
+
             if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
             {
                 isPaymentRequired = false;
             }
 
-            if (item.Price > user.Balance && isPaymentRequired)
+            if (userPrice > user.Balance && isPaymentRequired)
             {
                 StatusMessage = "Fejl - der er ikke penge nok på din turkonto, du bliver nødt til at tanke op";
                 return RedirectToAction(nameof(Index));
@@ -321,7 +322,7 @@ namespace ClubScansub.Controllers
 
             var accounttrans = new ApplicationUserAccountEntry
             {
-                Amount = isPaymentRequired ? -item.Price : 0,
+                Amount = isPaymentRequired ? -userPrice : 0,
                 AccountType = AccountTypeEnum.EventAccountType,
                 Description = $"{item.Title} ,d. {item.StartDateAndTime.ToShortDateString()}",
                 Event = item,

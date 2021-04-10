@@ -23,7 +23,7 @@ namespace ClubScansub.Models
         public string PrivacyText { get; set; }
 
         [Display(Name = "Hvad er klubbens adresse=")]
-        public virtual Address Address { get; set; }
+        public Address Address { get; set; }
 
         public bool IsOldMemberDatabaseImported { get; set; }
 

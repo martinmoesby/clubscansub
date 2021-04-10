@@ -53,10 +53,10 @@ namespace ClubScansub.Models
         public byte[] Image { get; set; }
 
         [Display(Name = "Mødested")]
-        public virtual Address MeetingLocation { get; set; }
+        public Address MeetingLocation { get; set; }
 
         [Display(Name = "Min. certificering")]
-        public virtual Certificate Certificate { get; set; }
+        public Certificate Certificate { get; set; }
 
         [Display(Name = "Normal start tidspunkt")]
         public TimeSpan DefaultStartTime { get; set; }
@@ -69,7 +69,7 @@ namespace ClubScansub.Models
         public EventTypeEnum DefaultEventType { get; set; }
         
         [JsonIgnore]
-        public virtual ICollection<Event> Events { get; set; }
+        public ICollection<Event> Events { get; set; }
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }
     }
 }

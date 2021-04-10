@@ -17,8 +17,8 @@
 
             <form method="post">
                 <input type="hidden" asp-for="Event.Id" />
-                <input type="hidden" asp-for="Event.Divelocation.Id" />
-
+                <input type="hidden" asp-for="Event.Divelocation.Name" />
+                <input type="hidden" asp-for="Event.DeeplinkId" />
                 <input type="hidden" asp-for="Event.Divelocation.MinDepth" />
                 <input type="hidden" asp-for="Event.Divelocation.MaxDepth" />
                 <input type="hidden" asp-for="Event.FixedParticipants" />
@@ -27,14 +27,19 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Type:</span>
                     </div>
-                    <input type="text" class="form-control" asp-for="Event.EventType" readonly />
+                    <select class="form-control" asp-for="Event.EventType" asp-items="@Html.GetEnumSelectList<EventTypeEnum>()">
+                    </select>
+                    @*<input type="text" class="form-control" asp-for="Event.EventType" readonly />*@
                 </div>
 
                 <div class="form-group input-group col-12">
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Til:</span>
                     </div>
-                    <input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Event.Divelocation.Name" readonly />
+                    <select class="form-control" asp-for="Event.Divelocation.Id" asp-items="Model.LocationsList">
+                        <option value="">Dykkersted...</option>
+                    </select>
+                    @*<input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Event.Divelocation.Name" readonly /> *@
                 </div>
 
 
@@ -92,42 +97,51 @@
                     </div>
                 </div>
 
-                <div class="form-group input-group col-12">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" style="width:120px;">Pris:</span>
-
-                    </div>
-                    <input class="form-control" asp-for="Event.Price" asp-format="{0:N0}" />
-                </div>
-
-
                 <div class="form-group d-flex justify-content-between">
                     <div class="form-group input-group col-6">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <input type="checkbox" asp-for="Event.IsInternal" />
-                            </span>
+                            <span class="input-group-text" style="width:120px;">Pris:</span>
+
                         </div>
-                        <label class="form-control" asp-for="Event.IsInternal"></label>
+                        <input class="form-control" asp-for="Event.Price" asp-format="{0:N0}" id="NormalPrice" onchange="SynchWithControl('PremiumPrice')" />
                     </div>
+
                     <div class="form-group input-group col-6">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <input type="checkbox" asp-for="Event.IsFreeForDivepros" />
-                            </span>
+                            <span class="input-group-text" style="width:120px;">Pris (Prem. medlemmer):</span>
+
                         </div>
-                        <label class="form-control" asp-for="Event.IsFreeForDivepros"></label>
+                        <input class="form-control" asp-for="Event.PremiumPrice" asp-format="{0:N0}" id="PremiumPrice" />
+                    </div>
+                </div>
+
+                    <div class="form-group d-flex justify-content-between">
+                        <div class="form-group input-group col-6">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <input type="checkbox" asp-for="Event.IsInternal" />
+                                </span>
+                            </div>
+                            <label class="form-control" asp-for="Event.IsInternal"></label>
+                        </div>
+                        <div class="form-group input-group col-6">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <input type="checkbox" asp-for="Event.IsFreeForDivepros" />
+                                </span>
+                            </div>
+                            <label class="form-control" asp-for="Event.IsFreeForDivepros"></label>
+                        </div>
+
+
                     </div>
 
+                    <div asp-validation-summary="All" class="text-danger"></div>
 
-                </div>
-
-                <div asp-validation-summary="All" class="text-danger"></div>
-
-                <div class="form-group col-12 d-flex justify-content-between mt-3">
-                    <button class="btn btn-outline-success btn-sm" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
-                    <a class="btn btn-outline-info btn-sm" asp-action="Index" asp-route-eventtype="@Model.Event.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
-                </div>
+                    <div class="form-group col-12 d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-success btn-sm" type="submit"><i class="fas fa-save"></i> &nbsp;Gem</button>
+                        <a class="btn btn-outline-info btn-sm" asp-action="Index" asp-route-eventtype="@Model.Event.EventType"><i class="fas fa-times"></i> &nbsp;Annuller</a>
+                    </div>
 
             </form>
 
@@ -222,6 +236,15 @@
 
             document.getElementById("addUserToEventButton").disabled = selectedUserId == "-1";
 
+        }
+
+        function SynchWithControl(e, obj) {
+            var control = $("#" + obj);
+            if (control != undefined) {
+                control.val = e.val;
+            } else {
+                console.log(obj + " is not found")
+            }
         }
     </script>
 }

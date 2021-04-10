@@ -28,6 +28,12 @@ namespace ClubScansub.API
         }
         #region Public end points
         
+        [Route("event/{id}")]
+        public async Task<ActionResult> Get(int id)
+        {
+            return Json(await db.Events.FindAsync(id));
+        }
+
         [Route("events/{eventtype}")]
         public async Task<ActionResult> Get(string eventtype)
         {
@@ -94,13 +100,19 @@ namespace ClubScansub.API
                     x.Divelocation.DiveType,
                     x.Divelocation.MinDepth,
                     x.Divelocation.MaxDepth,
-                    Price = userShouldPay ? x.Price : 0,
-                    AlreadySignedUp = x.Participants.Any(p=> userevents.Contains(p)),
+                    Price = User.HasClaim("isPremium", "True") ? x.PremiumPrice : x.Price,
+                    AlreadySignedUp = x.Participants.Single(p => p.ApplicationUser == user) != null,
                     HasFunds = x.Price > balance && userShouldPay ? false : true,
                     isSignedIn,
                     isDivePro
                 })
                 .ToListAsync();
+
+
+                //foreach (var item in data)
+                //{
+                //    item.AlreadySignedUp = userevents.Any(x=> x.EventId.ToString() == item.Id);
+                //}
 
                 return Json(data);
             }
@@ -133,7 +145,7 @@ namespace ClubScansub.API
                 return RedirectToAction(nameof(Index));
             }
 
-            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && User.IsInRole(Userroles.Member));
+            var isPaymentRequired = !((item.EventType == EventTypeEnum.Other || item.EventType == EventTypeEnum.Klubture) && (User.IsInRole(Userroles.Member) || User.HasClaim("IsPremium","True")));
 
             if (item.IsFreeForDivepros && User.IsInRole(Userroles.Divepro))
             {
@@ -193,7 +205,7 @@ namespace ClubScansub.API
             var eventplan = await db.EventUsers
                 .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
                 .Include(x=>x.Event).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
-                .Where(x => x.ApplicationUser == user && x.Event.StartDateAndTime > DateTime.Now)
+                .Where(x => x.ApplicationUser == user && x.Event.StartDateAndTime > DateTime.Now && !x.Event.IsCancelled)
                 .ToListAsync();
 
             var result = eventplan.OrderBy(x=>x.Event.StartDateAndTime).Select(x => new
@@ -267,7 +279,8 @@ namespace ClubScansub.API
 
             var workplan = await db.CourseSessionInstructors
                  .Include(x => x.CourseSession).ThenInclude(x => x.Course)
-                 .Include(x => x.CourseSession).ThenInclude(x => x.CourseSessionTemplate)
+                 .Include(x => x.CourseSession).ThenInclude(x => x.CourseSessionTemplate).ThenInclude(x=>x.Address)
+                 .Include(x => x.CourseSession).ThenInclude(x=> x.Divelocation)
                  .Where(x => x.InstructorId == User.GetIdentityId() && x.CourseSession.DateTime > DateTime.Now)
                  .ToListAsync();
 
@@ -276,11 +289,15 @@ namespace ClubScansub.API
                 {
                     Id = x.CourseSessionId.ToString(),
                     x.CourseSession.DateTime,
-                    x.CourseSession.SessionDescription,
-                    x.CourseSession.Divelocation,
-                    x.CourseSession.Course
+                    SessionName = string.IsNullOrEmpty(x.CourseSession.SessionName) ? x.CourseSession.CourseSessionTemplate.Name : x.CourseSession.SessionName,
+                    SessionDescription= string.IsNullOrEmpty(x.CourseSession.SessionDescription) ? x.CourseSession.CourseSessionTemplate.Description : x.CourseSession.SessionDescription,
+                    AddressName = x.CourseSession.CourseSessionTemplate?.Address?.Name,
+                    DiveLocationName = x.CourseSession.Divelocation?.Name,
+                    x.CourseSession.Course.CourseName,
+                    x.InstructorApproved,
+                    x.CourseSession.Sessiontype
                 }
-                );
+                ).OrderBy(x=>x.DateTime);
 
             return Json(result);
 

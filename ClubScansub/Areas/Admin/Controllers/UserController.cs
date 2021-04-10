@@ -40,14 +40,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 SearchText = searchText ?? "",
                 MemberType = membertype ?? Userroles.User
             };
-            var usersinrole = await um.GetUsersInRoleAsync(membertype);
 
+            var usersinrole = await um.GetUsersInRoleAsync(membertype);
             var userSearchResult = await db.ApplicationUsers
                 .Include(x => x.AccountTransactions)
                 .Include(c => c.Certificates)
-                .Where(x=>x.Name.ToLower().Contains(IndexPageVM.SearchText.ToLower()) && usersinrole.Any(u => x.Id == u.Id))               
-                .OrderBy(x=>x.UserName)
+                .Where(x => (x.Firstname.ToLower().Contains(IndexPageVM.SearchText.ToLower()) || x.Lastname.ToLower().Contains(IndexPageVM.SearchText.ToLower())))
+                .OrderBy(x => x.UserName)
                 .ToListAsync();
+            var result = userSearchResult.Where(x=> usersinrole.Contains(x));
 
             IndexPageVM.Pager = new Pager
             {
@@ -55,11 +56,11 @@ namespace ClubScansub.Areas.Admin.Controllers
                 urlParam = $"/Admin/User/?page=:&searchText={searchText}&membertype={membertype}"
             };
 
-            IndexPageVM.Pager.TotalItems = userSearchResult.Count();
+            IndexPageVM.Pager.TotalItems = result.Count();
             if (page > IndexPageVM.Pager.totalPages) page = 1;
             IndexPageVM.Pager.CurrentPage = page;
 
-            var users = userSearchResult.Skip((page - 1) * IndexPageVM.Pager.PageSize).Take(IndexPageVM.Pager.PageSize).ToList();
+            var users = result.Skip((page - 1) * IndexPageVM.Pager.PageSize).Take(IndexPageVM.Pager.PageSize).ToList();
 
             IndexPageVM.Users = users;
 
@@ -81,19 +82,19 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(c=>c.VerifiedBy)
                 .Include(a=>a.AccountTransactions)
                 .FirstOrDefaultAsync(x => x.Id == id)
-                
                 ;
 
             if (user == null)
                 return NotFound(new NotFoundObjectResult($"User with id '{id}' wasn't found in the database"));
 
-            var userroles = um.GetRolesAsync(user);
+            var userroles = await um.GetRolesAsync(user);
+            var roles = await db.UserRoles.Where(x => x.UserId == id).Select(x => x.RoleId).ToListAsync();
 
             var editUser = new EditUserViewModel()
             {
                 Roles = await rm.Roles.ToListAsync(),
                 User = user,
-                Userroles = new HashSet<string>(await db.UserRoles.Where(x => x.UserId == id).Select(x=>x.RoleId).ToListAsync()),
+                Userroles = new HashSet<string>(roles),
             };
 
            
@@ -191,7 +192,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             user.City = model.User.City;
             user.Country = model.User.Country;
 
-            await db.SaveChangesAsync();
+            db.SaveChanges();
 
             return RedirectToAction("Edit", new { id = user.Id });
         }
@@ -263,20 +264,29 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .OrderBy(x => x.PostingDate)
                 .Select(x => new
                 {
-                    x.PostingDate,
-                    x.Description,
-                    x.Amount,
-                    InvoiceNumber = x.InvoiceNumber ?? "",
-                    Title = x.Event?.Title ?? "",
+                    postingDate = x.PostingDate?.ToLocalTime().Date,
+                    description = x.Description,
+                    amount = x.Amount,
+                    title = x.Event?.Title ?? "",
+                    invoiceNumber = x.InvoiceNumber ?? "",
                 });
-                
 
-            return new JsonResult(transactions, new JsonSerializerSettings()
+            //var jsonSerializerSettings =  new Newtonsoft.Json.JsonSerializerSettings()
+            //{
+            //    Formatting = Formatting.Indented,
+            //    DateFormatString = "yyyy-MM-dd"
+            //});
+
+            var jsonSerializerSettings = new System.Text.Json.JsonSerializerOptions()
             {
-                Formatting = Formatting.Indented,
-                DateFormatString = "yyyy-MM-dd"
+                //WriteIndented = true,
+               
+            };
 
-            });
+            var result = Json(transactions, jsonSerializerSettings);
+
+            return new JsonResult(transactions, jsonSerializerSettings);
+
 
             //return JsonConvert.SerializeObject(transactions, Formatting.Indented);
 

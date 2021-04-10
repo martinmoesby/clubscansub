@@ -39,6 +39,11 @@ namespace ClubScansub.Models
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
+        [Display(Name = "Prim (Prem. medlem)")]
+        public decimal PremiumPrice { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal")]
         [Display(Name = "Depositum")] 
         public decimal Deposit { get; set; }
 
@@ -65,15 +70,15 @@ namespace ClubScansub.Models
         //[Display(Name = "Gratis for Premium?")]
         //public bool IsFreeForPremiumMembers { get; set; }
 
-        public virtual Certificate RequiredCertificate { get; set; }
+        public Certificate RequiredCertificate { get; set; }
 
-        public virtual Divelocation Divelocation { get; set; }
+        public Divelocation Divelocation { get; set; }
 
-        public virtual Address Address { get; set; }
+        public Address Address { get; set; }
         //public virtual Club Club { get; set; }
-        public virtual ICollection<EventUser> Participants { get; set; }
+        public ICollection<EventUser> Participants { get; set; }
 
-        public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
+        public ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
 
         [NotMapped]
         [Display(Name = "Frie pladser")]

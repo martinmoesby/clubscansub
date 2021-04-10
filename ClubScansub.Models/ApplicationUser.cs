@@ -85,18 +85,18 @@ namespace ClubScansub.Models
 
         [PersonalData]
         [Display(Name = "Certifikater")]
-        public virtual ICollection<UserCertificat> Certificates { get; set; }
+        public ICollection<UserCertificat> Certificates { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<EventUser> Events { get; set; }
+        public ICollection<EventUser> Events { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<CourseSignup> Courses { get; set; }
+        public ICollection<CourseSignup> Courses { get; set; }
 
         [JsonIgnore]
-        public virtual ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
+        public ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
         [JsonIgnore]
-        public virtual ICollection<CourseSessionInstructor> InstructorSessions { get; set; }
+        public ICollection<CourseSessionInstructor> InstructorSessions { get; set; }
 
 
     }

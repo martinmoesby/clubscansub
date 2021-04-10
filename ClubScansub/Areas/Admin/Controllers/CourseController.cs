@@ -82,7 +82,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.IsCompleteCourses = false;
             ViewBag.CourseType = courseType;
-            return View(db.Courses.Where(x=>x.CourseType == courseType && x.StartDateAndTime > DateTime.Now).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
+            return View(db.Courses.Where(x=>x.CourseType == courseType && x.EndDateAndTime > DateTime.Now).Include(x=>x.CourseSessions).Include(x=>x.Participants).Include(x=>x.Signups));
 
         }
 
@@ -112,7 +112,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.IsCompleteCourses = true;
             ViewBag.CourseType = courseType;
-            return View("Index", db.Courses.Where(x => x.CourseType == courseType && x.StartDateAndTime <= DateTime.Now).Include(x => x.CourseSessions).Include(x => x.Participants).Include(x => x.Signups));
+            return View("Index", db.Courses.Where(x => x.CourseType == courseType && x.EndDateAndTime <= DateTime.Now).Include(x => x.CourseSessions).Include(x => x.Participants).Include(x => x.Signups));
 
         }
 
@@ -134,7 +134,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                     .ThenInclude(c=>c.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
             
-            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x=>x.Name).Select(x => new SelectListItem()
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id

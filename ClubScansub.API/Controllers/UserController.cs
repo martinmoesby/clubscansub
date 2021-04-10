@@ -86,7 +86,7 @@ namespace ClubScansub.API
             var user = await db.ApplicationUsers.Include(x => x.AccountTransactions).SingleAsync(x => x.Id == userManager.GetUserId(User));
 
             if (user == null)
-                return NotFound();
+                return Unauthorized();
             var userInfo = new
             {
                 username = $"{user.Firstname} {user.Lastname}",
@@ -124,6 +124,9 @@ namespace ClubScansub.API
                 return NotFound(model);
             
             var dbUser = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
+            
+            if (dbUser == null)
+                return Unauthorized();
 
             dbUser.Firstname = model.Firstname;
             dbUser.Lastname = model.Lastname;
@@ -145,41 +148,37 @@ namespace ClubScansub.API
                 await userManager.SetPhoneNumberAsync(dbUser, model.PhoneNumber);
             }
 
-            //var email = await _userManager.GetEmailAsync(appUser);
-            //if (Input.Email != email)
-            //{
-            //    var setEmailResult = await _userManager.SetEmailAsync(appUser, Input.Email);
-            //    if (!setEmailResult.Succeeded)
-            //    {
-            //        var userId = await _userManager.GetUserIdAsync(appUser);
-            //        throw new InvalidOperationException($"Unexpected error occurred setting email for user with ID '{userId}'.");
-            //    }
-            //}
-
-            //var phoneNumber = await _userManager.GetPhoneNumberAsync(appUser);
-            //if (Input.PhoneNumber != phoneNumber)
-            //{
-            //    var setPhoneResult = await _userManager.SetPhoneNumberAsync(appUser, Input.PhoneNumber);
-            //    if (!setPhoneResult.Succeeded)
-            //    {
-            //        var userId = await _userManager.GetUserIdAsync(appUser);
-            //        throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
-            //    }
-            //}
-            //if (!User.Identity.IsAuthenticated && User.Identity.Name != model.UserName)
-            //    return Unauthorized("Not a vlid user to update");
-
             await db.SaveChangesAsync();
 
             return await RefreshUserInfo();
         }
 
-        public class LoginModel
+        [Authorize]
+        [Route("mycertificates")]
+        [HttpGet]
+        public async Task<ActionResult> GetCertificates()
         {
-            public string Email { get; set; }
-            public string Password { get; set; }
-        }
+            var user = await db.ApplicationUsers.Include(x => x.AccountTransactions).SingleAsync(x => x.Id == userManager.GetUserId(User));
 
+            if (user == null)
+                return Unauthorized();
+
+            var certificates = db.UserCertificates.Where(x => x.User == user).Select(x=> new { 
+                x.Id,
+                x.FrontSideImage,
+                x.BackSideImage,
+                x.IssuedDate,
+                x.IsVerified,
+                CertificateName = x.Certificate.Name,
+                CertificateShortNamt = x.Certificate.ShortName,
+                CertifiedDepth = x.Certificate.DepthLimit,
+                VerifiedByName = x.VerifiedBy.Name,
+                x.VerifiedDate
+            });
+
+            return Json(certificates);
+
+        }
 
         public class UpdateUserModel
         {
@@ -201,6 +200,13 @@ namespace ClubScansub.API
           //"postalCode": "2620",
           //"streetaddress": "Støvlestræde 19",
         }
+
+        public class LoginModel
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
+
 
         private object GenerateJwtToken(string email, IdentityUser appUser)
         {
