@@ -17,7 +17,7 @@
 
             <form method="post">
                 <input type="hidden" asp-for="Event.Id" />
-                <input type="hidden" asp-for="Event.Divelocation.Id" />
+                <input type="hidden" asp-for="Event.Divelocation.Name" />
                 <input type="hidden" asp-for="Event.DeeplinkId" />
                 <input type="hidden" asp-for="Event.Divelocation.MinDepth" />
                 <input type="hidden" asp-for="Event.Divelocation.MaxDepth" />
@@ -36,7 +36,10 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" style="width:120px;">Til:</span>
                     </div>
-                    <input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Event.Divelocation.Name" readonly />
+                    <select class="form-control" asp-for="Event.Divelocation.Id" asp-items="Model.LocationsList">
+                        <option value="">Dykkersted...</option>
+                    </select>
+                    @*<input type="text" class="form-control" data-style="btn btn-secondary" asp-for="Event.Divelocation.Name" readonly /> *@
                 </div>
 
 
