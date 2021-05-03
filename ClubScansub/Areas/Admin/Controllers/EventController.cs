@@ -230,6 +230,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 }
 
+
                 //if (pageModel.SelectedCertificate != null)
                 //    pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.SelectedCertificate);
 
