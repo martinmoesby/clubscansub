@@ -183,6 +183,8 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 var newLocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
 
+                // Notify uisers of new divelocation
+
                 if (existingEventLocation.Divelocation.Id != pageModel.Event.Divelocation.Id)
                 {
                     // Rename Titel and Details of event
@@ -207,9 +209,31 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 }
 
+                // Notify users of new event date
+                if (existingEventLocation.StartDateAndTime != pageModel.Event.StartDateAndTime)
+                {
+                    // Notify signed up users using smsSender and emailSender
+                    var participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Select(x => x.ApplicationUser).ToListAsync();
+
+                    foreach (var participant in participants)
+                    {
+                        var smsText = $"Hej {participant.Firstname}, \n\n" +
+                            $"Turen til '{existingEventLocation.Title}' den {existingEventLocation.StartDateAndTime.ToShortDateString()} er blevet ændret til '{pageModel.Event.StartDateAndTime.ToShortDateString()}' \n" +
+                            $"\n" +
+                            $"Hvis du ikke har mulighed for at deltage på turen denne dag, så kontakt venligst klubben for at blive afmeldt turen. \n" +
+                            $"\n" +
+                            $"Med venlig hilsen\n" +
+                            $"Klub Scansub";
+                        await smsSender.SendSmsAsync(participant.PhoneNumber, smsText);
+
+                    }
+
+                }
+
+
                 //if (pageModel.SelectedCertificate != null)
                 //    pageModel.Event.RequiredCertificate = await db.Certificates.FindAsync(pageModel.SelectedCertificate);
-                
+
                 db.Attach(pageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index", new { eventtype = pageModel.Event.EventType });
