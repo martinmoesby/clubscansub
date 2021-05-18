@@ -94,6 +94,9 @@ namespace ClubScansub
                 })
                 ;
 
+            services.AddRazorPages()
+                .AddRazorRuntimeCompilation();
+
             services.AddMvc(options =>
             {
                 // MvcOptions.EnableEndpointRouting = false
@@ -103,9 +106,9 @@ namespace ClubScansub
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDbInitializer dbInit)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer dbInit)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();

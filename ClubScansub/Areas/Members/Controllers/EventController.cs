@@ -35,11 +35,13 @@ namespace ClubScansub.Areas.Members.Controllers
 
         public async Task<IActionResult> Index()
         {
-            Events = await db.EventUsers//.Include(x=>x.Event)
-                .Where(x=> !x.Event.IsCancelled && x.ApplicationUserId == User.GetIdentityId() && x.Event.EventType != EventTypeEnum.NotAnEvent && x.Event.StartDateAndTime > DateTime.Now)
-                .Select(x=>x.Event)//.Include(x=>x.Participants)
-                .OrderBy(x=>x.StartDateAndTime).ThenBy(x=>x.Id)
+            var eventplan = await db.EventUsers
+                .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
+                .Include(x => x.Event).ThenInclude(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Where(x => x.ApplicationUserId == User.GetIdentityId() && x.Event.StartDateAndTime > DateTime.Now && !x.Event.IsCancelled)
                 .ToListAsync();
+
+            Events = eventplan.Select(x => x.Event);
 
             return View(Events);
         }
