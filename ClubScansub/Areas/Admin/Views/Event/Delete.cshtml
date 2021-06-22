@@ -89,7 +89,7 @@
             @if (Model.Participants.Count() == 0)
             {
                 <div class="col-3 align-self-start">
-                    <a asp-action="CompleteDelete" asp-route-id="@Model.Id" class="btn btn-danger form-control"><i class="fas fa-trash"></i>&nbsp;Slet helt fra kalenderen!!</a>
+                    <a asp-action="CompleteDelete" asp-controller="Event" asp-area="Admin" asp-route-id="@Model.Id" class="btn btn-danger form-control"><i class="fas fa-trash"></i>&nbsp;Slet helt fra kalenderen!!</a>
                 </div>
             }
 

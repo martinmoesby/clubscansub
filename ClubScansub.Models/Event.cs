@@ -44,7 +44,7 @@ namespace ClubScansub.Models
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
-        [Display(Name = "Depositum")] 
+        [Display(Name = "Depositum")]
         public decimal Deposit { get; set; }
 
         [Display(Name = "Starttidspunkt")]
@@ -66,7 +66,7 @@ namespace ClubScansub.Models
 
         [Display(Name = "Gratis for Instruktører?")]
         public bool IsFreeForDivepros { get; set; }
-        
+
         //[Display(Name = "Gratis for Premium?")]
         //public bool IsFreeForPremiumMembers { get; set; }
 
@@ -75,7 +75,17 @@ namespace ClubScansub.Models
         public Divelocation Divelocation { get; set; }
 
         public Address Address { get; set; }
-        //public virtual Club Club { get; set; }
+
+        [Display(Name = "Dykkerleder")]
+        public ApplicationUser Diveleader { get; set; }
+
+        [Display(Name = "Standby dykker")]
+        public ApplicationUser StandbyDiver { get; set; }
+
+        [Display(Name = "Bådfører")]
+        public ApplicationUser BoatLeader { get; set; }
+
+
         public ICollection<EventUser> Participants { get; set; }
 
         public ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }

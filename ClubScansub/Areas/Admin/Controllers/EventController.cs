@@ -501,10 +501,12 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         }
 
-        [HttpPost, ActionName("CompleteDelete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteDelete(int id)
         {
+
+            if (!User.IsInRole("Administrator"))
+                return new StatusCodeResult(403);
+                
             var e = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == id);
 
             var eventtype = e.EventType;
