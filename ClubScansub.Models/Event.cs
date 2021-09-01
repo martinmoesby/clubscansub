@@ -74,6 +74,8 @@ namespace ClubScansub.Models
 
         public Divelocation Divelocation { get; set; }
 
+        public Divelocation? SecondaryDivelocation { get; set; }
+
         public Address Address { get; set; }
 
         [Display(Name = "Dykkerleder")]

@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ClubScansub.Models.Event>
+
+<table class="table small">
+    <thead>
+        <tr>
+            <th>
+                Dato
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Participants)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCancelled)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@item.StartDateAndTime.ToShortDateString()
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @item.Participants.Count()
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCancelled)
+            </td>            
+        </tr>
+}
+    </tbody>
+</table>
