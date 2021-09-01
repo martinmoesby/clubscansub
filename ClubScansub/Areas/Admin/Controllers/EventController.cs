@@ -132,7 +132,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             var eventItem = await db.Events
                 .Include(x => x.Participants)
-                    .ThenInclude(x => x.ApplicationUser)
+                   .ThenInclude(x => x.ApplicationUser)
                    .Include(x => x.Divelocation)
                    .Include(x=>x.RequiredCertificate)
                    .FirstOrDefaultAsync(x => x.Id == id);
@@ -141,8 +141,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 return NotFound();
 
             _PageModel.Event = eventItem;
-
-            _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventItem.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            if (eventItem.EventType == EventTypeEnum.Stranddyk || eventItem.EventType == EventTypeEnum.Klubture)
+            {
+                _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == EventTypeEnum.Klubture || x.DefaultEventType == EventTypeEnum.Stranddyk).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            }
+            else
+            {
+                _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventItem.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            }
+            
 
             //if (eventItem.RequiredCertificate != null)
             //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;

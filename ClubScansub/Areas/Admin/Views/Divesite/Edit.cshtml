@@ -5,7 +5,7 @@
 
 <form method="post" asp-action="Edit" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Divelocation.Image" />
+    <input type="hidden" asp-for="Divelocation.Image.Id" />
     <div class="container p-4 m-4">
         <h2 class="text-info mb-3">Rediger dykkersted</h2>
         <div class="row">
@@ -152,16 +152,17 @@
 
                 <div class="form-group row">
                     <div class="col-md-8 offset-md-4 col-12">
-                        @{if (Model.Divelocation.Image != null)
+                        @await Component.InvokeAsync("Image", new { imageId = Model.Divelocation.Id, showThumbnail = false})
+                        @*@{if (Model.Divelocation.Image?.ImageData != null)
                             {
-                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
+                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image.ImageData)}";
                                 <img class="img-fluid img-thumbnail rounded" src="@(imgSource)" alt="" />
                             }
                             else
                             {
                                 <p class="form-control">Intet billede indlæst</p>
                             }
-                        }
+                        }*@
                     </div>
                 </div>
 

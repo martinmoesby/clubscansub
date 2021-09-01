@@ -20,9 +20,8 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    @*<th>
-                            <label asp-for="@Model.First().Id"></label>
-                        </th>*@
+                    <th>
+                    </th>
                     <th>
                         <label asp-for="@Model.First().Title"></label>
                     </th>
@@ -49,8 +48,22 @@
                 @foreach (var item in Model.OrderBy(x=>x.StartDateAndTime))
                 {
                     <tr>
-                        @*<td class="small">@item.Id</td>*@
-                        <td class="small">@item.Title</td>
+                        <td class="small" style="width:128px;">
+                            @await Component.InvokeAsync("Image", new { imageId = item.Divelocation.Id, showThumbnail = false })
+                        </td>
+
+                        <td class="small">
+                            @if (item.EndDateAndTime.ToUniversalTime() <= DateTime.UtcNow)
+                            {@item.Title
+                        }
+                        else
+                        {
+                            <a asp-action="Edit" class="btn btn-link btn-sm text-primary" asp-route-id="@item.Id">
+                                <i class="fas fa-edit"></i>
+                                @item.Title
+                            </a>
+                        }
+                        </td>
                         <td class="small">@item.StartDateAndTime.ToShortDateString() kl. @item.StartDateAndTime.ToShortTimeString()</td>
                         @if (item.Divelocation != null)
                         {
@@ -70,16 +83,18 @@
                         @*<td>
                                 <input type="checkbox" asp-for="@item.IsFreeForDivepros" readonly disabled />
                             </td>*@
-                        <td class="small">
-                            @if (!item.IsCancelled)
-                            {
-                                <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />
-                            }
-                            else
-                            {
-                                <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
-                            }
-                        </td>
+                    <td class="small">
+                        @if (!item.IsCancelled)
+                        {
+                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@Model.ToString()"><i class="fas fa-trash-alt"></i></a>
+                            @*<a asp-action="Details" class="btn btn-outline-success text-success" asp-route-id="@Model"><i class="fas fa-list-alt"></i></a>
+                            <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />*@
+                        }
+                        else
+                        {
+                            <span class="text-danger"><i class="fas fa-ban"></i>&nbsp;Aflyst</span>
+                        }
+                    </td>
                     </tr>
                 }
             </tbody>

@@ -19,6 +19,7 @@ namespace ClubScansub.Data
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<UserCertificat> UserCertificates { get; set; }
         public DbSet<Divelocation> Divelocations { get; set; }
+        public DbSet<DivelocationImage> DivelocationImages { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventUser> EventUsers { get; set; }
@@ -127,6 +128,13 @@ namespace ClubScansub.Data
                 .HasOne(x => x.Divelocation)
                 .WithMany(x => x.Events)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Divelocation>()
+                .HasOne(x => x.Image)
+                .WithOne(x => x.Divelocation)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasForeignKey<DivelocationImage>(x => x.DivelocationId);
+                ;
 
         }
     }

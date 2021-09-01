@@ -26,11 +26,15 @@ namespace ClubScansub.Areas.Divepro.Controllers
         
         [TempData]
         public string StatusMessage { get; set; }
+
+        [TempData]
+        public int ActiveCourse { get; set; }
         
         public async Task<IActionResult> Index()
         {
             ViewBag.Pagetitle = "Kurser der mangler instruktøer";
             ViewBag.StatusMessage = StatusMessage;
+            ViewBag.ActiveCourse = ActiveCourse;
 
             var courses = await db.Courses
                 .Include(x => x.CourseSessions)
@@ -50,28 +54,30 @@ namespace ClubScansub.Areas.Divepro.Controllers
         }
 
         [Authorize(Roles = Userroles.Divepro)]
-        public async Task<IActionResult> Apply(int sessionid)
+        public async Task<IActionResult> Apply(int[] sessionid)
         {
-            var session = await db.CourseSessions
-                .Include(x => x.CourseSessionTemplate)
-                .Include(x => x.SessionInstructors)
-                .FirstOrDefaultAsync(x => x.Id == sessionid);
+            string sessionDescription = "Du har skrevet dig på som instruktør til : \n";
 
-            session.SessionInstructors.Add(new CourseSessionInstructor() { InstructorId = User.GetIdentityId() });
+            foreach (var item in sessionid)
+            {
 
-            //var sessioninstructor = new CourseSessionInstructor()
-            //{
-            //    CourseSessionId = sessionid,
-            //    InstructorId = User.GetIdentityId()
-            //};
+                var session = await db.CourseSessions
+                    .Include(x=>x.Course)
+                    .Include(x => x.CourseSessionTemplate)
+                    .Include(x => x.SessionInstructors)
+                    .FirstOrDefaultAsync(x => x.Id == item);
 
-            //db.CourseSessionInstructors.Add(sessioninstructor);
+                ActiveCourse = session.Course.Id;
+
+                session.SessionInstructors.Add(new CourseSessionInstructor() { InstructorId = User.GetIdentityId() });
+
+                var sessionText = session.CourseSessionTemplate != null ? session.CourseSessionTemplate.Name : session.SessionName;
+                    sessionDescription += $"{sessionText} d. {session.DateTime.ToString("dd. MMMM yyyy")} \n";
+
+            }
             await db.SaveChangesAsync();
 
-            var sessionDescription = session.CourseSessionTemplate != null ? session.CourseSessionTemplate.Name : session.SessionName;
-
-            StatusMessage = $"Du har skrevet dig på som instruktør til {sessionDescription} d. {session.DateTime.ToString("dd. MMMM yyyy")}";
-
+            StatusMessage = sessionDescription;
             return RedirectToAction(nameof(Index));
 
         }
@@ -81,21 +87,36 @@ namespace ClubScansub.Areas.Divepro.Controllers
         {
             var sessioninstructor = await db.CourseSessionInstructors.FindAsync(sessionid, instructorId);
             var instructor = await db.ApplicationUsers.FindAsync(instructorId);
+            var session = await db.CourseSessions.Include(x => x.CourseSessionTemplate).Include(x=>x.Course).FirstOrDefaultAsync(x => x.Id == sessionid);
+            sessioninstructor.InstructorApproved = !sessioninstructor.InstructorApproved;
+            ActiveCourse = session.Course.Id;
 
-            var session = await db.CourseSessions.Include(x => x.CourseSessionTemplate).FirstOrDefaultAsync(x => x.Id == sessionid);
-
-            sessioninstructor.InstructorApproved = true;
+            await db.SaveChangesAsync();
 
             if (instructor.PhoneNumberConfirmed)
             {
-                await smsSender.SendSmsAsync(instructor.PhoneNumber, $"Du har undervisning på kurset {session.SessionName} d. {session.DateTime}. Du kan se din fulde liste over dine kursusdage på klub-sitet under din profil - Min undervisningplan");
+                switch (sessioninstructor.InstructorApproved)
+                {
+                    case true:
+                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"Du har undervisning på kurset {session.SessionName} d. {session.DateTime}. Du kan se din fulde liste over dine kursusdage på klub-sitet under din profil - Min undervisningplan");
+                        break;
+                    case false:
+                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"Du er blevet fjernet som instruktør på kurset \n {session.SessionName}\n d. {session.DateTime}.\n Hvis dette er en fejl, bedes du kontakte Scansub DK Diver\n  Du kan se din fulde liste over dine kursusdage på klub-sitet under din profil - Min undervisningplan");
+                        break;
+                }
             }
-            else
+            else if (instructor.PhoneNumberConfirmed)
             {
-                StatusMessage = $"Du har aktiveret {instructor.Name} som instruktør på kurset {session.SessionName} d. {session.DateTime}, men vedkommende har ikke fået en SMS- Husk at give vedkommende besked";
+                switch (sessioninstructor.InstructorApproved)
+                {
+                    case true:
+                        StatusMessage = $"Du har aktiveret {instructor.Name} som instruktør på kurset {session.SessionName} d. {session.DateTime}, men vedkommende har ikke fået en SMS - Husk at give vedkommende besked";
+                        break;
+                    case false:
+                        StatusMessage = $"Du har deaktiveret {instructor.Name} som instruktør på kurset {session.SessionName} d. {session.DateTime}, men vedkommende har ikke fået en SMS - Husk at give vedkommende besked";
+                        break;
+                }
             }
-
-            await db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
 

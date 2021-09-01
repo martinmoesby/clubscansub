@@ -1,5 +1,6 @@
 ﻿using ClubScansub.Data;
 using ClubScansub.Service;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -84,6 +85,9 @@ namespace ClubScansub
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
             services.Configure<SmsOptions>(Configuration.GetSection("SMS"));
 
+            ImageOptions imgOptions = new ImageOptions();
+            Configuration.GetSection("ImageSettings").Bind(imgOptions);
+            services.AddSingleton<ImageOptions>(imgOptions);
 
             services.AddAuthentication()
                 .AddFacebook(options =>
@@ -102,7 +106,7 @@ namespace ClubScansub
                 // MvcOptions.EnableEndpointRouting = false
                 options.EnableEndpointRouting = false;
             });
-            services.AddApplicationInsightsTelemetry();
+            //services.AddApplicationInsightsTelemetry();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

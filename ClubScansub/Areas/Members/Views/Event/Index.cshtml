@@ -62,7 +62,7 @@
                 <div class="col-3 d-flex justify-content-end">
                     @{ if (item.Divelocation.Image != null)
                         {
-                            var imgSource = $"data:image;base64,{Convert.ToBase64String(item.Divelocation.Image)}";
+                            var imgSource = $"data:image;base64,{Convert.ToBase64String(item.Divelocation.Image.ImageData)}";
                         <img class="img-fluid rounded" src="@(imgSource)" alt="No image" style="height:120px" />
 
                         }

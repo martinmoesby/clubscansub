@@ -2,77 +2,126 @@
 @{
     ViewData["Title"] = "Kurser der mangler instruktører";
     var pageTitle = ViewData["Title"];
+    var activeCourse = ViewBag.ActiveCourse;
+    var courseIcon="";
+    var poolIcon = "fa-swimming-pool";
+    var openwaterIcon = "fa-water";
+    var academicIcon = "fa-chalkboard-teacher";
+
 }
 <partial name="_StatusMessage" model="@ViewBag.StatusMessage" />
-<div class="container">
+<div class="containerjustify-content-between align-content-center accordion" id="accordion">
 
     <partial name="_IndexPageHeaderPartialNoCreateButton" model="@pageTitle" />
     @foreach (var item in Model.Where(x => x.CourseSessions.Count > 0))
     {
-        <div class="container border bg-light mb-3">
+    <div class="container border bg-light mb-3">
 
-            <div class="row p-2 mb-2">
-                <h4>
-                    @if (item.InstructorsCovered)
+        <div class="row">
+            <div class="col-md-12 pt-2">
+                <a class="accordion-icon" data-toggle="collapse" data-target="@($"#course_{item.Id}")" aria-expanded="false" aria-controls="@($"#course_{item.Id}")">
+                    <h4>
+                        @if (item.InstructorsCovered)
                     {
-                        <span class="btn btn-outline-success" title="Instruktører OK"><i class="fas fa-thumbs-up"></i></span>
+                        <span class="btn btn-outline-success mr-2" title="Instruktører OK"><i class="fas fa-thumbs-up"></i></span>
                     }
                     else
                     {
-                        <span class="btn btn-outline-danger" title="Mangler instruktører"><i class="fas fa-thumbs-down"></i></span>
+                        <span class="btn btn-outline-danger mr-2" title="Mangler instruktører"><i class="fas fa-thumbs-down"></i></span>
                     }
-                    @(item.CourseName) d. @(item.StartDateAndTime.ToString("dd-MM-yyyy"))
-                </h4>
+                        @(item.CourseName) d. @(item.StartDateAndTime.ToString("dd-MM-yyyy"))
+                        <span class="float-right"><i class="fas fa-angle-down"></i></span>
+                    </h4>
+                </a>
             </div>
-            <div class="row">
-                <div class="card w-25">
-                    <div class="card-header">Elever:</div>
-                    <div class="card-body">
-                        <p class="card-title">Skrevet op :</p>
-                        @foreach (var signup in item.Signups)
+        </div>
+        <div class="row collapse @(item.Id == activeCourse ? "show" : "")" data-parent="#accordion" id="@($"course_{item.Id}")">
+            <div class="card w-25">
+                <div class="card-header">Elever:</div>
+                <div class="card-body">
+                    <p class="card-title">Skrevet op :</p>
+                    @foreach (var signup in item.Signups)
                         {
-                            <div class="alert alert-info small">@signup.ApplicationUser.Name</div>
+                    <div class="alert alert-info small">@signup.ApplicationUser.Name</div>
                         }
-                        <p class="card-title">Tilmeldt :</p>
-                        @foreach (var participant in item.Participants)
+                    <p class="card-title">Tilmeldt :</p>
+                    @foreach (var participant in item.Participants)
                         {
-                            <div class="alert alert-info small">@participant.ApplicationUser.Name</div>
+                    <div class="alert alert-info small">@participant.ApplicationUser.Name</div>
                         }
-                    </div>
                 </div>
+            </div>
 
-                <div class="card w-75">
-                    <div class="card-header">Instruktører</div>
-                    <div class="card-body">
+            <div class="card w-75">
+                <div class="card-header">Kursus dage</div>
+                <div class="card-body">
+                    <form asp-action="apply" method="POST">
+
                         @foreach (var session in item.CourseSessions)
                         {
-                            <div class="row">
+
+                            if (session.Sessiontype == CourseSessionTypeEnum.AcademicSession) { courseIcon=academicIcon; }
+                            if (session.Sessiontype == CourseSessionTypeEnum.PoolSession) { courseIcon=poolIcon;}
+                            if (session.Sessiontype == CourseSessionTypeEnum.OpenWaterSession) { courseIcon=openwaterIcon;}
+
+                            <div class="row py-3 mb-1 border-info border-bottom">
+                                <div class="col-1">
+                                    <i class="h2 text-info fas @courseIcon"></i>
+                                </div>
                                 <div class="col-11">
-                                    <p>@session.DateTime.ToString("dd. MMMM yyyy kl. HH:mm") : <strong>@(!string.IsNullOrEmpty(session.SessionDescription) ? session.SessionDescription : session.CourseSessionTemplate!= null ? session.CourseSessionTemplate.Description : "Ingen beskrivelse af sessionen")</strong>
-                                    </p>
-                                </div>
-                                <div class="col-1 text-right">
-                                    @if (session.SessionInstructors.Select(x => x.Instructor.Id).Contains(User.GetIdentityId()))
-                                    {
-                                        <span class="btn btn-outline-info btn-sm" title="Du har skrevet dog på til dette kursus"><i class="far fa-calendar-check"></i></span>
-                                    }
-                                    else
-                                    {
-                                        <a asp-action="Apply" asp-route-sessionid="@session.Id" class="btn btn-outline-success btn-sm" title="Ja tak, jeg vil gerne undervise"><i class="fas fa-thumbs-up"></i></a>
-                                    }
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="lead">
+                                                @session.DateTime.ToString("dd. MMMM yyyy kl. HH:mm"):
+                                            </p>
+                                            <p>
+                                                @(!string.IsNullOrEmpty(session.SessionDescription) ? session.SessionDescription : session.CourseSessionTemplate!= null ? session.CourseSessionTemplate.Description : "Ingen beskrivelse af sessionen")
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <small>
+                                                <partial name="_InstructorSignups" model="session.SessionInstructors" />
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="row ">
+                                        <div class="col">
+                                            @if (session.SessionInstructors.Select(x => x.Instructor.Id).Contains(User.GetIdentityId()))
+                                            {
+                                            @if (session.SessionInstructors.FirstOrDefault(x => x.InstructorId == User.GetIdentityId()).InstructorApproved)
+                                                {
+                                            <span title="Du er sat på som instruktør" class="alert alert-success small text-sm-right"><i class="fas fa-thumbs-up mr-2"></i>Du skal undervise</span>
+                                                }
+                                                else
+                                                {
+                                            <span title="Du er tilmeldt som instrktør" class="alert alert-info small text-sm-right"><i class="fas fa-thumbtack mr-2"></i>Afventer...</span>
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                            <input type="checkbox" value="@session.Id" name="sessionid" id="@session.Id" class="btn btn-outline-success btn-sm mr-2" title="Ja tak, jeg vil gerne undervise" />
+                                            <label for="@session.Id" class="text-success">Ja - jeg kan godt undervise denne dag</label>
+                                            }
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <small>
-                                        <partial name="_InstructorSignups" model="session.SessionInstructors" />
-                                    </small>
-                                </div>
-                            </div>
+
                         }
-                    </div>
+                        <div class="row pt-3">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Ja tak, jeg vil gerne undervise"><i class="fas fa-thumbs-up mr-2"></i>Send tilmelding</button>
+                                @*<a asp-action="Apply" asp-route-sessionid="@session.Id" class="btn btn-outline-success btn-sm" title="Ja tak, jeg vil gerne undervise"><i class="fas fa-thumbs-up"></i></a>*@
+                            </div>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
         </div>
+    </div>
     }
 </div>

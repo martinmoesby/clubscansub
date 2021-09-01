@@ -1,4 +1,4 @@
-﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+﻿@*@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet*@
 @using ClubScansub.Utility;
 @inject ClubScansub.Data.ApplicationDbContext db
 
@@ -27,7 +27,7 @@
     <script src="https://kit.fontawesome.com/1138205eac.js" crossorigin="anonymous"></script>
     <link href="~/lib/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
-    @Html.Raw(JavaScriptSnippet.FullScript)
+    @*@Html.Raw(JavaScriptSnippet.FullScript)*@
 </head>
 <body>
     <header>
