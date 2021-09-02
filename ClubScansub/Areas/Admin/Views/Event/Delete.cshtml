@@ -21,11 +21,11 @@
         <div class="row mb-3 border rounded box-shadow p-3 d-flex justify-content-between">
             <div class="p-3 col-3">
                 <h2>
-                    @if (Model.Participants.Count == 0)
+                    @if (Model.Participants?.Count == 0)
                     {
                         <i class="fas fa-users text-danger" title="Ingen tilmeldte"></i>
                     }
-                    else if (Model.Participants.Count < Model.MinParticipants)
+                    else if (Model.Participants?.Count < Model.MinParticipants)
                     {
                         <i class="fas fa-user-friends text-warning" title="Ikke nok tilmeldte"></i>
                     }
