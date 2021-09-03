@@ -18,12 +18,13 @@ namespace ClubScansub.Areas.Admin.Controllers
         public TemplateController(ApplicationDbContext db)
             :base(db)
         {
-
+            Certificates = db.Certificates.Where(x => x.IsDiveproCertificate).ToList();
         }
+
         public async Task<IActionResult> Index()
         {
 
-            var templates = await db.CourseTemplates.Include(x => x.Sessions).ToListAsync();
+            var templates = await db.CourseTemplates.Include(x => x.Sessions).Include(x=>x.InstructorCertificate).ToListAsync();
 
             return View(templates);
 
@@ -31,6 +32,9 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [BindProperty]
         public CourseTemplate CourseTemplate { get; set; }
+
+        [BindProperty]
+        public List<Certificate> Certificates { get; set; }
 
         [BindProperty]
         public CreateCourseSessionTemplateViewModel SessionTemplateVM { get; set; }
@@ -42,13 +46,18 @@ namespace ClubScansub.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new CourseTemplate());
+            Certificates = db.Certificates.Where(x => x.IsDiveproCertificate).ToList();
+
+            ViewData["Certificates"] = Certificates.Select(x => new SelectListItem() { Value = x.Id.ToString(), Text = x.ShortName }).ToList();
+
+            return View(new CourseTemplate() { InstructorCertificate = new Certificate() });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CourseTemplate model)
+        public async Task<IActionResult> Create(CourseTemplate model, int InstructorCerfificateId)
         {
+
 
             if (!ModelState.IsValid)
                 return View();
@@ -63,6 +72,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                     model.Image = ms.ToArray();
                 }
             }
+            var certificate = await db.Certificates.FindAsync(InstructorCerfificateId);
+            model.InstructorCertificate = certificate;
 
             db.CourseTemplates.Add(model);
 
@@ -80,11 +91,16 @@ namespace ClubScansub.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            Certificates = db.Certificates.Where(x => x.IsDiveproCertificate).ToList();
+
             var template = await db.CourseTemplates
                 .Include(x=>x.Sessions)
                 .ThenInclude(x=>x.Address)
+                .Include(x=>x.InstructorCertificate)
                 .FirstOrDefaultAsync(x=>x.Id ==id);
             template.Sessions.OrderBy(x => x.SessionNumber);
+
+            ViewData["Certificates"] = Certificates.Select(x=> new SelectListItem() { Value = x.Id.ToString(), Text = x.ShortName }).ToList();
 
             return View(template);
         }
@@ -94,6 +110,8 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTemplate(CourseTemplate template)
         {
+            var certificate = await db.Certificates.FindAsync(template.InstructorCertificate.Id);
+            template.InstructorCertificate = certificate;
 
             db.Entry(template).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             var files = HttpContext.Request.Form.Files;

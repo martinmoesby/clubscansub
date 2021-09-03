@@ -1,6 +1,7 @@
 ﻿@model CourseTemplate
 @{
     ViewData["Title"] = "Rediger kursus skabelon";
+    List<SelectListItem> proCertificates = (List<SelectListItem>)ViewData["Certificates"];
 }
 
 <div class="container">
@@ -28,6 +29,18 @@
                 <span asp-validation-for="TemplateDurationInWeeks"></span>
             </div>
         </div>
+        
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="InstructorCertificate"></label>
+                <select class="form-control form-control-sm" asp-for="InstructorCertificate.Id" asp-items="proCertificates">
+                    <option value="0">Vælg krævet Pro certificat</option>
+                </select>
+                <span asp-validation-for="InstructorCertificate"></span>
+            </div>
+
+        </div>
 
         <div class="row">
 
@@ -38,16 +51,16 @@
             </div>
 
 
-                <div class="col-3 form-group form-group-sm">
-                    <label class="col-form-label form-control-sm" asp-for="MinStudents"></label>
-                    <input class="form-control form-control-sm" type="number" asp-for="MinStudents" />
-                    <span asp-validation-for="MinStudents"></span>
-                </div>
-                <div class="col-3 form-group form-group-sm">
-                    <label class="col-form-label form-control-sm" asp-for="MaxStudents"></label>
-                    <input class="form-control form-control-sm" type="number" asp-for="MaxStudents" />
-                    <span asp-validation-for="MaxStudents"></span>
-                </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="MinStudents"></label>
+                <input class="form-control form-control-sm" type="number" asp-for="MinStudents" />
+                <span asp-validation-for="MinStudents"></span>
+            </div>
+            <div class="col-3 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="MaxStudents"></label>
+                <input class="form-control form-control-sm" type="number" asp-for="MaxStudents" />
+                <span asp-validation-for="MaxStudents"></span>
+            </div>
 
 
         </div>
@@ -63,7 +76,7 @@
                 @{if (Model.Image != null)
                     {
                         var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Image)}";
-                        <img class="img-fluid rounded" src="@(imgSource)" alt=""  style="height:192px;"/>
+                        <img class="img-fluid rounded" src="@(imgSource)" alt="" style="height:192px;" />
                     }
                     else
                     {

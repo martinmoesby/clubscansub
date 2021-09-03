@@ -43,6 +43,9 @@ namespace ClubScansub.Models
         
         [Display(Name = "Billede")]
         public byte[] Image { get; set; }
+
+        [Display(Name = "Krævet Instruktør certifikat")]
+        public Certificate InstructorCertificate { get; set; }
         ////public virtual Club Club { get; set; }
         //public virtual ICollection<Course> Courses { get; set; }
     }
