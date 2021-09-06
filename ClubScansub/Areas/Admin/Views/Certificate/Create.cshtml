@@ -1,7 +1,6 @@
 ﻿@model Certificate
 @{
     ViewData["Title"] = "Create";
-    List<ApplicationUser> instructors = (List<ApplicationUser>)ViewData["Divepros"];
 }
 
 <div class="container">
@@ -61,7 +60,7 @@
             </div>
         </div>
 
-        <div class="row d-flex">
+        @*<div class="row d-flex">
             @foreach (var item in instructors)
             {
                 <div class="col4">
@@ -69,7 +68,7 @@
                     <label asp-for="@item.Id">@item.Name</label>
                 </div>
             }
-        </div>
+        </div>*@
 
         <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
     </form>

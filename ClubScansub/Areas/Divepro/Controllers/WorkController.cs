@@ -36,6 +36,11 @@ namespace ClubScansub.Areas.Divepro.Controllers
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.ActiveCourse = ActiveCourse;
 
+            var myProCerts = db.UserCertificates
+                .Include(x => x.User)
+                .Include(x=>x.Certificate)
+                .Where(x => x.User.Id == User.GetIdentityId() && x.Certificate.IsDiveproCertificate == true);
+
             var courses = await db.Courses
                 .Include(x => x.CourseSessions)
                     .ThenInclude(x => x.SessionInstructors)
@@ -46,7 +51,9 @@ namespace ClubScansub.Areas.Divepro.Controllers
                     .ThenInclude(x=>x.ApplicationUser)
                 .Include(x=>x.Participants)
                     .ThenInclude(x => x.ApplicationUser)
-                .Where(x => x.StartDateAndTime > DateTime.Now)
+                .Include(x=>x.CourseTemplate)
+                    .ThenInclude(x=>x.InstructorCertificate)
+                .Where(x => x.StartDateAndTime > DateTime.Now &&  myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id))
                 .OrderBy(x=>x.StartDateAndTime)
                 .ToListAsync();
 

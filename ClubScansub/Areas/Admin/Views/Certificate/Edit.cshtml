@@ -1,6 +1,7 @@
 ﻿@model Certificate
 @{
     ViewData["Title"] = "Edit";
+    List<UserCertificat> assigned = (List<UserCertificat>)ViewData["AssignedDivepros"];
     List<ApplicationUser> instructors = (List<ApplicationUser>)ViewData["Divepros"];
 }
 
@@ -73,7 +74,7 @@
                         <div class="card-body">
                             <ul class="list-group pb-5" style="min-height:20px;" ondrop="dragDropRemove(event)" ondragover="allowDrop(event)">
 
-                                @foreach (var item in instructors)
+                                @foreach (var item in instructors.Where(x=> !assigned.Any(y => y.User.Id == x.Id)))
                                 {
                                     <li class="list-group-item" id="@item.Id" draggable="true" ondragstart="dragStart(event)">@item.Name</li>
                                 }
@@ -88,6 +89,10 @@
                         <div class="card-header">Aktive instruktører til dette certifikat</div>
                         <div class="card-body" placeholder="Træk instruktører der har dette certifikat her til">
                             <ul class="list-group pb-5" ondrop="dragDropAdd(event)" style="min-height:20px;" ondragover="allowDrop(event)">
+                                @foreach (var item in assigned)
+                                {
+                                    <li class="list-group-item" id="@item.User.Id" draggable="true" ondragstart="dragStart(event)">@item.User.Name</li>
+                                }
                             </ul>
                         </div>
                     </section>

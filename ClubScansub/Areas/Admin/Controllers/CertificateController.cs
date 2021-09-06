@@ -24,10 +24,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         [BindProperty]
         public Certificate Certificate { get; set; }
-        
-        [BindProperty]
-        public List<ApplicationUser> Divepros { get; set; }
-        
+
         public async Task<IActionResult> Index()
         {
             var certificates = await db.Certificates.Include(x => x.Diveorgs).ThenInclude(x => x.Diveorg).ToListAsync();
@@ -37,14 +34,9 @@ namespace ClubScansub.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             Certificate = new Certificate();
-            var users = (await um.GetUsersInRoleAsync("Divepro"));
-            Divepros = await db.ApplicationUsers.Where(x => users.Any(s => x.Id == s.Id)).ToListAsync();
-
-            ViewData["Divepros"] = Divepros;
-
             return View(Certificate);
         }
 
@@ -83,9 +75,8 @@ namespace ClubScansub.Areas.Admin.Controllers
             Certificate = await db.Certificates.Include(x=>x.UserCertificate).ThenInclude(x=>x.User).SingleOrDefaultAsync(x=>x.Id == orgId);
 
             var members = (await um.GetUsersInRoleAsync("Divepro")).Select(x=>x.Id);
-            var pros = await db.ApplicationUsers.Where(x => members.Contains(x.Id)).ToListAsync();
-
-            ViewData["Divepros"] = pros;
+            ViewData["Divepros"] =  await db.ApplicationUsers.Where(x => members.Contains(x.Id)).ToListAsync();
+            ViewData["AssignedDivepros"] = Certificate.UserCertificate.ToList();
 
             return View(Certificate);
 

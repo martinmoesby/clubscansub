@@ -24,7 +24,10 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var templates = await db.CourseTemplates.Include(x => x.Sessions).Include(x=>x.InstructorCertificate).ToListAsync();
+            var templates = await db.CourseTemplates
+                .Include(x => x.Sessions)
+                .Include(x=>x.InstructorCertificate)
+                .ToListAsync();
 
             return View(templates);
 
