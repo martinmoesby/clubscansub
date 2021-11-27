@@ -271,21 +271,20 @@ namespace ClubScansub.Areas.Admin.Controllers
                     invoiceNumber = x.InvoiceNumber ?? "",
                 });
 
-            //var jsonSerializerSettings =  new Newtonsoft.Json.JsonSerializerSettings()
+            //var jsonSerializerSettings = new Newtonsoft.Json.JsonSerializerSettings()
             //{
             //    Formatting = Formatting.Indented,
             //    DateFormatString = "yyyy-MM-dd"
-            //});
+            //};
 
-            var jsonSerializerSettings = new System.Text.Json.JsonSerializerOptions()
-            {
-                //WriteIndented = true,
-               
-            };
+            //var jsonSerializerSettings = new System.Text.Json.JsonSerializerOptions()
+            //{
+            //    //WriteIndented = true,
+            //};
 
-            var result = Json(transactions, jsonSerializerSettings);
+            //var result = Json(transactions, jsonSerializerSettings);
 
-            return new JsonResult(transactions, jsonSerializerSettings);
+            return new JsonResult(transactions);
 
 
             //return JsonConvert.SerializeObject(transactions, Formatting.Indented);

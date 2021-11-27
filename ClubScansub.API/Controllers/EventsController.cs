@@ -60,13 +60,24 @@ namespace ClubScansub.API
 
                 if (userManager.GetUserId(User) != null)
                 {
-                    user = await db.ApplicationUsers
-                        .Include(x => x.Events)
-                        .Include(x => x.AccountTransactions)
-                        .SingleAsync(x => x.Id == userManager.GetUserId(User));
-                    balance = user.Balance;
-                    isSignedIn = true;
-                    userevents = user.Events;
+                    try
+                    {
+                        user = await db.ApplicationUsers
+                            .Include(x => x.Events)
+                            .Include(x => x.AccountTransactions)
+                            .SingleAsync(x => x.Id == userManager.GetUserId(User));
+                        balance = user.Balance;
+                        isSignedIn = true;
+                        userevents = user.Events;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write(ex.Message);
+                        Console.Write(ex.StackTrace);
+                        //return null;
+                        //throw;
+                    }
                 }
             }
 
