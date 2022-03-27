@@ -199,6 +199,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 sessiontemplate.DefaultStartTime = SessionTemplateVM.SessionTemplate.DefaultStartTime;
                 sessiontemplate.DefaultWeekday = SessionTemplateVM.SessionTemplate.DefaultWeekday;
                 sessiontemplate.UseDefaultWeekDay = SessionTemplateVM.SessionTemplate.UseDefaultWeekDay;
+                sessiontemplate.InstructorRatio = SessionTemplateVM.SessionTemplate.InstructorRatio;
                 sessiontemplate.Address = address;
             }
             else

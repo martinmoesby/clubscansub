@@ -1,0 +1,106 @@
+﻿@model IEnumerable<CourseSession>
+@*
+
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+    ViewData["Title"] = "Kurser der mangler instruktører";
+    var pageTitle = ViewData["Title"];
+    var activeCourse = ViewBag.ActiveCourse;
+    var courseIcon = "";
+    var poolIcon = "fa-swimming-pool";
+    var openwaterIcon = "fa-water";
+    var academicIcon = "fa-chalkboard-teacher";
+    var getDate = DateTime.Now;
+
+    var firstDayOfTheMonth = new DateTime(getDate.Year, getDate.Month, 1);
+    var lastDayOfTheMonth = firstDayOfTheMonth.AddMonths(1).AddDays(-1);
+
+    var numberOfDays = Convert.ToInt16(lastDayOfTheMonth.ToString("dd"));
+    DateTime startDate = firstDayOfTheMonth.AddDays(-(int)firstDayOfTheMonth.DayOfWeek);
+
+}
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-8 h4 display-4">@getDate.ToString("MMMM")</div>
+        <div class="col-4"></div>
+    </div>
+
+    <div class="row border-bottom border-primary">
+        <div class="col">Mandag</div>
+        <div class="col">Tirsdag</div>
+        <div class="col">Onsdag</div>
+        <div class="col">Torsdag</div>
+        <div class="col">Fredag</div>
+        <div class="col">Lørdag</div>
+        <div class="col">Søndag</div>
+    </div>
+
+    <div class="row">
+        @for (int i = 0; i < 42; i++)
+        {
+            DateTime date = startDate.AddDays(i);
+            if (i % 7 == 0 && i > 0)
+            {
+            @:</div><div class="row">
+                // start a new row every 7 days
+            }
+            <div class="col border-bottom">
+                @if (date.Month == getDate.Month)
+                {
+                    <span class="text-black-50 text-right">@date.ToString("M")</span>
+                }
+                @{
+                    var daysCOurses = Model.Where(x => x.DateTime.Day == date.Day);
+
+                    foreach (var item in daysCOurses)
+                    {
+                        
+                        <div class="row border rounded m-1">
+
+                            <div class="col-12 text-secondary">
+                                @item.Course.CourseName
+                            </div>
+
+                            <div class="col-12 small">
+                                @if (!item.SessionInstructors.Any(x => x.InstructorId == User.GetIdentityId()))
+                                {
+                                    <button class="btn btn-sm btn-secondary"><i class="fas fa-thumbs-up mr-1"></i></button>
+                                }
+                                @item.SessionName
+
+
+                                @foreach (var instructor in item.SessionInstructors)
+                                {
+                                    <div class="row">
+                                        <div class="col-2">
+                                            @if (User.IsInRole("Administrator"))
+                                                if (!instructor.InstructorApproved)
+                                                {
+                                                    <button class="btn btn-sm btn-outline-success border-0" onclick="@Url.Action("Approve", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })"><i class="fas fa-check"></i></button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sm btn-outline-danger border-0" onclick="@Url.Action("Remove", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })"><i class="fas fa-trash"></i></button>
+                                                }
+                                        </div>
+                                        <div class="col-8 @(instructor.InstructorApproved ? "text-success" : "text-warning")">
+                                            @instructor.Instructor.Name
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            </div>
+                    }
+
+                }
+            </div>
+        }
+    </div>
+
+
+</div>

@@ -21,14 +21,14 @@
             <div class="col-md-12 pt-2">
                 <a class="accordion-icon" data-toggle="collapse" data-target="@($"#course_{item.Id}")" aria-expanded="false" aria-controls="@($"#course_{item.Id}")">
                     <h4>
-                        @if (item.InstructorsCovered)
+                    @*    @if (item.InstructorsCovered)
                     {
                         <span class="btn btn-outline-success mr-2" title="Instruktører OK"><i class="fas fa-thumbs-up"></i></span>
                     }
                     else
                     {
                         <span class="btn btn-outline-danger mr-2" title="Mangler instruktører"><i class="fas fa-thumbs-down"></i></span>
-                    }
+                    }*@
                         @(item.CourseName) d. @(item.StartDateAndTime.ToString("dd-MM-yyyy"))
                         <span class="float-right"><i class="fas fa-angle-down"></i></span>
                     </h4>
@@ -67,6 +67,8 @@
                             <div class="row py-3 mb-1 border-info border-bottom">
                                 <div class="col-1">
                                     <i class="h2 text-info fas @courseIcon"></i>
+                                    <i class="fas fa-chalkboard-teacher text-secondary mr-1 mt-4" title="Instruktører krævet"></i>@(session.InstructorsMissing)
+                                    
                                 </div>
                                 <div class="col-11">
                                     <div class="row">

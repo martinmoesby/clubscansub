@@ -16,20 +16,24 @@
                 @if (User.IsInRole(Userroles.Administrator) || User.IsInRole(Userroles.Owner))
                 {
                         <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" asp-area="Divepro" asp-controller="Work"
-                           class="rounded-circle bg-primary text-center text-light btn btn-sm pt-2" title="@appUser.Name" style="height:40px; width:40px;">
+                           class="rounded-circle bg-secondary text-center text-light btn btn-sm pt-2" title="@appUser.Name" style="height:40px; width:40px;">
                             <span>@appUser.Initials</span>
                         </a>
                 }
                 else
                 {
-                        <span class="rounded-circle bg-primary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
+                        <span class="rounded-circle bg-secondary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
                 }
 
                 if (item.InstructorApproved)
                 {
-                    <i class="fas fa-check text-success position-relative h4" style="left:-25px;top:10px;width:0px;"></i>
+                    <i class="fas fa-check text-success position-relative h4" style="left:-15px;top:20px;width:0px;"></i>
                 }
 
+                if (item.InstructorRetracted)
+                {
+                    <i class="fas fa-times text-danger position-relative h4" style="left:-15px;top:20px;width:0px;"></i>
+                }
             }
 
 

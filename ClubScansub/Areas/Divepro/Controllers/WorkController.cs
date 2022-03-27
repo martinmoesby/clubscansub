@@ -8,6 +8,7 @@ using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,11 +18,15 @@ namespace ClubScansub.Areas.Divepro.Controllers
     public class WorkController : BaseDiveproController
     {
         private ISmsSender smsSender;
+        private UserManager<IdentityUser> userManager;
 
-        public WorkController(ApplicationDbContext db, ISmsSender smsSender)
+        public WorkController(ApplicationDbContext db, ISmsSender smsSender, UserManager<IdentityUser> userManager)
             : base(db)
         {
             this.smsSender = smsSender;
+            this.userManager = userManager; 
+            CurrentMonth = DateTime.Now.Month;
+            CurrentYear = DateTime.Now.Year;
         }
         
         [TempData]
@@ -30,6 +35,12 @@ namespace ClubScansub.Areas.Divepro.Controllers
         [TempData]
         public int ActiveCourse { get; set; }
         
+        [TempData]
+        public int CurrentMonth { get; set; }
+
+        [TempData]
+        public int CurrentYear { get; set; }
+
         public async Task<IActionResult> Index()
         {
             ViewBag.Pagetitle = "Kurser der mangler instruktøer";
@@ -53,8 +64,36 @@ namespace ClubScansub.Areas.Divepro.Controllers
                     .ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.CourseTemplate)
                     .ThenInclude(x=>x.InstructorCertificate)
-                .Where(x => x.StartDateAndTime > DateTime.Now &&  myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id))
+                .Where(x => x.StartDateAndTime > DateTime.Now && myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id))
                 .OrderBy(x=>x.StartDateAndTime)
+                .ToListAsync();
+
+            return View(courses);
+        }
+
+        public async Task<IActionResult> Workcalendar()
+        {
+            ViewBag.Pagetitle = "Kurser der mangler instruktøer";
+            ViewBag.StatusMessage = StatusMessage;
+            ViewBag.ActiveCourse = ActiveCourse;
+
+            var myProCerts = db.UserCertificates
+                .Include(x => x.User)
+                .Include(x => x.Certificate)
+                .Where(x => x.User.Id == User.GetIdentityId() && x.Certificate.IsDiveproCertificate == true);
+
+            var courses = await db.CourseSessions
+                .Include(x => x.SessionInstructors)
+                        .ThenInclude(x => x.Instructor)
+                .Include(x => x.CourseSessionTemplate)
+                .Include(x=>x.Course)
+                    .ThenInclude(x => x.Signups)
+                    .ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.Course)
+                    .ThenInclude(x => x.CourseTemplate)
+                        .ThenInclude(x => x.InstructorCertificate)
+                .Where(x => x.DateTime.Month == CurrentMonth && x.DateTime.Year == CurrentYear && myProCerts.Any(y => y.Certificate.Id == x.Course.CourseTemplate.InstructorCertificate.Id))
+                .AsNoTracking()
                 .ToListAsync();
 
             return View(courses);
@@ -63,7 +102,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
         [Authorize(Roles = Userroles.Divepro)]
         public async Task<IActionResult> Apply(int[] sessionid)
         {
-            string sessionDescription = "Du har skrevet dig på som instruktør til : \n";
+            string sessionDescription = "Du har skrevet dig på som instruktør til: \n";
 
             foreach (var item in sessionid)
             {
@@ -88,6 +127,34 @@ namespace ClubScansub.Areas.Divepro.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
+        [Authorize(Roles = Userroles.Divepro)]
+        public async Task<IActionResult> Retract(int sessionid)
+        {
+            var userId = User.GetIdentityId();
+            var user = await db.ApplicationUsers.FindAsync(userId);
+
+            var sessionInstructor = await db.CourseSessionInstructors
+                .Include(x=>x.CourseSession).ThenInclude(x=>x.Course)
+                .Include(x => x.CourseSession).ThenInclude(x => x.CourseSessionTemplate)
+                .Where(x => x.InstructorId == userId && x.CourseSessionId == sessionid).FirstOrDefaultAsync();
+            sessionInstructor.InstructorRetracted = true;
+
+            var sessionText = $"'{sessionInstructor.CourseSession.CourseSessionTemplate.Description}'";
+            var sessionDescription = $"Du har afmeldt dig til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n";
+
+            await db.SaveChangesAsync();
+
+            StatusMessage = sessionDescription;
+
+            var admins = await userManager.GetUsersInRoleAsync("Administrator");
+           
+            await smsSender.SendMultipleSmsAsync(admins, $"{user.Name } har meldt fra som instruktør til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n");
+
+            return RedirectToAction(nameof(MyWorkplan));
+
+        }
+
 
         [Authorize(Roles = Userroles.Administrator + ", " + Userroles.Owner)]
         public async Task<IActionResult> Approve(int sessionid, string instructorId)
