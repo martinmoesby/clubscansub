@@ -24,7 +24,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
             : base(db)
         {
             this.smsSender = smsSender;
-            this.userManager = userManager; 
+            this.userManager = userManager;
             CurrentMonth = DateTime.Now.Month;
             CurrentYear = DateTime.Now.Year;
         }
@@ -34,7 +34,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
 
         [TempData]
         public int ActiveCourse { get; set; }
-        
+
         [TempData]
         public int CurrentMonth { get; set; }
 
@@ -71,11 +71,27 @@ namespace ClubScansub.Areas.Divepro.Controllers
             return View(courses);
         }
 
-        public async Task<IActionResult> Workcalendar()
+        public async Task<IActionResult> Workcalendar(int offset = 0)
         {
-            ViewBag.Pagetitle = "Kurser der mangler instruktøer";
+            ViewBag.Pagetitle = "Kurser der mangler instruktører";
+            CurrentMonth += offset;
+            if (CurrentMonth < 1)
+            {
+                CurrentMonth = 12;
+                CurrentYear--;
+            }
+
+            if (CurrentMonth> 12)
+            {
+                CurrentMonth = 1;
+                CurrentYear++;
+
+            }
+
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.ActiveCourse = ActiveCourse;
+            ViewBag.CurrentMonth = CurrentMonth;
+            ViewBag.CurrentYear = CurrentYear;
 
             var myProCerts = db.UserCertificates
                 .Include(x => x.User)
@@ -126,6 +142,30 @@ namespace ClubScansub.Areas.Divepro.Controllers
             StatusMessage = sessionDescription;
             return RedirectToAction(nameof(Index));
 
+        }
+
+        [Authorize(Roles =Userroles.Divepro)]
+
+        public async Task<IActionResult> ApplySingle(int sessionId)
+        {
+            string sessionDescription = "Du har skrevet dig på som instruktør til: \n";
+
+            var session = await db.CourseSessions
+                    .Include(x => x.Course)
+                    .Include(x => x.CourseSessionTemplate)
+                    .Include(x => x.SessionInstructors)
+                    .FirstOrDefaultAsync(x => x.Id == sessionId);
+
+            ActiveCourse = session.Course.Id;
+
+            session.SessionInstructors.Add(new CourseSessionInstructor() { InstructorId = User.GetIdentityId() });
+            await db.SaveChangesAsync();
+
+            var sessionText = session.CourseSessionTemplate != null ? session.CourseSessionTemplate.Name : session.SessionName;
+            sessionDescription += $"{sessionText} d. {session.DateTime.ToString("dd. MMMM yyyy")} \n";
+
+            StatusMessage = sessionDescription;
+            return RedirectToAction(nameof(Workcalendar));
         }
 
         [Authorize(Roles = Userroles.Divepro)]

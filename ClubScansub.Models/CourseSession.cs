@@ -37,7 +37,7 @@ namespace ClubScansub.Models
                 {
                     var students = Course.Participants.Count;
 
-                    if (CourseSessionTemplate.InstructorRatio > 0)
+                    if (CourseSessionTemplate?.InstructorRatio > 0)
                         return (students / CourseSessionTemplate.InstructorRatio) + 1;
 
                     switch (Sessiontype)
