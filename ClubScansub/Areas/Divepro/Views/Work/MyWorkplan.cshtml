@@ -15,12 +15,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th style="width:120px;">Kursus</th>
-                    <th style="width:120px">Type</th>
+                    <th style="width:80px;">Kursus</th>
+                    <th style="width:80px">Type</th>
                     <th style="width:200px;">Session</th>
                     <th style="width:80px;">Dato</th>
                     <th style="width:40px;">Start</th>
                     <th style="width:40px;">Slut</th>
+                    <th style="width:40px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -33,6 +34,7 @@
                         <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
                         <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
                         <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.Duration != null ? item.CourseSession.Duration : (item.CourseSession.CourseSessionTemplate?.DefaultDuration).GetValueOrDefault()).ToString("HH:mm")</td>
+                        <td>&nbsp;</td>
                     </tr>
                 }
             </tbody>
@@ -44,12 +46,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th style="width:120px;">Kursus</th>
-                    <th style="width:10px">Type</th>
+                    <th style="width:80px;">Kursus</th>
+                    <th style="width:80px">Type</th>
                     <th style="width:200px;">Session</th>
                     <th style="width:80px;">Dato</th>
                     <th style="width:40px;">Start</th>
                     <th style="width:40px;">Slut</th>
+                    <th style="width:40px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -58,10 +61,23 @@
                 <tr>
                     <td class="small">@item.CourseSession.Course.CourseName</td>
                     <td class="small">@item.CourseSession.Sessiontype</td>
-                    <td class="small">@(string.IsNullOrEmpty(item.CourseSession.SessionDescription) ? item.CourseSession.CourseSessionTemplate?.Description : item.CourseSession.SessionDescription)</td>
+                    <td class="small">@(string.IsNullOrEmpty(item.CourseSession.SessionDescription) ? item.CourseSession.CourseSessionTemplate?.Name : item.CourseSession.SessionDescription)</td>
                     <td class="small">@item.CourseSession.DateTime.ToString("dd. MMMM yyyy")</td>
                     <td class="small">@item.CourseSession.DateTime.ToString("HH:mm")</td>
                     <td class="small">@item.CourseSession.DateTime.Add(item.CourseSession.Duration != null ? item.CourseSession.Duration : (item.CourseSession.CourseSessionTemplate?.DefaultDuration).GetValueOrDefault()).ToString("HH:mm")</td>
+                    <td class="small">
+                            @{
+                                if (item.InstructorRetracted)
+                                {
+                                    <span class="border rounded-circle text-success btn border-success"><i class="fas fa-times" title="DU har afmeldt din tilmelding"></i></span>
+                                }  
+                                else 
+                                {
+                                    <a asp-action="Retract" asp-route-sessionId="@item.CourseSessionId" class="border rounded-circle text-danger btn border-danger"><i class="fas fa-undo" title="Afmeld som instruktør"></i></a>
+                                }
+                             }
+
+                    </td>
                 </tr>
                 }
             </tbody>

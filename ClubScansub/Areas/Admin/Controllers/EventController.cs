@@ -132,8 +132,9 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             var eventItem = await db.Events
                 .Include(x => x.Participants)
-                    .ThenInclude(x => x.ApplicationUser)
+                   .ThenInclude(x => x.ApplicationUser)
                    .Include(x => x.Divelocation)
+                   .Include(x=>x.SecondaryDivelocation)
                    .Include(x=>x.RequiredCertificate)
                    .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -141,8 +142,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 return NotFound();
 
             _PageModel.Event = eventItem;
-
-            _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventItem.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            if (eventItem.EventType == EventTypeEnum.Stranddyk || eventItem.EventType == EventTypeEnum.Klubture)
+            {
+                _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == EventTypeEnum.Klubture || x.DefaultEventType == EventTypeEnum.Stranddyk).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            }
+            else
+            {
+                _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventItem.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            }
+            
 
             //if (eventItem.RequiredCertificate != null)
             //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;
@@ -173,23 +181,36 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (pageModel.Event.Divelocation != null)
                 pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
 
+            if (pageModel.Event.SecondaryDivelocation != null)
+                pageModel.Event.SecondaryDivelocation = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation.Id);
+
+
+
             if (ModelState.IsValid)
             {
-                var existingEventLocation = await db.Events
+                var existingEvent = await db.Events
                     .Include(x=>x.Divelocation)
+                    .Include(x=>x.SecondaryDivelocation)
                     .Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
                     .AsNoTracking()
                     .FirstAsync(x=>x.Id == pageModel.Event.Id);
 
                 var newLocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
-
+                var newLoc2 = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation?.Id);
                 // Notify uisers of new divelocation
 
-                if (existingEventLocation.Divelocation.Id != pageModel.Event.Divelocation.Id)
+                if (existingEvent.Divelocation.Id != pageModel.Event.Divelocation.Id || existingEvent.SecondaryDivelocation?.Id != pageModel.Event.SecondaryDivelocation?.Id)
                 {
                     // Rename Titel and Details of event
-                    pageModel.Event.Title = $"{pageModel.Event.EventType} til {newLocation.Name}.";
-                    pageModel.Event.Details = $"{pageModel.Event.EventType} til {newLocation.Name}. Turen kræver mindst {pageModel.Event.MinParticipants} deltagere og der er plads til maksimalt {pageModel.Event.MaxParticipants}";
+                    pageModel.Event.Title = $"{pageModel.Event.EventType} til {newLocation.Name}";
+
+                    if (newLoc2 != null)
+                    {
+                        pageModel.Event.Title += $" og {newLoc2.Name}";
+                    }
+
+                    
+                    pageModel.Event.Details = $"{pageModel.Event.Title}. Turen kræver mindst {pageModel.Event.MinParticipants} deltagere og der er plads til maksimalt {pageModel.Event.MaxParticipants}";
                     
                     // Notify signed up users using smsSender and emailSender
                     var participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Select(x => x.ApplicationUser).ToListAsync();
@@ -197,7 +218,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                     foreach(var participant in participants)
                     {
                         var smsText = $"Hej {participant.Firstname}, \n\n" +
-                            $"Turen til '{existingEventLocation.Title}' den {pageModel.Event.StartDateAndTime} er blevet ændret til '{newLocation.Name}' \n" +
+                            $"Turen til '{existingEvent.Title}' den {pageModel.Event.StartDateAndTime} er blevet ændret til '{newLocation.Name}' \n" +
                             $"\n" +
                             $"Hvis du ikke har mulighed eller lyst til at deltage, så kontakt venligst klubben for at få dig afmeldt (ub) \n" +
                             $"\n" +
@@ -210,7 +231,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 }
 
                 // Notify users of new event date
-                if (existingEventLocation.StartDateAndTime != pageModel.Event.StartDateAndTime)
+                if (existingEvent.StartDateAndTime != pageModel.Event.StartDateAndTime)
                 {
                     // Notify signed up users using smsSender and emailSender
                     var participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Select(x => x.ApplicationUser).ToListAsync();
@@ -218,7 +239,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                     foreach (var participant in participants)
                     {
                         var smsText = $"Hej {participant.Firstname}, \n\n" +
-                            $"Turen til '{existingEventLocation.Title}' den {existingEventLocation.StartDateAndTime.ToShortDateString()} er blevet ændret til '{pageModel.Event.StartDateAndTime.ToShortDateString()}' \n" +
+                            $"Turen til '{existingEvent.Title}' den {existingEvent.StartDateAndTime.ToShortDateString()} er blevet ændret til '{pageModel.Event.StartDateAndTime.ToShortDateString()}' \n" +
                             $"\n" +
                             $"Hvis du ikke har mulighed for at deltage på turen denne dag, så kontakt venligst klubben for at blive afmeldt turen. \n" +
                             $"\n" +
@@ -236,12 +257,27 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 db.Attach(pageModel.Event).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await db.SaveChangesAsync();
+                if (existingEvent.SecondaryDivelocation != null && pageModel.Event.SecondaryDivelocation == null)
+                {
+                    var ev = await db.Events.Include(x => x.SecondaryDivelocation).SingleAsync(x=>x.Id == pageModel.Event.Id);
+
+                    db.Entry(ev).Property("SecondaryDivelocationId").CurrentValue = null;
+                    db.Entry(ev).Property("SecondaryDivelocationId").IsModified = true;
+
+                    //db.Entry(blog).Property("PostId").CurrentValue = null;
+                    //This tells EF that you know the value of PostId and that it is null--previously even though the value was null EF had a flag set indicating that the value was unknown.
+                    //I think you should also be able to do this:
+                    //db.Entry(blog).Property("PostId").IsModified = true;
+                    await db.SaveChangesAsync();
+                }
+
                 return RedirectToAction("Index", new { eventtype = pageModel.Event.EventType });
             }
 
             //_PageModel.Event = pageModel.Event;
             pageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
             pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
+            pageModel.Event.SecondaryDivelocation = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation.Id);
             pageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == pageModel.Event.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
             pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x=>x.Lastname).Select(x => new SelectListItem()
             {
@@ -501,10 +537,12 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         }
 
-        [HttpPost, ActionName("CompleteDelete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteDelete(int id)
         {
+
+            if (!User.IsInRole("Administrator"))
+                return new StatusCodeResult(403);
+                
             var e = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == id);
 
             var eventtype = e.EventType;

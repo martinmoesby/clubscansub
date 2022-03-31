@@ -108,6 +108,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDiveproCertificate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
@@ -214,6 +217,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<bool>("InstructorApproved")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("InstructorRetracted")
+                        .HasColumnType("bit");
+
                     b.HasKey("CourseSessionId", "InstructorId");
 
                     b.HasIndex("InstructorId");
@@ -245,6 +251,9 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InstructorRatio")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -301,6 +310,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<int?>("InstructorCertificateId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaxStudents")
                         .HasColumnType("int");
 
@@ -320,6 +332,8 @@ namespace ClubScansub.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InstructorCertificateId");
 
                     b.ToTable("CourseTemplate");
                 });
@@ -348,9 +362,6 @@ namespace ClubScansub.Data.Migrations
 
                     b.Property<int>("DiveType")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
@@ -388,6 +399,27 @@ namespace ClubScansub.Data.Migrations
                     b.HasIndex("MeetingLocationId");
 
                     b.ToTable("Divelocation");
+                });
+
+            modelBuilder.Entity("ClubScansub.Models.DivelocationImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("DivelocationId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DivelocationId")
+                        .IsUnique();
+
+                    b.ToTable("DivelocationImages");
                 });
 
             modelBuilder.Entity("ClubScansub.Models.DiveorgCertificate", b =>
@@ -439,6 +471,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<string>("BoatLeaderId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<Guid>("DeeplinkId")
                         .HasColumnType("uniqueidentifier");
 
@@ -451,6 +486,9 @@ namespace ClubScansub.Data.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiveleaderId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("DivelocationId")
                         .HasColumnType("int");
@@ -488,6 +526,12 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int?>("RequiredCertificateId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SecondaryDivelocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StandbyDiverId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("StartDateAndTime")
                         .HasColumnType("datetime2");
 
@@ -498,9 +542,17 @@ namespace ClubScansub.Data.Migrations
 
                     b.HasIndex("AddressId");
 
+                    b.HasIndex("BoatLeaderId");
+
+                    b.HasIndex("DiveleaderId");
+
                     b.HasIndex("DivelocationId");
 
                     b.HasIndex("RequiredCertificateId");
+
+                    b.HasIndex("SecondaryDivelocationId");
+
+                    b.HasIndex("StandbyDiverId");
 
                     b.ToTable("Event");
 
@@ -902,6 +954,13 @@ namespace ClubScansub.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ClubScansub.Models.CourseTemplate", b =>
+                {
+                    b.HasOne("ClubScansub.Models.Certificate", "InstructorCertificate")
+                        .WithMany()
+                        .HasForeignKey("InstructorCertificateId");
+                });
+
             modelBuilder.Entity("ClubScansub.Models.Divelocation", b =>
                 {
                     b.HasOne("ClubScansub.Models.Certificate", "Certificate")
@@ -911,6 +970,15 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.Address", "MeetingLocation")
                         .WithMany()
                         .HasForeignKey("MeetingLocationId");
+                });
+
+            modelBuilder.Entity("ClubScansub.Models.DivelocationImage", b =>
+                {
+                    b.HasOne("ClubScansub.Models.Divelocation", "Divelocation")
+                        .WithOne("Image")
+                        .HasForeignKey("ClubScansub.Models.DivelocationImage", "DivelocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ClubScansub.Models.DiveorgCertificate", b =>
@@ -934,6 +1002,14 @@ namespace ClubScansub.Data.Migrations
                         .WithMany()
                         .HasForeignKey("AddressId");
 
+                    b.HasOne("ClubScansub.Models.ApplicationUser", "BoatLeader")
+                        .WithMany()
+                        .HasForeignKey("BoatLeaderId");
+
+                    b.HasOne("ClubScansub.Models.ApplicationUser", "Diveleader")
+                        .WithMany()
+                        .HasForeignKey("DiveleaderId");
+
                     b.HasOne("ClubScansub.Models.Divelocation", "Divelocation")
                         .WithMany("Events")
                         .HasForeignKey("DivelocationId")
@@ -942,6 +1018,14 @@ namespace ClubScansub.Data.Migrations
                     b.HasOne("ClubScansub.Models.Certificate", "RequiredCertificate")
                         .WithMany()
                         .HasForeignKey("RequiredCertificateId");
+
+                    b.HasOne("ClubScansub.Models.Divelocation", "SecondaryDivelocation")
+                        .WithMany()
+                        .HasForeignKey("SecondaryDivelocationId");
+
+                    b.HasOne("ClubScansub.Models.ApplicationUser", "StandbyDiver")
+                        .WithMany()
+                        .HasForeignKey("StandbyDiverId");
                 });
 
             modelBuilder.Entity("ClubScansub.Models.EventUser", b =>

@@ -49,8 +49,8 @@ namespace ClubScansub.Models
         [Display(Name = "Dyk type")]
         public DiveTypeEnum DiveType { get; set; }
         
-        [Display(Name = "Billede")] 
-        public byte[] Image { get; set; }
+        //[Display(Name = "Billede")] 
+        //public byte[] Image { get; set; }
 
         [Display(Name = "Mødested")]
         public Address MeetingLocation { get; set; }
@@ -70,6 +70,9 @@ namespace ClubScansub.Models
         
         [JsonIgnore]
         public ICollection<Event> Events { get; set; }
+
+        [JsonIgnore]
+        public virtual DivelocationImage Image { get; set; }
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }
     }
 }

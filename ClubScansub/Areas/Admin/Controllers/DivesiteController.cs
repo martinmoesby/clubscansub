@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ClubScansub.Areas.Admin.ViewModels;
 using ClubScansub.Data;
 using ClubScansub.Models;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace ClubScansub.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class DivesiteController : BaseAdminController
     {
-        public DivesiteController(ApplicationDbContext db)
+        private ImageOptions imgOptions;
+        public DivesiteController(ApplicationDbContext db, ImageOptions imgOptions)
             : base(db)
         {
+            this.imgOptions = imgOptions;
 
             // Initilize Viewmodel
             DiveLocationViewModel = new CreateDivelocationViewModel()
@@ -26,10 +31,11 @@ namespace ClubScansub.Areas.Admin.Controllers
                 SelectedAddressId = string.Empty,
                 SelectedCertificateId = string.Empty,
                 ExistingAddresses = db.Addresses.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList(),
-                Certificates = db.Certificates.Select(x=> new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
+                Certificates = db.Certificates.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
             };
             //DiveLocationViewModel.ExistingAddresses.Add(new SelectListItem { Selected = true, Value = "", Text = "" });
             DiveLocationViewModel.Divelocation.MeetingLocation = new Address();
+            DiveLocationViewModel.Divelocation.Image = new DivelocationImage();
             //End init
 
         }
@@ -38,7 +44,10 @@ namespace ClubScansub.Areas.Admin.Controllers
         public CreateDivelocationViewModel DiveLocationViewModel { get; set; }
         public async Task<IActionResult> Index()
         {
-            var locations = await db.Divelocations.Include(x => x.MeetingLocation).ToListAsync();
+            var locations = await db.Divelocations
+                .Include(x => x.MeetingLocation)
+                .Include(x => x.Image)
+                .ToListAsync();
             return View(locations);
         }
 
@@ -76,10 +85,10 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 if (existingAddress.Country != DiveLocationViewModel.Divelocation.MeetingLocation.Country)
                     existingAddress.Country = DiveLocationViewModel.Divelocation.MeetingLocation.Country;
-                
+
                 if (existingAddress.Latitude != DiveLocationViewModel.Divelocation.MeetingLocation.Latitude)
                     existingAddress.Latitude = DiveLocationViewModel.Divelocation.MeetingLocation.Latitude;
-                
+
                 if (existingAddress.Longitude != DiveLocationViewModel.Divelocation.MeetingLocation.Longitude)
                     existingAddress.Longitude = DiveLocationViewModel.Divelocation.MeetingLocation.Longitude;
 
@@ -102,10 +111,19 @@ namespace ClubScansub.Areas.Admin.Controllers
                 using (var ms = new MemoryStream())
                 {
                     files[0].CopyTo(ms);
-                    DiveLocationViewModel.Divelocation.Image = ms.ToArray();
+
+                    Image img = Image.FromStream(ms);
+                    var resizedImage = ImageUtils.ResizeImage(img, imgOptions);
+                    using (var newMS = new MemoryStream())
+                    {
+                        resizedImage.Save(newMS, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        DiveLocationViewModel.Divelocation.Image = new DivelocationImage()
+                        {
+                            ImageData = newMS.ToArray()
+                        };
+                    }
                 }
             }
-
 
             db.Divelocations.Add(DiveLocationViewModel.Divelocation);
 
@@ -125,15 +143,15 @@ namespace ClubScansub.Areas.Admin.Controllers
             var divesite = await db.Divelocations.FindAsync(id);
             if (divesite == null)
                 return NotFound();
-            
+
             return View(divesite);
         }
 
-        [HttpPost,ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(int id)
         {
-            var divesite = await db.Divelocations.Include(x=> x.Events).FirstOrDefaultAsync(x=>x.Id == id);
+            var divesite = await db.Divelocations.Include(x => x.Events).FirstOrDefaultAsync(x => x.Id == id);
             if (divesite == null)
                 return NotFound();
 
@@ -147,9 +165,9 @@ namespace ClubScansub.Areas.Admin.Controllers
 
 
         #region Edit Get Post
-        public async Task<IActionResult> Edit (int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var divelocation = await db.Divelocations.Include(x=>x.MeetingLocation).Include(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == id);
+            var divelocation = await db.Divelocations.Include(x => x.MeetingLocation).Include(x => x.Image).Include(x => x.Certificate).FirstOrDefaultAsync(x => x.Id == id);
             if (divelocation == null)
                 return NotFound();
 
@@ -190,15 +208,32 @@ namespace ClubScansub.Areas.Admin.Controllers
                 using (var ms = new MemoryStream())
                 {
                     files[0].CopyTo(ms);
-                    model.Image = ms.ToArray();
+                    if (model.Image == null)
+                        model.Image = new DivelocationImage();
+
+                    Image img = Image.FromStream(ms);
+                    var resizedImage = ImageUtils.ResizeImage(img, imgOptions);
+                    using (var newMS = new MemoryStream())
+                    {
+                        resizedImage.Save(newMS, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        model.Image.ImageData = newMS.ToArray();
+                    }
                 }
+            } else
+            {
+                model.Image = db.DivelocationImages.Find(model.Image.Id);
             }
 
             db.Attach(model);
 
             foreach (var item in db.ChangeTracker.Entries())
             {
-                item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                if (model.Image.Id == 0 && item.Entity.GetType() == typeof(DivelocationImage))
+                { }
+                else
+                {
+                    item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                }
             }
             await db.SaveChangesAsync();
 

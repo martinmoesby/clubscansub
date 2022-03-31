@@ -223,7 +223,8 @@
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@1.25.0/build/global/luxon.min.js"></script>
 
-    <script>
+    <script>    
+
         function showTransactions(userId, accountType) {
         url = "@Url.Action("_GetTransactions","User", new { Area= "Admin" })";
 
@@ -234,8 +235,8 @@
         <th>Dato</th>
         <th>Beskrivelse</th>
         <th>Beløb</th>
-        <th>Begivenhed<th>
-        <th>Fakt. nr</th>
+        <th>Begivenhed</th>
+        <th>Invoice</th>
     </thead>
 </table>
 `);
@@ -245,18 +246,20 @@
                     url: url + "?userId=" + userId + "&accountType=" + accountType,
                     dataSrc:''
                 },
+                "autoWidth": false,
                 "columns": [
                     {
                         "data": "postingDate",
                         "render": function (data, type, row) {
-                            return luxon.DateTime.fromISO(data).setLocale("da-DK").toFormat("DD");
+                            return luxon.DateTime.fromISO(data).setLocale("da-DK").toISODate(); //.toFormat("DD");
                             //return dt.getDay() + "-" + (dt.getMonth()+1) + "-" + dt.getFullYear();
-                        }
+                        },
+                        "width":"120px"
                     },
-                    { "data": "description" },
-                    { "data": "amount" },
-                    { "data": "title" },
-                    { "data": "invoiceNumber" },
+                    { "data": "description", "width":"360px" },
+                    { "data": "amount", "width": "80px"  },
+                    { "data": "title", "width": "120px"  },
+                    { "data": "invoiceNumber", "width": "80px"  },
                 ]
                 });
 

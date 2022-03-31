@@ -150,9 +150,9 @@
 
                 <div class="form-group row">
                     <div class="col-md-8 col-12">
-                        @{if (Model.Divelocation.Image != null)
+                        @{if (Model.Divelocation.Image.ImageData != null)
                             {
-                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
+                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image.ImageData)}";
                                 <img class="img-fluid rounded rounded-circle" src="@(imgSource)" alt="" />
                             }
                             else

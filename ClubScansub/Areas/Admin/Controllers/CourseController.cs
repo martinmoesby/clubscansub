@@ -301,8 +301,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .Include(x=>x.Divelocation)
                 .FirstOrDefaultAsync(x=>x.Id == Id);
 
-            if (string.IsNullOrEmpty(session.SessionName)) session.SessionName = session.CourseSessionTemplate.Name;
-            if (string.IsNullOrEmpty(session.SessionDescription)) session.SessionDescription = session.CourseSessionTemplate.Description;
+            if (string.IsNullOrEmpty(session.SessionName)) session.SessionName = session.CourseSessionTemplate?.Name;
+            if (string.IsNullOrEmpty(session.SessionDescription)) session.SessionDescription = session.CourseSessionTemplate?.Description;
 
             var partialView = isDelete ? "_DeleteSessionPartial" : "_EditSessionPartial";
             return PartialView(partialView, session);

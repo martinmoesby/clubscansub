@@ -37,16 +37,22 @@ namespace ClubScansub.Models
                 {
                     var students = Course.Participants.Count;
 
+                    if (CourseSessionTemplate?.InstructorRatio > 0)
+                        return (students / CourseSessionTemplate.InstructorRatio) + 1;
+
                     switch (Sessiontype)
                     {
                         case CourseSessionTypeEnum.AcademicSession:
-                            return students == 0 ? 0 : 1;
+                            return (students / 12) + 1;
+
                         case CourseSessionTypeEnum.PoolSession:
                             return (students / 4) + 1;
+
                         case CourseSessionTypeEnum.OpenWaterSession:
                             return (students / 2) + 1;
+
                         default:
-                            return 0;
+                            return 1;
                     }
 
                 }

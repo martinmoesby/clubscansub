@@ -60,13 +60,24 @@ namespace ClubScansub.API
 
                 if (userManager.GetUserId(User) != null)
                 {
-                    user = await db.ApplicationUsers
-                        .Include(x => x.Events)
-                        .Include(x => x.AccountTransactions)
-                        .SingleAsync(x => x.Id == userManager.GetUserId(User));
-                    balance = user.Balance;
-                    isSignedIn = true;
-                    userevents = user.Events;
+                    try
+                    {
+                        user = await db.ApplicationUsers
+                            .Include(x => x.Events)
+                            .Include(x => x.AccountTransactions)
+                            .SingleAsync(x => x.Id == userManager.GetUserId(User));
+                        balance = user.Balance;
+                        isSignedIn = true;
+                        userevents = user.Events;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write(ex.Message);
+                        Console.Write(ex.StackTrace);
+                        //return null;
+                        //throw;
+                    }
                 }
             }
 
@@ -74,6 +85,7 @@ namespace ClubScansub.API
             {
                 var data = await db.Events
                 .Include(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
+                .Include(x => x.Divelocation).ThenInclude(x => x.Image)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Where(x => x.IsCancelled == false &&
                         (x.MaxParticipants - x.FixedParticipants - x.Participants.Count) > 0 &&
@@ -94,7 +106,7 @@ namespace ClubScansub.API
                     x.FixedParticipants,
                     FreeSpots = x.MaxParticipants - x.FixedParticipants - x.Participants.Count,
                     RequiredSpots = (x.MinParticipants - x.FixedParticipants - x.Participants.Count) < 0 ? 0 : (x.MinParticipants - x.FixedParticipants - x.Participants.Count),
-                    x.Divelocation.Image,
+                    Image = x.Divelocation.Image.ImageData,
                     x.Divelocation.MeetingLocation,
                     x.Divelocation.Description,
                     x.Divelocation.DiveType,
@@ -204,6 +216,7 @@ namespace ClubScansub.API
 
             var eventplan = await db.EventUsers
                 .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
+                .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.Image)
                 .Include(x=>x.Event).ThenInclude(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
                 .Where(x => x.ApplicationUser == user && x.Event.StartDateAndTime > DateTime.Now && !x.Event.IsCancelled)
                 .ToListAsync();
@@ -221,7 +234,7 @@ namespace ClubScansub.API
                 x.Event.FixedParticipants,
                 FreeSpots = x.Event.MaxParticipants - x.Event.FixedParticipants - x.Event.Participants.Count,
                 RequiredSpots = (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count) < 0 ? 0 : (x.Event.MinParticipants - x.Event.FixedParticipants - x.Event.Participants.Count),
-                x.Event.Divelocation.Image,
+                Image = x.Event.Divelocation.Image?.ImageData,
                 x.Event.Divelocation.Description,
                 x.Event.Divelocation.MeetingLocation,
                 x.Event.Divelocation.MinDepth,

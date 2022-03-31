@@ -1,49 +1,83 @@
-﻿@model IEnumerable<Event>  
+﻿@model IEnumerable<Event>
 @{
     ViewData["Title"] = "Mine kommende ture";
 }
-    <div class="container">
+<div class="container">
 
-        <h1 class="display-4 mb-3"><i class="fas fa-calendar-alt"></i>&nbsp;@ViewData["Title"]</h1>
+    <h1 class="display-4 mb-3"><i class="fas fa-calendar-alt"></i>&nbsp;@ViewData["Title"]</h1>
 
-        <table class="table table-striped table-sm">
-            <thead>
-                <tr>
-                    <th><label asp-for="FirstOrDefault().StartDateAndTime"></label></th>
-                    <th><label asp-for="FirstOrDefault().EndDateAndTime"></label></th>
-                    <th><label asp-for="FirstOrDefault().Title"></label></th>
-                    <th><label asp-for="FirstOrDefault().Price"></label></th>
-                    <th><label>Tur status</label></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td class="small">@item.StartDateAndTime.ToShortDateString() kl. @item.StartDateAndTime.ToShortTimeString()</td>
-                        <td class="small">@item.EndDateAndTime.ToShortDateString() kl. @item.EndDateAndTime.ToShortTimeString()</td>
-                        <td>
-                            <strong>@item.Title</strong><br />
-                            <span class="small">@item.Details</span><br />
-                            <partial name="_SeatStatusPartial" model="@item" />
+    @{if (Model.Count() == 0)
+    {
+        <div>
+            <h4>Ingen aktive ture i kalenderen</h4>
+            <p>Du er ikke tilmeldt nogle aktiviteter på nuværende tidspunkt.</p>
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
 
-                        </td>
-                        <td class="small">@Html.FormatValue(item.Price, "{0:n2}")</td>
-                        <td>
-                            @if (item.RequiredSpots > 0)
-                            {
-                                <span class="badge badge-warning"><i class="fas fa-thumbs-down"></i>&nbsp;Ikke nok tilmeldte</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-success small"><i class="fas fa-thumbs-up"></i>&nbsp;Nok tilmeldte</span>
-                            }
-                            <br />
-                            <span class="small">Deltagere: @(item.FixedParticipants + item.Participants.Count)</span>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            <div class="d-flex flex-column p-2 mb-3 border rounded" style="height:200px">
+
+            <div class="p-2 d-flex justify-content-between">
+                <h4>@item.Title</h4>
+                <div class="small"><partial name="_SeatStatusPartial" model="@item" /></div>
+            </div>
+
+
+            <div class="d-flex flex-row">
+
+                <div class="col-3">
+                    <div class="pb-2">
+                        <span class="badge badge-success light p-2">
+                            <i class="fas fa-calendar-alt"></i>
+                            @item.StartDateAndTime.ToShortDateString()
+                            <i class="fas fa-clock ml-2"></i>
+                            @item.StartDateAndTime.ToShortTimeString()
+                        </span>
+                    </div>
+
+                    <div class="pb-2">
+                        <span class="badge badge-danger light p-2">
+                            <i class="fas fa-calendar-alt"></i>
+                            @item.EndDateAndTime.ToShortDateString()
+                            <i class="fas fa-clock ml-2"></i>
+                            @item.EndDateAndTime.ToShortTimeString()
+                        </span>
+                    </div>
+
+                    <div class="">
+                        <span class="badge badge-info light p-2">
+                            <i class="fas fa-coins"></i>
+                            @(Html.FormatValue(User.HasClaim("IsPremiumMember", "true") ? item.PremiumPrice : item.Price, "{0:n2}"))
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    @item.Details
+                </div>
+
+                <div class="col-3 d-flex justify-content-end">
+                    @{ if (item.Divelocation.Image != null)
+                        {
+                            var imgSource = $"data:image;base64,{Convert.ToBase64String(item.Divelocation.Image.ImageData)}";
+                        <img class="img-fluid rounded" src="@(imgSource)" alt="No image" style="height:120px" />
+
+                        }
+                        else
+                        {
+                        <img class="img-fluid rounded" src="~/images/alpha-flag-hi.png" alt="No image" style="height:120px" />
+                        }
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    }
+    }
+    }
+</div>
 

@@ -2,12 +2,12 @@
 @{
     ViewData["Title"] = "Administration - Dykkersted - Rediger";
 }
+<div class="container p-4 m-4">
+    <h2 class="text-info mb-3">Rediger dykkersted</h2>
 
-<form method="post" asp-action="Edit" enctype="multipart/form-data">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Divelocation.Image" />
-    <div class="container p-4 m-4">
-        <h2 class="text-info mb-3">Rediger dykkersted</h2>
+    <form method="post" asp-action="Edit" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Divelocation.Image.Id" />
         <div class="row">
             <div class="col-md-6 col-12">
                 <h4>Dykkersted</h4>
@@ -152,16 +152,17 @@
 
                 <div class="form-group row">
                     <div class="col-md-8 offset-md-4 col-12">
-                        @{if (Model.Divelocation.Image != null)
-                            {
-                                var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image)}";
-                                <img class="img-fluid img-thumbnail rounded" src="@(imgSource)" alt="" />
-                            }
-                            else
-                            {
-                                <p class="form-control">Intet billede indlæst</p>
-                            }
-                        }
+                        @await Component.InvokeAsync("Image", new { imageId = Model.Divelocation.Id, showThumbnail = false })
+                        @*@{if (Model.Divelocation.Image?.ImageData != null)
+                                {
+                                    var imgSource = $"data:image;base64,{Convert.ToBase64String(Model.Divelocation.Image.ImageData)}";
+                                    <img class="img-fluid img-thumbnail rounded" src="@(imgSource)" alt="" />
+                                }
+                                else
+                                {
+                                    <p class="form-control">Intet billede indlæst</p>
+                                }
+                            }*@
                     </div>
                 </div>
 
@@ -269,8 +270,45 @@
                 <partial name="_SaveAndBackButtonsPartial" />
             </div>
         </div>
+    </form>
+
+    <div class="container accordion" id="accordion">
+        <div class="row">
+            <div class="col-6">
+                <div class="card card-header bg-info">
+                    <a class="accordion-icon" data-toggle="collapse" data-target="#active" aria-expanded="true" aria-controls="#active">
+                        <h5>
+                            Aktive
+                            <span class="float-right"><i class="fas fa-angle-down"></i></span>
+                        </h5>
+                    </a>
+                </div>
+                <div class="card card-body collapse show" id="active" data-parent="#accordion">
+                    @await Component.InvokeAsync("LocationEventList", new { locationId = Model.Divelocation.Id, isActive = true })
+                </div>
+            </div>
+        @*</div>
+
+        <div class="row mt-2">*@
+            <div class="col-6 ">
+                <div class="card card-header bg-light">
+                    <a class="accordion-icon" data-toggle="collapse" data-target="#completed" aria-expanded="false" aria-controls="#completed">
+                        <h5>
+                            Afsluttede/Aflyste
+                            <span class="float-right"><i class="fas fa-angle-down"></i></span>
+                        </h5>
+                    </a>
+
+                </div>
+                <div class="card card-body collapse" id="completed" data-parent="#accordion">
+                    @await Component.InvokeAsync("LocationEventList", new { locationId = Model.Divelocation.Id, isActive = false })
+                </div>
+            </div>
+        </div>
     </div>
-</form>
+</div>
+
+
 
 @section Scripts {
     @{
@@ -298,7 +336,7 @@
                     $('#latitude').val(data.latitude);
 
                     if (data.latitude != "" && data.longitude != "") {
-                        centerMap(data.latitude,data.longitude);
+                        centerMap(data.latitude, data.longitude);
                     } else {
                         geocodeMap();
                     }

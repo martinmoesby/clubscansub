@@ -15,39 +15,25 @@
 
                 @if (User.IsInRole(Userroles.Administrator) || User.IsInRole(Userroles.Owner))
                 {
-                    if (string.IsNullOrEmpty(appUser.PhotoUrl))
-                    {
                         <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" asp-area="Divepro" asp-controller="Work"
-                           class="rounded-circle bg-primary text-center text-light btn btn-sm pt-2" title="@appUser.Name" style="height:40px; width:40px;">
+                           class="rounded-circle bg-secondary text-center text-light btn btn-sm pt-2" title="@appUser.Name" style="height:40px; width:40px;">
                             <span>@appUser.Initials</span>
                         </a>
-                    }
-                    else
-                    {
-                        <a asp-action="Approve" asp-route-sessionid="@item.CourseSessionId" asp-route-instructorId="@item.InstructorId" asp-area="Divepro" asp-controller="Work">
-                            <img class="img rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" alt="" title="@appUser.Name" />
-                        </a>
-                    }
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(appUser.PhotoUrl))
-                    {
-                        <span class="rounded-circle bg-primary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
-                    }
-                    else
-                    {
-                        <span title="@appUser.Name">
-                            <img class="img rounded-circle" style="background:url('@appUser.PhotoUrl') 50% 50% no-repeat; height:40px; width:40px;" />
-                        </span>
-                    }
+                        <span class="rounded-circle bg-secondary btn btn-sm pt-2 text-light" title="@appUser.Name" style="height:40px; width:40px;">@appUser.Initials</span>
                 }
 
                 if (item.InstructorApproved)
                 {
-                    <i class="fas fa-check text-success position-relative h2" style="left:-20px;top:10px;width:0px;"></i>
+                    <i class="fas fa-check text-success position-relative h4" style="left:-15px;top:20px;width:0px;"></i>
                 }
 
+                if (item.InstructorRetracted)
+                {
+                    <i class="fas fa-times text-danger position-relative h4" style="left:-15px;top:20px;width:0px;"></i>
+                }
             }
 
 

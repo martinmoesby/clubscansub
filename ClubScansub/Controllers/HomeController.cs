@@ -287,6 +287,8 @@ namespace ClubScansub.Controllers
                             .ThenInclude(x => x.ApplicationUser)
                         .Include(x => x.Divelocation)
                             .ThenInclude(x => x.MeetingLocation)
+                        .Include(x => x.Divelocation)
+                            .ThenInclude(x => x.Image)
                         .FirstOrDefaultAsync(x => x.Id == itemId);
                 return PartialView("_EventDetailsPartial", @event);
             }   
@@ -419,6 +421,15 @@ namespace ClubScansub.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
+        public async Task<IActionResult> ShowImage(int Id)
+        {
+            var image = await db.DivelocationImages.FindAsync(Id);
+            return PartialView("Image",image);
+        }
+        public async Task<IActionResult> ShowThumbnail(int Id)
+        {
+            var image = await db.DivelocationImages.FindAsync(Id);
+            return PartialView(image);
+        }
     }
 }

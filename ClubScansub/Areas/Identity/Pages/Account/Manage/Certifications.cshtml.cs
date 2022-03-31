@@ -40,7 +40,7 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
 
 
             Certificates = await db.Certificates
-                .Where(x => !ownedCertificates.Contains(x))
+                .Where(x => !ownedCertificates.Contains(x) && !x.IsDiveproCertificate)
                 .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.ShortName }).ToListAsync();
 
             ApplicationUser = await db.ApplicationUsers.Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == User.GetIdentityId());
@@ -64,7 +64,8 @@ namespace ClubScansub.Areas.Identity.Pages.Account.Manage
             var ownedCertificates = await db.UserCertificates.Include(x=>x.User).Where(x => x.User.Id == User.GetIdentityId()).Select(x=>x.Certificate).ToListAsync();
 
             ApplicationUser = await db.ApplicationUsers.Include(x => x.Certificates).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
-            Certificates = await db.Certificates.Where(x => !ownedCertificates.Any(c => x.Id == c.Id)).Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.ShortName }).ToListAsync();
+            Certificates = db.Certificates.AsEnumerable().Where(x => !ownedCertificates.Any(c => x.Id == c.Id))
+                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.ShortName }).ToList();
 
             return Page();
         }

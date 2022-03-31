@@ -22,5 +22,7 @@ namespace ClubScansub.Models
 
         public bool InstructorApproved { get; set; }
 
+        public bool InstructorRetracted { get; set; }
+
     }
 }

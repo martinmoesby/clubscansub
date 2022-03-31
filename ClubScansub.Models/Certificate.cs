@@ -25,6 +25,8 @@ namespace ClubScansub.Models
         [Display(Name ="Maks. dybde")]
         public int? DepthLimit { get; set; }
 
+        [Display(Name = "Pro certifikat?")]
+        public bool IsDiveproCertificate { get; set; }
 
         public ICollection<DiveorgCertificate> Diveorgs { get; set; }
 

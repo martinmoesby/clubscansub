@@ -37,6 +37,9 @@ namespace ClubScansub.Models
         [Display(Name = "Standard mødested")]
         public Address Address { get; set; }
 
+        [Display(Name = "Instruktør-til-Elev ratio 1:X")]
+        public int InstructorRatio { get; set; }
+
         public CourseTemplate CourseTemplate { get; set; }
 
     }

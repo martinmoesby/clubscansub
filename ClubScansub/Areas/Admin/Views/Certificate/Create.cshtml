@@ -46,9 +46,29 @@
                     </div>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+                
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="IsDiveproCertificate" class="col-form-label"></label>
+                    </div>
+                    <div class="col-9">
+                        <input type="checkbox" asp-for="IsDiveproCertificate" />
+                    </div>
+                    <span asp-validation-for="IsDiveproCertificate" class="text-danger"></span>
+                </div>
 
             </div>
         </div>
+
+        @*<div class="row d-flex">
+            @foreach (var item in instructors)
+            {
+                <div class="col4">
+                    <input type="checkbox" id="@item.Id" class="form-check" name="instructors" />
+                    <label asp-for="@item.Id">@item.Name</label>
+                </div>
+            }
+        </div>*@
 
         <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
     </form>

@@ -12,6 +12,7 @@
             <tr>
                 <th></th>
                 <th class="align-top"><label asp-for="@Model.FirstOrDefault().CourseType"></label></th>
+                <th class="align-top"><label asp-for="@Model.FirstOrDefault().InstructorCertificate"></label></th>
                 <th class="align-top"><label asp-for="@Model.FirstOrDefault().TemplateName"></label></th>
                 <th class="align-top"><label asp-for="@Model.FirstOrDefault().TemplateDurationInWeeks"></label></th>
                 <th class="align-top"><label>Sessioner<br /><span class="small">(Academic / Pool / OW)</span></label></th>
@@ -36,6 +37,7 @@
                     }
                 </td>
                 <td class="small">@item.CourseType</td>
+                <td class="small">@item.InstructorCertificate?.ShortName</td>
                 <td class="small">@item.TemplateName</td>
                 <td class="small">@item.TemplateDurationInWeeks</td>
                 <td class="small">@item.AcademicSessions / @item.PoolSessions / @item.OpenWaterSessions</td>

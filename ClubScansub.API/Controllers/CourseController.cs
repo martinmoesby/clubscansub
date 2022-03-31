@@ -40,10 +40,14 @@ namespace ClubScansub.API.Controllers
 
             if (user == null)
                 return Unauthorized();
-
+            var myProCerts = db.UserCertificates
+                .Include(x => x.User)
+                .Include(x => x.Certificate)
+                .Where(x => x.User.Id == User.GetIdentityId() && x.Certificate.IsDiveproCertificate == true);
 
             var courses = await db.Courses
-                .Where(x => !x.IsCancelled && x.EndDateAndTime > DateTime.Now && x.StartDateAndTime < DateTime.Now.AddMonths(12))
+                .Include(x=>x.CourseTemplate).ThenInclude(x=>x.InstructorCertificate)
+                .Where(x => !x.IsCancelled && myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id) && x.EndDateAndTime > DateTime.Now && x.StartDateAndTime < DateTime.Now.AddMonths(12))
                 .Select(x=> new
                 {
                     CourseId = x.Id,

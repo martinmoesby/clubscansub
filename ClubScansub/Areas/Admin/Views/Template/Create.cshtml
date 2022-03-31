@@ -1,6 +1,7 @@
 ﻿@model CourseTemplate
 @{
     ViewData["Title"] = "Opret ny kursus template";
+    List<SelectListItem> proCertificates = (List<SelectListItem>)ViewData["Certificates"];
 }
 
 <div class="container">
@@ -13,6 +14,18 @@
                 <input class="form-control form-control-sm" type="text" asp-for="TemplateName" />
                 <span asp-validation-for="TemplateName"></span>
             </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-6 form-group form-group-sm">
+                <label class="col-form-label form-control-sm" asp-for="InstructorCertificate"></label>
+                <select class="form-control form-control-sm" asp-for="InstructorCertificate.Id" asp-items="proCertificates">
+                    <option value="0">Vælg krævet Pro certificat</option>
+                </select>
+                <span asp-validation-for="InstructorCertificate"></span>
+            </div>
+
         </div>
 
         <div class="row">

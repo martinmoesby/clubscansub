@@ -1,0 +1,163 @@
+﻿@using System.Threading
+@model IEnumerable<CourseSession>
+@*
+
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+    
+*@
+@{
+
+    ViewData["Title"] = "Divepro Arbejdskalender";
+    var pageTitle = ViewData["Title"];
+    var activeCourse = ViewBag.ActiveCourse;
+    var courseIcon = "";
+    var poolIcon = "fa-swimming-pool";
+    var openwaterIcon = "fa-water";
+    var academicIcon = "fa-chalkboard-teacher";
+    var getDate = new DateTime((int)ViewBag.CurrentYear, (int)ViewBag.CUrrentMonth,1);
+
+    var firstDayOfTheMonth = new DateTime(getDate.Year, getDate.Month, 1);
+    var lastDayOfTheMonth = firstDayOfTheMonth.AddMonths(1).AddDays(-1);
+
+    var numberOfDays = lastDayOfTheMonth.Day;
+    DateTime startDate = firstDayOfTheMonth.AddDays((int)firstDayOfTheMonth.DayOfWeek == 0 ? -6 :-(int)firstDayOfTheMonth.DayOfWeek+1);
+    DateTime endDate = lastDayOfTheMonth.AddDays((int)lastDayOfTheMonth.DayOfWeek == 0 ? 0 : 7-(int)lastDayOfTheMonth.DayOfWeek);
+    int totalDays = (int)(endDate - startDate).TotalDays+1;
+
+    DateTime iterateDate = startDate;
+
+}
+
+<div class="container-fluid" style="min-width:1388px;">
+    <partial name="_IndexPageHeaderPartialNoCreateButton" model="@pageTitle" />
+
+    <div class="row">
+        <div class="col-2"><a asp-action="Workcalendar" asp-route-offset=-1><i class="fas fa-arrow-left border rounded-circle text-info border-info p-2 mr-3"></i></a> </div>
+        <div class="col-2"></div>
+        <div class="col-4 text-center">
+            
+            <span class="h4 text-info text-capitalize">@getDate.ToString("MMMM") @getDate.ToString("yyyy")</span>
+            
+        </div>
+        <div class="col-2"></div>
+        <div class="col-2 text-right"><a asp-action="Workcalendar" asp-route-offset=1><i class="fas fa-arrow-right border rounded-circle text-info border-info p-2 ml-3"></i></a></div>
+    </div>
+
+    <div class="row border-bottom border-info text-info mt-2">
+        <div class="col">Mandag</div>
+        <div class="col">Tirsdag</div>
+        <div class="col">Onsdag</div>
+        <div class="col">Torsdag</div>
+        <div class="col">Fredag</div>
+        <div class="col">Lørdag</div>
+        <div class="col">Søndag</div>
+    </div>
+
+    <div class="row border-bottom border-left" style="min-height:75px">
+        @for (int i = 0; i < totalDays; i++)
+        {
+            iterateDate = startDate.AddDays(i);
+            var bgStyle = iterateDate.DayOfWeek == DayOfWeek.Sunday || iterateDate.DayOfWeek == DayOfWeek.Saturday ? "bg-light text-dark" : "bg-white text-dark";
+
+            if (iterateDate.DayOfWeek == Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek && i > 0)
+                {
+                    @:</div><div class="row border-bottom border-left" style="min-height:75px">
+                    // start a new row every 7 days
+                }  
+                <div class="col border-right @bgStyle">
+                    @if (iterateDate.Month == getDate.Month)
+                    {
+                    <div class="mb-2">@iterateDate.ToString("M")</div>
+            
+
+                        var daysCOurses = Model.Where(x => x.DateTime.Day == iterateDate.Day);
+                        
+                        foreach (var item in daysCOurses.OrderBy(x=>x.DateTime))
+                        {
+                            var bgItemStyle = "bg-white";
+                            
+                            @if (item.SessionInstructors.Where(x=>!x.InstructorRetracted).Any(x=> x.InstructorId == User.GetIdentityId()))
+                            {
+                                bgItemStyle = "alert-warning";//"alert alert-warning";
+                            }
+                            
+                            @if (item.SessionInstructors.Where(x=>x.InstructorApproved).Any(x=> x.InstructorId == User.GetIdentityId()))
+                            {
+                                bgItemStyle = "alert-success";//"alert alert-success";
+                            }
+
+                            <div class="col-12 text-dark small border rounded @bgItemStyle text-truncate p-1 mb-2">
+                                <div class="row">
+                                     <div class="col-3">
+                                        <i class="fas @(item.Sessiontype == CourseSessionTypeEnum.AcademicSession ? academicIcon : @item.Sessiontype == CourseSessionTypeEnum.PoolSession ? poolIcon : openwaterIcon) text-info"></i>
+                                        <span class="small">@item.DateTime.ToShortTimeString()</span>
+                                    </div>
+
+                                    <div class="col-9 text-truncate">
+                                        @item.Course.CourseName
+                                    </div>
+                                </div>
+
+                                <div class="row border-bottom pb-2 mb-2" >
+                                    <div class="col-3 small text-muted">
+                                        <i class="fas fa-user mr-1" title="Students"></i>@(item.Course.Participants.Count() + @item.Course.Signups.Count())
+                                    </div>                                     
+                                    <div class="col-9 text-wrap text-muted small">
+                                        @item.SessionName
+                                    </div>
+                                </div>
+
+                                <div class="row d-flex">
+                                    @if (!item.SessionInstructors.Any(x => x.InstructorId == User.GetIdentityId()))
+                                    {
+                                        <div class="col-auto m-1 small">
+                                            <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id" >Skriv mig på <i class="fas fa-thumbs-up small" title="Yes, I can - sign me up!!"></i></a>
+                                        </div>
+                                    }                                     
+                                    @foreach (var instructor in item.SessionInstructors.OrderByDescending(x=>x.InstructorApproved))
+                                    {
+                                      <div class="col-auto m-1 small">
+                                           
+                                                @if (instructor.InstructorRetracted && !instructor.InstructorApproved)
+                                                {
+                                                    <span class="btn btn-sm badge-danger">
+                                                        <s>@instructor.Instructor.Firstname</s><i class="far fa-thumbs-down small ml-2" title="This instructor has retracted"></i>
+                                                    </span>
+                                                } 
+                                                else if (!instructor.InstructorApproved && !instructor.InstructorRetracted && instructor.InstructorId == User.GetIdentityId())
+                                                {
+                                                    <a class="btn btn-sm btn-warning mr-1" asp-action="Retract" asp-route-sessionid="@item.Id">
+                                                        @instructor.Instructor.Firstname<i class="fas fa-thumbs-down small" title="Sorry, have to retract my subnmission"></i>
+                                                    </a>
+                                                } 
+                                                else if (User.IsInRole("Administrator") && !instructor.InstructorRetracted)
+                                                {
+                                                    if (!instructor.InstructorApproved)
+                                                    {
+                                                        <button class="btn btn-sm btn-warning" title="Assign instructor" onclick="@Url.Action("Approve", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
+                                                            @instructor.Instructor.Firstname<i class="fas fa-check small ml-2 text-success"></i>
+                                                         </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-sm btn-success" title="Remove instructor" onclick="@Url.Action("Remove", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
+                                                            @instructor.Instructor.Firstname<i class="fas fa-times small ml-2 text-danger"></i>
+                                                        </button>
+                                                    }
+                                                }
+                                                else 
+                                                {
+                                                    <span class="btn btn-sm @(instructor.InstructorApproved ? "badge-success" : instructor.InstructorRetracted ? "badge-danger" : "badge-warning")">@instructor.Instructor.Firstname</span>
+                                                }
+                                            
+                                      </div>
+                                    }
+                                </div>
+                            </div>
+                    }
+                 }
+            </div>
+        }
+    </div>
+</div>

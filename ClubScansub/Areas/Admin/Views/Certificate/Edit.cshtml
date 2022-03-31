@@ -1,18 +1,18 @@
-﻿@model  Certificate
+﻿@model Certificate
 @{
     ViewData["Title"] = "Edit";
+    List<UserCertificat> assigned = (List<UserCertificat>)ViewData["AssignedDivepros"];
+    List<ApplicationUser> instructors = (List<ApplicationUser>)ViewData["Divepros"];
 }
-
-<h1>Edit</h1>
 
 <div class="container">
     <form method="post" asp-action="Edit" enctype="multipart/form-data">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Id" id="certificateId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <h3 class="text-info mb-3">Rediger @Model.ShortName</h3>
 
         <div class="row">
-            <div class="col-md-10 col-12">
+            <div class="col">
 
                 <div class="form-group row">
                     <div class="col-3">
@@ -52,10 +52,145 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="IsDiveproCertificate" class="col-form-label"></label>
+                    </div>
+                    <div class="col-9">
+                        <input type="checkbox" asp-for="IsDiveproCertificate" />
+                    </div>
+                    <span asp-validation-for="IsDiveproCertificate" class="text-danger"></span>
+                </div>
+
             </div>
         </div>
+        @if (Model.IsDiveproCertificate)
+        {
+            <div class="row row-cols-2 mb-3">
 
-        <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+                <div class="col">
+                    <section class="card">
+                        <div class="card-header">Tilgængelige instruktører</div>
+                        <div class="card-body">
+                            <ul class="list-group pb-5" style="min-height:20px;" ondrop="dragDropRemove(event)" ondragover="allowDrop(event)">
+
+                                @foreach (var item in instructors.Where(x=> !assigned.Any(y => y.User.Id == x.Id)))
+                                {
+                                    <li class="list-group-item" id="@item.Id" draggable="true" ondragstart="dragStart(event)">@item.Name</li>
+                                }
+                            </ul>
+
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col">
+                    <section class="card">
+                        <div class="card-header">Aktive instruktører til dette certifikat</div>
+                        <div class="card-body" placeholder="Træk instruktører der har dette certifikat her til">
+                            <ul class="list-group pb-5" ondrop="dragDropAdd(event)" style="min-height:20px;" ondragover="allowDrop(event)">
+                                @foreach (var item in assigned)
+                                {
+                                    <li class="list-group-item" id="@item.User.Id" draggable="true" ondragstart="dragStart(event)">@item.User.Name</li>
+                                }
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        }
+
+    <div class="row justify-content-between">
+        <div class="col">
+            <button type="submit" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i>&nbsp;Gem</button>
+            <a type="button" class="btn btn-outline-danger btn-sm" asp-action="Index" asp-controller="Certificate" asp-area="Admin"><i class="fas fa-trash"></i>&nbsp;Annuller</a>
+        </div>
+    </div>
+        
     </form>
 
 </div>
+
+@section Scripts {
+    <script language="javascript">
+
+        var addUrl = "@Url.Action("AddCertificateToUser","Certificate", new { Area = "Admin" })";
+        var removeUrl = "@Url.Action("RemoveCertificateFromUser","Certificate", new { Area = "Admin" })";
+
+        var certificateId = $("#certificateId")[0].value;
+
+        console.log(certificateId);
+
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function dragStart(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function dragDropAdd(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            var data = ev.dataTransfer.getData("text");
+            console.log("data:", data);
+            console.log("event.target:", ev.target);
+            var movingItem = document.getElementById(data);
+
+
+            $.ajax({
+                type: "POST",
+                url: addUrl,
+                data: { "certificateId": certificateId, "instructorId": data },
+                cache: false,
+                success: function (data) {
+                    // TODO : refill list with result from Action
+                    console.log(data);
+
+                    if (ev.target.localName === "ul") {
+                        ev.target.appendChild(movingItem);
+                    }
+                    if (ev.target.localName === "li") {
+                        ev.target.parentNode.appendChild(movingItem);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert("Could not assign PRO certificate to Instructor");
+                }
+            });
+        }
+
+        function dragDropRemove(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            var data = ev.dataTransfer.getData("text");
+            var movingItem = document.getElementById(data);
+
+            $.ajax({
+                type: "POST",
+                url: removeUrl,
+                data: { "certificateId": certificateId, "instructorId": data },
+                cache: false,
+                success: function (data) {
+                    // TODO : refill list with result from Action
+                    console.log(data);
+
+                    if (ev.target.localName === "ul") {
+                        ev.target.appendChild(movingItem);
+                    }
+                    if (ev.target.localName === "li") {
+                        ev.target.parentNode.appendChild(movingItem);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert("Could not assign PRO certificate to Instructor");
+                }
+            });
+        }
+
+    </script>
+}

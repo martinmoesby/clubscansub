@@ -54,6 +54,12 @@
                 <input type="checkbox" asp-for="SessionTemplate.UseDefaultWeekDay" class="form-check-inline" />
                 <label class="col-form-label" asp-for="SessionTemplate.UseDefaultWeekDay"></label>
             </div>
+
+            <div class="col-4 form-group">
+                <label class="col-form-label" asp-for="SessionTemplate.InstructorRatio"></label>
+                <input type="number" min="1" max="16" asp-for="SessionTemplate.InstructorRatio" class="form-control form-control-sm" />
+            </div>
+
         </div>
 
         <div class="row">
