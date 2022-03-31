@@ -1,4 +1,6 @@
 ﻿@using System.Threading
+@using Nager.Date
+@using Nager.Date.Model
 @model IEnumerable<CourseSession>
 @*
 
@@ -24,6 +26,7 @@
     DateTime startDate = firstDayOfTheMonth.AddDays((int)firstDayOfTheMonth.DayOfWeek == 0 ? -6 :-(int)firstDayOfTheMonth.DayOfWeek+1);
     DateTime endDate = lastDayOfTheMonth.AddDays((int)lastDayOfTheMonth.DayOfWeek == 0 ? 0 : 7-(int)lastDayOfTheMonth.DayOfWeek);
     int totalDays = (int)(endDate - startDate).TotalDays+1;
+    IEnumerable<PublicHoliday> holidays = DateSystem.GetPublicHoliday(startDate, endDate, CountryCode.DK);
 
     DateTime iterateDate = startDate;
 
@@ -57,8 +60,16 @@
     <div class="row border-bottom border-left" style="min-height:75px">
         @for (int i = 0; i < totalDays; i++)
         {
+            var holidayName = "";
+
             iterateDate = startDate.AddDays(i);
             var bgStyle = iterateDate.DayOfWeek == DayOfWeek.Sunday || iterateDate.DayOfWeek == DayOfWeek.Saturday ? "bg-light text-dark" : "bg-white text-dark";
+            var holiday = holidays.FirstOrDefault(x => x.Date == iterateDate);
+            if (holiday != null) {
+                holidayName = $" - {holiday.LocalName}";
+                bgStyle = "alert-info";
+            }
+
 
             if (iterateDate.DayOfWeek == Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek && i > 0)
                 {
@@ -68,8 +79,7 @@
                 <div class="col border-right @bgStyle">
                     @if (iterateDate.Month == getDate.Month)
                     {
-                    <div class="mb-2">@iterateDate.ToString("M")</div>
-            
+                    <div class="mb-2">@iterateDate.ToString("M") <span class="small text-bold">@holidayName</span></div>
 
                         var daysCOurses = Model.Where(x => x.DateTime.Day == iterateDate.Day);
                         
