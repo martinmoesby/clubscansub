@@ -112,7 +112,7 @@
                                     @if (!item.SessionInstructors.Any(x => x.InstructorId == User.GetIdentityId()))
                                     {
                                         <div class="col-auto m-1 small">
-                                            <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id" >Skriv mig på <i class="fas fa-thumbs-up small" title="Yes, I can - sign me up!!"></i></a>
+                                            <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id" >Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></a>
                                         </div>
                                     }                                     
                                     @foreach (var instructor in item.SessionInstructors.OrderByDescending(x=>x.InstructorApproved))
@@ -122,13 +122,13 @@
                                                 @if (instructor.InstructorRetracted && !instructor.InstructorApproved)
                                                 {
                                                     <span class="btn btn-sm badge-danger">
-                                                        <s>@instructor.Instructor.Firstname</s><i class="far fa-thumbs-down small ml-2" title="This instructor has retracted"></i>
+                                                        <s>@instructor.Instructor.ShortName</s><i class="far fa-thumbs-down small ml-2" title="This instructor has retracted"></i>
                                                     </span>
                                                 } 
                                                 else if (!instructor.InstructorApproved && !instructor.InstructorRetracted && instructor.InstructorId == User.GetIdentityId())
                                                 {
                                                     <a class="btn btn-sm btn-warning mr-1" asp-action="Retract" asp-route-sessionid="@item.Id">
-                                                        @instructor.Instructor.Firstname<i class="fas fa-thumbs-down small" title="Sorry, have to retract my subnmission"></i>
+                                                        @instructor.Instructor.ShortName<i class="fas fa-thumbs-down small ml-2" title="Sorry, have to retract my subnmission"></i>
                                                     </a>
                                                 } 
                                                 else if (User.IsInRole("Administrator") && !instructor.InstructorRetracted)
@@ -136,19 +136,19 @@
                                                     if (!instructor.InstructorApproved)
                                                     {
                                                         <button class="btn btn-sm btn-warning" title="Assign instructor" onclick="@Url.Action("Approve", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
-                                                            @instructor.Instructor.Firstname<i class="fas fa-check small ml-2 text-success"></i>
+                                                            @instructor.Instructor.ShortName<i class="fas fa-check small ml-2 text-success"></i>
                                                          </button>
                                                     }
                                                     else
                                                     {
                                                         <button class="btn btn-sm btn-success" title="Remove instructor" onclick="@Url.Action("Remove", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
-                                                            @instructor.Instructor.Firstname<i class="fas fa-times small ml-2 text-danger"></i>
+                                                            @instructor.Instructor.ShortName<i class="fas fa-times small ml-2 text-danger"></i>
                                                         </button>
                                                     }
                                                 }
                                                 else 
                                                 {
-                                                    <span class="btn btn-sm @(instructor.InstructorApproved ? "badge-success" : instructor.InstructorRetracted ? "badge-danger" : "badge-warning")">@instructor.Instructor.Firstname</span>
+                                                    <span class="btn btn-sm @(instructor.InstructorApproved ? "badge-success" : instructor.InstructorRetracted ? "badge-danger" : "badge-warning")">@instructor.Instructor.ShortName</span>
                                                 }
                                             
                                       </div>
