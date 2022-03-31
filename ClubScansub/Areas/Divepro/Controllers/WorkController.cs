@@ -64,7 +64,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
                     .ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.CourseTemplate)
                     .ThenInclude(x=>x.InstructorCertificate)
-                .Where(x => x.StartDateAndTime > DateTime.Now && myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id))
+                .Where(x => x.EndDateAndTime > DateTime.Now && myProCerts.Any(y => y.Certificate.Id == x.CourseTemplate.InstructorCertificate.Id))
                 .OrderBy(x=>x.StartDateAndTime)
                 .ToListAsync();
 
@@ -73,7 +73,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
 
         public async Task<IActionResult> Workcalendar(int offset = 0)
         {
-            ViewBag.Pagetitle = "Kurser der mangler instruktører";
+            ViewBag.Pagetitle = "Divepro Arbejdskalender";
             CurrentMonth += offset;
             if (CurrentMonth < 1)
             {
@@ -145,7 +145,6 @@ namespace ClubScansub.Areas.Divepro.Controllers
         }
 
         [Authorize(Roles =Userroles.Divepro)]
-
         public async Task<IActionResult> ApplySingle(int sessionId)
         {
             string sessionDescription = "Du har skrevet dig på som instruktør til: \n";
@@ -180,7 +179,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
                 .Where(x => x.InstructorId == userId && x.CourseSessionId == sessionid).FirstOrDefaultAsync();
             sessionInstructor.InstructorRetracted = true;
 
-            var sessionText = $"'{sessionInstructor.CourseSession.CourseSessionTemplate.Description}'";
+            var sessionText = $"'{sessionInstructor.CourseSession.SessionDescription}'";
             var sessionDescription = $"Du har afmeldt dig til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n";
 
             await db.SaveChangesAsync();
@@ -191,7 +190,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
            
             await smsSender.SendMultipleSmsAsync(admins, $"{user.Name } har meldt fra som instruktør til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n");
 
-            return RedirectToAction(nameof(MyWorkplan));
+            return RedirectToAction(nameof(Workcalendar));
 
         }
 
