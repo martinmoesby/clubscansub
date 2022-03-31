@@ -74,7 +74,25 @@ namespace ClubScansub.Models
 
         [NotMapped]
         [Display(Name = "Kort navn")]
-        public string ShortName => $"{Firstname} {Lastname.Take(1).FirstOrDefault()}.";
+        public string ShortName
+        {
+            get
+            {
+                try
+                {
+                    var lastNameInitial = "";
+                    if (!string.IsNullOrEmpty(Lastname) && Lastname.Length>0)
+                    {
+                        lastNameInitial = Lastname.Take(1).FirstOrDefault().ToString();
+                    }
+                    return $"{Firstname} {lastNameInitial}.";
+                }
+                catch (Exception)
+                {
+                    return Firstname;
+                }
+            }
+        } 
 
         [PersonalData]
         [Display(Name ="Kursuskonto balance")]
