@@ -134,36 +134,40 @@
                                 </div>
 
                                 <div class="row d-flex">
-                                    @if (!item.SessionInstructors.Any(x => x.InstructorId == User.GetIdentityId()))
+                                    @* Can only sign up, if you are NOT site-admin /Owner *@
+                                    @if (!item.SessionInstructors.Any(x => x.InstructorId == User.GetIdentityId()) && !User.IsInRole("Owner"))
                                     {
-                                        if(!alreadyActivatedMe && !dayIsDisabled)
-                                        {
-                                            <div class="col-auto m-1 small">
-                                                <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id">Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></a>
-                                            </div>                                        
-                                        } else
-                                        {
-                                            <div class="col-auto m-1 small">
-                                                <button class="btn btn-sm btn-info" disabled>Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></button>
-                                            </div>                                        
-                                        }
+                                        
+                                            @if(!alreadyActivatedMe && !dayIsDisabled)
+@*                                            {
+                                                
+                                                <span class="btn btn-sm alert-info" disabled title="@title">Skriv mig på</span>
+                                                                                          
+                                            } else*@
+                                            {
+                                                <div class="col-auto m-1 small">
+                                                    <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id">Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></a>
+                                                </div>
+                                            }
+                                        
                                     }                                     
+
                                     @foreach (var instructor in item.SessionInstructors.OrderByDescending(x=>x.InstructorApproved))
                                     {
-                                      var alreadyActivatedThisInstructor = daysCOurses.SelectMany(x => x.SessionInstructors).Any(x => x.InstructorId == instructor.InstructorId && x.InstructorApproved && x.CourseSessionId != item.Id);
+                                      var alreadyActivatedThisInstructor = daysCOurses.SelectMany(x => x.SessionInstructors).Any(x => x.InstructorId == instructor.InstructorId && x.InstructorApproved && x.CourseSessionId != item.Id && x.CourseSession.Course.Id != item.Course.Id);
 
                                       <div class="col-auto m-1 small">
                                            
                                         @if (instructor.InstructorRetracted && !instructor.InstructorApproved)
                                         {
-                                            <span class="btn btn-sm badge-danger" disabled>
-                                                <s>@instructor.Instructor.ShortName</s><i class="far fa-thumbs-down small ml-2" title="This instructor has retracted"></i>
+                                            <span class="btn btn-sm alert-danger" disabled>
+                                                <s>@instructor.Instructor.ShortName</s>
                                             </span>
                                         } 
                                         else if (!instructor.InstructorApproved && !instructor.InstructorRetracted && instructor.InstructorId == User.GetIdentityId() && !dayIsDisabled)
                                         {
-                                            <a class="btn btn-sm btn-warning mr-1" asp-action="Retract" asp-route-sessionid="@item.Id">
-                                                @instructor.Instructor.ShortName<i class="fas fa-thumbs-down small ml-2" title="Sorry, have to retract my subnmission"></i>
+                                            <a class="btn btn-sm btn-danger mr-1" asp-action="Retract" asp-route-sessionid="@item.Id" title="Sorry, have to retract my subnmission">
+                                                @instructor.Instructor.ShortName<i class="far fa-thumbs-down small ml-2" ></i>
                                             </a>
                                         } 
                                         else if (User.IsInRole("Administrator") && !instructor.InstructorRetracted)
@@ -172,31 +176,32 @@
                                             {
                                                 if(alreadyActivatedThisInstructor || dayIsDisabled)
                                                 {
-                                                <button class="btn btn-sm btn-warning" disabled title="Assign instructor" onclick="@Url.Action("Approve", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
-                                                    @instructor.Instructor.ShortName<i class="fas fa-check small ml-2 text-success"></i>
-                                                </button>
+                                                    var title = alreadyActivatedThisInstructor ? "Cannot approve - already assigned to a different Course" : "Cannot approve for days in the past";
+                                                    <button class="btn btn-sm btn-warning" disabled title="@title">
+                                                        @instructor.Instructor.ShortName
+                                                     </button>                                               
 
                                                 } else
                                                 {
-                                                <button class="btn btn-sm btn-warning"  title="Assign instructor" onclick="@Url.Action("Approve", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
-                                                    @instructor.Instructor.ShortName<i class="fas fa-check small ml-2 text-success"></i>
-                                                    </button>
-
+                                                    <a class="btn btn-sm alert-success" asp-action="Approve"  asp-route-sessionId="@item.Id" asp-route-instructorId="@instructor.InstructorId"
+                                                        title="Assign instructor">
+                                                        @instructor.Instructor.ShortName<i class="fas fa-check small ml-2 text-success"></i>
+                                                    </a>
                                                 }
                                             }
                                             else
                                             {
                                                 if (dayIsDisabled)
                                                 {
-                                                    <button class="btn btn-sm btn-success" title="Remove instructor" disabled onclick="@Url.Action("Remove", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
-                                                        @instructor.Instructor.ShortName<i class="fas fa-times small ml-2 text-danger"></i>
+                                                    <button class="btn btn-sm btn-success" title="Remove instructor" disabled>
+                                                        @instructor.Instructor.ShortName
                                                     </button>
 
                                                 } else
                                                 {
-                                                    <button class="btn btn-sm btn-success" title="Remove instructor" onclick="@Url.Action("Remove", "Work", new { sessionId = item.Id, instructorId = instructor.InstructorId })">
+                                                    <a class="btn btn-sm btn-success" asp-action="Approve" asp-route-sessionId="@item.Id" asp-route-instructorId="@instructor.InstructorId" title="Remove instructor">
                                                         @instructor.Instructor.ShortName<i class="fas fa-times small ml-2 text-danger"></i>
-                                                    </button>
+                                                    </a>
                                                 }
                                             }
                                         }

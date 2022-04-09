@@ -201,6 +201,25 @@ namespace ClubScansub.Areas.Divepro.Controllers
 
         }
 
+        //[Authorize(Roles = Userroles.Administrator + ", " + Userroles.Owner)]
+        //public async Task<IActionResult> Remove(int sessionId, string instructorId)
+        //{
+        //    var sessionInstructor = await db.CourseSessionInstructors.FindAsync(sessionId, instructorId);
+        //    if (sessionInstructor != null)
+        //    {
+        //        sessionInstructor.InstructorApproved = false;
+        //        await db.SaveChangesAsync();
+
+        //        var instructor = await db.ApplicationUsers.FindAsync(instructorId);
+        //        if (instructorId != null)
+        //        {
+
+        //        }
+
+        //    }
+        //    return RedirectToAction(nameof(Workcalendar));
+
+        //}
 
         [Authorize(Roles = Userroles.Administrator + ", " + Userroles.Owner)]
         public async Task<IActionResult> Approve(int sessionid, string instructorId)
@@ -225,7 +244,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
                         break;
                 }
             }
-            else if (instructor.PhoneNumberConfirmed)
+            else if (!instructor.PhoneNumberConfirmed)
             {
                 switch (sessioninstructor.InstructorApproved)
                 {
@@ -238,7 +257,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
                 }
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Workcalendar));
 
         }
 
