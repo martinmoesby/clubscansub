@@ -285,6 +285,8 @@ namespace ClubScansub.Controllers
                         .Include(x => x.RequiredCertificate)
                         .Include(x => x.Participants)
                             .ThenInclude(x => x.ApplicationUser)
+                        .Include(x=>x.ExternalClubMembers)
+                            .ThenInclude(x=>x.ApplicationUser)
                         .Include(x => x.Divelocation)
                             .ThenInclude(x => x.MeetingLocation)
                         .Include(x => x.Divelocation)
@@ -345,6 +347,48 @@ namespace ClubScansub.Controllers
 
             return RedirectToAction(nameof(Index));
 
+        }
+
+        [Authorize]
+        public async Task<IActionResult> SignUpMultiple(int id, int divers)
+        {
+            var item = await db.Events.Include(x => x.Participants)
+                .Include(x=>x.ExternalClubMembers)
+                .Include(x => x.RequiredCertificate)
+                .FirstAsync(x => x.Id == id);
+
+            var user = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(x => x.Certificates).ThenInclude(x => x.Certificate).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+
+            var userPrice = item.PremiumPrice * divers;
+
+            if (item == null || user == null)
+            {
+                StatusMessage = $"Der skete en fejl: Bruger eller begivenhed ikke genkendt.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var accounttrans = new ApplicationUserAccountEntry
+            {
+                Amount = -userPrice,
+                AccountType = AccountTypeEnum.EventAccountType,
+                Description = $"{item.Title} med {divers} dykkere, d. {item.StartDateAndTime.ToShortDateString()}",
+                Event = item,
+                PostingDate = DateTime.Now
+            };
+
+            user.AccountTransactions.Add(accounttrans);
+
+            // ADD Logic to add x number of KlubDivers to the event
+            for (int i = 0; i < divers; i++)
+            {
+                item.ExternalClubMembers.Add(new EventMultiApplicationUser() { ApplicationUser = user, Event = item });
+            }
+            await db.SaveChangesAsync();
+
+            StatusMessage = $"Du har tilmeldt {divers} {(divers > 1 ? "dykkere" : "dykker")} til '{item.Title}' d. {item.StartDateAndTime.ToShortDateString()}";
+            StatusMessage += $"\nHusk at sørge for at dine dykkere har de korrekte certificeringer eller at de dykker med en kvalificeret instruktør e.l. på turen.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize]

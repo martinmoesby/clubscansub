@@ -52,6 +52,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var @events = await db.Events
                 .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                 .Include(x => x.Divelocation)
                 .ToListAsync();
 
@@ -90,6 +91,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var @events = await db.Events
                 .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime <= DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                 .Include(x => x.Divelocation)
                 .ToListAsync();
 
@@ -133,6 +135,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var eventItem = await db.Events
                 .Include(x => x.Participants)
                    .ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                    .Include(x => x.Divelocation)
                    .Include(x => x.SecondaryDivelocation)
                    .Include(x => x.RequiredCertificate)
@@ -438,6 +441,58 @@ namespace ClubScansub.Areas.Admin.Controllers
 
         }
 
+
+        public async Task<IActionResult> RemoveExternalUserFromEvent(int eventid, string userid)
+        {
+            var ev_user = await db.EventExternalUsers.Where(x => x.EventId == eventid && x.ApplicationUserId == userid).FirstOrDefaultAsync();
+
+            if (ev_user != null)
+            {
+                db.EventExternalUsers.Remove(ev_user);
+                var user = await db.ApplicationUsers
+                    .Include(x => x.AccountTransactions)
+                        .ThenInclude(x => x.Event)
+                    .FirstOrDefaultAsync(x => x.Id == userid);
+
+                var ev = await db.Events.FindAsync(eventid);
+                decimal refundFactor = 1m;
+
+                if ((ev.StartDateAndTime - DateTime.Now).Days > 0 && (ev.StartDateAndTime - DateTime.Now).Days < 8)
+                    refundFactor = 0.5m;
+
+                if ((ev.StartDateAndTime - DateTime.Now).Days < 1)
+                    refundFactor = 0;
+
+                if (user.PhoneNumberConfirmed)
+                {
+                    var smsSendResult = await smsSender.SendSmsAsync(user.PhoneNumber, $"Du har afmeldt en dykker til '{ev.Title}' d. {ev.StartDateAndTime.ToShortDateString()}. Du er blevet refunderet {refundFactor * 100} % af betalingen for turen");
+                }
+
+                //var accountEntry = user.AccountTransactions
+                //    .Where(x => x.Event != null && x.AccountType == AccountTypeEnum.EventAccountType)
+                //    .OrderBy(x => x.PostingDate)
+                //    .FirstOrDefault(x => x.Event.Id == eventid);
+
+                //if (accountEntry != null)
+                //{
+                    var newEntry = new ApplicationUserAccountEntry
+                    {
+                        Amount = ev.PremiumPrice * refundFactor,
+                        ApplicationUser = user,
+                        AccountType = AccountTypeEnum.EventAccountType,
+                        Event = ev,
+                        Description = $"Tilbageførsel for en dykker '{ev.Title}' ({refundFactor * 100} %)",
+                        PostingDate = DateTime.Now
+                    };
+                    db.ApplicationUserAccountEntry.Add(newEntry);
+                //}
+                await db.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Edit", new { id = eventid });
+
+        }
+
         [HttpPost, ActionName("AddUserToEvent")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddUserToEvent(int eventId, string userId, bool doCreateAccountTransaction = false)
@@ -516,6 +571,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         {
             var @events = await db.Events
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                 .Include(x => x.Divelocation)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -538,7 +594,11 @@ namespace ClubScansub.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var e = await db.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).FirstOrDefaultAsync(x=>x.Id == id);
+            var e = await db.Events
+                    .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                    .Include(x=>x.ExternalClubMembers).ThenInclude(x => x.ApplicationUser)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
             var eventtype = e.EventType;
 
             foreach (var item in e.Participants)
@@ -564,16 +624,50 @@ namespace ClubScansub.Areas.Admin.Controllers
                 }
             }
 
-            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Begivenheden '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. \n\nEvt. pris er blevet indstat på din turkonto\n\nMed venlig hilsen\nKlub Scansub");
 
-            if (smsSendResult.Any(x=>!x.IsSuccessStatusCode))
+            var externalClubParticipants = e.ExternalClubMembers.GroupBy(x => x.ApplicationUser).Select(group => new { User = group.Key, Count = group.Count() }).OrderBy(x => x.User);
+            foreach (var item in externalClubParticipants)
             {
-                StatusMessage = "Der opstod fejl i forbindelse med afsendelsen af SMS: ";
-                foreach (var item in smsSendResult.Where(x => !x.IsSuccessStatusCode))
+                var accountTransaction = item.Count * e.PremiumPrice;
+                //var accountTransaction = await db.ApplicationUserAccountEntry
+                //    .Include(x => x.ApplicationUser)
+                //    .Include(x => x.Event)
+                //    .OrderByDescending(x => x.Id)
+                //    .Where(x => x.Event.Id == id && x.ApplicationUser.Id == item.User.Id).SumAsync(x=>x.Amount);
+
+                if (accountTransaction != 0)
                 {
-                    StatusMessage += item.GetErrorMessage();
+                    var accounttrans = new ApplicationUserAccountEntry
+                    {
+                        Amount = accountTransaction,
+                        AccountType = AccountTypeEnum.EventAccountType,
+                        PostingDate = DateTime.Now,
+                        Description = $"Tilbageførsel pga. annulering af '{e.Title}' for {item.Count} dykkere",
+                        ApplicationUser = item.User,
+                        Event = e
+                    };
+                    db.ApplicationUserAccountEntry.Add(accounttrans);
                 }
             }
+
+
+            var smsSendResult = await smsSender.SendMultipleSmsAsync(e.Participants.Select(x=>x.ApplicationUser), $"Begivenheden '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. \n\nEvt. pris er blevet indstat på din turkonto\n\nMed venlig hilsen\nKlub Scansub");
+            var smsSendResult2 = await smsSender.SendMultipleSmsAsync(externalClubParticipants.Select(x => x.User), $"Begivenheden '{e.Title}' d. {e.StartDateAndTime.ToShortDateString()} er desværre blevet aflyst. \n\nVi har tilbageført prisen for de tilmeldte dykkere.\n\nMed venlig hilsen\nKlub Scansub");
+
+            if (smsSendResult.Any(x => !x.IsSuccessStatusCode) || smsSendResult2.Any(x => !x.IsSuccessStatusCode))
+            {
+                StatusMessage = "Der opstod fejl i forbindelse med afsendelsen af SMS: \n";
+                          
+                foreach (var item in smsSendResult.Where(x => !x.IsSuccessStatusCode))
+                {
+                    StatusMessage += $"{item.GetErrorMessage()}\n";
+                }
+                foreach (var item in smsSendResult2.Where(x => !x.IsSuccessStatusCode))
+                {
+                    StatusMessage += $"{item.GetErrorMessage()}\n";
+                }
+            }
+
             e.IsCancelled = true;
             await db.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new { eventtype });
@@ -586,7 +680,10 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (!User.IsInRole("Administrator"))
                 return new StatusCodeResult(403);
                 
-            var e = await db.Events.Include(x => x.Participants).ThenInclude(x => x.ApplicationUser).FirstOrDefaultAsync(x => x.Id == id);
+            var e = await db.Events
+                .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Include(x=>x.ExternalClubMembers)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             var eventtype = e.EventType;
             db.Remove(e);

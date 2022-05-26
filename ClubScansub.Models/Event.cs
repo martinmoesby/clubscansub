@@ -86,7 +86,8 @@ namespace ClubScansub.Models
 
         [Display(Name = "Bådfører")]
         public ApplicationUser BoatLeader { get; set; }
-
+         
+        public virtual ICollection<EventMultiApplicationUser> ExternalClubMembers { get; set; }  
 
         public ICollection<EventUser> Participants { get; set; }
 
@@ -94,13 +95,16 @@ namespace ClubScansub.Models
 
         [NotMapped]
         [Display(Name = "Frie pladser")]
-        public int FreeSpots => MaxParticipants - FixedParticipants - Participants.Count;
+        public int FreeSpots => MaxParticipants - FixedParticipants - Participants.Count - ExternalClubMembersCount;
 
         [NotMapped]
         [Display(Name = "Manglende deltagere")]
-        public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants;
+        public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount;
 
         public Guid DeeplinkId { get; set; }
+
+        [NotMapped]
+        private int ExternalClubMembersCount => ExternalClubMembers == null ? 0 : ExternalClubMembers.Count;
 
     }
 }

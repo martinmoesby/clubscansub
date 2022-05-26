@@ -35,6 +35,23 @@ namespace ClubScansub.Areas.Members.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var currentUser = await db.ApplicationUsers.FindAsync(User.GetIdentityId());
+            if (currentUser.IsMultiUser)
+            {
+                var eventplan = await db.EventExternalUsers
+                    .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
+                    .Include(x => x.Event).ThenInclude(x => x.ExternalClubMembers).ThenInclude(x => x.ApplicationUser)
+                    .Where(x => x.ApplicationUserId == User.GetIdentityId() && x.Event.StartDateAndTime > DateTime.Now && !x.Event.IsCancelled)
+                    .ToListAsync();
+
+                Events = eventplan.Select(x => x.Event).Distinct();
+
+                return View(Events);
+
+            }
+            else
+            {
+
             var eventplan = await db.EventUsers
                 .Include(x => x.Event).ThenInclude(x => x.Divelocation).ThenInclude(x => x.MeetingLocation)
                 .Include(x => x.Event).ThenInclude(x => x.Participants).ThenInclude(x => x.ApplicationUser)
@@ -44,6 +61,7 @@ namespace ClubScansub.Areas.Members.Controllers
             Events = eventplan.Select(x => x.Event);
 
             return View(Events);
+            }
         }
 
         [Route("Courses")]

@@ -23,6 +23,8 @@ namespace ClubScansub.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventUser> EventUsers { get; set; }
+
+        public DbSet<EventMultiApplicationUser> EventExternalUsers { get; set; }
         public DbSet<ApplicationUserAccountEntry> ApplicationUserAccountEntry { get; set; }
         public DbSet<CourseTemplate> CourseTemplates { get; set; }
         public DbSet<CourseSessionTemplate> CourseSessionTemplates { get; set; }

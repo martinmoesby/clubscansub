@@ -1,41 +1,46 @@
 ﻿@model Event
 
-    <div class="badge badge-pill bg-light p-2">
-        @for (int i = 0; i < Model.FixedParticipants; i++)
-        {
-            <i class="fas fa-user-check text-info" title="Plads optaget af DkDiver"></i>
-        }
+<div class="badge badge-pill bg-light p-2">
+    @for (int i = 0; i < Model.FixedParticipants; i++)
+    {
+        <i class="fas fa-user-check text-info" title="Plads optaget af DkDiver"></i>
+    }
 
-        @foreach (var user in Model.Participants)
-        {
-            @if (user.ApplicationUser != null && User.Identity.IsAuthenticated)
-            {
-                <i class="fas fa-user-check text-success" title="Plads taget af @user.ApplicationUser.Firstname"></i>
-            }
-            else
-            {
-                <i class="fas fa-user-check text-success" title="Plads optaget"></i>
-            }
-        }
+    @foreach (var user in Model.ExternalClubMembers)
+    {
+        <i class="fas fa-user-check text-success" title="Plads taget af @user.ApplicationUser.ShortName"></i>
+    }
 
-        @for (int i = 0; i < Model.RequiredSpots % 10; i++)
+    @foreach (var user in Model.Participants)
+    {
+        @if (user.ApplicationUser != null && User.Identity.IsAuthenticated)
         {
-            <i class="far fa-user text-warning" title="1 påkrævet plads"></i>
+            <i class="fas fa-user-check text-success" title="Plads taget af @user.ApplicationUser.Firstname"></i>
         }
-
-        @for (int i = 0; i < Model.RequiredSpots / 10; i++)
+        else
         {
-            <i class="fas fa-users text-warning" title="10 påkrævede pladser"></i>
+            <i class="fas fa-user-check text-success" title="Plads optaget"></i>
         }
+    }
 
-        @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) % 10; i++)
-        {
-            <i class="far fa-user text-dark" title="Ledig plads"></i>
-        }
+    @for (int i = 0; i < Model.RequiredSpots % 10; i++)
+    {
+        <i class="far fa-user text-warning" title="1 påkrævet plads"></i>
+    }
 
-        @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) / 10; i++)
-        {
-            <i class="fas fa-users text-dark" title="10 ledige pladser"></i>
-        }
+    @for (int i = 0; i < Model.RequiredSpots / 10; i++)
+    {
+        <i class="fas fa-users text-warning" title="10 påkrævede pladser"></i>
+    }
 
-    </div>
+    @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) % 10; i++)
+    {
+        <i class="far fa-user text-dark" title="Ledig plads"></i>
+    }
+
+    @for (int i = 0; i < (Model.FreeSpots - Model.RequiredSpots) / 10; i++)
+    {
+        <i class="fas fa-users text-dark" title="10 ledige pladser"></i>
+    }
+
+</div>

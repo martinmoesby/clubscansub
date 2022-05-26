@@ -49,7 +49,7 @@
                 {
                     <tr>
                         <td class="small" style="width:128px;">
-                            @await Component.InvokeAsync("Image", new { imageId = item.Divelocation.Id, showThumbnail = false })
+                            @await Component.InvokeAsync("Image", new { imageId = item.Divelocation?.Id, showThumbnail = false })
                         </td>
 
                         <td class="small">
@@ -75,7 +75,7 @@
                             <td class="small" colspan="2">Dykker lokation ikke angivet</td>
                         }
 
-                        <td class="small">@(item.Participants.Count + item.FixedParticipants) af @item.MinParticipants - @item.MaxParticipants</td>
+                        <td class="small">@(item.Participants.Count + item.FixedParticipants + item.ExternalClubMembers?.Count) af @item.MinParticipants - @item.MaxParticipants</td>
 
                         <td>
                             <input type="checkbox" asp-for="@item.IsInternal" readonly disabled />

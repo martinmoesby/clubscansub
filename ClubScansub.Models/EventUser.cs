@@ -16,4 +16,17 @@ namespace ClubScansub.Models
         [JsonIgnore]
         public Event Event { get; set; }
     }
+
+    [Table("EventMultiuser")]
+    public class EventMultiApplicationUser 
+    {
+        [Key]
+        public int Id { get; set; }
+        public string ApplicationUserId { get; set; }
+        public int EventId { get; set; }
+        [JsonIgnore]
+        public ApplicationUser ApplicationUser { get; set; }
+        [JsonIgnore]
+        public Event Event { get; set; }
+    }
 }

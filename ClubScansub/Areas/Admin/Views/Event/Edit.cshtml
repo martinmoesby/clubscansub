@@ -183,8 +183,11 @@
                         </div>
 
                         <div class="text-right my-3">
-                            <button type="submit" id="addUserToEventButton" class="btn btn-sm btn-outline-success" disabled><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
-                        </div>
+                            @if (Model.Event.FreeSpots > 0)
+                            {
+                                <button type="submit" id="addUserToEventButton" class="btn btn-sm btn-outline-success" disabled><i class="fas fa-user-plus"></i>&nbsp;Tilmeld bruger</button>
+                            }
+                            </div>
 
                     </form>
 
@@ -196,18 +199,18 @@
                 <div class="col">
 
                     <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
-                    <form asp-action="FixedUser" method="post" asp-route-eventid="@Model.Event.Id" asp-route-isadding="true">
-                    <div class="input-group mb-2">
+                    <!--<form asp-action="FixedUser" method="post" asp-route-eventid="@Model.Event.Id" asp-route-isadding="true">
+                        <div class="input-group mb-2">-->
 
-                       <span class="input-group-text">Reserver</span>
-                       <input type="number" aria-label="Antal pladser?" class="form-control" name="numberOfSeats" value="1">                     
-                       <span class="input-group-text">til</span>
-                       <select class="form-select" asp-items="@Model.MultiUsersList" name="userid">
-                          <option selected value="-1">Vælg Multibruger...</option>
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-outline-info text-info" title="Spær en plads"><i class="fas fa-user-plus"></i></button>
-                    </div>
-                    </form>
+                            @*<span class="input-group-text">Reserver</span>
+        <input type="number" aria-label="Antal pladser?" class="form-control" name="numberOfSeats" value="1">
+         <span class="input-group-text">til</span>
+         <select class="form-select" asp-items="@Model.MultiUsersList" name="userid">
+            <option selected value="-1">Vælg Multibruger...</option>
+          </select>*@
+                            <!--<button type="submit" class="btn btn-sm btn-outline-info text-info" title="Spær en plads"></button>
+                        </div>
+                    </form>-->
 
 
                     
@@ -216,8 +219,16 @@
 
                         <div class="card">
 
-                            <div class="card-header justify-content-between">
-                                Reserveret
+                            <div class="card-header d-flex justify-content-between">
+                                <span class="btn btn-sm">Reserveret</span>
+                                @if (Model.Event.FreeSpots > 0)
+                                    {
+
+                                    <a class="btn btn-sm btn-outline-info text-info" title="Spær en plads" asp-action="FixedUser" method="post" asp-route-eventid="@Model.Event.Id" asp-route-isadding="true">
+                                    <i class="fas fa-user-plus"></i>
+                                    </a>
+                                    } 
+
                             </div>
 
                             <div class="card-body">
@@ -227,17 +238,26 @@
                                         <i class="fas fa-user-minus mr-2 "></i>Dk Diver
                                     </a>
                                 }
+
                             </div>
                         </div>
 
                         <div class="card">
 
-                            <div class="card-header">Tilmeldte</div>
+                            <div class="card-header d-flex justify-content-between">
+                                <span class="btn btn-sm">Tilmeldte</span>
+                            </div>
 
                             <div class="card-body">
                                 @foreach (var item in Model.Event.Participants)
                                 {
                                     <a class="btn btn-outline-danger btn-sm mb-1 form-control small text-left ellipsis" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
+                                        <i class="fas fa-user-minus mr-2"></i>@item.ApplicationUser.Name
+                                    </a>
+                                }
+                                @foreach (var item in Model.Event.ExternalClubMembers)
+                                {
+                                    <a class="btn btn-outline-danger btn-sm mb-1 form-control small text-left ellipsis" asp-action="RemoveExternalUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
                                         <i class="fas fa-user-minus mr-2"></i>@item.ApplicationUser.Name
                                     </a>
                                 }

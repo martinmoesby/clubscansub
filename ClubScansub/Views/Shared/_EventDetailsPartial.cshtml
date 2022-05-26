@@ -6,6 +6,7 @@
         .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
         .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
+    var maxSeatsAvailable = (int)(currentUser?.Balance / Model.PremiumPrice) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.PremiumPrice) : Model.FreeSpots;
     bool isEligable = Model.RequiredCertificate == null;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
@@ -120,15 +121,15 @@
 
             if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) != null)
             {
-        <span class="rounded border border-success text-success p-2 small">
-            <i class="fas fa-user-check mr-2" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>Allerede tilmeldt
-        </span>
+                <span class="rounded border border-success text-success p-2 small">
+                    <i class="fas fa-user-check mr-2" title="Du er tilmeldt denne tur - rigtig god fornøjelse"></i>Allerede tilmeldt
+                </span>
             }
             else if (Model.FreeSpots <= 0)
             {
-        <span class="rounded border small border-dark text-black-50 p-2">
-            <i class="fas fa-lightbulb mr-2" title="Turen er fyldt op"></i>Ikke flere pladser
-        </span>
+                <span class="rounded border small border-dark text-black-50 p-2">
+                    <i class="fas fa-lightbulb mr-2" title="Turen er fyldt op"></i>Ikke flere pladser
+                </span>
             }
             else if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
             {
@@ -147,22 +148,40 @@
         <span class="rounded border border-warning text-warning p-2 small">
             <i class="fas fa-exclamation-triangle mr-2" title="Du har ikke penge nok på din turkonto."></i>Din turkonto er lav
         </span>
-            }
+        }
 
-            else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
+        else if (Model.Participants.FirstOrDefault(x => x.ApplicationUserId == User.GetIdentityId()) == null)
+        {
+            if (!isEligable && !currentUser.IsMultiUser)
             {
-                if (!isEligable)
-                {
-        <span><i class="rounded-circle bg-warning text-white p-2 fas fa-award" title="Du mangler det krævede certifikat"></i>&nbsp; @certName</span>
-        <a asp-action="Signup" class="btn btn-outline-warning btn-sm small" asp-route-id="@Model.Id" title="Advarsel - du har ikke det krævede certifikat til denne tur, men tilmeld dig denne tur, hvis du har penge på turkontoen">
-            <i class="fas fa-user-plus mr-2"></i>Certifikat mangler
-        </a>
+                    <span><i class="rounded-circle bg-warning text-white p-2 fas fa-award" title="Du mangler det krævede certifikat"></i>&nbsp; @certName</span>
+                    <a asp-action="Signup" class="btn btn-outline-warning btn-sm small" asp-route-id="@Model.Id" title="Advarsel - du har ikke det krævede certifikat til denne tur, men tilmeld dig denne tur, hvis du har penge på turkontoen">
+                        <i class="fas fa-user-plus mr-2"></i>Certifikat mangler
+                    </a>
                 }
                 else
                 {
-        <a asp-action="Signup" class="btn btn-outline-success btn-sm small" asp-route-id="@Model.Id" title="Tilmeld dig">
-            <i class="fas fa-user-plus mr-2"></i>Tilmeld
-        </a>
+                    if (currentUser.IsMultiUser)
+                    {
+                        <form method="POST" action="@Url.Action("SignUpMultiple")">
+                            <input type="hidden" value="@Model.Id" name="id" id="Id" />
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user-plus mr-2"></i>Tilmeld</span>
+                                </div>
+                                <input name="divers" id="divers" type="number" min="1" max="@(maxSeatsAvailable)" class="form-control text-center" placeholder="Antal" >
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-success">dykkere</button>
+                                </div>
+                            </div>
+                        </form>
+                    } else
+                    {
+                        <a asp-action="Signup" class="btn btn-outline-success btn-sm small" asp-route-id="@Model.Id" title="Tilmeld dig">
+                            <i class="fas fa-user-plus mr-2"></i>Tilmeld
+                        </a>
+
+                    }
                 }
             }
             else
@@ -224,37 +243,43 @@
                 <div class="card-body">
                     @if (!string.IsNullOrEmpty(User.Identity.Name))
                     {
-                        if (Model.Participants.Count > 0 || Model.FixedParticipants > 0)
+                        if (Model.Participants.Count > 0 || Model.FixedParticipants > 0 || Model.ExternalClubMembers.Count > 0)
                         {
                             for (int i = 0; i < Model.FixedParticipants; i++)
                             {
-                    <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
-                    <br />
+                                <span class="p-2 small text-info"><i class="fas fa-user-check"></i>&nbsp;Dk Diver</span>
+                                <br />
+                            }
+
+                            foreach (var item in Model.ExternalClubMembers)
+                            {
+                                <span class="p-2 small text-success"><i class="fas fa-user-check"></i>@item.ApplicationUser.ShortName</span>
+                                <br />
                             }
 
                             foreach (var user in Model.Participants)
                             {
-                    <div class="row small justify-content-between">
-                        <div class="col-6 text-success ellipsis">
-                            <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
-                        </div>
-                        @if (User.IsInRole(Userroles.Divepro))
+                                <div class="row small justify-content-between">
+                                    <div class="col-6 text-success ellipsis">
+                                        <i class="fas fa-user-check"></i>&nbsp;@user.ApplicationUser.Name
+                                    </div>
+                                    @if (User.IsInRole(Userroles.Divepro))
                                     {
-                        <div class="col-6 text-info ellipsis">
-                            <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
-                        </div>
+                                        <div class="col-6 text-info ellipsis">
+                                            <i class="fas fa-phone mr-1"></i>@user.ApplicationUser.PhoneNumber
+                                        </div>
                                     }
-                    </div>
+                                </div>
                             }
                         }
                         else
                         {
-                    <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
+                            <span class="p-2 text-danger small"><i class="fas fa-sad"></i>&nbsp;Ingen tilmeldte endnu</span>
                         }
                     }
                     else
                     {
-                    <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
+                        <span class="p-2 text-info small"><i class="fas fa-sign-in-alt"></i>&nbsp;Log ind for at se tilmeldte</span>
                     }
                 </div>
             </div>
