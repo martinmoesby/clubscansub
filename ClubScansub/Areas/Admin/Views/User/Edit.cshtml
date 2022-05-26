@@ -10,6 +10,7 @@
 
         <div class="col-6">
             <h1 class="display-4">@Model.User.Name</h1>
+
         </div>
 
         <div class="col-3 text-right">
@@ -82,6 +83,15 @@
                         <div class="col-8">
                             <label asp-for="User.City" class="text text-black-50 small"></label>
                             <input asp-for="User.City" placeholder="By" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-sm">
+                    <div class="form-row">
+                        <div class="form-group form-check">
+                            <input type="checkbox" asp-for="User.IsMultiUser" class="form-check-input" />
+                            <label asp-for="User.IsMultiUser" class="form-check-label text text-black-50 small"></label>
                         </div>
                     </div>
                 </div>

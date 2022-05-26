@@ -102,6 +102,11 @@ namespace ClubScansub.Models
         [Display(Name = "Turkonto balance")]
         public decimal Balance => AccountTransactions == null ? 0 : AccountTransactions.Where(x => x.AccountType == Utility.AccountTypeEnum.EventAccountType).Sum(x => x.Amount);
 
+
+        [PersonalData]
+        [Display(Name = "Dykkerklub?")]
+        public bool IsMultiUser { get; set; }
+
         public bool OldAccountImported { get; set; }
 
         [PersonalData]

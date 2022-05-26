@@ -37,7 +37,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             public Event Event { get; set; }
             public IEnumerable<SelectListItem> UsersList { get; set; }
             public IEnumerable<SelectListItem> CertificatesList { get; set; }
-
+            public IEnumerable<SelectListItem> MultiUsersList { get; set; }
             public IEnumerable<SelectListItem> LocationsList { get; set; }
 
         }
@@ -50,9 +50,9 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Index(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
         {
             var @events = await db.Events
-                .Where(x=>x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
+                .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
-                .Include(x=>x.Divelocation)
+                .Include(x => x.Divelocation)
                 .ToListAsync();
 
 
@@ -92,7 +92,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Include(x => x.Divelocation)
                 .ToListAsync();
-            
+
             ViewBag.Pagetitle = "Afsluttede ";
 
             switch (eventtype)
@@ -119,11 +119,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             }
 
             ViewBag.EventType = eventtype;
-            
+
             ViewBag.IsClosedEvents = true;
 
             ViewBag.StatusMessage = StatusMessage;
-            return View("Index",events);
+            return View("Index", events);
 
         }
 
@@ -134,8 +134,8 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .Include(x => x.Participants)
                    .ThenInclude(x => x.ApplicationUser)
                    .Include(x => x.Divelocation)
-                   .Include(x=>x.SecondaryDivelocation)
-                   .Include(x=>x.RequiredCertificate)
+                   .Include(x => x.SecondaryDivelocation)
+                   .Include(x => x.RequiredCertificate)
                    .FirstOrDefaultAsync(x => x.Id == id);
 
             if (eventItem == null)
@@ -150,18 +150,23 @@ namespace ClubScansub.Areas.Admin.Controllers
             {
                 _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventItem.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
             }
-            
 
             //if (eventItem.RequiredCertificate != null)
             //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;
 
-            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x=>x.Lastname).Select(x => new SelectListItem()
+            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
             }).ToListAsync();
 
-            _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem() 
+            _PageModel.MultiUsersList = await db.ApplicationUsers.Where(x => x.IsMultiUser).OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
+            {
+                Text = $"{x.Name} ({x.AccountNumber})",
+                Value = x.Id
+            }).ToListAsync();
+
+            _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem()
             {
                 Text = $"{x.ShortName} ({x.DepthLimit} m.)",
                 Value = x.Id.ToString()
@@ -189,11 +194,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var existingEvent = await db.Events
-                    .Include(x=>x.Divelocation)
-                    .Include(x=>x.SecondaryDivelocation)
-                    .Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
+                    .Include(x => x.Divelocation)
+                    .Include(x => x.SecondaryDivelocation)
+                    .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                     .AsNoTracking()
-                    .FirstAsync(x=>x.Id == pageModel.Event.Id);
+                    .FirstAsync(x => x.Id == pageModel.Event.Id);
 
                 var newLocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
                 var newLoc2 = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation?.Id);
@@ -209,13 +214,13 @@ namespace ClubScansub.Areas.Admin.Controllers
                         pageModel.Event.Title += $" og {newLoc2.Name}";
                     }
 
-                    
+
                     pageModel.Event.Details = $"{pageModel.Event.Title}. Turen kræver mindst {pageModel.Event.MinParticipants} deltagere og der er plads til maksimalt {pageModel.Event.MaxParticipants}";
-                    
+
                     // Notify signed up users using smsSender and emailSender
                     var participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Select(x => x.ApplicationUser).ToListAsync();
 
-                    foreach(var participant in participants)
+                    foreach (var participant in participants)
                     {
                         var smsText = $"Hej {participant.Firstname}, \n\n" +
                             $"Turen til '{existingEvent.Title}' den {pageModel.Event.StartDateAndTime} er blevet ændret til '{newLocation.Name}' \n" +
@@ -259,7 +264,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 await db.SaveChangesAsync();
                 if (existingEvent.SecondaryDivelocation != null && pageModel.Event.SecondaryDivelocation == null)
                 {
-                    var ev = await db.Events.Include(x => x.SecondaryDivelocation).SingleAsync(x=>x.Id == pageModel.Event.Id);
+                    var ev = await db.Events.Include(x => x.SecondaryDivelocation).SingleAsync(x => x.Id == pageModel.Event.Id);
 
                     db.Entry(ev).Property("SecondaryDivelocationId").CurrentValue = null;
                     db.Entry(ev).Property("SecondaryDivelocationId").IsModified = true;
@@ -279,7 +284,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
             pageModel.Event.SecondaryDivelocation = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation.Id);
             pageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == pageModel.Event.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
-            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x=>x.Lastname).Select(x => new SelectListItem()
+            pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
                 Text = x.Name,
                 Value = x.Id
@@ -302,7 +307,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> CreateEvent(CreateEventViewModel newevent)
         {
 
-            var location  = await db.Divelocations.FindAsync(newevent.DivelocationId);
+            var location = await db.Divelocations.FindAsync(newevent.DivelocationId);
             var certificate = await db.Certificates.FindAsync(newevent.CertificateId);
 
             var item = newevent.Event;
@@ -343,6 +348,44 @@ namespace ClubScansub.Areas.Admin.Controllers
             await db.SaveChangesAsync();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet] 
+        public async Task<ActionResult> Create(EventTypeEnum eventType)
+        {
+            DateTime today = DateTime.Today;
+            // The (... + 7) % 7 ensures we end up with a value in the range [0, 6]
+            int daysInFuture = ((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7) % 7;
+
+            DateTime eventDate = today.AddDays(daysInFuture).AddHours(8).AddMinutes(30);
+
+            _PageModel.Event = new Event()
+            {
+                StartDateAndTime = eventDate,
+                EndDateAndTime = eventDate.AddHours(4),
+            };
+            
+            _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem()
+            {
+                Text = $"{x.ShortName} ({x.DepthLimit} m.)",
+                Value = x.Id.ToString()
+            }).ToListAsync();
+            _PageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == eventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+
+            return View(_PageModel);
+        }
+
+        [HttpPost,ActionName("Create")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(PageModel pagemodel)
+        {
+            //if (!ModelState.IsValid) 
+            //    return View(pagemodel);
+
+            db.Events.Add(pagemodel.Event);
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index),pagemodel.Event.EventType);
         }
 
         public async Task<IActionResult> RemoveUserFromEvent(int eventid, string userid)
@@ -479,11 +522,11 @@ namespace ClubScansub.Areas.Admin.Controllers
             return View(events);
         }
 
-        public async Task<IActionResult> FixedUser(int eventid, bool isadding)
+        public async Task<IActionResult> FixedUser(int eventid, bool isadding, int numberOfSeats = 1)
         {
             var e = await db.Events.FindAsync(eventid);
 
-            e.FixedParticipants = isadding ? ++e.FixedParticipants: --e.FixedParticipants;
+            e.FixedParticipants = isadding ? e.FixedParticipants+=numberOfSeats: e.FixedParticipants-=numberOfSeats;
 
             await db.SaveChangesAsync();
 

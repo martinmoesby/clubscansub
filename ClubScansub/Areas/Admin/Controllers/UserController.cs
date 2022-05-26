@@ -33,7 +33,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         [TempData]
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> Index(int page = 1, string searchText = "", string membertype = Userroles.User)
+        public async Task<IActionResult> Index(int page = 1, string searchText = "", string membertype = Userroles.User, bool showClubs = false)
         {
             IndexPageVM = new UserIndexViewModel
             {
@@ -49,11 +49,15 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .OrderBy(x => x.UserName)
                 .ToListAsync();
             var result = userSearchResult.Where(x=> usersinrole.Contains(x));
+            if (showClubs)
+            {
+                result = userSearchResult.Where(x => x.IsMultiUser == true);
+            }
 
             IndexPageVM.Pager = new Pager
             {
                 PageSize = 100,
-                urlParam = $"/Admin/User/?page=:&searchText={searchText}&membertype={membertype}"
+                urlParam = $"/Admin/User/?page=:&searchText={searchText}&membertype={membertype}&showClubs={showClubs.ToString()}"
             };
 
             IndexPageVM.Pager.TotalItems = result.Count();
@@ -191,8 +195,9 @@ namespace ClubScansub.Areas.Admin.Controllers
             user.PostalCode = model.User.PostalCode;
             user.City = model.User.City;
             user.Country = model.User.Country;
+            user.IsMultiUser = model.User.IsMultiUser;
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return RedirectToAction("Edit", new { id = user.Id });
         }
