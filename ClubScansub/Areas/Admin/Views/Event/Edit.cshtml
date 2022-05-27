@@ -167,7 +167,7 @@
 
             <div class="row">
                 <div class="col">
-                    <h5><i class="fas fa-user-plus mr-2"></i>Tilmeld bruger til tur</h5>
+                    <h5 class="text-success"><i class="fas fa-user-plus mr-2"></i>Tilmeld bruger til tur</h5>
 
                     <form method="post" asp-action="AddUserToEvent" asp-route-eventId="@Model.Event.Id">
 
@@ -194,26 +194,37 @@
                 </div>
 
             </div>
+            <div class="row">
+                <div class="col">
+                    <h5 class="text-warning"><i class="fas fa-user-plus mr-2"></i>Tilmeld eksterne klubmedlemmer</h5>
 
+                    <form asp-action="AddExternalUserToEvent" method="post" asp-route-eventid="@Model.Event.Id">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Tilmeld</span>
+                            </div>
+                            <input type="number" aria-label="Antal pladser?" class="form-control col-4 text-center" name="numberOfSeats" value="1">
+                            <div class="input-group-append">
+                                <span class="input-group-text">dykkere fra</span>
+                            </div>
+                            <div class="input-group-append">
+
+                            <select class="form-control col-12 selectpicker" asp-items="@Model.MultiUsersList" name="userid" data-style="btn btn-outline-light text-dark border">
+                                <option selected value="-1">Vælg Multibruger...</option>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end my-3">
+                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Spær en plads"><i class="fas fa-user-plus mr-2"></i>Tilmeld dykkere</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
             <div class="row">
                 <div class="col">
 
-                    <h5><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
-                    <!--<form asp-action="FixedUser" method="post" asp-route-eventid="@Model.Event.Id" asp-route-isadding="true">
-                        <div class="input-group mb-2">-->
-
-                            @*<span class="input-group-text">Reserver</span>
-        <input type="number" aria-label="Antal pladser?" class="form-control" name="numberOfSeats" value="1">
-         <span class="input-group-text">til</span>
-         <select class="form-select" asp-items="@Model.MultiUsersList" name="userid">
-            <option selected value="-1">Vælg Multibruger...</option>
-          </select>*@
-                            <!--<button type="submit" class="btn btn-sm btn-outline-info text-info" title="Spær en plads"></button>
-                        </div>
-                    </form>-->
-
-
-                    
+                    <h5 class="text-info"><i class="fas fa-users"></i>&nbsp;Tilmeldinger</h5>
 
                     <div class="card-group">
 

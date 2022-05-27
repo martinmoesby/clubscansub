@@ -156,18 +156,19 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             //if (eventItem.RequiredCertificate != null)
             //    _PageModel.SelectedCertificate = eventItem.RequiredCertificate.Id;
-
-            _PageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
-            {
-                Text = $"{x.Name} ({x.AccountNumber})",
-                Value = x.Id
-            }).ToListAsync();
-
             _PageModel.MultiUsersList = await db.ApplicationUsers.Where(x => x.IsMultiUser).OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
                 Text = $"{x.Name} ({x.AccountNumber})",
                 Value = x.Id
             }).ToListAsync();
+
+            _PageModel.UsersList = await db.ApplicationUsers.Where(x => !x.IsMultiUser).OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
+            {
+                Text = $"{x.Name} ({x.AccountNumber})",
+                Value = x.Id
+            }).ToListAsync();
+
+
 
             _PageModel.CertificatesList = await db.Certificates.Select(x => new SelectListItem()
             {
@@ -468,24 +469,17 @@ namespace ClubScansub.Areas.Admin.Controllers
                     var smsSendResult = await smsSender.SendSmsAsync(user.PhoneNumber, $"Du har afmeldt en dykker til '{ev.Title}' d. {ev.StartDateAndTime.ToShortDateString()}. Du er blevet refunderet {refundFactor * 100} % af betalingen for turen");
                 }
 
-                //var accountEntry = user.AccountTransactions
-                //    .Where(x => x.Event != null && x.AccountType == AccountTypeEnum.EventAccountType)
-                //    .OrderBy(x => x.PostingDate)
-                //    .FirstOrDefault(x => x.Event.Id == eventid);
+                var newEntry = new ApplicationUserAccountEntry
+                {
+                    Amount = ev.PremiumPrice * refundFactor,
+                    ApplicationUser = user,
+                    AccountType = AccountTypeEnum.EventAccountType,
+                    Event = ev,
+                    Description = $"Tilbageførsel for en dykker '{ev.Title}' ({refundFactor * 100} %)",
+                    PostingDate = DateTime.Now
+                };
+                db.ApplicationUserAccountEntry.Add(newEntry);
 
-                //if (accountEntry != null)
-                //{
-                    var newEntry = new ApplicationUserAccountEntry
-                    {
-                        Amount = ev.PremiumPrice * refundFactor,
-                        ApplicationUser = user,
-                        AccountType = AccountTypeEnum.EventAccountType,
-                        Event = ev,
-                        Description = $"Tilbageførsel for en dykker '{ev.Title}' ({refundFactor * 100} %)",
-                        PostingDate = DateTime.Now
-                    };
-                    db.ApplicationUserAccountEntry.Add(newEntry);
-                //}
                 await db.SaveChangesAsync();
             }
 
@@ -538,6 +532,73 @@ namespace ClubScansub.Areas.Admin.Controllers
             {
                 var mailMessage = $"Hej {applicationUser.Firstname}," +
                     $"Du er nu blevet tilmeldt turen {@event.Title} med start d. {@event.StartDateAndTime}.<br />" +
+                    $"" +
+                    $"" +
+                    $"<br />" +
+                    $"Vi glæder os rgtig meget til at se dig.<br/>" +
+                    $"<br />" +
+                    $"<br/><br/>Med venlig hilsen <br/><br/> Scansub DK Diver";
+
+                await emailSender.SendEmailAsync(applicationUser.Email, $"Tilmelding til {@event.Title}", mailMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået besked vial mail";
+            }
+
+            if (!applicationUser.EmailConfirmed && !applicationUser.PhoneNumberConfirmed)
+            {
+                StatusMessage = $"Fejl: {applicationUser.Firstname} har hverken valideret sin email eller sit telefonr. så det har ikke været muligt at give elektronisk besked.";
+            }
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Edit), new { id = eventId });
+        }
+
+
+        [HttpPost, ActionName("AddExternalUserToEvent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddExternalUsersToEvent(int eventId, string userId, int numberofseats)
+        {
+
+            var @event = await db.Events
+                .Include(x => x.ExternalClubMembers)
+                .FirstOrDefaultAsync(x => x.Id == eventId);
+
+            var applicationUser = await db.ApplicationUsers.FindAsync(userId);
+            var userprice = @event.PremiumPrice;
+
+            for (int i = 0; i < numberofseats; i++)
+            {
+                @event.ExternalClubMembers.Add(new EventMultiApplicationUser() { ApplicationUser = applicationUser });
+            }
+
+            db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
+            {
+                AccountType = AccountTypeEnum.EventAccountType,
+                Amount = -userprice * numberofseats,
+                Description = $"Betaling for {numberofseats} dykkere til {@event.Title}",
+                PostingDate = DateTime.Now,
+                Event = @event,
+                ApplicationUser = applicationUser
+            });
+
+            if (applicationUser.PhoneNumberConfirmed)
+            {
+                var smsMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du har fået tilmeldt {numberofseats} dykkere til turen {@event.Title} d. {@event.StartDateAndTime}.\n" +
+                    $"\n" +
+                    $"Vi glæder os rigtig meget til at se jer.\n" +
+                    $"\n" +
+                    $"Med venlig hilsen \n" +
+                    $"Scansub DK Diver";
+
+                await smsSender.SendSmsAsync(applicationUser.PhoneNumber, smsMessage);
+                StatusMessage = $"{applicationUser.Firstname} er blevet tilmeldt og har fået beksed via SMS";
+            }
+
+            if (applicationUser.EmailConfirmed)
+            {
+                var mailMessage = $"Hej {applicationUser.Firstname}," +
+                    $"Du har fået tilmeldt {numberofseats} dykkere til turen {@event.Title} med start d. {@event.StartDateAndTime}.<br />" +
                     $"" +
                     $"" +
                     $"<br />" +
