@@ -1,0 +1,17 @@
+﻿@model EventUser
+
+<div class="row mb-3">
+    <div class="col p-4">
+        Er du sikker på at du vil fjerne @Model.ApplicationUser.Name fra turen '@Model.Event.Title'?
+    </div>
+</div>
+<div class="row">
+    <div class="col d-flex justify-content-between modal-footer">
+        <a asp-action="RemoveUserFromEvent" asp-route-eventid="@Model.EventId" asp-route-userid="@Model.ApplicationUserId" class="btn btn-outline-success">
+           <i class="fas fa-user-minus mr-2"></i> Ja, fjern denne bruger
+        </a>
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+        <i class="fas fa-user-check mr-2"></i>Nej, behold brugeren på turen
+        </button>
+    </div>
+</div>

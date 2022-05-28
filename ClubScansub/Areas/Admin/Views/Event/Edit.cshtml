@@ -262,7 +262,7 @@
                             <div class="card-body">
                                 @foreach (var item in Model.Event.Participants)
                                 {
-                                    <a class="btn btn-outline-danger btn-sm mb-1 form-control small text-left ellipsis" asp-action="RemoveUserFromEvent" asp-route-eventId="@Model.Event.Id" asp-route-userid="@item.ApplicationUserId" title="Fjern bruger fra tur og returner betaling">
+                                    <a class="btn btn-outline-danger btn-sm mb-1 form-control small text-left ellipsis" onclick="confirmRemoveUserFromEvent('@Model.Event.Id','@item.ApplicationUserId')" title="Fjern bruger fra tur og returner betaling">
                                         <i class="fas fa-user-minus mr-2"></i>@item.ApplicationUser.Name
                                     </a>
                                 }
@@ -305,6 +305,30 @@
             } else {
                 console.log(obj + " is not found")
             }
+        }
+
+        function confirmRemoveUserFromEvent(eventid, userid) {
+
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("ConfirmRemoveUserFromEvent","Event", new { area = "Admin" })",
+                contentType: "application/json;charset=utf-8",
+                data: { eventid, userid },
+                cache: false,
+                datatype: "json",
+                success: function(data) {
+                    $("#myModalTitle").text("Fjern bruger?");
+                    $("#myModalContent").html(data);
+                    $("#myModal").modal('show');
+                },
+                error: function() {
+                    $(".modal-header").removeClass("bg-info").addClass("bg-danger");
+                    $("#myModalTitle").text("Fejl");
+                    $("#myModalContent").html("Der opstod en fejl. Prøv igen senere");
+                    $("#myModal").modal('show');
+                }
+            });
         }
     </script>
 }

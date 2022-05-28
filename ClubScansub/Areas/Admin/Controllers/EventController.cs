@@ -443,6 +443,16 @@ namespace ClubScansub.Areas.Admin.Controllers
         }
 
 
+        public async Task<IActionResult> ConfirmRemoveUserFromEvent(int eventid, string userid)
+        {
+            var ev_user = await db.EventUsers.Include(x=>x.Event).Include(x=>x.ApplicationUser).FirstOrDefaultAsync(x=>x.ApplicationUserId == userid && x.EventId == eventid);
+            if(ev_user != null)
+            {
+                return PartialView("_ConfirmRemoveUserPartial",ev_user);
+            }
+            return RedirectToAction("Edit", new { id = eventid });
+        }
+
         public async Task<IActionResult> RemoveExternalUserFromEvent(int eventid, string userid)
         {
             var ev_user = await db.EventExternalUsers.Where(x => x.EventId == eventid && x.ApplicationUserId == userid).FirstOrDefaultAsync();
