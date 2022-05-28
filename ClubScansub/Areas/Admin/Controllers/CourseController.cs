@@ -407,7 +407,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var course = await db.Courses.FindAsync(session.Course.Id);
 
-            var maxEndDate = await db.CourseSessions.Where(x => x.Course == course).MaxAsync(x => x.DateTime.Add(x.Duration));
+            var maxEndDate = await db.CourseSessions.Where(x => x.Course == course).MaxAsync(x => x.DateTime);
             var minEndDate = await db.CourseSessions.Where(x => x.Course == course).MinAsync(x => x.DateTime);
             course.StartDateAndTime = minEndDate;
             course.EndDateAndTime = maxEndDate;
