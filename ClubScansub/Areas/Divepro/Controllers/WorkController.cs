@@ -186,7 +186,11 @@ namespace ClubScansub.Areas.Divepro.Controllers
                 .Where(x => x.InstructorId == userId && x.CourseSessionId == sessionid).FirstOrDefaultAsync();
             sessionInstructor.InstructorRetracted = true;
 
-            var sessionText = $"'{sessionInstructor.CourseSession.SessionDescription}'";
+            var sessionName = string.IsNullOrEmpty(sessionInstructor.CourseSession.SessionName)
+                ? sessionInstructor.CourseSession.CourseSessionTemplate.Name
+                : sessionInstructor.CourseSession.SessionName;
+
+            var sessionText = $"'{sessionInstructor.CourseSession.Course.CourseName} - {sessionName}'";
             var sessionDescription = $"Du har afmeldt dig til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n";
 
             await db.SaveChangesAsync();
