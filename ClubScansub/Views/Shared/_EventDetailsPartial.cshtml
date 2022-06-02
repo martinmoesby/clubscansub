@@ -6,7 +6,12 @@
         .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
         .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
-    var maxSeatsAvailable = (int)(currentUser?.Balance / Model.PremiumPrice) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.PremiumPrice) : Model.FreeSpots;
+
+    var maxSeatsAvailable = Model.FreeSpots;
+    if (currentUser != null && currentUser.IsMultiUser) {
+        maxSeatsAvailable = (int)(currentUser.Balance / Model.PremiumPrice) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.PremiumPrice) : Model.FreeSpots;
+    }
+
     bool isEligable = Model.RequiredCertificate == null;
     var certName = "";
     if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
