@@ -481,7 +481,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 var newEntry = new ApplicationUserAccountEntry
                 {
-                    Amount = ev.PremiumPrice * refundFactor,
+                    Amount = ev.Price * refundFactor,
                     ApplicationUser = user,
                     AccountType = AccountTypeEnum.EventAccountType,
                     Event = ev,
@@ -574,7 +574,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(x => x.Id == eventId);
 
             var applicationUser = await db.ApplicationUsers.FindAsync(userId);
-            var userprice = @event.PremiumPrice;
+            var userprice = @event.Price;
 
             for (int i = 0; i < numberofseats; i++)
             {
@@ -699,7 +699,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             var externalClubParticipants = e.ExternalClubMembers.GroupBy(x => x.ApplicationUser).Select(group => new { User = group.Key, Count = group.Count() }).OrderBy(x => x.User);
             foreach (var item in externalClubParticipants)
             {
-                var accountTransaction = item.Count * e.PremiumPrice;
+                var accountTransaction = item.Count * e.Price;
                 //var accountTransaction = await db.ApplicationUserAccountEntry
                 //    .Include(x => x.ApplicationUser)
                 //    .Include(x => x.Event)

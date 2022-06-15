@@ -9,7 +9,7 @@
 
     var maxSeatsAvailable = Model.FreeSpots;
     if (currentUser != null && currentUser.IsMultiUser) {
-        maxSeatsAvailable = (int)(currentUser.Balance / Model.PremiumPrice) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.PremiumPrice) : Model.FreeSpots;
+        maxSeatsAvailable = (int)(currentUser.Balance / Model.Price) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.Price) : Model.FreeSpots;
     }
 
     bool isEligable = Model.RequiredCertificate == null;
@@ -27,6 +27,11 @@
     {
         paymentNote = "(gratis for Divepros)";
         paymentPrice = 0;
+    } 
+    else if (currentUser.IsMultiUser)
+    {
+        paymentPrice=Model.Price;
+        paymentNote = "(pris/dykker)";
     }
     else if (User.IsInRole(ClubScansub.Utility.Userroles.Member)) // (Model.EventType == EventTypeEnum.Other || Model.EventType == EventTypeEnum.Klubture) &&
     {

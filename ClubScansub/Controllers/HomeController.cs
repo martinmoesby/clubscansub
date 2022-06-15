@@ -359,7 +359,7 @@ namespace ClubScansub.Controllers
 
             var user = await db.ApplicationUsers.Include(x => x.AccountTransactions).Include(x => x.Certificates).ThenInclude(x => x.Certificate).FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
 
-            var userPrice = item.PremiumPrice * divers;
+            var userPrice = item.Price * divers;
 
             if (item == null || user == null)
             {
