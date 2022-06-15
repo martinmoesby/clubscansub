@@ -86,7 +86,7 @@
                     <td class="small">
                         @if (!item.IsCancelled)
                         {
-                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@item.Id"><i class="fas fa-cancel"></i></a>
+                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@item.Id"><i class="fas fa-ban" title="Annuller begívenhed"></i></a>
                             @*<a asp-action="Details" class="btn btn-outline-success text-success" asp-route-id="@Model"><i class="fas fa-list-alt"></i></a>
                             <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />*@
                         }
