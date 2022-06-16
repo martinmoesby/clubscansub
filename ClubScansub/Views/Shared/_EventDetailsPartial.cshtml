@@ -2,44 +2,54 @@
 @using Microsoft.EntityFrameworkCore;
 @inject ClubScansub.Data.ApplicationDbContext db;
 @{
+    try {
+    }
+    catch (Exception e)
+    {
+        throw (e);
+    }
     var currentUser = await db.ApplicationUsers
         .Include(x => x.Certificates).ThenInclude(x => x.Certificate)
         .Include(x => x.AccountTransactions)
         .FirstOrDefaultAsync(x => x.Id == User.GetIdentityId());
 
-    var maxSeatsAvailable = Model.FreeSpots;
-    if (currentUser != null && currentUser.IsMultiUser) {
-        maxSeatsAvailable = (int)(currentUser.Balance / Model.Price) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.Price) : Model.FreeSpots;
-    }
-
-    bool isEligable = Model.RequiredCertificate == null;
-    var certName = "";
-    if (currentUser != null && (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id)))
-    {
-        isEligable = true;
-        certName = Model.RequiredCertificate.ShortName;
-    }
-
     var paymentNote = "";
     var paymentPrice = Model.Price;
+    var maxSeatsAvailable = Model.FreeSpots;
+    bool isEligable = Model.RequiredCertificate == null;
+    bool hasFunds = false;
+    var certName = "";
 
-    if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+    if (currentUser != null)
     {
-        paymentNote = "(gratis for Divepros)";
-        paymentPrice = 0;
-    } 
-    else if (currentUser.IsMultiUser)
-    {
-        paymentPrice=Model.Price;
-        paymentNote = "(pris/dykker)";
-    }
-    else if (User.IsInRole(ClubScansub.Utility.Userroles.Member)) // (Model.EventType == EventTypeEnum.Other || Model.EventType == EventTypeEnum.Klubture) &&
-    {
-        paymentNote = "(Pris for Prem. medl.)";
-        paymentPrice = Model.PremiumPrice;
-    }
-    bool hasFunds = currentUser?.Balance >= paymentPrice;
+        if (currentUser.IsMultiUser)
+        {
+            maxSeatsAvailable = (int)(currentUser.Balance / Model.Price) <= Model.FreeSpots ? (int)(currentUser?.Balance / Model.Price) : Model.FreeSpots;
+            paymentPrice = Model.Price;
+            paymentNote = "(pris/dykker)";
+        }
+        else
+        {
 
+            if (Model.RequiredCertificate != null && currentUser.Certificates.Any(x => x.Certificate.Id == Model.RequiredCertificate.Id))
+            {
+                isEligable = true;
+                certName = Model.RequiredCertificate.ShortName;
+            }
+
+            if (User.IsInRole(Userroles.Divepro) && Model.IsFreeForDivepros)
+            {
+                paymentNote = "(gratis for Divepros)";
+                paymentPrice = 0;
+            }
+            else if (User.IsInRole(ClubScansub.Utility.Userroles.Member)) // (Model.EventType == EventTypeEnum.Other || Model.EventType == EventTypeEnum.Klubture) &&
+            {
+                paymentNote = "(Pris for Prem. medl.)";
+                paymentPrice = Model.PremiumPrice;
+            }
+            hasFunds = currentUser?.Balance >= paymentPrice;
+        }
+    }
 }
 
 
