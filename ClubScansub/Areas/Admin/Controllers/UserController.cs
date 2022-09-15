@@ -43,8 +43,8 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             var usersinrole = await um.GetUsersInRoleAsync(membertype);
             var userSearchResult = await db.ApplicationUsers
-                .Include(x => x.AccountTransactions)
-                .Include(c => c.Certificates)
+                //.Include(x => x.AccountTransactions)
+                //.Include(c => c.Certificates)
                 .Where(x => (x.Firstname.ToLower().Contains(IndexPageVM.SearchText.ToLower()) || x.Lastname.ToLower().Contains(IndexPageVM.SearchText.ToLower())))
                 .OrderBy(x => x.UserName)
                 .ToListAsync();
@@ -79,7 +79,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             var user = await db.ApplicationUsers
-                .Include(x=>x.Events)
+                //.Include(x=>x.Events)
                 .Include(x=>x.Certificates)
                     .ThenInclude(x=>x.Certificate)
                  .Include(c=>c.Certificates)   

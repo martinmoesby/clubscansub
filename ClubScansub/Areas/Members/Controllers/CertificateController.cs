@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +18,13 @@ namespace ClubScansub.Areas.Members.Controllers
     [Authorize(Roles = Userroles.User)]
     public class CertificateController : BaseController
     {
-
-        public CertificateController(ApplicationDbContext db)
+        private ImageOptions imgOptions;
+        public CertificateController(ApplicationDbContext db, ImageOptions imgOptions)
             :base(db)
         {
+            imgOptions.MaxHeight = 80;
+            imgOptions.MaxWidth = 120;
+            this.imgOptions = imgOptions;
         }
 
         [BindProperty]
@@ -59,7 +63,14 @@ namespace ClubScansub.Areas.Members.Controllers
                 using (var ms = new MemoryStream())
                 {
                     frontImage.CopyTo(ms);
-                    certificat.FrontSideImage = ms.ToArray();
+                    Image img = Image.FromStream(ms);
+
+                    var resizedImage = ImageUtils.ResizeImage(img, imgOptions);
+                    using (var newMS = new MemoryStream())
+                    {
+                        resizedImage.Save(newMS, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        certificat.FrontSideImage = newMS.ToArray();
+                    }
                 }
             }
 
@@ -68,7 +79,15 @@ namespace ClubScansub.Areas.Members.Controllers
                 using (var ms = new MemoryStream())
                 {
                     backImage.CopyTo(ms);
-                    certificat.BackSideImage = ms.ToArray();
+                    Image img = Image.FromStream(ms);
+
+                    var resizedImage = ImageUtils.ResizeImage(img, imgOptions);
+                    using (var newMS = new MemoryStream())
+                    {
+                        resizedImage.Save(newMS, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        certificat.BackSideImage = newMS.ToArray();
+                    }
+                    
                 }
             }
 

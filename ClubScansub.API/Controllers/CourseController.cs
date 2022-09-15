@@ -165,7 +165,11 @@ namespace ClubScansub.API.Controllers
             //    })
             //})
 
-            var sessions = await db.CourseSessions.Where(x => x.Course.Id == id && x.DateTime > DateTime.Now)
+            var sessions = await db.CourseSessions
+                .Include(x=>x.SessionInstructors).ThenInclude(x=>x.Instructor)
+                .Include(x=>x.CourseSessionTemplate)
+                .Include(x=>x.Divelocation)
+                .Where(x => x.Course.Id == id && x.DateTime > DateTime.Now)
                 .Select(cs => new
                 {
                     SessionName = string.IsNullOrEmpty(cs.SessionName) ? cs.CourseSessionTemplate.Name : cs.SessionName,
