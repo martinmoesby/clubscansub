@@ -7,6 +7,7 @@ using ClubScansub.Extensions;
 using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
+using ClubScansub.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,17 @@ namespace ClubScansub.Areas.Divepro.Controllers
         [TempData]
         public int CurrentYear { get; set; }
 
+        [TempData]
+        public int CurrentMonthKey { get; set; }
+
+        [TempData]
+        public int PreviousMonthKey { get; set; }
+
+        [TempData]
+        public int NextMonthKey { get; set; }
+
+
+
         public async Task<IActionResult> Index()
         {
             ViewBag.Pagetitle = "Kurser der mangler instruktøer";
@@ -72,27 +84,24 @@ namespace ClubScansub.Areas.Divepro.Controllers
             return View(courses);
         }
 
-        public async Task<IActionResult> Workcalendar(int offset = 0)
+        public async Task<IActionResult> Workcalendar(int monthKey = 0)
         {
+            if (monthKey == 0)
+                monthKey = DateTime.Now.ToMonthKey();
+
+            PreviousMonthKey = new DateTime().FromMonthKey(monthKey).PreviousMonthFirstDateOfMonth().ToMonthKey();
+            NextMonthKey = new DateTime().FromMonthKey(monthKey).NextMonthFirstDateOfMonth().ToMonthKey();
+            CurrentMonth = new DateTime().FromMonthKey(monthKey).Month;
+            CurrentYear = new DateTime().FromMonthKey(monthKey).Year;
+
+
             ViewBag.Pagetitle = "Divepro Arbejdskalender";
-            CurrentMonth += offset;
-            if (CurrentMonth < 1)
-            {
-                CurrentMonth = 12;
-                CurrentYear--;
-            }
-
-            if (CurrentMonth> 12)
-            {
-                CurrentMonth = 1;
-                CurrentYear++;
-
-            }
-
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.ActiveCourse = ActiveCourse;
-            ViewBag.CurrentMonth = CurrentMonth;
-            ViewBag.CurrentYear = CurrentYear;
+            ViewBag.CurrentDate = new DateTime().FromMonthKey(monthKey);
+            ViewBag.Next = NextMonthKey;
+            ViewBag.Prev = PreviousMonthKey;
+            ViewBag.Current = monthKey;
 
             var myProCerts = db.UserCertificates
                 .Include(x => x.User)
