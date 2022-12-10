@@ -34,22 +34,16 @@ namespace ClubScansub.Areas.Divepro.Controllers
         [TempData]
         public string StatusMessage { get; set; }
 
-        [TempData]
         public int ActiveCourse { get; set; }
 
-        [TempData]
         public int CurrentMonth { get; set; }
 
-        [TempData]
         public int CurrentYear { get; set; }
 
-        [TempData]
         public int CurrentMonthKey { get; set; }
 
-        [TempData]
         public int PreviousMonthKey { get; set; }
 
-        [TempData]
         public int NextMonthKey { get; set; }
 
 
@@ -88,6 +82,8 @@ namespace ClubScansub.Areas.Divepro.Controllers
         {
             if (monthKey == 0)
                 monthKey = DateTime.Now.ToMonthKey();
+
+            CurrentMonthKey = monthKey;
 
             PreviousMonthKey = new DateTime().FromMonthKey(monthKey).PreviousMonthFirstDateOfMonth().ToMonthKey();
             NextMonthKey = new DateTime().FromMonthKey(monthKey).NextMonthFirstDateOfMonth().ToMonthKey();
@@ -161,7 +157,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
         }
 
         [Authorize(Roles =Userroles.Divepro)]
-        public async Task<IActionResult> ApplySingle(int sessionId)
+        public async Task<IActionResult> ApplySingle(int sessionId, int monthKey)
         {
             string sessionDescription = "Du har skrevet dig på som instruktør til: \n";
 
@@ -180,11 +176,11 @@ namespace ClubScansub.Areas.Divepro.Controllers
             sessionDescription += $"{sessionText} d. {session.DateTime.ToString("dd. MMMM yyyy")} \n";
 
             StatusMessage = sessionDescription;
-            return RedirectToAction(nameof(Workcalendar));
+            return RedirectToAction(nameof(Workcalendar), new { monthKey });
         }
 
         [Authorize(Roles = Userroles.Divepro)]
-        public async Task<IActionResult> Retract(int sessionid)
+        public async Task<IActionResult> Retract(int sessionid, int monthKey)
         {
             var userId = User.GetIdentityId();
             var user = await db.ApplicationUsers.FindAsync(userId);
@@ -210,7 +206,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
            
             await smsSender.SendMultipleSmsAsync(admins, $"{user.Name } har meldt fra som instruktør til {sessionText} d. {sessionInstructor.CourseSession.DateTime.ToString("dd. MMMM yyyy")}.\n");
 
-            return RedirectToAction(nameof(Workcalendar));
+            return RedirectToAction(nameof(Workcalendar), new { monthKey });
 
         }
 
