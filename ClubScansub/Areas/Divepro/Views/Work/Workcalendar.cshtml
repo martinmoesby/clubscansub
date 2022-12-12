@@ -1,15 +1,9 @@
 ﻿@using System.Threading
 @using ClubScansub.Utility.Extensions
-@using Nager.Date
+@*@using Nager.Date*@
 @using Nager.Date.Model
 @using System.Globalization
 @model IEnumerable<CourseSession>
-@*
-
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-    
-*@
 @{
 
     ViewData["Title"] = "Divepro Arbejdskalender";
@@ -18,19 +12,20 @@
     var poolIcon = "fa-swimming-pool";
     var openwaterIcon = "fa-water";
     var academicIcon = "fa-chalkboard-teacher";
-    var currentDate = (DateTime)ViewBag.CurrentDate;
-
-    var firstDayOfTheMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
-    var lastDayOfTheMonth = firstDayOfTheMonth.AddMonths(1).AddDays(-1);
-
-    var numberOfDays = lastDayOfTheMonth.Day;
-    DateTime startDate = firstDayOfTheMonth.AddDays((int)firstDayOfTheMonth.DayOfWeek == 0 ? -6 :-(int)firstDayOfTheMonth.DayOfWeek+1);
-    DateTime endDate = lastDayOfTheMonth.AddDays((int)lastDayOfTheMonth.DayOfWeek == 0 ? 0 : 7-(int)lastDayOfTheMonth.DayOfWeek);
-    int totalDays = (int)(endDate - startDate).TotalDays+1;
-    IEnumerable<PublicHoliday> holidays = DateSystem.GetPublicHoliday(startDate, endDate, CountryCode.DK);
+    var current = (MonthKey)ViewBag.CurrentMonthKey;
+    var actualMonthKey = new MonthKey(DateTime.Now);
+    var next = current.GetNext();
+    var prev = current.GetPrevious();
+    
+    var numberOfDays = current.NumberOfDays;
+    DateTime startDate = current.CalendarStartDate;
+    DateTime endDate = current.CalendarEndDate;
+    DateTime iterateDate = startDate;
+    int totalDays =current.TotalCalendarDays;
+    IEnumerable<PublicHoliday> holidays =current.GetHolidays();
+    
     Calendar cal = new CultureInfo("da-DK").Calendar;
 
-    DateTime iterateDate = startDate;
 
 }
 
@@ -39,17 +34,17 @@
 
     <div class="row">
         <div class="col-2">
-            <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" asp-route-monthKey=@(ViewBag.Prev) title="@currentDate.AddMonths(1).ToString("MMMM") @currentDate.AddMonths(-1).ToString("yyyy")"><i class="fas fa-arrow-left"></i></a> 
+            <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" asp-route-monthKey=@prev.Id title="@prev.ToString()"><i class="fas fa-arrow-left"></i></a> 
         </div>
         <div class="col-8 text-center">
-            @if (DateTime.Now.ToMonthKey() != ViewBag.Current) {
-                <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" title="@DateTime.Now.ToString("MMMM") @DateTime.Now.ToString("yyyy")"><i class="fas fa-arrow-up" aria-hidden="true"></i></a>
+            @if (actualMonthKey.Id != current.Id) {
+                <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" title="@actualMonthKey.ToString()"><i class="fa fa-undo" aria-hidden="true"></i></a>
             }            
-            <span class="h3 text-info text-capitalize">@currentDate.ToString("MMMM") @currentDate.ToString("yyyy")</span>
+            <span class="h3 text-info text-capitalize">@current.ToString()</span>
         </div>
         <div class="col-2 text-right">
 
-            <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" asp-route-monthKey=@(ViewBag.Next) title="@currentDate.AddMonths(1).ToString("MMMM") @currentDate.AddMonths(1).ToString("yyyy")"><i class="fas fa-arrow-right"></i></a>
+            <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" asp-route-monthKey=@next.Id title="@next.ToString()"><i class="fas fa-arrow-right"></i></a>
         </div>
     </div>
 
@@ -85,7 +80,7 @@
                     // start a new row every 7 days
                 }  
                 <div class="col border-right @bgStyle">
-                    @if (iterateDate.Month == currentDate.Month)
+                    @if (iterateDate.Month == current.FirstDate.Month)
                     {
                     <div class="mb-2">@iterateDate.ToString("M") <span class="small text-bold">@holidayName</span></div>
 
