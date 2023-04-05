@@ -27,8 +27,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
         {
             this.smsSender = smsSender;
             this.userManager = userManager;
-            CurrentMonth = DateTime.Now.Month;
-            CurrentYear = DateTime.Now.Year;
+
         }
         
         [TempData]
@@ -36,15 +35,11 @@ namespace ClubScansub.Areas.Divepro.Controllers
 
         public int ActiveCourse { get; set; }
 
-        public int CurrentMonth { get; set; }
+        public MonthKey CurrentMonthKey { get; set; }
 
-        public int CurrentYear { get; set; }
+        //public MonthKey PreviousMonthKey { get; set; }
 
-        public int CurrentMonthKey { get; set; }
-
-        public int PreviousMonthKey { get; set; }
-
-        public int NextMonthKey { get; set; }
+        //public MonthKey NextMonthKey { get; set; }
 
 
 
@@ -83,21 +78,16 @@ namespace ClubScansub.Areas.Divepro.Controllers
             if (monthKey == 0)
                 monthKey = DateTime.Now.ToMonthKey();
 
-            CurrentMonthKey = monthKey;
+            CurrentMonthKey = new MonthKey(monthKey);
 
-            PreviousMonthKey = new DateTime().FromMonthKey(monthKey).PreviousMonthFirstDateOfMonth().ToMonthKey();
-            NextMonthKey = new DateTime().FromMonthKey(monthKey).NextMonthFirstDateOfMonth().ToMonthKey();
-            CurrentMonth = new DateTime().FromMonthKey(monthKey).Month;
-            CurrentYear = new DateTime().FromMonthKey(monthKey).Year;
+            //PreviousMonthKey = CurrentMonthKey.Previous;
+            //NextMonthKey = CurrentMonthKey.Next;
 
 
             ViewBag.Pagetitle = "Divepro Arbejdskalender";
             ViewBag.StatusMessage = StatusMessage;
             ViewBag.ActiveCourse = ActiveCourse;
-            ViewBag.CurrentDate = new DateTime().FromMonthKey(monthKey);
-            ViewBag.Next = NextMonthKey;
-            ViewBag.Prev = PreviousMonthKey;
-            ViewBag.Current = monthKey;
+            ViewBag.CurrentMonthKey = CurrentMonthKey;
 
             var myProCerts = db.UserCertificates
                 .Include(x => x.User)
@@ -120,7 +110,7 @@ namespace ClubScansub.Areas.Divepro.Controllers
                 .Include(x=>x.Course)
                     .ThenInclude(x => x.CourseTemplate)
                         .ThenInclude(x => x.InstructorCertificate)
-                .Where(x => x.DateTime.Month == CurrentMonth && x.DateTime.Year == CurrentYear && myProCerts.Any(y => y.Certificate.Id == x.Course.CourseTemplate.InstructorCertificate.Id))
+                .Where(x => x.DateTime.Month == CurrentMonthKey.Month && x.DateTime.Year == CurrentMonthKey.Year && myProCerts.Any(y => y.Certificate.Id == x.Course.CourseTemplate.InstructorCertificate.Id))
                 .AsNoTracking()
                 .ToListAsync();
 
