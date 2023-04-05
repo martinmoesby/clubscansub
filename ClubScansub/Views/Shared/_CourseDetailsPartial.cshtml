@@ -32,12 +32,6 @@
                     <button data-toggle="collapse" data-target="#collapse" class="btn btn-outline-info d-inline" title="Klik for at se yderligere detaljer" type="button"><i class="fas fa-exclamation-circle"></i></button>
                     @Model.CourseName                
                     
-                    @if (User.IsInRole(Userroles.Administrator))
-                    {
-                        <input hidden type="text" id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" readonly disabled />
-                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyDeeplink()"><i class="fas fa-copy mr-2"></i>Kopier link</button>
-                    }
-
                 </h4>
                 <p>
                     Start dato: <strong>@Model.CourseSessions.Min(x => x.DateTime).ToString("dd. MMMM yyyy kl. HH:mm") </strong>
@@ -206,6 +200,22 @@
 
                 </div>
             </div>
+            @if (User.IsInRole(Userroles.Administrator))
+            {
+            <div class="card mt-3">
+                <div class="card-header">Deeplink</div>
+                <div class="card-body small">
+
+                        <div class="input-group mb-3">
+                            <input type="text" readonly disabled id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copyDeeplink()" type="button" id="button-addon2"><i class="fas fa-copy mr-2"></i>Kopier link</button>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+            }
         </div>
 
     </div>
@@ -214,8 +224,8 @@
 <script>
     function copyDeeplink() {
         /* Get the text field */
-        var copyText = document.getElementById("deeplink");
-
+        var copyText = document.querySelector("#deeplink");
+        copyText.disabled = false;
         /* Select the text field */
         copyText.select();
         copyText.setSelectionRange(0, 99999); /*For mobile devices*/
@@ -223,11 +233,7 @@
         /* Copy the text inside the text field */
         document.execCommand("copy");
 
-
-        /* Alert the copied text */
-        alert("Copied the text: " + copyText.value);
-
-        copyText.blur();
+        copyText.disabled = false;
 
         if (window.getSelection) { // All browsers, except IE <=8
             window.getSelection().removeAllRanges();

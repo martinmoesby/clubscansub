@@ -45,6 +45,8 @@ namespace ClubScansub.Controllers
                 UpcomingEvents = await db.Events
                     .Include(x=>x.Participants)
                         .ThenInclude(x=>x.ApplicationUser)
+                    .Include(x => x.ExternalClubMembers)
+                        .ThenInclude(x => x.ApplicationUser)
                     .Include(x => x.Divelocation)
                         .ThenInclude(x=>x.MeetingLocation)
                     .Where(x => x.StartDateAndTime > DateTime.Now)
@@ -71,6 +73,8 @@ namespace ClubScansub.Controllers
                 @event = await db.Events
                     .Include(x => x.RequiredCertificate)
                     .Include(x => x.Participants)
+                        .ThenInclude(x => x.ApplicationUser)
+                    .Include(x => x.ExternalClubMembers)
                         .ThenInclude(x => x.ApplicationUser)
                     .Include(x => x.Divelocation)
                         .ThenInclude(x => x.MeetingLocation)

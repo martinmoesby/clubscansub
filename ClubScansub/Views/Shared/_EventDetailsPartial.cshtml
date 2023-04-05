@@ -105,7 +105,7 @@
                     }
                 }
                         *@
-                    </div>
+            </div>
         </div>
 
 
@@ -320,8 +320,14 @@
             <div class="card mt-3">
                 <div class="card-header">Deeplink</div>
                 <div class="card-body small">
-                    <input hidden type="text" id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" readonly disabled />
-                    <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyDeeplink()"><i class="fas fa-copy mr-2"></i>Kopier link</button>
+
+                        <div class="input-group mb-3">
+                            <input type="text" readonly disabled id="deeplink" value="@Url.AbsoluteContent(Url.Action("DL", "Home", new { id = Model.DeeplinkId }))" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copyDeeplink()" type="button" id="button-addon2"><i class="fas fa-copy mr-2"></i>Kopier link</button>
+                            </div>
+                        </div>
+
                 </div>
             </div>
             }
@@ -339,21 +345,18 @@
     var title = '@Model.Divelocation?.Name';
 
     function copyDeeplink() {
-        /* Get the text field */
-        var copyText = document.getElementById("deeplink");
 
-        /* Select the text field */
+
+        var copyText = document.querySelector("#deeplink");
+
+        copyText.disabled = false;
+
         copyText.select();
-        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        copyText.setSelectionRange(0, 99999);
 
-        /* Copy the text inside the text field */
         document.execCommand("copy");
 
-
-        /* Alert the copied text */
-        alert("Copied the text: " + copyText.value);
-
-        copyText.blur();
+        copyText.disabled = true;
 
         if (window.getSelection) { // All browsers, except IE <=8
             window.getSelection().removeAllRanges();
