@@ -50,7 +50,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> Index(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
         {
             var @events = await db.Events
-                .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime > DateTime.Now)
+                .Where(x => x.EventType == eventtype && x.StartDateAndTime > DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                 .Include(x => x.Divelocation)
@@ -89,7 +89,7 @@ namespace ClubScansub.Areas.Admin.Controllers
         public async Task<IActionResult> ClosedEvents(EventTypeEnum eventtype = EventTypeEnum.Bådtur)
         {
             var @events = await db.Events
-                .Where(x => x.EventType == eventtype && x.IsCancelled == false && x.StartDateAndTime <= DateTime.Now)
+                .Where(x => x.EventType == eventtype && x.StartDateAndTime <= DateTime.Now)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Include(x=>x.ExternalClubMembers).ThenInclude(x=>x.ApplicationUser)
                 .Include(x => x.Divelocation)

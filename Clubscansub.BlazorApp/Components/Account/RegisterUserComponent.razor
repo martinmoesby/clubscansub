@@ -1,0 +1,136 @@
+﻿@using ClubScansub.Models.DTO
+
+
+@*    <RadzenStack Gap="10">
+
+        <RadzenCard>
+
+            <RadzenFormField Variant="Variant.Outlined" Text="Email">
+                <RadzenTextBox @bind-Value="@newUser.Email" />
+            </RadzenFormField>
+
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="10" JustifyContent="JustifyContent.Start">
+
+                <RadzenFormField Variant="Variant.Outlined" Text="Password">
+                    <RadzenPassword @bind-Value="@newUser.Password" />
+                </RadzenFormField>
+
+                <RadzenFormField Variant="Variant.Outlined" Text="Repeat password">
+                    <RadzenPassword @bind-Value="@newUser.ConfirmPassword" />
+                </RadzenFormField>
+
+            </RadzenStack>
+        </RadzenCard>
+
+
+
+        <RadzenCard>
+            <RadzenFormField Variant="Variant.Outlined" Text="Firstname(s)">
+                <RadzenText @bind-Value="@newUser.Firstname" />
+            </RadzenFormField>
+        </RadzenCard>
+
+
+    </RadzenStack>
+
+*@
+<RadzenTemplateForm Data=@newUser Submit="@((RegisterUserDTO args) => { onSubmit(args); })" InvalidSubmit="@invalidSubmit">
+
+    <RadzenFieldset>
+        <HeaderTemplate>
+            <RadzenText TextStyle="TextStyle.Overline" Text="Login information" />
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Username" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Nickname />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Email" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Email Name="Email" />
+                        <RadzenRequiredValidator Component="Email" Popup="true" Style="position:absolute" Text="Enter email" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="50">
+                <RadzenColumn Size="6">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Password" Style="width:100%">
+                        <RadzenPassword @bind-value=@newUser.Password Name="Password" />
+                        <RadzenRequiredValidator Component="Password" Popup="true" Style="position:absolute" Text="Enter password" />
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="6">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Confirm password" Style="width:100%">
+                        <RadzenPassword @bind-value=@newUser.ConfirmPassword Name="ConfirmPassword" />
+                        <RadzenRequiredValidator Component="ConfirmPassword" Popup="true" Style="position:absolute" Text="Confirm your password" />
+                        <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(newUser.ConfirmPassword)) Value=@newUser.Password Component="RepeatPassword" Text="Passwords should be the same" Popup="true" Style="position: absolute" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+        </ChildContent>
+
+    </RadzenFieldset>
+
+    <RadzenFieldset>
+        <HeaderTemplate>
+            <RadzenText TextStyle="TextStyle.Overline" Text="Contact Information" />
+        </HeaderTemplate>
+        <ChildContent>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Adress" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Street />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="50">
+                <RadzenColumn Size="4">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Zip/Postal code" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.PostalCode />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+                <RadzenColumn Size="8">
+                    <RadzenFormField Variant="Variant.Outlined" Text="City" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.City />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Country" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Country />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Phone" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.PhoneNumber />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+        </ChildContent>
+    </RadzenFieldset>
+
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-8">
+        <RadzenButton Variant="Variant.Text" class="rz-text-info-color" Text="Cancel" />
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Register" Icon="person_add" />
+    </RadzenStack>
+
+
+
+</RadzenTemplateForm>

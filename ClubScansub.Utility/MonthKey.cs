@@ -105,7 +105,8 @@ namespace ClubScansub.Utility
         }
         public IEnumerable<PublicHoliday> GetHolidays()
         {
-            return DateSystem.GetPublicHoliday(FirstDate, LastDate, CountryCode.DK);
+            var holidays = DateSystem.GetPublicHoliday(FirstDate, LastDate, CountryCode.DK);
+            return holidays; // DateSystem.GetPublicHoliday (FirstDate, LastDate, CountryCode.DK);
         }
 
     }

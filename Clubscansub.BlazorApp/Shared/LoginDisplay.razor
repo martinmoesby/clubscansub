@@ -1,0 +1,50 @@
+﻿<AuthorizeView>
+    <NotAuthorized>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
+            <RadzenButton Icon="login" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Click="OnLoginClick" />
+            <RadzenButton Icon="person_add" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Click="OnRegisterClick" />
+        </RadzenStack>
+
+    </NotAuthorized>
+    <Authorized>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
+
+        <RadzenButton @onclick="OnManageClick">
+                @if (currentUser?.Initials  == null) {
+                    <RadzenIcon Icon="person" />
+                } else 
+                {
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @currentUser.Initials
+                    </RadzenText>
+                }
+        </RadzenButton>
+        <form method="post" action="/Account/LogOut">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Color="Color.Surface" />
+        </form>
+        </RadzenStack>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    [Inject]
+    NavigationManager nav { get; set; }
+
+    [CascadingParameter(Name = "currentUser")]
+    ApplicationUser? currentUser { get; set; }
+
+    private void OnRegisterClick()
+    {
+        nav.NavigateTo("/account/register");
+    }
+    private void OnLoginClick()
+    {
+        Console.WriteLine("Trying to open login.form");
+        nav.NavigateTo("/account/login");
+    }
+    private void OnManageClick()
+    {
+        nav.NavigateTo("/account/Manage");
+    }
+}

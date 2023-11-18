@@ -86,13 +86,14 @@
                     <td class="small">
                         @if (!item.IsCancelled)
                         {
-                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@item.Id"><i class="fas fa-ban" title="Annuller begívenhed"></i></a>
+                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@item.Id"><i class="fas fa-ban" title="Annuller begívenhed"></i>Annuller</a>
                             @*<a asp-action="Details" class="btn btn-outline-success text-success" asp-route-id="@Model"><i class="fas fa-list-alt"></i></a>
                             <partial name="_EditDetailsDeleteButtonsPartial" model="@item.Id" />*@
                         }
                         else
                         {
-                            <span class="text-danger"><i class="fas fa-ban mr-2"></i>Aflyst</span>
+                            <a asp-action="Delete" class="btn btn-link btn-sm text-danger" asp-route-id="@item.Id"><i class="fas fa-ban" title="Slet fra kalender"></i>Slet fra kalender</a>
+                            @*<span class="text-danger"><i class="fas fa-ban mr-2"></i>Aflyst</span>*@
                         }
                     </td>
                     </tr>

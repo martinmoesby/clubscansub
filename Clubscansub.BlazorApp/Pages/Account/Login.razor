@@ -1,0 +1,31 @@
+﻿@page "/account/login"
+@using ClubScansub.Models.DTO
+
+
+<RadzenStack Gap="0" Class="rz-my-auto rz-mx-auto rz-border-radius-1 rz-shadow-1" Style="width: 480px;">
+    <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-p-6" style="text-align: center;">
+        <RadzenText TextStyle="TextStyle.DisplayH4">Login</RadzenText>
+    
+        <RadzenTemplateForm Data=@("LoginUserDTO")>
+            <RadzenLogin 
+                FormFieldVariant="Variant.Text" 
+                Login="@(args => onLogin(args))" 
+                Register="@onRegister" 
+                
+                AllowResetPassword="false" 
+                ResetPassword="@onRegister"
+                ResetPasswordText="Forgot your password??"
+
+                AllowRememberMe="false" 
+                RememberMe = "false"
+                RememberMeText="Persist login"
+
+                AllowRegister="true" 
+                RegisterText="Create account"
+                RegisterMessageText="No Account yet - create one here?"
+                
+                />
+        </RadzenTemplateForm>
+
+    </RadzenCard>
+</RadzenStack>

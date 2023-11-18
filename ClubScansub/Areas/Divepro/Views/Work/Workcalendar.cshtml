@@ -12,17 +12,17 @@
     var poolIcon = "fa-swimming-pool";
     var openwaterIcon = "fa-water";
     var academicIcon = "fa-chalkboard-teacher";
-    var current = (MonthKey)ViewBag.CurrentMonthKey;
+    var currentMonthKey = (MonthKey)ViewBag.CurrentMonthKey;
     var actualMonthKey = new MonthKey(DateTime.Now);
-    var next = current.GetNext();
-    var prev = current.GetPrevious();
+    var next = currentMonthKey.GetNext();
+    var prev = currentMonthKey.GetPrevious();
     
-    var numberOfDays = current.NumberOfDays;
-    DateTime startDate = current.CalendarStartDate;
-    DateTime endDate = current.CalendarEndDate;
+    var numberOfDays = currentMonthKey.NumberOfDays;
+    DateTime startDate = currentMonthKey.CalendarStartDate;
+    DateTime endDate = currentMonthKey.CalendarEndDate;
     DateTime iterateDate = startDate;
-    int totalDays =current.TotalCalendarDays;
-    IEnumerable<PublicHoliday> holidays =current.GetHolidays();
+    int totalDays =currentMonthKey.TotalCalendarDays;
+    IEnumerable<PublicHoliday> holidays = currentMonthKey.GetHolidays();
     
     Calendar cal = new CultureInfo("da-DK").Calendar;
 
@@ -37,10 +37,10 @@
             <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" asp-route-monthKey=@prev.Id title="@prev.ToString()"><i class="fas fa-arrow-left"></i></a> 
         </div>
         <div class="col-8 text-center">
-            @if (actualMonthKey.Id != current.Id) {
+            @if (actualMonthKey.Id != currentMonthKey.Id) {
                 <a asp-action="Workcalendar" class="btn btn-outline-info rounded-circle mb-2" title="@actualMonthKey.ToString()"><i class="fa fa-undo" aria-hidden="true"></i></a>
             }            
-            <span class="h3 text-info text-capitalize">@current.ToString()</span>
+            <span class="h3 text-info text-capitalize">@currentMonthKey.ToString()</span>
         </div>
         <div class="col-2 text-right">
 
@@ -80,7 +80,7 @@
                     // start a new row every 7 days
                 }  
                 <div class="col border-right @bgStyle">
-                    @if (iterateDate.Month == current.FirstDate.Month)
+                    @if (iterateDate.Month == currentMonthKey.FirstDate.Month)
                     {
                     <div class="mb-2">@iterateDate.ToString("M") <span class="small text-bold">@holidayName</span></div>
 
