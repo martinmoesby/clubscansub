@@ -81,12 +81,13 @@ namespace Clubscansub.BlazorApp.Pages.Account
                 {
                     { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this,onRegistered) }
                 },
-                new DialogOptions() { CloseDialogOnOverlayClick = true, CloseDialogOnEsc = true }
+                new DialogOptions() { Width = "960px", CloseDialogOnOverlayClick = true, CloseDialogOnEsc = true }
                 );
         }
 
         private async void onRegistered(RegisterUserResult result)
         {
+            dialogService.Close();
             await dialogService.Alert($"User: '{result.User.UserName}' has been created", "Congrats", new AlertOptions() { OkButtonText = "ok"});
 
         }

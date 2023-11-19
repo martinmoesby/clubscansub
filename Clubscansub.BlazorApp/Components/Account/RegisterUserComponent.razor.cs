@@ -4,6 +4,7 @@ using ClubScansub.Service;
 using ClubScansub.Service.ServiceResults;
 using Microsoft.AspNetCore.Components;
 using Radzen;
+using System.Text.Json;
 
 namespace Clubscansub.BlazorApp.Components.Account
 {
@@ -20,11 +21,13 @@ namespace Clubscansub.BlazorApp.Components.Account
 
         private RegisterUserDTO newUser { get; set; } = new();
 
-        private async void onSubmit(RegisterUserDTO newUser)
+        private async void onSubmit(RegisterUserDTO registerUser)
         {
-            if (newUser != null)
+            Console.WriteLine($"Submit: {JsonSerializer.Serialize(registerUser, new JsonSerializerOptions() { WriteIndented = true })}");
+
+            if (registerUser != null)
             {
-                var registerResult =await  userService.RegisterNewUserAsync(newUser);
+                var registerResult = await userService.RegisterNewUserAsync(registerUser);
                 if (registerResult != null && registerResult.IsSucceesfull)
                 {
                     
@@ -42,9 +45,17 @@ namespace Clubscansub.BlazorApp.Components.Account
 
         private async void invalidSubmit(FormInvalidSubmitEventArgs args)
         {
-            await dialogService.Alert("InvalidCastException registration", "Error", new AlertOptions() { CloseDialogOnEsc = true });
+            await dialogService.Alert("IPlease check you information - and fill out all required fields", "Error", new AlertOptions() { CloseDialogOnEsc = true, OkButtonText = "Got it!" });
         }
 
+        //private async void OnSubmit(RegisterUserDTO model)
+        //{
+        //    Console.WriteLine($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true })}");
+        //}
 
+        //private async void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+        //{
+        //    Console.WriteLine($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
+        //}
     }
 }
