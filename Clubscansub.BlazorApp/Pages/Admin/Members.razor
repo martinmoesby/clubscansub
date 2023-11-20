@@ -1,0 +1,34 @@
+﻿@page "/admin/members"
+@using ClubScansub.Models.DTO;
+<h3>Members</h3>
+@*   style="height:500px"   Data="@members"
+    TItem="MemberDTO"
+    AllowVirtualization="true"
+    AllowPaging="true"
+    AllowFiltering = "true"
+    LoadData="@loadData"
+    Count="@count"*@
+<RadzenStack>
+    <RadzenDataGrid Data="@members" PageSize="15" TItem="MemberDTO" 
+        AllowPaging="true"    
+        AllowVirtualization="true"
+        AllowSorting="true"
+        AllowFiltering="true" 
+        FilterMode="FilterMode.Simple" 
+        LogicalFilterOperator="LogicalFilterOperator.Or" 
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+        FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    AllowAlternatingRows=false
+    >
+        <Columns>
+            <RadzenDataGridColumn Filterable=true Property="AccountNumber" TItem="MemberDTO" Title="Acc. number" Width="100px" MinWidth="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="MemberDTO" Title="Full name" Property="FullName"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="DayOfbirth" FormatString="{0:d}" TItem="MemberDTO" Title="Birthday" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="Profile status" TItem="MemberDTO" Filterable=false Width="250px" MinWidth="250px">
+                <Template Context="member">
+                    <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member"/>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>

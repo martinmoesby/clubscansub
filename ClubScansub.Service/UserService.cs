@@ -1,5 +1,7 @@
-﻿using ClubScansub.Models;
+﻿using AutoMapper;
+using ClubScansub.Models;
 using ClubScansub.Models.DTO;
+using ClubScansub.Service.Automapper;
 using ClubScansub.Service.Exceptions;
 using ClubScansub.Service.Interfaces;
 using ClubScansub.Service.ServiceResults;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -121,6 +124,17 @@ namespace ClubScansub.Service
             }
         }
 
+        public async Task<IList<string>> GetRolesByUserId(MemberDTO member)
+        {
+            //var user = await userStore.FindByIdAsync(member.Id, new CancellationToken());
+            var mapperConfig = new MemberMapperConfiguration().Configure();
+            var map = new Mapper(mapperConfig);
+            var user = map.Map<ApplicationUser>(member);
+
+            var roles = await userManager.GetRolesAsync(user);
+            return roles;
+
+        }
 
         public async Task<RegisterUserResult> RegisterNewUserAsync(RegisterUserDTO userWM)
         {

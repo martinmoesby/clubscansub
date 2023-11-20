@@ -8,7 +8,7 @@
     
         <RadzenTemplateForm Data=@("LoginUserDTO")>
             <RadzenLogin 
-                FormFieldVariant="Variant.Text" 
+                FormFieldVariant="Variant.Outlined" 
                 Login="@(args => onLogin(args))" 
                 Register="@onRegister" 
                 
@@ -16,10 +16,11 @@
                 ResetPassword="@onRegister"
                 ResetPasswordText="Forgot your password??"
 
-                AllowRememberMe="false" 
+                
+                AllowRememberMe="true" 
                 RememberMe = "false"
-                RememberMeText="Persist login"
-
+                RememberMeText="Remember me"
+                 
                 AllowRegister="true" 
                 RegisterText="Create account"
                 RegisterMessageText="No Account yet - create one here?"

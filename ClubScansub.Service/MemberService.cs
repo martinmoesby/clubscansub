@@ -1,59 +1,97 @@
-﻿using ClubScansub.Data;
+﻿using AutoMapper;
+using ClubScansub.Data;
 using ClubScansub.Models.DTO;
+using ClubScansub.Service.Automapper;
 using ClubScansub.Service.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ClubScansub.Service
 {
-    internal class MemberService :ServiceBase, IMemberService
+    public class MemberService : ServiceBase, IMemberService
     {
+        private readonly ApplicationDbContext context;
+        private readonly Mapper mapper;
+
         public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender)
             : base( options, emailSender)
         {
-
+            context = new ApplicationDbContext(dbContextOptions);
+            var config = new MemberMapperConfiguration().Configure();
+            mapper = new Mapper(config);    
+            
         }
-        public MemberDTO Add(MemberDTO Item)
+
+        public Task<MemberDTO> AddAsync(MemberDTO Item)
         {
             throw new NotImplementedException();
         }
 
-        public IList<MemberDTO> Add(IList<MemberDTO> Items)
+        public Task<IList<MemberDTO>> AddAsync(IList<MemberDTO> Items)
         {
             throw new NotImplementedException();
         }
 
-        public IList<MemberDTO> Add(params MemberDTO[] Items)
+        public Task<IList<MemberDTO>> AddAsync(params MemberDTO[] Items)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(MemberDTO Item)
+        public Task DeleteAsync(MemberDTO Item)
         {
             throw new NotImplementedException();
         }
 
-        public MemberDTO Get(string Id)
+        public async Task<IList<MemberDTO>> GetAllAsync()
+        {
+            var members = await context.ApplicationUsers.ToListAsync();
+            return mapper.Map<IList<MemberDTO>>(members);
+        }
+        public IList<MemberDTO> GetPage(int page, int pagesize)
+        { 
+            using var ctx = new ApplicationDbContext(dbContextOptions);
+            var skip = page * pagesize;
+            var members = ctx.ApplicationUsers.Skip(skip).Take(pagesize).ToList();
+            var returndata = mapper.Map<IList<MemberDTO>>(members);
+            return returndata;
+
+        }
+
+        public int GetCount(string filter)
+        {
+            using var ctx = new ApplicationDbContext(dbContextOptions);
+            var query = ctx.ApplicationUsers.AsQueryable();
+            int count;
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                //query = query.Where(filter);
+                count = query.Count();
+            }
+            else
+            {
+                count = ctx.ApplicationUsers.Count();
+            }
+
+            return count;
+
+        }
+
+        public Task<MemberDTO> GetAsync(string Id)
         {
             throw new NotImplementedException();
         }
 
-        public MemberDTO Get(Guid Id)
+        public Task<MemberDTO> GetAsync(Guid Id)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<IList<MemberDTO>> GetAll()
-        {
-            using var context = new ApplicationDbContext(dbContextOptions);
-            var members = context.ApplicationUsers;
-
-
         }
 
         public IList<MemberDTO> GetByRoles(params string[] userroles)
@@ -61,17 +99,17 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public MemberDTO Update(MemberDTO item)
+        public Task<MemberDTO> UpdateAsync(MemberDTO item)
         {
             throw new NotImplementedException();
         }
 
-        public IList<MemberDTO> Update(IList<MemberDTO> Items)
+        public Task<IList<MemberDTO>> UpdateAsync(IList<MemberDTO> Items)
         {
             throw new NotImplementedException();
         }
 
-        public IList<MemberDTO> Update(params MemberDTO[] Items)
+        public Task<IList<MemberDTO>> UpdateAsync(params MemberDTO[] Items)
         {
             throw new NotImplementedException();
         }
