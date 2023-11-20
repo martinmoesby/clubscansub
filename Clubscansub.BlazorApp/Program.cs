@@ -3,8 +3,10 @@ using Clubscansub.BlazorApp.Areas.Identity;
 using ClubScansub.Data;
 using ClubScansub.Models;
 using ClubScansub.Service;
+using ClubScansub.Service.Communication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using System.Globalization;
@@ -71,9 +73,27 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<ISmsSender, SmsSender>();
+
 builder.Services.AddTransient<UserService>();
 
+
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<SmsOptions>(builder.Configuration.GetSection("SMS"));
+
 var app = builder.Build();
+
+// Apply database migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    if (context.Database.GetPendingMigrations().ToList().Count() > 0)
+    {
+        context.Database.Migrate();
+    }
+}
 
 var supportedCultures = new[]
 {

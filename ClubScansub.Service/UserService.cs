@@ -39,7 +39,7 @@ namespace ClubScansub.Service
             SignInManager<ApplicationUser> signInManager,
             NavigationManager navigationManager,
             ILogger<UserService> logger
-            ) : base(options)
+            ) : base(options, emailSender)
         {
             this.userStore = userStore;
             this.userManager = userManager;
@@ -54,9 +54,16 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task<IdentityResult> EmailConfirmAsync(Guid userid, string code)
+        public async Task<IdentityResult> EmailConfirmAsync(Guid userid, string code)
         {
-            throw new NotImplementedException();
+            var user = await userManager.FindByIdAsync(userid.ToString());
+            if (user == null)
+            {
+                return IdentityResult.Failed(new UserNotFoundIdentityError(userid.ToString()));
+            }
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            return await userManager.ConfirmEmailAsync(user, code);
+
         }
 
         public Task<List<AuthenticationScheme>> GetExternalLoginsAsync()
@@ -137,8 +144,8 @@ namespace ClubScansub.Service
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = generateCallbackUrl("/account/confirmemail", userId, code);
 
-                    //await emailSender.SendEmailAsync(userWM.Email, "Please confirm your email for mindartklub.dk",
-                    //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await emailSender.SendEmailAsync(userWM.Email, "Please confirm your email for clubscansub.dk",
+                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     return new RegisterUserResult(user, requireConfirmedAccount);
                 }

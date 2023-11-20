@@ -15,9 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubScansub.React", "CLubsc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clubscansub.BlazorApp", "Clubscansub.BlazorApp\Clubscansub.BlazorApp.csproj", "{E890BBEA-DF75-43BB-98D1-2EBAE8692A6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "BlazorApp1\BlazorApp1.csproj", "{71E0000C-F59F-4682-9930-B923C9B03FD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp1", "BlazorApp1\BlazorApp1.csproj", "{71E0000C-F59F-4682-9930-B923C9B03FD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubScansub.Service", "ClubScansub.Service\ClubScansub.Service.csproj", "{FE33BAC3-43CC-41F0-8591-3D5385E7D35B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubScansub.Service", "ClubScansub.Service\ClubScansub.Service.csproj", "{FE33BAC3-43CC-41F0-8591-3D5385E7D35B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DATA", "DATA", "{8FFBA0C0-4161-4224-9C7E-A8A2D273DB1B}"
 EndProject

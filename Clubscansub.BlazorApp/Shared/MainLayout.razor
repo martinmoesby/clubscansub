@@ -1,3 +1,4 @@
+@using ClubScansub.Utility;
 @inherits LayoutComponentBase
 <RadzenDialog />
 <RadzenNotification />
@@ -37,12 +38,17 @@
         <RadzenPanelMenu Style="text-align: left; flex-grow:1">
             <RadzenPanelMenuItem Text="Home" Path="" /> 
 
-            <AuthorizeView Roles="Member">
-                <RadzenPanelMenuItem Text="Profile" Path="/profile" />
+            <AuthorizeView Roles="@Userroles.Member">
+                <RadzenPanelMenuItem Text="Profile" Path="/account/" />
             </AuthorizeView>
 
-            <AuthorizeView Roles="Admin">
-                <RadzenPanelMenuItem Text="Adminitration" Path="/admin" />
+            <AuthorizeView Roles="@adminroles">
+                <RadzenPanelMenuItem Text="Administration" Path="/admin/">
+                    <RadzenPanelMenuItem Icon="persons" Text="Members" Path="/admin/members" />
+                    <RadzenPanelMenuItem Text="Divesites" Path="/admin/divesites" />
+                    <RadzenPanelMenuItem Text="Coursemanagement" Path="/admin/coursemanagement" />
+                    <RadzenPanelMenuItem Text="Workmanagement" Path="/admin/workmanagement" />
+                </RadzenPanelMenuItem>
             </AuthorizeView>
 
         </RadzenPanelMenu>
@@ -55,3 +61,7 @@
     </RadzenSidebar>
 
 </RadzenLayout>
+
+@code {
+    string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
+}
