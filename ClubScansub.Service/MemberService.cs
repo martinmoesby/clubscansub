@@ -25,7 +25,7 @@ namespace ClubScansub.Service
         {
             context = new ApplicationDbContext(dbContextOptions);
             var config = new MemberMapperConfiguration().Configure();
-            mapper = new Mapper(config);    
+            mapper = new Mapper(config);
             
         }
 
@@ -54,35 +54,6 @@ namespace ClubScansub.Service
             var members = await context.ApplicationUsers.ToListAsync();
             return mapper.Map<IList<MemberDTO>>(members);
         }
-        public IList<MemberDTO> GetPage(int page, int pagesize)
-        { 
-            using var ctx = new ApplicationDbContext(dbContextOptions);
-            var skip = page * pagesize;
-            var members = ctx.ApplicationUsers.Skip(skip).Take(pagesize).ToList();
-            var returndata = mapper.Map<IList<MemberDTO>>(members);
-            return returndata;
-
-        }
-
-        public int GetCount(string filter)
-        {
-            using var ctx = new ApplicationDbContext(dbContextOptions);
-            var query = ctx.ApplicationUsers.AsQueryable();
-            int count;
-
-            if (!string.IsNullOrEmpty(filter))
-            {
-                //query = query.Where(filter);
-                count = query.Count();
-            }
-            else
-            {
-                count = ctx.ApplicationUsers.Count();
-            }
-
-            return count;
-
-        }
 
         public Task<MemberDTO> GetAsync(string Id)
         {
@@ -94,10 +65,12 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public IList<MemberDTO> GetByRoles(params string[] userroles)
+        public Task<IList<MemberDTO>> GetByRolesAsync(params string[] userroles)
         {
+            
             throw new NotImplementedException();
         }
+
 
         public Task<MemberDTO> UpdateAsync(MemberDTO item)
         {

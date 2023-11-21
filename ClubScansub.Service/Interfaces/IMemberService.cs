@@ -9,7 +9,7 @@ namespace ClubScansub.Service.Interfaces
 {
     internal interface IMemberService : IGenericService<MemberDTO>
     {
-        IList<MemberDTO> GetByRoles(params string[] userroles);
+        Task<IList<MemberDTO>> GetByRolesAsync(params string[] userroles);
 
     }
 }

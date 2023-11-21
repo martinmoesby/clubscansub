@@ -8,27 +8,44 @@
     AllowFiltering = "true"
     LoadData="@loadData"
     Count="@count"*@
-<RadzenStack>
-    <RadzenDataGrid Data="@members" PageSize="15" TItem="MemberDTO" 
-        AllowPaging="true"    
-        AllowVirtualization="true"
-        AllowSorting="true"
-        AllowFiltering="true" 
-        FilterMode="FilterMode.Simple" 
-        LogicalFilterOperator="LogicalFilterOperator.Or" 
-        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-        FilterPopupRenderMode="PopupRenderMode.OnDemand"
-    AllowAlternatingRows=false
-    >
-        <Columns>
-            <RadzenDataGridColumn Filterable=true Property="AccountNumber" TItem="MemberDTO" Title="Acc. number" Width="100px" MinWidth="100px"></RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="MemberDTO" Title="Full name" Property="FullName"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="DayOfbirth" FormatString="{0:d}" TItem="MemberDTO" Title="Birthday" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Title="Profile status" TItem="MemberDTO" Filterable=false Width="250px" MinWidth="250px">
-                <Template Context="member">
-                    <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member"/>
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-</RadzenStack>
+
+
+<RadzenDataGrid Data="@members" PageSize="15" TItem="MemberDTO"
+                AllowPaging="true"
+                AllowVirtualization="true"
+                AllowSorting="true"
+                AllowFiltering="true"
+                ShowPagingSummary="true"
+                FilterMode="FilterMode.Simple"
+                LogicalFilterOperator="LogicalFilterOperator.Or"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                AllowAlternatingRows=false
+                SelectionMode="DataGridSelectionMode.Single" 
+                RowSelect="@onRowSelect"
+                @bind-Value=@selectedMembers>
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center"  Gap="10px">
+            <RadzenText Text="Minimum role filter" TextStyle="TextStyle.Button" class="rz-mt-2"></RadzenText>
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showOwner ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Owners" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showAdmin ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Admins" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showDivepro ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Pros" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showMember ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Prem." Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showUser ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Basic" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+            <RadzenToggleButton Disabled=@isLoading Change="@getMembersByRoleFilter" Size="ButtonSize.ExtraSmall" @bind-Value=@showStudent ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" Shade="Shade.Light" ToggleShade="Shade.Lighter" Text="Students" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+        </RadzenStack>
+    </HeaderTemplate>
+    <LoadingTemplate>
+        <RadzenProgressBarCircular />
+    </LoadingTemplate>
+    <Columns>
+        <RadzenDataGridColumn Filterable=true Property="AccountNumber" TItem="MemberDTO" Title="Acc. number" Width="100px" MinWidth="100px"></RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="MemberDTO" Title="Full name" Property="FullName"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="DayOfbirth" FormatString="{0:d}" TItem="MemberDTO" Title="Birthday" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Profile status" TItem="MemberDTO" Filterable=false Width="180px" MinWidth="100px">
+            <Template Context="member">
+                <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>

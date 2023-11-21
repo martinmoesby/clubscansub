@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Execution;
 using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service.Automapper;
@@ -187,6 +188,21 @@ namespace ClubScansub.Service
         public Task<ApplicationUser> UpdateUserAsync(ApplicationUser newUser)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IList<MemberDTO>> GetUsersByRolesAsync(params string[] roles)
+        {
+            List<ApplicationUser> users = new();
+            foreach (var item in roles)
+            {
+                var roleUsers = await userManager.GetUsersInRoleAsync(item);
+                users.AddRange(roleUsers);
+                users = users.Distinct().ToList(); ;
+            }
+            var mapperConfig = new MemberMapperConfiguration().Configure();
+            var map = new Mapper(mapperConfig);
+
+            return map.Map<IList<MemberDTO>>(users);
         }
 
         #region "Private support functions"
