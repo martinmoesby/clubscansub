@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Execution;
 using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service.Automapper;
@@ -15,13 +14,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace ClubScansub.Service
 {
@@ -146,21 +140,30 @@ namespace ClubScansub.Service
                 var user = createUser(userWM);
                 //var returnUrl = generateUrl("/index", null);
 
-                await userStore.SetUserNameAsync(user, userWM.Email, CancellationToken.None);
+                await userStore.SetUserNameAsync(user, userWM.Username, CancellationToken.None);
                 await emailStore.SetEmailAsync(user, userWM.Email, CancellationToken.None);
-                var result = await userManager.CreateAsync(user, userWM.Password);
 
+                var randomPassword = PasswordGenerator.GetRandomAlphanumericString(10);
+                var result = await userManager.CreateAsync(user, randomPassword);
 
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, Userroles.Member);
                     var userId = await userManager.GetUserIdAsync(user);
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = generateCallbackUrl("/account/confirmemail", userId, code);
 
+                    var passwordChangeToken = await userManager.GeneratePasswordResetTokenAsync(user);
+                    var changePasswordCallbackUrl = generateCallbackUrl("/account/changepassword", userId, passwordChangeToken);
+
+
                     await emailSender.SendEmailAsync(userWM.Email, "Please confirm your email for clubscansub.dk",
-                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>. For security reasons your password will be sendt in a seperate email");
+
+                    await emailSender.SendEmailAsync(userWM.Email, "Your password for ClubScnsub.dk",
+                        $"Please use this password to login to CLubscansub.dk : {randomPassword}. We STRONGLY suggest that you immediately login to the site and <a href='{HtmlEncoder.Default.Encode(changePasswordCallbackUrl)}'> change your password by clicking here</a>");
 
                     return new RegisterUserResult(user, requireConfirmedAccount);
                 }
@@ -228,6 +231,7 @@ namespace ClubScansub.Service
                 user.PostalCode = userInfo.PostalCode;
                 user.City = userInfo.City;
                 user.Country = userInfo.Country;
+                user.AccountNumber = userInfo.AccountNumber;
 
                 return user;
             }

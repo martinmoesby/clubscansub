@@ -44,5 +44,10 @@ namespace ClubScansub.Models.DTO
         [Display(Name = "Streetname and number")]
         public string Street { get; set; } = "";
 
+        [Required]
+        public string AccountNumber { get; set; }
+
+        public string Username => $"{AccountNumber}@scansub.dk";
+
     }
 }

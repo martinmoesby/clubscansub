@@ -5,9 +5,17 @@
 
     <RadzenFieldset>
         <HeaderTemplate>
-            <RadzenText TextStyle="TextStyle.Overline" Text="Login information" />
+            <RadzenText TextStyle="TextStyle.Overline" Text="User information" />
         </HeaderTemplate>
         <ChildContent>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Account NUmber" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.AccountNumber />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
 
             <RadzenRow>
                 <RadzenColumn Size="12">
@@ -28,6 +36,7 @@
                 </RadzenColumn>
             </RadzenRow>
 
+@*            
             <RadzenRow>
                 <RadzenColumn Size="6">
                     <RadzenFormField Variant="Variant.Filled" Text="Password" Style="width:100%">
@@ -44,7 +53,8 @@
                     </RadzenFormField>
                 </RadzenColumn>
             </RadzenRow>
-        
+*@
+
         </ChildContent>
 
     </RadzenFieldset>
@@ -54,11 +64,16 @@
             <RadzenText TextStyle="TextStyle.Overline" Text="Contact Information" />
         </HeaderTemplate>
         <ChildContent>
-            
-            <RadzenRow>
-                <RadzenColumn Size="12">
-                    <RadzenFormField Variant="Variant.Outlined" Text="Nickname" Style="width:100%">
-                        <RadzenTextBox @bind-value=@newUser.Nickname />
+            <RadzenRow Gap="50">
+                <RadzenColumn Size="6">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Firts name(s)" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Firstname />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Variant="Variant.Outlined" Text="Last name" Style="width:100%">
+                        <RadzenTextBox @bind-value=@newUser.Lastname />
                     </RadzenFormField>
                 </RadzenColumn>
             </RadzenRow>

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using ClubScansub.Data;
+using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service.Automapper;
 using ClubScansub.Service.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -44,9 +46,12 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(MemberDTO Item)
+        public async Task DeleteAsync(MemberDTO Item)
         {
-            throw new NotImplementedException();
+            context.Attach(Item);
+            context.Entry(Item).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await context.SaveChangesAsync();
+
         }
 
         public async Task<IList<MemberDTO>> GetAllAsync()
@@ -72,9 +77,16 @@ namespace ClubScansub.Service
         }
 
 
-        public Task<MemberDTO> UpdateAsync(MemberDTO item)
+        public async Task<MemberDTO> UpdateAsync(MemberDTO item)
         {
-            throw new NotImplementedException();
+            var member = mapper.Map<ApplicationUser>(item);
+
+            context.Update(member);
+            await context.SaveChangesAsync();
+            context.Entry(member).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+
+            return item;
+
         }
 
         public Task<IList<MemberDTO>> UpdateAsync(IList<MemberDTO> Items)

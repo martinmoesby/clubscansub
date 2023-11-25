@@ -1,6 +1,8 @@
-﻿using Clubscansub.BlazorApp.Components.Member;
+﻿using Clubscansub.BlazorApp.Components.Account;
+using Clubscansub.BlazorApp.Components.Member;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service;
+using ClubScansub.Service.ServiceResults;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +12,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Clubscansub.BlazorApp.Pages.Admin
 {
-    public partial class Members
+    public partial class Members : ComponentBase
     {
         [Inject]
         DialogService dialogService { get; set; }
@@ -18,51 +20,95 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         [Inject]
         UserService userService { get; set; }
 
+        [Inject]
+        MemberService memberService { get; set; }
+
         MemberDTO member = new();
-        IList<MemberDTO> selectedMembers;
 
         protected override async Task OnInitializedAsync()
         {
-            
+
             await base.OnInitializedAsync();
             await getMembersByRoleFilter();
-            
+
         }
 
         private IList<MemberDTO> members;
         private bool isLoading = false;
-        private bool showOwner = true;
-        private bool showAdmin = true;
-        private bool showDivepro = true;
-        private bool showMember = true;
-        private bool showUser = true;
-        private bool showStudent = true;
-        private Dictionary<string, bool> showRoles;
-        private string[] roleFilter;
+        private string[] roleFilter = new string[] { Userroles.Administrator, Userroles.Divepro, Userroles.Divepro };
+
+        private DialogOptions editDialogOptions = new DialogOptions()
+        {
+            Width = "800px",
+            AutoFocusFirstElement = true,
+            CloseDialogOnEsc = true,
+        };
+
+        private async Task setRoleFilter(string[] newFilter)
+        {
+            roleFilter = newFilter;
+            await getMembersByRoleFilter();
+        }
+
         private async Task getMembersByRoleFilter()
         {
             isLoading = true;
 
-            showRoles = new Dictionary<string, bool> {
-                { Userroles.Owner, showOwner } ,
-                { Userroles.Administrator, showAdmin } ,
-                { Userroles.Divepro,showDivepro} ,
-                { Userroles.Member,showMember} ,
-                { Userroles.User,showUser} ,
-                { Userroles.Student ,showStudent}
-            };
-
-            roleFilter = showRoles.Where(x => x.Value).Select(x => x.Key).ToArray();
-
             members = (await userService.GetUsersByRolesAsync(roleFilter)).OrderBy(x=>x.UserName).ToList();
-            StateHasChanged();
+
             isLoading = false;
+            StateHasChanged();
         }
 
-        void onRowSelect(MemberDTO member)
+        void onRowDblCLick(DataGridRowMouseEventArgs<MemberDTO> arg)
         {
+            //Console.WriteLine("Trying to Show memberdata");
+            dialogService.Open<MemberDetailsComponent>($"",
+                new Dictionary<string, object> 
+                {
+                    { "Member", arg.Data },
+                    { "UpdateUserCallback", EventCallback.Factory.Create<MemberDTO>(this, updateMember) },
+                    { "DeleteUserCallback", EventCallback.Factory.Create<MemberDTO>(this, deleteMember) }
+                }, editDialogOptions);
 
-            dialogService.Open<MemberDetailsComponent>($"Selected member: { member.Email} ", new Dictionary<string, object> { { "Member", member } });
         }
+
+        void onCreateNewMemberClick()
+        {
+            dialogService.Open<RegisterUserComponent>($"Create new member",
+                new Dictionary<string, object>
+                {
+                    { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this, createMember) },
+                }, editDialogOptions);
+        }
+
+        async void deleteMember(MemberDTO member)
+        {
+            var deleteUser = await dialogService.Confirm($"Dou you want to delete {member.Name} ? This is irreverible and cannot be undone!", "Delete member", new ConfirmOptions() { CancelButtonText = "No", OkButtonText = "Yes" });
+            if ( deleteUser.GetValueOrDefault()) 
+            { 
+                await memberService.DeleteAsync(member);
+                dialogService.Close();
+                await getMembersByRoleFilter();
+
+            }
+
+        }
+        async void updateMember(MemberDTO updatedMember)
+        {
+            Console.WriteLine("Trying to update member data");
+
+            await memberService.UpdateAsync(updatedMember);
+            await dialogService.Alert("Member updated", "Success");
+            dialogService.Close();
+
+        }
+        async void createMember(RegisterUserResult registerUserResult)
+        {
+            await dialogService.Alert($"Member '{registerUserResult.User.Name}' was created.", "New user created");
+            dialogService.Close();
+            await getMembersByRoleFilter();
+        }
+        
     }
 }
