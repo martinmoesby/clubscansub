@@ -72,6 +72,7 @@ namespace ClubScansub.Service
         public Task<ApplicationUser> GetUserAsync(Guid Id)
         {
             throw new NotImplementedException();
+            
         }
 
         public Task<ApplicationUser> GetUserAsync(string username)
@@ -131,8 +132,35 @@ namespace ClubScansub.Service
 
         }
 
-        public async Task<RegisterUserResult> RegisterNewUserAsync(RegisterUserDTO userWM)
+        public async Task SetRolesByUserId(MemberDTO member)
         {
+            if (member.Roles == null)
+                throw new ArgumentNullException(nameof(member.Roles));
+
+            var user = await userStore.FindByIdAsync(member.Id, new CancellationToken());
+            if (user == null)
+                throw new ArgumentException($"User '{member.Id}' could not be retrieved");
+
+            try
+            {
+                var existingRoles = await userManager.GetRolesAsync(user);
+                await userManager.RemoveFromRolesAsync(user, existingRoles);
+                await userManager.AddToRolesAsync(user, member.Roles);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to reset users roles association.Se InnerExceptions for more information", ex);
+            }
+
+        }
+
+        public async Task<RegisterUserResult> RegisterNewUserAsync(RegisterUserDTO userWM, string[] roles = null)
+        {
+            if (roles == null)
+                roles = new string[] { Userroles.User };
+
+
             try
             {
                 logger.LogInformation($"Initiating to create user '{userWM.Email}'");
@@ -148,7 +176,7 @@ namespace ClubScansub.Service
 
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(user, Userroles.Member);
+                    await userManager.AddToRolesAsync(user, roles);
                     var userId = await userManager.GetUserIdAsync(user);
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
 

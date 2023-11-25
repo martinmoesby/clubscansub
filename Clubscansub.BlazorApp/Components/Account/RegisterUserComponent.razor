@@ -1,5 +1,6 @@
 ﻿@using ClubScansub.Models.DTO
 @using System.Text.Json;
+@using ClubScansub.Utility;
 
 <RadzenTemplateForm TItem="RegisterUserDTO" Data=@newUser Submit=@onSubmit InvalidSubmit=@invalidSubmit>
 
@@ -36,7 +37,12 @@
                 </RadzenColumn>
             </RadzenRow>
 
-@*            
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent InitialRoles="userRoles" MemberRolesChanged="onSetUseroles" LabelText="Select Role" IsLoading="false" />
+                </RadzenColumn>
+            </RadzenRow>
+            @*
             <RadzenRow>
                 <RadzenColumn Size="6">
                     <RadzenFormField Variant="Variant.Filled" Text="Password" Style="width:100%">

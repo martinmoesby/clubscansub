@@ -2,6 +2,7 @@
 using ClubScansub.Models.DTO;
 using ClubScansub.Service;
 using ClubScansub.Service.ServiceResults;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
 using Radzen;
 using System.Text.Json;
@@ -21,16 +22,17 @@ namespace Clubscansub.BlazorApp.Components.Account
 
         private RegisterUserDTO newUser { get; set; } = new();
 
+        private string[] userRoles { get; set; } = new string[] { Userroles.User };
+
         private async void onSubmit(RegisterUserDTO registerUser)
         {
             Console.WriteLine($"Submit: {JsonSerializer.Serialize(registerUser, new JsonSerializerOptions() { WriteIndented = true })}");
 
             if (registerUser != null)
             {
-                var registerResult = await userService.RegisterNewUserAsync(registerUser);
+                var registerResult = await userService.RegisterNewUserAsync(registerUser, userRoles);
                 if (registerResult != null && registerResult.IsSucceesfull)
                 {
-                    
                      await OnRegisterSuccess.InvokeAsync(registerResult);
                 }
 
@@ -48,14 +50,10 @@ namespace Clubscansub.BlazorApp.Components.Account
             await dialogService.Alert("IPlease check you information - and fill out all required fields", "Error", new AlertOptions() { CloseDialogOnEsc = true, OkButtonText = "Got it!" });
         }
 
-        //private async void OnSubmit(RegisterUserDTO model)
-        //{
-        //    Console.WriteLine($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true })}");
-        //}
+        private void onSetUseroles(string[] roles)
+        {
+            userRoles= roles;
+        }
 
-        //private async void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-        //{
-        //    Console.WriteLine($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
-        //}
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Clubscansub.BlazorApp.Components.Account;
 using Clubscansub.BlazorApp.Components.Member;
 using ClubScansub.Models.DTO;
+using ClubScansub.Models.ViewModels;
 using ClubScansub.Service;
 using ClubScansub.Service.ServiceResults;
 using ClubScansub.Utility;
@@ -14,6 +15,9 @@ namespace Clubscansub.BlazorApp.Pages.Admin
 {
     public partial class Members : ComponentBase
     {
+        [Inject]
+        NotificationService notificationService { get; set; }
+
         [Inject]
         DialogService dialogService { get; set; }
 
@@ -54,7 +58,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         {
             isLoading = true;
 
-            members = (await userService.GetUsersByRolesAsync(roleFilter)).OrderBy(x=>x.UserName).ToList();
+            members = (await userService.GetUsersByRolesAsync(roleFilter)).OrderBy(x => x.UserName).ToList();
 
             isLoading = false;
             StateHasChanged();
@@ -62,9 +66,10 @@ namespace Clubscansub.BlazorApp.Pages.Admin
 
         void onRowDblCLick(DataGridRowMouseEventArgs<MemberDTO> arg)
         {
+
             //Console.WriteLine("Trying to Show memberdata");
-            dialogService.Open<MemberDetailsComponent>($"",
-                new Dictionary<string, object> 
+            dialogService.Open<MemberDetailsComponent>($"Edit member",
+                new Dictionary<string, object>
                 {
                     { "Member", arg.Data },
                     { "UpdateUserCallback", EventCallback.Factory.Create<MemberDTO>(this, updateMember) },
@@ -85,8 +90,8 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         async void deleteMember(MemberDTO member)
         {
             var deleteUser = await dialogService.Confirm($"Dou you want to delete {member.Name} ? This is irreverible and cannot be undone!", "Delete member", new ConfirmOptions() { CancelButtonText = "No", OkButtonText = "Yes" });
-            if ( deleteUser.GetValueOrDefault()) 
-            { 
+            if (deleteUser.GetValueOrDefault())
+            {
                 await memberService.DeleteAsync(member);
                 dialogService.Close();
                 await getMembersByRoleFilter();
@@ -94,13 +99,22 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             }
 
         }
-        async void updateMember(MemberDTO updatedMember)
+        async void updateMember(MemberDTO model)
         {
-            Console.WriteLine("Trying to update member data");
 
-            await memberService.UpdateAsync(updatedMember);
-            await dialogService.Alert("Member updated", "Success");
-            dialogService.Close();
+            try
+            {
+                await memberService.UpdateAsync(model);
+                await userService.SetRolesByUserId(model);
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{model.Name}' has been updated", CloseOnClick = true });
+                await getMembersByRoleFilter();
+
+            }
+            catch (Exception ex)
+            {
+                await dialogService.Alert($"An error occurred: {ex.Message}", "Update error!", new AlertOptions() { OkButtonText = "OK" });
+            }
 
         }
         async void createMember(RegisterUserResult registerUserResult)
@@ -109,6 +123,6 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             dialogService.Close();
             await getMembersByRoleFilter();
         }
-        
+
     }
 }

@@ -1,4 +1,7 @@
 ﻿using ClubScansub.Models.DTO;
+using ClubScansub.Models.ViewModels;
+using ClubScansub.Service;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
 using Radzen;
 
@@ -9,6 +12,9 @@ namespace Clubscansub.BlazorApp.Components.Member
         [Inject]
         DialogService dialogService { get; set; }
 
+        [Inject]
+        UserService userService { get; set; }
+
         [Parameter]
         public EventCallback<MemberDTO> UpdateUserCallback { get; set; }
 
@@ -18,10 +24,12 @@ namespace Clubscansub.BlazorApp.Components.Member
         [Parameter]
         public MemberDTO Member { get; set; } = new();
 
-        protected override async Task OnParametersSetAsync()
+        protected override async Task OnInitializedAsync()
         {
-            await base.OnParametersSetAsync();
+            var userRoles = (await userService.GetRolesByUserId(Member)).ToArray();
+            Member.Roles= userRoles;
         }
+
 
         private void onInvalidSubmit()
         {
@@ -30,6 +38,11 @@ namespace Clubscansub.BlazorApp.Components.Member
         private void deleteUserClick()
         {
             DeleteUserCallback.InvokeAsync(Member);
+        }
+
+        private void onSetUserRoles(string[] userRoles)
+        {
+            Member.Roles = userRoles;
         }
 
     }

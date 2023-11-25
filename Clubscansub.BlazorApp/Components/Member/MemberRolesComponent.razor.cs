@@ -32,6 +32,10 @@ namespace Clubscansub.BlazorApp.Components.Member
             return base.OnInitializedAsync();
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            
+        }
 
         private bool showOwner = true;
         private bool showAdmin = true;

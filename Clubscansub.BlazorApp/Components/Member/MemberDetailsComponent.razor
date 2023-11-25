@@ -1,11 +1,13 @@
 ﻿@using ClubScansub.Models.DTO;
 
-<RadzenTemplateForm Data="@Member" Submit="@((MemberDTO member) => UpdateUserCallback.InvokeAsync(member))" InvalidSubmit="@onInvalidSubmit">
+<RadzenTemplateForm Data="@Member" TItem="MemberDTO" Submit="@((MemberDTO member) => UpdateUserCallback.InvokeAsync(member))" InvalidSubmit="@onInvalidSubmit">
 
     <RadzenFieldset Text="@Member.UserName">
-        <RadzenStack Style="width:100%" JustifyContent="JustifyContent.End">
-            <RadzenText Text="@Member.Balance.ToString("C2")" /> 
+
+        <RadzenStack Style="width:100%" JustifyContent="JustifyContent.End" AlignItems="AlignItems.End">
+            <RadzenText Text="@Member.Balance.ToString("C2")" TextAlign="TextAlign.Right" TextStyle="TextStyle.Caption" />
         </RadzenStack>
+        
         <RadzenRow>
             <RadzenColumn Size="6">
                 <RadzenFormField Text="First name(s)" Style="width:100%">
@@ -60,7 +62,12 @@
         </RadzenRow>
 
     </RadzenFieldset>
-
+    <RadzenFieldset Text="membership Roles" >
+        @if (Member.Roles != null)
+        {
+            <MemberRolesComponent MemberRolesChanged="@onSetUserRoles" InitialRoles="@Member.Roles" LabelText="Roles" />
+        }
+    </RadzenFieldset>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-4">
         <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Success" Variant="Variant.Outlined" />
         <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click="deleteUserClick" />
