@@ -1,4 +1,5 @@
-﻿using Clubscansub.BlazorApp.Components.Account;
+﻿using AutoMapper.Execution;
+using Clubscansub.BlazorApp.Components.Account;
 using Clubscansub.BlazorApp.Components.Member;
 using ClubScansub.Models.DTO;
 using ClubScansub.Models.ViewModels;
@@ -7,6 +8,7 @@ using ClubScansub.Service.ServiceResults;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json.Linq;
 using Radzen;
 using System;
@@ -63,7 +65,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         {
             isLoading = true;
 
-            members = (await userService.GetUsersByRolesAsync(roleFilter)).OrderBy(x => x.UserName).ToList();
+            members = (await memberService.GetAllByRolesAsync(roleFilter)).OrderBy(x => x.UserName).ToList();
 
             isLoading = false;
             StateHasChanged();
@@ -85,44 +87,6 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                     { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this, createMember) },
                 }, editDialogOptions);
         }
-
-        async void deleteMember(MemberDTO member)
-        {
-            var deleteUser = await dialogService.Confirm($"Dou you want to delete {member.Name} ? This is irreverible and cannot be undone!", "Delete member", new ConfirmOptions() { CancelButtonText = "No", OkButtonText = "Yes" });
-            if (deleteUser.GetValueOrDefault())
-            {
-                await memberService.DeleteAsync(member);
-                dialogService.Close();
-                await getMembersByRoleFilter();
-
-            }
-
-        }
-        async void updateMember(MemberDTO model)
-        {
-
-            try
-            {
-                await memberService.UpdateAsync(model);
-                await userService.SetRolesByUserId(model);
-                dialogService.Close();
-                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{model.Name}' has been updated", CloseOnClick = true });
-                await getMembersByRoleFilter();
-
-            }
-            catch (Exception ex)
-            {
-                await dialogService.Alert($"An error occurred: {ex.Message}", "Update error!", new AlertOptions() { OkButtonText = "OK" });
-            }
-
-        }
-        async void createMember(RegisterUserResult registerUserResult)
-        {
-            await dialogService.Alert($"Member '{registerUserResult.User.Name}' was created.", "New user created");
-            dialogService.Close();
-            await getMembersByRoleFilter();
-        }
-
         void onCellContextMenu(DataGridCellMouseEventArgs<MemberDTO> args)
         {
             selectedMembers = new List<MemberDTO>() { args.Data };
@@ -144,7 +108,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                             toggleActiveStatus(args.Data);
                             break;
                         case 3:
-                            Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, MemberId: {args.Data.UserName}");
+                            showAddTransactionDialog(args.Data);
                             break;
                         default:
                             Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, MemberID: {args.Data.UserName}");
@@ -152,6 +116,74 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                     }
                 }
              );
+        }
+
+
+        private async void deleteMember(MemberDTO member)
+        {
+            var deleteUser = await dialogService.Confirm($"Dou you want to delete {member.Name} ? This is irreverible and cannot be undone!", "Delete member", new ConfirmOptions() { CancelButtonText = "No", OkButtonText = "Yes" });
+            if (deleteUser.GetValueOrDefault())
+            {
+                await memberService.DeleteAsync(member);
+                dialogService.Close();
+                await getMembersByRoleFilter();
+
+            }
+
+        }
+        private async void updateMember(MemberDTO model)
+        {
+
+            try
+            {
+                await memberService.UpdateAsync(model);
+                await userService.SetRolesByUserId(model);
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{model.Name}' has been updated", CloseOnClick = true });
+                await getMembersByRoleFilter();
+
+            }
+            catch (Exception ex)
+            {
+                await dialogService.Alert($"An error occurred: {ex.Message}", "Update error!", new AlertOptions() { OkButtonText = "OK" });
+            }
+
+        }
+        private async void createMember(RegisterUserResult registerUserResult)
+        {
+            try
+            {
+                notificationService.Notify(new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Duration = 2500,
+                    Summary = "New user created",
+                    Detail = $"Member '{registerUserResult.User.Name}' was created."
+                });
+                dialogService.Close();
+                await getMembersByRoleFilter();
+            }
+            catch (Exception ex)
+            {
+
+                await dialogService.Alert($"An error occurred: {ex.Message}", "Registration error!", new AlertOptions() { OkButtonText = "OK" });
+            }
+        }
+        private async void makeTransaction(AccountTransactionDTO transaction)
+        {
+            try
+            {
+                var updateMember = await memberService.AddTransactionAsync(transaction.CurrentMember, transaction);
+                dialogService.Close();
+                members.Where(x => x.Id == updateMember.Id).First().AccountTransactions = updateMember.AccountTransactions;
+                StateHasChanged();
+
+                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{transaction.CurrentMember.Name}' has receiced a deposit of {transaction.Amount.ToString("C")}", CloseOnClick = true });
+            }
+            catch (Exception ex)
+            {
+                await dialogService.Alert($"An error occurred: {ex.Message}", "Transaction error!", new AlertOptions() { OkButtonText = "OK" });
+            }
         }
 
 
@@ -179,6 +211,18 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 members.Where(x => x.Id == member.Id).First().LockoutEnd = member.LockoutEnd;
                 StateHasChanged();
             }
+        }
+        private void showAddTransactionDialog(MemberDTO member)
+        {
+            if (member == null) return;
+
+            dialogService.Open<AddToAccountBalance>("Add transaction",
+                new Dictionary<string, object>
+                {
+                     { "Member", member },
+                     { "Callback", EventCallback.Factory.Create<AccountTransactionDTO>(this, makeTransaction) },
+                }
+                , editDialogOptions);
         }
     }
 }

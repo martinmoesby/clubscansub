@@ -1,0 +1,24 @@
+﻿@using ClubScansub.Utility;
+<RadzenStack Gap="40">
+    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"Make deposit to {Member.Name}'s account")" />
+    <RadzenSelectBar TValue="AccountTypeEnum" Size="ButtonSize.Small" @bind-Value="@accountType">
+        <Items>
+            <RadzenSelectBarItem Value="AccountTypeEnum.EventAccountType" Text="Event Account" />
+            <RadzenSelectBarItem Value="AccountTypeEnum.CourseAccountType" Text="Course Account" />
+        </Items>
+    </RadzenSelectBar>
+    
+    <RadzenRow Gap="2">
+        <RadzenColumn Size="3">
+            <RadzenTextBox @bind-Value=@transaction.InvoiceNumber Placeholder="Invoice no." Style="width:100%" />
+        </RadzenColumn>
+        <RadzenColumn Size="7">
+            <RadzenTextBox @bind-Value=@transaction.Description Placeholder="Remark" Style="width:100%" />
+        </RadzenColumn>
+        <RadzenColumn Size="2">
+            <RadzenNumeric @bind-Value=@transaction.Amount Placeholder="Amount to deposit..." Format="C" ConvertValue="((string arg) => Convert.ToDecimal(arg))" ShowUpDown="false" />
+        </RadzenColumn>
+    </RadzenRow>
+
+</RadzenStack>
+<RadzenButton Click="@saveTransaction" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Success" Shade="Shade.Default" Text="Save" Icon="save" class="rz-mt-6" />

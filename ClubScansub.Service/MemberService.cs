@@ -4,6 +4,8 @@ using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service.Automapper;
 using ClubScansub.Service.Interfaces;
+using ClubScansub.Utility;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyModel;
@@ -21,14 +23,16 @@ namespace ClubScansub.Service
     {
         private readonly ApplicationDbContext context;
         private readonly Mapper mapper;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender)
-            : base( options, emailSender)
+        public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender, UserManager<ApplicationUser> userManager)
+            : base(options, emailSender)
         {
             context = new ApplicationDbContext(dbContextOptions);
             var config = new MemberMapperConfiguration().Configure();
             mapper = new Mapper(config);
-            
+            this.userManager = userManager;
+
         }
 
         public Task<MemberDTO> AddAsync(MemberDTO Item)
@@ -56,8 +60,25 @@ namespace ClubScansub.Service
 
         public async Task<IList<MemberDTO>> GetAllAsync()
         {
-            var members = await context.ApplicationUsers.AsNoTracking().ToListAsync();
-            return mapper.Map<IList<MemberDTO>>(members);
+            var members = await context.ApplicationUsers.Include(x=>x.AccountTransactions).AsNoTracking().ToListAsync();
+            var data = mapper.Map<IList<MemberDTO>>(members);
+
+            return data;
+        }
+
+        public async Task<IList<MemberDTO>> GetAllByRolesAsync(string[] roles)
+        {
+            List<ApplicationUser> users = new();
+            foreach (var item in roles)
+            {
+                var roleUsers = await userManager.GetUsersInRoleAsync(item);
+                users.AddRange(roleUsers);
+                users = users.Distinct().ToList(); ;
+            }
+            var members = await context.ApplicationUsers.Include(x => x.AccountTransactions).AsNoTracking().Where(x=> users.Contains(x)).ToListAsync();
+            var data = mapper.Map<IList<MemberDTO>>(members);
+
+            return data;
         }
 
         public Task<MemberDTO> GetAsync(string Id)
@@ -72,7 +93,7 @@ namespace ClubScansub.Service
 
         public Task<IList<MemberDTO>> GetByRolesAsync(params string[] userroles)
         {
-            
+
             throw new NotImplementedException();
         }
 
@@ -108,6 +129,22 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
 
             return mapper.Map<MemberDTO>(user);
+
+        }
+
+        public async Task<MemberDTO> AddTransactionAsync(MemberDTO member, AccountTransactionDTO transaction)
+        {
+            var user = await context.ApplicationUsers.FindAsync(member.Id);
+            if (user == null)
+                return member;
+
+            transaction.ApplicationUser = user;
+            context.ApplicationUserAccountEntry.Add(transaction);
+            await context.SaveChangesAsync();
+
+            var returnUser = context.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefault(x => x.Id == user.Id);
+            return mapper.Map<MemberDTO>(returnUser);
+
 
         }
     }
