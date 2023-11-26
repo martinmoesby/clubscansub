@@ -7,14 +7,20 @@ using ClubScansub.Service.ServiceResults;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Radzen;
+using System;
 using System.ComponentModel.Design.Serialization;
+using System.Drawing;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Clubscansub.BlazorApp.Pages.Admin
 {
     public partial class Members : ComponentBase
     {
+        [Inject]
+        ContextMenuService contextMenuService { get; set; }
+
         [Inject]
         NotificationService notificationService { get; set; }
 
@@ -27,8 +33,6 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         [Inject]
         MemberService memberService { get; set; }
 
-        MemberDTO member = new();
-
         protected override async Task OnInitializedAsync()
         {
 
@@ -38,6 +42,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         }
 
         private IList<MemberDTO> members;
+        IList<MemberDTO> selectedMembers;
         private bool isLoading = false;
         private string[] roleFilter = new string[] { Userroles.Administrator, Userroles.Divepro, Userroles.Divepro };
 
@@ -68,13 +73,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         {
 
             //Console.WriteLine("Trying to Show memberdata");
-            dialogService.Open<MemberDetailsComponent>($"Edit member",
-                new Dictionary<string, object>
-                {
-                    { "Member", arg.Data },
-                    { "UpdateUserCallback", EventCallback.Factory.Create<MemberDTO>(this, updateMember) },
-                    { "DeleteUserCallback", EventCallback.Factory.Create<MemberDTO>(this, deleteMember) }
-                }, editDialogOptions);
+            showEditDialog(arg.Data);
 
         }
 
@@ -124,5 +123,62 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             await getMembersByRoleFilter();
         }
 
+        void onCellContextMenu(DataGridCellMouseEventArgs<MemberDTO> args)
+        {
+            selectedMembers = new List<MemberDTO>() { args.Data };
+            var disableEnableMenuText = args.Data.LockoutEnd == DateTime.MaxValue ? "Activate" : "Deactivate";
+
+            contextMenuService.Open(args,
+                new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
+                new ContextMenuItem(){ Text = @disableEnableMenuText, Value = 2, Icon = "change_circle" },
+                new ContextMenuItem(){ Text = "Top off account", Value = 3, Icon = "add" },
+                },
+                (e) => {
+                    switch (e.Value)
+                    {
+                        case 1:
+                            showEditDialog(args.Data);
+                            break;
+                        case 2:
+                            toggleActiveStatus(args.Data);
+                            break;
+                        case 3:
+                            Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, MemberId: {args.Data.UserName}");
+                            break;
+                        default:
+                            Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, MemberID: {args.Data.UserName}");
+                            break;
+                    }
+                }
+             );
+        }
+
+
+        private void showEditDialog(MemberDTO member)
+        {
+            if (member == null)
+            {
+                return;
+            }
+            dialogService.Open<MemberDetailsComponent>($"Edit member",
+                new Dictionary<string, object>
+                {
+                                { "Member", member },
+                                { "UpdateUserCallback", EventCallback.Factory.Create<MemberDTO>(this, updateMember) },
+                                { "DeleteUserCallback", EventCallback.Factory.Create<MemberDTO>(this, deleteMember) }
+                }, editDialogOptions);
+        }
+        private async void toggleActiveStatus(MemberDTO member)
+        {
+            var disableEnableMenuText = member.LockoutEnd == DateTime.MaxValue ? "Activate" : "Deactivate";
+            var confirmAnswer = await dialogService.Confirm($"Do you want to {disableEnableMenuText} '{member.Name}'? ", disableEnableMenuText, new ConfirmOptions() { CloseDialogOnEsc = true, OkButtonText = "Yes", CancelButtonText = "No" });
+            if (confirmAnswer.GetValueOrDefault())
+            {
+                member = await memberService.ToggleActiveStatus(member);
+                members.Where(x => x.Id == member.Id).First().LockoutEnd = member.LockoutEnd;
+                StateHasChanged();
+            }
+        }
     }
 }

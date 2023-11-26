@@ -13,5 +13,6 @@ namespace ClubScansub.Models.DTO
     {
         public string[] Roles { get; set; }
 
+        public bool IsActive => LockoutEnd > DateTime.Now;
     }
 }

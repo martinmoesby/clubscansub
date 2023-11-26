@@ -1,0 +1,7 @@
+﻿body {
+}
+
+/* Additions to Blazor's CSS (hopefully) */
+.rz-custom-header {
+    width: 100% !important
+}

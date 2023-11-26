@@ -13,7 +13,7 @@
                 <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
             </RadzenColumn>
             <RadzenColumn Size="7">
-                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" class="rz-pr-4">
                     <LoginDisplay />
                 </RadzenStack>
             </RadzenColumn>
@@ -21,7 +21,7 @@
     </RadzenHeader>
 
     <RadzenBody Expanded="@sidebarExpanded">
-        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-2 rz-pt-md-4 rz-pt-lg-6 rz-pt-xl-12 rz-pb-2 rz-pb-lg-12" Style="width: 100%;">
+        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;">
             <RadzenColumn Size="12">
             @Body
             </RadzenColumn>

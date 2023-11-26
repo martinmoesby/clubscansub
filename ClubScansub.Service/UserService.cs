@@ -46,6 +46,7 @@ namespace ClubScansub.Service
             this.navManager = navigationManager;
             this.logger = logger;
             emailStore = getEmailStore();
+            appDbContext = new Data.ApplicationDbContext(dbContextOptions);
         }
         public Task<IdentityResult> ChangePassordAsync(ApplicationUser user, string oldPassword, string newPassword)
         {
@@ -122,13 +123,28 @@ namespace ClubScansub.Service
 
         public async Task<IList<string>> GetRolesByUserId(MemberDTO member)
         {
-            //var user = await userStore.FindByIdAsync(member.Id, new CancellationToken());
-            var mapperConfig = new MemberMapperConfiguration().Configure();
-            var map = new Mapper(mapperConfig);
-            var user = map.Map<ApplicationUser>(member);
-
-            var roles = await userManager.GetRolesAsync(user);
-            return roles;
+            try
+            {
+                var user = await userStore.FindByIdAsync(member.Id, new CancellationToken());
+                if (user != null) 
+                { 
+                    //var mapperConfig = new MemberMapperConfiguration().Configure();
+                    //var map = new Mapper(mapperConfig);
+                    //var user = map.Map<ApplicationUser>(member);
+                    //appDbContext.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                    //await Task.Delay(100);
+                    var roles = await userManager.GetRolesAsync(user);
+                return roles;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor= ConsoleColor.Red;
+                Console.WriteLine($"Error getting roles for {member.Name} :{ex.Message}");
+                Console.ResetColor();
+                return new List<string>();
+            }
 
         }
 

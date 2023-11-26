@@ -56,7 +56,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<MemberDTO>> GetAllAsync()
         {
-            var members = await context.ApplicationUsers.ToListAsync();
+            var members = await context.ApplicationUsers.AsNoTracking().ToListAsync();
             return mapper.Map<IList<MemberDTO>>(members);
         }
 
@@ -75,7 +75,6 @@ namespace ClubScansub.Service
             
             throw new NotImplementedException();
         }
-
 
         public async Task<MemberDTO> UpdateAsync(MemberDTO item)
         {
@@ -97,6 +96,19 @@ namespace ClubScansub.Service
         public Task<IList<MemberDTO>> UpdateAsync(params MemberDTO[] Items)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<MemberDTO> ToggleActiveStatus(MemberDTO member)
+        {
+            var user = context.ApplicationUsers.Find(member.Id);
+            if (user == null)
+                return member;
+            user.LockoutEnd = user.LockoutEnd == DateTime.MaxValue ? DateTime.Now : DateTime.MaxValue;
+            user.LockoutEnabled = true;
+            await context.SaveChangesAsync();
+
+            return mapper.Map<MemberDTO>(user);
+
         }
     }
 }
