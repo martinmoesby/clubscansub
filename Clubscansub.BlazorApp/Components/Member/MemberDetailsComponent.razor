@@ -2,74 +2,92 @@
 
 <RadzenTemplateForm Data="@Member" TItem="MemberDTO" Submit="@((MemberDTO member) => UpdateUserCallback.InvokeAsync(member))" InvalidSubmit="@onInvalidSubmit">
 
-    <RadzenFieldset Text="@Member.UserName">
+    <RadzenRow>
+        <RadzenColumn Size="10">
+            <RadzenFieldset Text="@($"Account number: {Member.AccountNumber}")">
+@*                <HeaderTemplate>
+                    <RadzenStack Style="width:100%" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                        <RadzenText Text="@Member.AccountNumber" TextStyle="TextStyle.Overline" />
+                        <RadzenText Text="@Member.UserName" TextStyle="TextStyle.Overline" />
+                        <RadzenText Text="@Member.Balance.ToString("C2")" TextAlign="TextAlign.Right" TextStyle="TextStyle.Overline" />
+                    </RadzenStack>
+                </HeaderTemplate>*@
+                <ChildContent>
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenFormField Text="First name(s)" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.Firstname" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenFormField Text="Last name" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.Lastname" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
 
-        <RadzenStack Style="width:100%" JustifyContent="JustifyContent.End" AlignItems="AlignItems.End">
-            <RadzenText Text="@Member.Balance.ToString("C2")" TextAlign="TextAlign.Right" TextStyle="TextStyle.Caption" />
-        </RadzenStack>
-        
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenFormField Text="First name(s)" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.Firstname" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenFormField Text="Last name" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.Lastname" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Size="12">
+                            <RadzenFormField Text="Address" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.Streetaddress" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
 
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <RadzenFormField Text="Address" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.Streetaddress" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Size="4">
+                            <RadzenFormField Text="Postcode" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.PostalCode" />
+                            </RadzenFormField>
+                        </RadzenColumn>
 
-        <RadzenRow>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Postcode" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.PostalCode" />
-                </RadzenFormField>
-            </RadzenColumn>
+                        <RadzenColumn Size="8">
+                            <RadzenFormField Text="City" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.City" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
 
-            <RadzenColumn Size="8">
-                <RadzenFormField Text="City" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.City" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Size="4">
+                            <RadzenFormField Text="Phone" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.PhoneNumber" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="4">
+                            <RadzenFormField Text="Email" Variant="Variant.Text" Style="width:100%">
+                                <RadzenTextBox @bind-Value="@Member.Email" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="4">
+                            <RadzenFormField Text="Birthday" Variant="Variant.Text" Style="width:100%">
+                                <RadzenDatePicker @bind-Value="@Member.DayOfbirth" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </ChildContent>
+            </RadzenFieldset>
+        </RadzenColumn>
+        <RadzenColumn Size="2">
+            <RadzenFieldset Text="Roles" Style="height:100%">
+                @if (Member.Roles != null)
+                {
+                    <MemberRolesComponent Orientation="Orientation.Vertical" MemberRolesChanged="@onSetUserRoles" InitialRoles="@Member.Roles" ShowLabel="false" Alignment="AlignItems.Stretch" Justify="JustifyContent.Stretch" />
+                }
+            </RadzenFieldset>
 
-        <RadzenRow>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Phone" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.PhoneNumber" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Email" Style="width:100%">
-                    <RadzenTextBox @bind-Value="@Member.Email" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Birthday" Style="width:100%">
-                    <RadzenDatePicker @bind-Value="@Member.DayOfbirth" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
 
-    </RadzenFieldset>
-    <RadzenFieldset Text="membership Roles" >
-        @if (Member.Roles != null)
-        {
-            <MemberRolesComponent MemberRolesChanged="@onSetUserRoles" InitialRoles="@Member.Roles" LabelText="Roles" />
-        }
-    </RadzenFieldset>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-4">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Success" Variant="Variant.Outlined" />
-        <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click="deleteUserClick" />
+  
+   <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
+        <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click="deleteUserClick" Size="ButtonSize.Small" />
     </RadzenStack>
 </RadzenTemplateForm>
+
+<style>
+    .rz-custom-header {
+        width: 100% !important
+    }
+</style>

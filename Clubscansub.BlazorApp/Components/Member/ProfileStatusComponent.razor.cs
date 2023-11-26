@@ -11,14 +11,49 @@ namespace Clubscansub.BlazorApp.Components.Member
         [Inject]
         UserService service { get; set; }
 
+        [Inject]
+        TooltipService tooltipService { get; set; }
+
         [Parameter]
         public MemberDTO Profile { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
 
-            phoneBadgeStyle = Profile.PhoneNumberConfirmed ? BadgeStyle.Success : BadgeStyle.Danger;
-            emailBadgeStyle = Profile.EmailConfirmed ? BadgeStyle.Success: BadgeStyle.Danger;
+            await base.OnInitializedAsync();
+            if (!Profile.IsActive)
+            {
+                profileIconStyle= IconStyle.Secondary;
+                profileStatusPopupText = "Profile Deactivated";
+                profileIcon = "person_off";
+            }
+
+            if (!Profile.PhoneNumberConfirmed)
+            {
+                phoneIconStyle = IconStyle.Secondary;
+                phoneStatusPopupText = "Phone number has NOT been confirmed";
+                phoneIcon = "phone_locked";
+            }
+
+            if (!Profile.EmailConfirmed)
+            {
+                emailIconStyle = IconStyle.Secondary;
+                emailStatusPopupText = "Email has been NOT confirmed";
+                emailIcon = "mail_lock";
+            }
+
+        }
+        private IconStyle phoneIconStyle = IconStyle.Primary;
+        private IconStyle emailIconStyle = IconStyle.Primary;
+        private IconStyle profileIconStyle = IconStyle.Primary;
+
+        private string phoneIcon = "phone";
+        private string emailIcon = "mail";
+        private string profileIcon = "person";
+
+        private string phoneStatusPopupText = "Phone number has been confirmed";
+        private string emailStatusPopupText = "Email has been confirmed";
+        private string profileStatusPopupText ="Profile Active";
 
             //var roles = await service.GetRolesByUserId(Profile);
             //var orderedRoles =  fixedRoleOrder.Select(x=> roles.Contains(x) ? x : "-1").Where(x=>x != "-1").ToArray();
@@ -53,16 +88,22 @@ namespace Clubscansub.BlazorApp.Components.Member
             //    default:
             //        break;
             //}
+        
+
+        //private string[] fixedRoleOrder = { Userroles.Owner, Userroles.Administrator , Userroles.Divepro, Userroles.Member, Userroles.User, Userroles.Student };
+        //private string role { get; set; } = "No roles";
+        //private Shade userRoleShade { get; set; } = Shade.Default;
+        //private BadgeStyle userRoleBadgeStyle { get; set; } = BadgeStyle.Light;
+
+
+        void ShowTooltip(ElementReference elementReference, string name )
+        {
+            if (name == "phone")
+                tooltipService.Open(elementReference, phoneStatusPopupText, new TooltipOptions());
+            if (name == "email")
+                tooltipService.Open(elementReference, emailStatusPopupText, new TooltipOptions());
+            if (name == "profile")
+                tooltipService.Open(elementReference, profileStatusPopupText, new TooltipOptions());
         }
-
-        private string[] fixedRoleOrder = { Userroles.Owner, Userroles.Administrator , Userroles.Divepro, Userroles.Member, Userroles.User, Userroles.Student };
-        private string role { get; set; } = "No roles";
-        private BadgeStyle phoneBadgeStyle { get; set; }
-        private BadgeStyle emailBadgeStyle { get; set; }
-
-        private Shade userRoleShade { get; set; } = Shade.Default;
-        private BadgeStyle userRoleBadgeStyle { get; set; } = BadgeStyle.Light;
-
-
     }
 }

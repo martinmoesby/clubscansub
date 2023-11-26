@@ -13,6 +13,15 @@ namespace Clubscansub.BlazorApp.Components.Member
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
         [Parameter]
+        public AlignItems Alignment { get; set; } = AlignItems.Stretch;
+
+        [Parameter]
+        public JustifyContent Justify { get; set; } = JustifyContent.Normal;
+
+        [Parameter]
+        public bool ShowLabel { get; set; } = true;
+        
+        [Parameter]
         public bool IsLoading { get; set; } = false;
 
         [Parameter]

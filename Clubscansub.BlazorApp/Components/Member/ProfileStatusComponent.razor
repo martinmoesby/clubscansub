@@ -1,17 +1,5 @@
 ﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
-
-
-        <RadzenBadge BadgeStyle="@phoneBadgeStyle" Shade="Shade.Default" Variant="Variant.Text">
-            <RadzenIcon Icon="phone" Style="font-size:0.9rem" />
-        </RadzenBadge>
-
-        <RadzenBadge BadgeStyle="@emailBadgeStyle" Shade="Shade.Dark" Variant="Variant.Text">
-            <RadzenIcon Icon="email" Style="font-size:0.9rem" />
-        </RadzenBadge>
-    
-    @*<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Reverse="true">
-    </RadzenStack>
-*@
-    @*<RadzenBadge BadgeStyle="@userRoleBadgeStyle" Shade="@userRoleShade" Variant="Variant.Filled" Text="@role" class="rz-p-1" />*@
-
+    <RadzenIcon Icon="@profileIcon" Style="font-size:1rem" IconStyle="@profileIconStyle" MouseEnter="@(args=> ShowTooltip(args, "profile"))"/>
+    <RadzenIcon Icon="@phoneIcon" Style="font-size:1rem" IconStyle="@phoneIconStyle" MouseEnter="@(args=> ShowTooltip(args, "phone"))" />
+    <RadzenIcon Icon="@emailIcon" Style="font-size:1rem" IconStyle="@emailIconStyle" MouseEnter="@(args=> ShowTooltip(args, "email"))" />
 </RadzenStack>

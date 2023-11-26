@@ -101,11 +101,13 @@ namespace ClubScansub.Service
         {
             var member = mapper.Map<ApplicationUser>(item);
 
+            context.Attach(member);
             context.Update(member);
             await context.SaveChangesAsync();
+
             context.Entry(member).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
 
-            return item;
+            return mapper.Map<MemberDTO>(member);
 
         }
 

@@ -47,6 +47,8 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         IList<MemberDTO> selectedMembers;
         private bool isLoading = false;
         private string[] roleFilter = new string[] { Userroles.Administrator, Userroles.Divepro, Userroles.Divepro };
+        private string searchFilter = "";
+
 
         private DialogOptions editDialogOptions = new DialogOptions()
         {
@@ -65,12 +67,18 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         {
             isLoading = true;
 
-            members = (await memberService.GetAllByRolesAsync(roleFilter)).OrderBy(x => x.UserName).ToList();
+            members = (await memberService.GetAllByRolesAsync(roleFilter)).OrderBy(x => x.UserName).Where(x=> x.Name.Contains(searchFilter)).ToList();
 
             isLoading = false;
             StateHasChanged();
         }
 
+
+        async void resetSearchFilter()
+        {
+            searchFilter = "";
+            await getMembersByRoleFilter();
+        }
         void onRowDblCLick(DataGridRowMouseEventArgs<MemberDTO> arg)
         {
 
@@ -126,6 +134,15 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             {
                 await memberService.DeleteAsync(member);
                 dialogService.Close();
+
+                notificationService.Notify(new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Duration = 2500,
+                    Summary = "Member deleted!",
+                    Detail = $"Member '{member.Name}' was deleted."
+                });
+
                 await getMembersByRoleFilter();
 
             }
@@ -153,15 +170,31 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         {
             try
             {
-                notificationService.Notify(new NotificationMessage()
+                if (registerUserResult.IsSucceesfull)
                 {
-                    Severity = NotificationSeverity.Success,
-                    Duration = 2500,
-                    Summary = "New user created",
-                    Detail = $"Member '{registerUserResult.User.Name}' was created."
-                });
-                dialogService.Close();
-                await getMembersByRoleFilter();
+                    notificationService.Notify(new NotificationMessage()
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Duration = 2500,
+                        Summary = "New user created",
+                        Detail = $"Member '{registerUserResult.User.Name}' was created."
+                    });
+                    dialogService.Close();
+                    await getMembersByRoleFilter();
+
+                } else
+                {
+                    notificationService.Notify(new NotificationMessage()
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Duration = 2500,
+                        Summary = registerUserResult.Errors.FirstOrDefault(),
+                        Detail =  string.Join(" - ", registerUserResult.Errors.ToArray())
+                    });
+                    dialogService.Close();
+
+                }
+
             }
             catch (Exception ex)
             {
@@ -185,7 +218,6 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 await dialogService.Alert($"An error occurred: {ex.Message}", "Transaction error!", new AlertOptions() { OkButtonText = "OK" });
             }
         }
-
 
         private void showEditDialog(MemberDTO member)
         {

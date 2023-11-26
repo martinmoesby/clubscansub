@@ -30,7 +30,6 @@ namespace Clubscansub.BlazorApp.Components.Member
             Member.Roles= userRoles;
         }
 
-
         private void onInvalidSubmit()
         {
             dialogService.Alert("Invlid information - please check all data and try again", "Invalid", new AlertOptions() { OkButtonText= "OK" });

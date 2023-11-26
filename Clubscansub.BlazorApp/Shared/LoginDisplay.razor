@@ -9,20 +9,10 @@
     </NotAuthorized>
     <Authorized>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
-
-        <RadzenButton @onclick="OnManageClick">
-                @if (currentUser?.Initials  == null) {
-                    <RadzenIcon Icon="person" />
-                } else 
-                {
-                    <RadzenText TextStyle="TextStyle.Body2">
-                        @currentUser.Initials
-                    </RadzenText>
-                }
-        </RadzenButton>
-        <form method="post" action="/Account/LogOut">
-            <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Color="Color.Surface" />
-        </form>
+            <RadzenButton @onclick="OnManageClick" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Icon="person" />
+            <form method="post" action="/Account/LogOut">
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" />
+            </form>
         </RadzenStack>
     </Authorized>
 </AuthorizeView>

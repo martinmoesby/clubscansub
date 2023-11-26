@@ -22,7 +22,7 @@ namespace Clubscansub.BlazorApp.Components.Account
 
         private RegisterUserDTO newUser { get; set; } = new();
 
-        private string[] userRoles { get; set; } = new string[] { Userroles.User };
+        private string[] userRoles { get; set; } = new string[] { Userroles.User, Userroles.Student };
 
         private async void onSubmit(RegisterUserDTO registerUser)
         {
