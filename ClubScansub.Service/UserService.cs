@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using ClubScansub.Models;
+﻿using ClubScansub.Models;
 using ClubScansub.Models.DTO;
-using ClubScansub.Service.Automapper;
 using ClubScansub.Service.Exceptions;
 using ClubScansub.Service.Interfaces;
 using ClubScansub.Service.ServiceResults;
@@ -121,7 +119,7 @@ namespace ClubScansub.Service
             }
         }
 
-        public async Task<IList<string>> GetRolesByUserId(MemberDTO member)
+        public async Task<IList<string>> GetRolesByUserId(ApplicationUser member)
         {
             try
             {
@@ -148,7 +146,7 @@ namespace ClubScansub.Service
 
         }
 
-        public async Task SetRolesByUserId(MemberDTO member)
+        public async Task SetRolesByUserId(ApplicationUser member)
         {
             if (member.Roles == null)
                 throw new ArgumentNullException(nameof(member.Roles));
@@ -237,7 +235,7 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public async Task<IList<MemberDTO>> GetUsersByRolesAsync(params string[] roles)
+        public async Task<IList<ApplicationUser>> GetUsersByRolesAsync(params string[] roles)
         {
             List<ApplicationUser> users = new();
             foreach (var item in roles)
@@ -246,10 +244,8 @@ namespace ClubScansub.Service
                 users.AddRange(roleUsers);
                 users = users.Distinct().ToList(); ;
             }
-            var mapperConfig = new MemberMapperConfiguration().Configure();
-            var map = new Mapper(mapperConfig);
 
-            return map.Map<IList<MemberDTO>>(users);
+            return users;
         }
 
         #region "Private support functions"

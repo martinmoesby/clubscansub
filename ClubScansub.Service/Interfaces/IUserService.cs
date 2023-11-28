@@ -23,6 +23,6 @@ namespace ClubScansub.Service.Interfaces
         Task<LoginResult> LoginUserAsync(string username, string password, bool persistent);
         Task<RegisterUserResult> RegisterNewUserAsync(RegisterUserDTO userWM, string[] userRoles);
         Task<ApplicationUser> UpdateUserAsync(ApplicationUser user);
-        Task<IList<MemberDTO>> GetUsersByRolesAsync(params string[] roles);
+        Task<IList<ApplicationUser>> GetUsersByRolesAsync(params string[] roles);
     }
 }

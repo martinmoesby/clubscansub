@@ -1,4 +1,5 @@
-﻿using ClubScansub.Models.DTO;
+﻿using ClubScansub.Models;
+using ClubScansub.Models.DTO;
 using ClubScansub.Models.ViewModels;
 using ClubScansub.Service;
 using ClubScansub.Utility;
@@ -16,13 +17,13 @@ namespace Clubscansub.BlazorApp.Components.Member
         UserService userService { get; set; }
 
         [Parameter]
-        public EventCallback<MemberDTO> UpdateUserCallback { get; set; }
+        public EventCallback<ApplicationUser> UpdateUserCallback { get; set; }
 
         [Parameter]
-        public EventCallback<MemberDTO> DeleteUserCallback { get; set; }
+        public EventCallback<ApplicationUser> DeleteUserCallback { get; set; }
 
         [Parameter]
-        public MemberDTO Member { get; set; } = new();
+        public ApplicationUser Member { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {

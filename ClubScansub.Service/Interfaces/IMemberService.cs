@@ -1,4 +1,4 @@
-﻿using ClubScansub.Models.DTO;
+﻿using ClubScansub.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ClubScansub.Service.Interfaces
 {
-    internal interface IMemberService : IGenericService<MemberDTO>
+    internal interface IMemberService : IGenericService<ApplicationUser>
     {
-        Task<IList<MemberDTO>> GetByRolesAsync(params string[] userroles);
+        Task<IList<ApplicationUser>> GetByRolesAsync(params string[] userroles);
 
     }
 }

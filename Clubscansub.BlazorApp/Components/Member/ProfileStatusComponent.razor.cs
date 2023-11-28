@@ -1,4 +1,5 @@
-﻿using ClubScansub.Models.DTO;
+﻿using ClubScansub.Models;
+using ClubScansub.Models.DTO;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +16,7 @@ namespace Clubscansub.BlazorApp.Components.Member
         TooltipService tooltipService { get; set; }
 
         [Parameter]
-        public MemberDTO Profile { get; set; }
+        public ApplicationUser Profile { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
