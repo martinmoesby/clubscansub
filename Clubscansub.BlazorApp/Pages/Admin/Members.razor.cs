@@ -1,20 +1,12 @@
-﻿using AutoMapper.Execution;
-using Clubscansub.BlazorApp.Components.Account;
+﻿using Clubscansub.BlazorApp.Components.Account;
 using Clubscansub.BlazorApp.Components.Member;
+using ClubScansub.Models;
 using ClubScansub.Models.DTO;
-using ClubScansub.Models.ViewModels;
 using ClubScansub.Service;
 using ClubScansub.Service.ServiceResults;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Newtonsoft.Json.Linq;
 using Radzen;
-using System;
-using System.ComponentModel.Design.Serialization;
-using System.Drawing;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Clubscansub.BlazorApp.Pages.Admin
 {
@@ -43,8 +35,8 @@ namespace Clubscansub.BlazorApp.Pages.Admin
 
         }
 
-        private IList<MemberDTO> members;
-        IList<MemberDTO> selectedMembers;
+        private IList<ApplicationUser> members;
+        IList<ApplicationUser> selectedMembers;
         private bool isLoading = false;
         private string[] roleFilter = new string[] { Userroles.Administrator, Userroles.Divepro, Userroles.Divepro };
         private string searchFilter = "";
@@ -79,7 +71,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             searchFilter = "";
             await getMembersByRoleFilter();
         }
-        void onRowDblCLick(DataGridRowMouseEventArgs<MemberDTO> arg)
+        void onRowDblCLick(DataGridRowMouseEventArgs<ApplicationUser> arg)
         {
 
             //Console.WriteLine("Trying to Show memberdata");
@@ -95,9 +87,9 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                     { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this, createMember) },
                 }, editDialogOptions);
         }
-        void onCellContextMenu(DataGridCellMouseEventArgs<MemberDTO> args)
+        void onCellContextMenu(DataGridCellMouseEventArgs<ApplicationUser> args)
         {
-            selectedMembers = new List<MemberDTO>() { args.Data };
+            selectedMembers = new List<ApplicationUser>() { args.Data };
             var disableEnableMenuText = args.Data.LockoutEnd == DateTime.MaxValue ? "Activate" : "Deactivate";
 
             contextMenuService.Open(args,
@@ -127,7 +119,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         }
 
 
-        private async void deleteMember(MemberDTO member)
+        private async void deleteMember(ApplicationUser member)
         {
             var deleteUser = await dialogService.Confirm($"Dou you want to delete {member.Name} ? This is irreverible and cannot be undone!", "Delete member", new ConfirmOptions() { CancelButtonText = "No", OkButtonText = "Yes" });
             if (deleteUser.GetValueOrDefault())
@@ -148,7 +140,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             }
 
         }
-        private async void updateMember(MemberDTO model)
+        private async void updateMember(ApplicationUser model)
         {
 
             try
@@ -202,16 +194,16 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 await dialogService.Alert($"An error occurred: {ex.Message}", "Registration error!", new AlertOptions() { OkButtonText = "OK" });
             }
         }
-        private async void makeTransaction(AccountTransactionDTO transaction)
+        private async void makeTransaction(ApplicationUserAccountEntry transaction)
         {
             try
             {
-                var updateMember = await memberService.AddTransactionAsync(transaction.CurrentMember, transaction);
+                var updateMember = await memberService.AddTransactionAsync(transaction.ApplicationUser, transaction);
                 dialogService.Close();
                 members.Where(x => x.Id == updateMember.Id).First().AccountTransactions = updateMember.AccountTransactions;
                 StateHasChanged();
 
-                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{transaction.CurrentMember.Name}' has receiced a deposit of {transaction.Amount.ToString("C")}", CloseOnClick = true });
+                notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{transaction.ApplicationUser.Name}' has receiced a deposit of {transaction.Amount.ToString("C")}", CloseOnClick = true });
             }
             catch (Exception ex)
             {
@@ -219,7 +211,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             }
         }
 
-        private void showEditDialog(MemberDTO member)
+        private void showEditDialog(ApplicationUser member)
         {
             if (member == null)
             {
@@ -229,11 +221,11 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 new Dictionary<string, object>
                 {
                                 { "Member", member },
-                                { "UpdateUserCallback", EventCallback.Factory.Create<MemberDTO>(this, updateMember) },
-                                { "DeleteUserCallback", EventCallback.Factory.Create<MemberDTO>(this, deleteMember) }
+                                { "UpdateUserCallback", EventCallback.Factory.Create<ApplicationUser>(this, updateMember) },
+                                { "DeleteUserCallback", EventCallback.Factory.Create<ApplicationUser>(this, deleteMember) }
                 }, editDialogOptions);
         }
-        private async void toggleActiveStatus(MemberDTO member)
+        private async void toggleActiveStatus(ApplicationUser member)
         {
             var disableEnableMenuText = member.LockoutEnd == DateTime.MaxValue ? "Activate" : "Deactivate";
             var confirmAnswer = await dialogService.Confirm($"Do you want to {disableEnableMenuText} '{member.Name}'? ", disableEnableMenuText, new ConfirmOptions() { CloseDialogOnEsc = true, OkButtonText = "Yes", CancelButtonText = "No" });
@@ -244,7 +236,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 StateHasChanged();
             }
         }
-        private void showAddTransactionDialog(MemberDTO member)
+        private void showAddTransactionDialog(ApplicationUser member)
         {
             if (member == null) return;
 
@@ -252,7 +244,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 new Dictionary<string, object>
                 {
                      { "Member", member },
-                     { "Callback", EventCallback.Factory.Create<AccountTransactionDTO>(this, makeTransaction) },
+                     { "Callback", EventCallback.Factory.Create<ApplicationUserAccountEntry>(this, makeTransaction) },
                 }
                 , editDialogOptions);
         }

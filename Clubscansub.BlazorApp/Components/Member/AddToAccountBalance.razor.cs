@@ -1,4 +1,4 @@
-﻿using ClubScansub.Models.DTO;
+﻿using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
@@ -12,10 +12,10 @@ namespace Clubscansub.BlazorApp.Components.Member
         MemberService memberService { get; set; }
 
         [Parameter]
-        public MemberDTO Member { get; set; }
+        public ApplicationUser Member { get; set; }
 
         [Parameter]
-        public EventCallback<AccountTransactionDTO> Callback{ get; set; }
+        public EventCallback<ApplicationUserAccountEntry> Callback{ get; set; }
 
         protected override void OnInitialized()
         {
@@ -24,12 +24,12 @@ namespace Clubscansub.BlazorApp.Components.Member
 
         private void saveTransaction()
         {
-            transaction.CurrentMember = Member;
+            transaction.ApplicationUser = Member;
             Callback.InvokeAsync(transaction);
         }
 
         private AccountTypeEnum accountType { get; set; } = AccountTypeEnum.EventAccountType;
-        private AccountTransactionDTO transaction { get; set; } = new();
+        private ApplicationUserAccountEntry transaction { get; set; } = new();
 
     }
 }

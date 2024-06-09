@@ -1,6 +1,6 @@
 ﻿@using ClubScansub.Models.DTO;
 
-<RadzenTemplateForm Data="@Member" TItem="MemberDTO" Submit="@((MemberDTO member) => UpdateUserCallback.InvokeAsync(member))" InvalidSubmit="@onInvalidSubmit">
+<RadzenTemplateForm Data="@Member" TItem="ApplicationUser" Submit="@((ApplicationUser member) => UpdateUserCallback.InvokeAsync(member))" InvalidSubmit="@onInvalidSubmit">
 
     <RadzenRow>
         <RadzenColumn Size="10">
@@ -13,6 +13,12 @@
                     </RadzenStack>
                 </HeaderTemplate>*@
                 <ChildContent>
+                    <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
+                        <RadzenColumn Size="12">
+                            <RadzenLabel Component="LockedOutDate" Text="Locked out until:"  />
+                            <RadzenText Text="@Member.LockoutEnd.ToString()"  TextStyle="TextStyle.Caption" TextAlign="TextAlign.Right" />
+                        </RadzenColumn>
+                    </RadzenRow>
                     <RadzenRow>
                         <RadzenColumn Size="6">
                             <RadzenFormField Text="First name(s)" Variant="Variant.Text" Style="width:100%">

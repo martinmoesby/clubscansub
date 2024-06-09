@@ -109,6 +109,11 @@ namespace ClubScansub.Models
 
         public bool OldAccountImported { get; set; }
 
+        [NotMapped]
+        public bool IsActive => (LockoutEnd <= DateTime.Now || LockoutEnd == null);
+        [NotMapped]
+        public string[] Roles { get; set; }
+
         [PersonalData]
         [Display(Name = "Certifikater")]
         public ICollection<UserCertificat> Certificates { get; set; }

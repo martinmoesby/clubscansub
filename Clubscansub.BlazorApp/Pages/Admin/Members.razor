@@ -1,13 +1,10 @@
 ﻿@page "/admin/members"
-@using ClubScansub.Models.DTO;
 
 <RadzenRow Gap="5">
     <RadzenColumn Size="6" SizeSM="10" SizeXS="12">
         <RadzenRow AlignItems="AlignItems.Center" class="rz-mb-1">
             <RadzenColumn>
                 <RadzenText TextStyle="TextStyle.DisplayH6" Text="Member management" />
-@*            </RadzenColumn>
-            <RadzenColumn>*@
                 <RadzenFormField Style="width:100%">
                     <Start>
                         <RadzenIcon Icon="search" />
@@ -24,7 +21,7 @@
         <RadzenRow>
             <RadzenDataGrid Data="@members"
                             PageSize="15"
-                            TItem="MemberDTO"
+                            TItem="ApplicationUser"
                             AllowPaging="true"
                             AllowVirtualization="true"
                             AllowSorting="true"
@@ -59,18 +56,18 @@
                 </LoadingTemplate>
 
                 <Columns>
-                    <RadzenDataGridColumn Pickable="false" TItem="MemberDTO" Title="Profile status" Filterable=false Width="120px" MinWidth="120px" Frozen="true">
+                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Profile status" Filterable=false Width="120px" MinWidth="120px" Frozen="true">
                         <Template Context="member">
                             <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Pickable="false" TItem="MemberDTO" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" Frozen="true"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Pickable="false" TItem="MemberDTO" Title="Full name" Property="Name" MinWidth="150px" Frozen="true"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="true" TItem="MemberDTO" Title="Address" Property="Streetaddress" Filterable=false Width="240px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="MemberDTO" Title="Postcode" Property="PostalCode" Filterable=false Width="120px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="MemberDTO" Title="City" Property="City" Filterable=false Width="180px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="MemberDTO" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="true" TItem="MemberDTO" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" Frozen="true"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Full name" Property="Name" MinWidth="150px" Frozen="true"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Address" Property="Streetaddress" Filterable=false Width="240px"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Postcode" Property="PostalCode" Filterable=false Width="120px"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="City" Property="City" Filterable=false Width="180px"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"></RadzenDataGridColumn>
 
                 </Columns>
 
