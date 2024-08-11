@@ -27,13 +27,15 @@ namespace ClubScansub.API
 
         }
         #region Public end points
-        
+
+        [HttpGet]
         [Route("event/{id}")]
         public async Task<ActionResult> Get(int id)
         {
             return Json(await db.Events.FindAsync(id));
         }
-
+        
+        [HttpGet]
         [Route("events/{eventtype}")]
         public async Task<ActionResult> Get(string eventtype)
         {

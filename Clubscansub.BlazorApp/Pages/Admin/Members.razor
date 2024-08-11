@@ -20,6 +20,7 @@
         </RadzenRow>
         <RadzenRow>
             <RadzenDataGrid Data="@members"
+                            @ref=@grid
                             PageSize="15"
                             TItem="ApplicationUser"
                             AllowPaging="true"
@@ -43,7 +44,7 @@
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
 
-                        <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent MemberRolesChanged="setRoleFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="false" Alignment="AlignItems.Center" />
+                        <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent MemberRolesChanged="setRoleFilter" ShowStatusFilter="true" MemberStatusFilterChanged="setStatusFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="true" Alignment="AlignItems.Center" Justify="JustifyContent.SpaceBetween" />
 
                         <RadzenButton Icon="person_add" Click="onCreateNewMemberClick" Size="ButtonSize.Small" class="rz-mr-4" />
 

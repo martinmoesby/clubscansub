@@ -1,7 +1,9 @@
-﻿using ClubScansub.Data;
+﻿using AutoMapper.Execution;
+using ClubScansub.Data;
 using ClubScansub.Models;
 using ClubScansub.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,13 +14,14 @@ namespace ClubScansub.Service
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IUserStore<ApplicationUser> userStore;
 
-        public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender, UserManager<ApplicationUser> userManager)
+        public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore)
             : base(options, emailSender)
         {
             context = new ApplicationDbContext(dbContextOptions);
             this.userManager = userManager;
-
+            this.userStore = userStore;
         }
 
         public Task<ApplicationUser> AddAsync(ApplicationUser Item)
@@ -46,7 +49,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<ApplicationUser>> GetAllAsync()
         {
-            var members = await context.ApplicationUsers.Include(x=>x.AccountTransactions).ToListAsync();
+            var members = await context.ApplicationUsers.Include(x=>x.AccountTransactions).AsNoTracking().ToListAsync();
             return members;
         }
 
@@ -59,7 +62,7 @@ namespace ClubScansub.Service
                 users.AddRange(roleUsers);
                 users = users.Distinct().ToList(); ;
             }
-            var members = await context.ApplicationUsers.Include(x => x.AccountTransactions).Where(x=> users.Contains(x)).ToListAsync();
+            var members = await context.ApplicationUsers.Include(x => x.AccountTransactions).Where(x=> users.Contains(x)).AsNoTracking().ToListAsync();
             return members;
         }
 
@@ -81,22 +84,38 @@ namespace ClubScansub.Service
 
         public async Task<ApplicationUser> UpdateAsync(ApplicationUser item)
         {
-            var user = await context.ApplicationUsers.FindAsync(item.Id);
+            if (item.Roles == null)
+                throw new ArgumentNullException(nameof(item.Roles));
+
+            var user = await userStore.FindByIdAsync(item.Id, new CancellationToken());
             if (user == null)
-                return item;
+                throw new ArgumentException($"User '{item.Id}' could not be retrieved");
 
-            user.PhoneNumber = item.PhoneNumber;
-            user.Email = item.Email;
-            user.AccountNumber = item.AccountNumber;
-            user.Firstname = item.Firstname;
-            user.Lastname = item.Lastname;
-            user.Streetaddress = item.Streetaddress;
-            user.PostalCode = item.PostalCode;
-            user.City = item.City;
-            user.Country = item.Country;
-            user.IsMultiUser = item.IsMultiUser;
+            try
+            {
+                var existingRoles = await userManager.GetRolesAsync(user);
+                await userManager.RemoveFromRolesAsync(user, existingRoles);
+                await userManager.AddToRolesAsync(user, item.Roles);
 
-            await context.SaveChangesAsync();
+                user.PhoneNumber = item.PhoneNumber;
+                user.Email = item.Email;
+                user.AccountNumber = item.AccountNumber;
+                user.Firstname = item.Firstname;
+                user.Lastname = item.Lastname;
+                user.Streetaddress = item.Streetaddress;
+                user.PostalCode = item.PostalCode;
+                user.City = item.City;
+                user.Country = item.Country;
+                user.IsMultiUser = item.IsMultiUser;
+
+                await userManager.UpdateAsync(user);
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to update user information.Se InnerExceptions for more information", ex);
+            }
 
             return item;
         }
@@ -113,28 +132,32 @@ namespace ClubScansub.Service
 
         public async Task<ApplicationUser> ToggleActiveStatus(ApplicationUser member)
         {
-            var user = context.ApplicationUsers.Find(member.Id);
-            if (user == null)
-                return member;
-            user.LockoutEnd = user.LockoutEnd == DateTime.MaxValue ? DateTime.Now : DateTime.MaxValue;
-            user.LockoutEnabled = true;
+            //var user = context.ApplicationUsers.Find(member.Id);
+            //if (user == null)
+            //    return member;
+            member.LockoutEnd = member.LockoutEnd == DateTime.MaxValue ? DateTime.Now : DateTime.MaxValue;
+            member.LockoutEnabled = true;
+            context.ApplicationUsers.Update(member);
             await context.SaveChangesAsync();
 
-            return user;
+            return member;
 
         }
 
         public async Task<ApplicationUser> AddTransactionAsync(ApplicationUser member, ApplicationUserAccountEntry transaction)
         {
-            var user = await context.ApplicationUsers.Include(x => x.AccountTransactions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == member.Id);
+            var user = await context.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == member.Id);
 
             if (user == null)
                 return member;
 
             user.AccountTransactions.Add(transaction);  
+
             await context.SaveChangesAsync();
             return user;
 
         }
+
+
     }
 }

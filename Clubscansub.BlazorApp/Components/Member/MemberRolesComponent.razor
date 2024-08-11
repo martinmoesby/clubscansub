@@ -1,5 +1,6 @@
 ﻿
 <RadzenStack Orientation="@Orientation" JustifyContent="@Justify" AlignItems="@Alignment" Gap="10px">
+    <RadzenStack Orientation="@Orientation">
 
     <RadzenText Text="@LabelText" TextStyle="TextStyle.Button" class="rz-mt-2" Visible=@ShowLabel></RadzenText>
 
@@ -9,5 +10,12 @@
     <RadzenToggleButton Disabled=@IsLoading Change="@onMemberRolesChanged" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" @bind-Value=@showMember Shade="Shade.Lighter" ToggleShade="Shade.Default" Text="Prem." Icon="radio_button_unchecked" ToggleIcon="task_alt" />
     <RadzenToggleButton Disabled=@IsLoading Change="@onMemberRolesChanged" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" @bind-Value=@showUser Shade="Shade.Lighter" ToggleShade="Shade.Default" Text="Basic" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
     <RadzenToggleButton Disabled=@IsLoading Change="@onMemberRolesChanged" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Secondary" ToggleButtonStyle="ButtonStyle.Success" @bind-Value=@showStudent Shade="Shade.Lighter" ToggleShade="Shade.Default" Text="Students" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="@Orientation" Visible=@ShowStatusFilter>
+        <RadzenText Text="Member Status" TextStyle="TextStyle.Button" class="rz-mt-2" Visible=@ShowLabel></RadzenText>
+        <RadzenToggleButton Disabled=@IsLoading Change="@onMemberStatusFilterChanged" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Danger" ToggleButtonStyle="ButtonStyle.Danger" @bind-Value=@showDeactivated Shade="Shade.Lighter" ToggleShade="Shade.Darker" Text="Deactivated" Icon="radio_button_unchecked" ToggleIcon="task_alt" />
+    </RadzenStack>
+
 
 </RadzenStack>

@@ -1,0 +1,20 @@
+﻿<RadzenCard Variant="Variant.Filled" Class="rz-my-2 rz-mx-auto" Style="max-width: 420px">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+        <RadzenImage Path="" Style="width: 25px; height: 25px; border-radius: 50%;" />
+        <RadzenStack Gap="0">
+            <RadzenText TextStyle="TextStyle.Body1">@(Event?.Title)</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">
+                    @Event.StartDateAndTime.ToShortTimeString()
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">
+                    @Event.EndDateAndTime.ToShortTimeString()
+                </RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+        <RadzenStack Gap="0">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@Event.PremiumPrice.ToString("{C2}")</RadzenText>
+            
+        </RadzenStack>
+</RadzenCard>

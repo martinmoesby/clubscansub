@@ -1,0 +1,27 @@
+﻿@using ClubScansub.Utility;
+<RadzenStack Gap="40">
+    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"Account details")" />
+    <RadzenSelectBar TValue="AccountTypeEnum" Size="ButtonSize.Small" @bind-Value="@accountType">
+        <Items>
+            <RadzenSelectBarItem Value="AccountTypeEnum.EventAccountType" Text="Event Account" />
+            <RadzenSelectBarItem Value="AccountTypeEnum.CourseAccountType" Text="Course Account" />
+        </Items>
+    </RadzenSelectBar>
+@*     <RadzenGrid 
+        TItem="ApplicationUserAccountEntry" 
+        AllowPaging 
+        AllowFiltering 
+        PageSize="10"
+        Data="@Transactions">
+        <Columns>
+            <RadzenGridColumn TItem="ApplicationUserAccountEntry" Property="PostingDate" Format="{D0}" Title="PostingDate"/>
+             <RadzenGridColumn TItem="ApplicationUserAccountEntry" Property="Description" Title="Description" />
+             <RadzenGridColumn TItem="ApplicationUserAccountEntry" Property="InvoiceNumber" Title="InvoiceNumber" />
+             <RadzenGridColumn TItem="ApplicationUserAccountEntry" Property="Amount" Format="{N2}" Title="Amount" />
+        </Columns>
+    </RadzenGrid> *@
+</RadzenStack>
+ <RadzenButton Click="@closeDialog" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Success" Shade="Shade.Default" Text="Close" Icon="close" class="rz-mt-6" />
+
+
+

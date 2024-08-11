@@ -25,10 +25,16 @@ namespace Clubscansub.BlazorApp.Components.Member
         public bool IsLoading { get; set; } = false;
 
         [Parameter]
+        public bool ShowStatusFilter { get; set; } = false;
+
+        [Parameter]
         public string[] InitialRoles { get; set; }
 
         [Parameter]
         public EventCallback<string[]> MemberRolesChanged { get; set; }
+
+        [Parameter]
+        public EventCallback<bool> MemberStatusFilterChanged { get; set; }
 
         protected override Task OnInitializedAsync()
         {
@@ -53,6 +59,8 @@ namespace Clubscansub.BlazorApp.Components.Member
         private bool showUser = false;
         private bool showStudent = false;
 
+        private bool showDeactivated = false;
+
         private Dictionary<string, bool> showRoles;
         private string[] roleFilter;
 
@@ -72,5 +80,9 @@ namespace Clubscansub.BlazorApp.Components.Member
             MemberRolesChanged.InvokeAsync(roleFilter);
         }
 
+        private void onMemberStatusFilterChanged()
+        {
+            MemberStatusFilterChanged.InvokeAsync(showDeactivated);
+        }
     }
 }

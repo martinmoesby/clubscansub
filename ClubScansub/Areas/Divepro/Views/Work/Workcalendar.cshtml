@@ -146,7 +146,7 @@
                                         @if(!alreadyActivatedMe && !dayIsDisabled)
                                         {
                                             <div class="col-auto m-1 small">
-                                                <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id" asp-route-monthKey="@(ViewBag.Current)">Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></a>
+                                                <a class="btn btn-sm btn-info" asp-action="ApplySingle" asp-route-sessionId="@item.Id" asp-route-monthKey="@currentMonthKey.Id">Skriv mig på <i class="fas fa-thumbs-up small ml-2" title="Yes, I can - sign me up!!"></i></a>
                                             </div>
                                         }
                                     }                                     

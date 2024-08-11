@@ -221,7 +221,7 @@ namespace ClubScansub.API
                 new Claim("IsDivePro", userManager.IsInRoleAsync(appUser, Userroles.Divepro).GetAwaiter().GetResult().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt2Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.Now.AddDays(Convert.ToDouble(config["JwtExpireDays"]));
 

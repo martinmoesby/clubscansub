@@ -238,7 +238,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                         break;
                 }
             }
-
+            item.DeeplinkId = Guid.NewGuid();
             item.Details += $"{item.Title.TrimEnd('.')} - kræver mindst { item.MinParticipants} deltagere og der er plads til maksimalt { item.MaxParticipants}";
 
             db.Events.Add(item);

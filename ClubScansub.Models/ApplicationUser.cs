@@ -76,6 +76,7 @@ namespace ClubScansub.Models
         [Display(Name = "Kort navn")]
         public string ShortName
         {
+            
             get
             {
                 try
@@ -128,6 +129,9 @@ namespace ClubScansub.Models
         public ICollection<ApplicationUserAccountEntry> AccountTransactions { get; set; }
         [JsonIgnore]
         public ICollection<CourseSessionInstructor> InstructorSessions { get; set; }
+
+        [NotMapped]
+        public string SearchStringValue => string.Concat(AccountNumber, Name, PostalCode ,Streetaddress, City, Country);
 
 
     }

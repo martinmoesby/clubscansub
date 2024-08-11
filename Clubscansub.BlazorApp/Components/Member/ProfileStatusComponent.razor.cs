@@ -24,29 +24,29 @@ namespace Clubscansub.BlazorApp.Components.Member
             await base.OnInitializedAsync();
             if (!Profile.IsActive)
             {
-                profileIconStyle= IconStyle.Secondary;
+                profileIconStyle= IconStyle.Danger;
                 profileStatusPopupText = "Profile Deactivated";
                 profileIcon = "person_off";
             }
 
             if (!Profile.PhoneNumberConfirmed)
             {
-                phoneIconStyle = IconStyle.Secondary;
+                phoneIconStyle = IconStyle.Danger;
                 phoneStatusPopupText = "Phone number has NOT been confirmed";
                 phoneIcon = "phone_locked";
             }
 
             if (!Profile.EmailConfirmed)
             {
-                emailIconStyle = IconStyle.Secondary;
+                emailIconStyle = IconStyle.Danger;
                 emailStatusPopupText = "Email has been NOT confirmed";
                 emailIcon = "mail_lock";
             }
 
         }
-        private IconStyle phoneIconStyle = IconStyle.Primary;
-        private IconStyle emailIconStyle = IconStyle.Primary;
-        private IconStyle profileIconStyle = IconStyle.Primary;
+        private IconStyle phoneIconStyle = IconStyle.Success;
+        private IconStyle emailIconStyle = IconStyle.Success;
+        private IconStyle profileIconStyle = IconStyle.Success;
 
         private string phoneIcon = "phone";
         private string emailIcon = "mail";
