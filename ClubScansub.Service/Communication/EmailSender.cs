@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 
 namespace ClubScansub.Service.Communication
 {
+    public interface IEmailSender
+    {
+        Task SendEmailAsync(string email, string subject, string message);
+    }
+
     public class EmailSender : IEmailSender
     {
         public EmailOptions Options { get; set; }

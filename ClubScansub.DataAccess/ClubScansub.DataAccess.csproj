@@ -1,28 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyVersion>1.0.22832.0</AssemblyVersion>
     <FileVersion>1.0.22832.0</FileVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Migrations\20191016185442_Added Default Price to a course template.cs" />
     <Compile Remove="Migrations\20191016185442_Added Default Price to a course template.Designer.cs" />
     <Compile Remove="Migrations\20200218123303_changedSiteModel.cs" />
     <Compile Remove="Migrations\20200218123303_changedSiteModel.Designer.cs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="7.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.1" />    
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ClubScansub.Models\ClubScansub.Models.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
+  </ItemGroup>
 </Project>

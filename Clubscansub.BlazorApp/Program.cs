@@ -6,7 +6,6 @@ using ClubScansub.Service;
 using ClubScansub.Service.Communication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using System.Globalization;
@@ -23,7 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString); 
 }, ServiceLifetime.Transient);
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
 
     options.SignIn = new SignInOptions
     {
@@ -49,9 +49,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     };
 
 })
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultUI()
 .AddDefaultTokenProviders()
-.AddDefaultUI() // UIFramework.Bootstrap4)
-.AddEntityFrameworkStores<ApplicationDbContext>();
+; // UIFramework.Bootstrap4)
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 

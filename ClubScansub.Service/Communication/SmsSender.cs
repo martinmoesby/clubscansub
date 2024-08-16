@@ -1,22 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Text;
-using System.IO;
-using Mailjet.Client;
-using Mailjet.Client.Resources.SMS;
-using Mailjet.Client.Resources;
-using Send = Mailjet.Client.Resources.SMS.Send;
+﻿using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
-using ClubScansub.Models;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using Send = Mailjet.Client.Resources.SMS.Send;
 
 namespace ClubScansub.Service.Communication
 {

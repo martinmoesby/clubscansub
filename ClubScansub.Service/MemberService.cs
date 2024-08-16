@@ -1,10 +1,8 @@
-﻿using AutoMapper.Execution;
-using ClubScansub.Data;
+﻿using ClubScansub.Data;
 using ClubScansub.Models;
+using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

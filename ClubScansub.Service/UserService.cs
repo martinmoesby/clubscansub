@@ -1,5 +1,6 @@
 ﻿using ClubScansub.Models;
 using ClubScansub.Models.DTO;
+using ClubScansub.Service.Communication;
 using ClubScansub.Service.Exceptions;
 using ClubScansub.Service.Interfaces;
 using ClubScansub.Service.ServiceResults;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

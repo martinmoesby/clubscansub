@@ -1,26 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>db8cb011-c058-4d4c-b18b-d74e8472cb36</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.19" />
-    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="7.0.19" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.8" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ClubScansub.DataAccess\ClubScansub.DataAccess.csproj" />
     <ProjectReference Include="..\ClubScansub.Models\ClubScansub.Models.csproj" />
     <ProjectReference Include="..\ClubScansub.Utility\ClubScansub.Utility.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Service\" />
   </ItemGroup>
-
-
 </Project>

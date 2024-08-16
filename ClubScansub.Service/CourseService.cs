@@ -1,15 +1,9 @@
 ﻿using ClubScansub.Data;
 using ClubScansub.Models;
+using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClubScansub.Service
 {

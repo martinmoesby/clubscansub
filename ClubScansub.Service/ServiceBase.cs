@@ -1,6 +1,5 @@
 ﻿using ClubScansub.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using ClubScansub.Service.Communication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
