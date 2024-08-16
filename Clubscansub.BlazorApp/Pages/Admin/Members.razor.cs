@@ -51,7 +51,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         private IList<ApplicationUser> members;
         IList<ApplicationUser> selectedMembers;
         private bool isLoading = false;
-        private string[] roleFilter = new string[] { Userroles.Administrator, Userroles.Divepro, Userroles.Divepro };
+        private string[] roleFilter = new string[] { Userroles.Member, Userroles.Student , Userroles.User };
         private string searchFilter = "";
         private bool showDeactivated = false;
 

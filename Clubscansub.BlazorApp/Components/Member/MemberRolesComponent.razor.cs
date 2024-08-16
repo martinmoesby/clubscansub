@@ -52,11 +52,11 @@ namespace Clubscansub.BlazorApp.Components.Member
             
         }
 
-        private bool showOwner = true;
-        private bool showAdmin = true;
+        private bool showOwner = false;
+        private bool showAdmin = false;
         private bool showDivepro = true;
         private bool showMember = true;
-        private bool showUser = false;
+        private bool showUser = true;
         private bool showStudent = false;
 
         private bool showDeactivated = false;

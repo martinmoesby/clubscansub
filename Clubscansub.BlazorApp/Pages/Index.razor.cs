@@ -1,4 +1,6 @@
 using System.Net.Http;
+using ClubScansub.Models;
+using ClubScansub.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -31,5 +33,30 @@ namespace Clubscansub.BlazorApp.Pages
 
         [Inject]
         protected NotificationService NotificationService { get; set; }
+
+        [Inject]
+        protected EventService  eventService { get; set; }
+
+        private IList<Event> events = new List<Event>();
+        private IList<Course> courses = new List<Course>();
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                events = await eventService.GetAllAsync();
+                StateHasChanged();
+            }
+        }
+
+        private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Event> args)
+        {
+            if (args.Data.EventType == ClubScansub.Utility.EventTypeEnum.Bådtur)
+            {
+                args.Attributes["style"] = "backgroundcolor:red;";
+            }
+        }
     }
 }

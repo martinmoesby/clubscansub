@@ -1,13 +1,30 @@
 @page "/"
 <PageTitle>Calendar</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch">
-<RadzenScheduler 
-    TItem="Event"
->
-<Template Context="context">
-    
-</Template>
-</RadzenScheduler>
+    <RadzenScheduler TItem="Event"
+                     Data="@events"
+                     StartProperty="StartDateAndTime"
+                     EndProperty="EndDateAndTime"
+                     TextProperty="Title"
+                     AppointmentRender="OnAppointmentRender"
+                     style="height: 768px;">
+        <Template Context="context" >
+
+                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@context.Title" class="rz-my-3" />
+
+        </Template>
+        <ChildContent>
+
+            <RadzenDayView />
+            <RadzenWeekView />
+            <RadzenMonthView />
+            <RadzenYearView />
+            <RadzenYearPlannerView />
+            <RadzenYearTimelineView />
+
+        </ChildContent>
+
+    </RadzenScheduler>
 
 </RadzenStack>
 
