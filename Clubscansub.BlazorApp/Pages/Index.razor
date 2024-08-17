@@ -1,26 +1,31 @@
 @page "/"
 <PageTitle>Calendar</PageTitle>
-<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch">
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
     <RadzenScheduler TItem="Event"
                      Data="@events"
                      StartProperty="StartDateAndTime"
                      EndProperty="EndDateAndTime"
                      TextProperty="Title"
                      AppointmentRender="OnAppointmentRender"
-                     style="height: 768px;">
+                     SelectedIndex="2"
+                     style="height: 100%">
         <Template Context="context" >
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap">
+                <RadzenIcon Icon="sailing" IconStyle="IconStyle.Light" Style="font-size:12px;" />
+                <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;">@context.Title</span>
+                @* <RadzenText TextStyle="TextStyle.Caption" Text="@context.Title" Style="overflow:hidden;" /> *@
 
-                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@context.Title" class="rz-my-3" />
+            </RadzenStack>
 
         </Template>
         <ChildContent>
 
             <RadzenDayView />
-            <RadzenWeekView />
-            <RadzenMonthView />
-            <RadzenYearView />
-            <RadzenYearPlannerView />
-            <RadzenYearTimelineView />
+            <RadzenWeekView Text="Uge" />
+            <RadzenMonthView MaxAppointmentsInSlot="6" Text="Måned" />
+            <RadzenYearView Text="År" />
+            <RadzenYearPlannerView Text="Planner"/>
+            <RadzenYearTimelineView Text ="Tidslinje"/>
 
         </ChildContent>
 

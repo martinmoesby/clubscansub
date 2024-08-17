@@ -51,7 +51,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         private IList<ApplicationUser> members;
         IList<ApplicationUser> selectedMembers;
         private bool isLoading = false;
-        private string[] roleFilter = new string[] { Userroles.Member, Userroles.Student , Userroles.User };
+        private string[] roleFilter = [Userroles.Member, Userroles.Student , Userroles.User];
         private string searchFilter = "";
         private bool showDeactivated = false;
 
@@ -91,6 +91,13 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             searchFilter = "";
             await getMembersByRoleFilter();
         }
+
+        async void applySearchFilter(string filter)
+        {
+            searchFilter = filter;
+            await getMembersByRoleFilter();
+        }
+
         void onRowDblCLick(DataGridRowMouseEventArgs<ApplicationUser> arg)
         {
 
@@ -118,7 +125,7 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 new ContextMenuItem(){ Text = @disableEnableMenuText, Value = 2, Icon = "change_circle" },
                 new ContextMenuItem(){ Text = "Top off account", Value = 3, Icon = "add" },
                 new ContextMenuItem(){ Text = "Transactions", Value = 4, Icon = "receipt_long" },
-
+                new ContextMenuItem(){ Text = "Reset Password", Value = 5, Icon = "lock_reset" },
                 },
                 (e) => {
                     switch (e.Value)
@@ -135,7 +142,11 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                         case 4:
                             showTransactionsDialog(args.Data);
                             break;
+                        case 5:
+                            resetPasswordDialog(args.Data);
+                            break;
                         default:
+
                             Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, MemberID: {args.Data.UserName}");
                             break;
                     }
@@ -289,6 +300,15 @@ namespace Clubscansub.BlazorApp.Pages.Admin
                 , editDialogOptions);
         }
 
+        private void resetPasswordDialog(ApplicationUser member)
+        {
+            dialogService.Alert("Not implemented yet", "Reset password", new AlertOptions()
+            {
+                CloseDialogOnEsc = true,
+                CloseDialogOnOverlayClick = true,
+                OkButtonText = "OK",
+            });
+        }
         private void closeDialog()
         {
             dialogService.Close();

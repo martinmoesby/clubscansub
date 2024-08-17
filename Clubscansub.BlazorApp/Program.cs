@@ -79,6 +79,7 @@ builder.Services.AddSingleton<ISmsSender, SmsSender>();
 
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<MemberService>();
+builder.Services.AddTransient<SiteService>();
 builder.Services.AddTransient<EventService>();
 
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));

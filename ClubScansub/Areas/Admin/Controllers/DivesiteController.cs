@@ -228,7 +228,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
             foreach (var item in db.ChangeTracker.Entries())
             {
-                if (model.Image.Id == 0 && item.Entity.GetType() == typeof(DivelocationImage))
+                if (model.Image?.Id == 0 && item.Entity.GetType() == typeof(DivelocationImage))
                 { }
                 else
                 {

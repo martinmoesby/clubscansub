@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
+using Microsoft.Win32;
 using Radzen;
 using Radzen.Blazor;
 
@@ -53,10 +54,51 @@ namespace Clubscansub.BlazorApp.Pages
 
         private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Event> args)
         {
-            if (args.Data.EventType == ClubScansub.Utility.EventTypeEnum.Bådtur)
+            string baseClassString = "rz-px-1";
+            string bgClass = "rz-background-color-primary";
+            string fgClass = "rz-color-white";
+
+            switch (args.Data.EventType)
             {
-                args.Attributes["style"] = "backgroundcolor:red;";
+                case ClubScansub.Utility.EventTypeEnum.Bådtur:
+                    bgClass = "rz-background-color-primary-darker";
+
+                    break;
+                case ClubScansub.Utility.EventTypeEnum.Stranddyk:
+                    bgClass = "rz-background-color-primary-lighter";
+                    fgClass = "rz-color-black";
+                    break;
+                case ClubScansub.Utility.EventTypeEnum.Klubture:
+                    bgClass = "rz-background-color-primary";
+                    
+                    break;
+
+
+                case ClubScansub.Utility.EventTypeEnum.Other:
+                    bgClass = "rz-background-color-info-darker";
+                    
+                    break;
+
+
+                case ClubScansub.Utility.EventTypeEnum.Rejse:
+                    bgClass = "rz-background-color-success";
+                    
+                    break;
+                case ClubScansub.Utility.EventTypeEnum.Liveaboard:
+                    bgClass = "rz-background-color-success-darker";
+                    
+                    break;
+
+
+                case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
+                    bgClass = "rz-background-color-danger-light";
+                    
+                    break;
+                default:
+                    break;
             }
+
+            args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
         }
     }
 }

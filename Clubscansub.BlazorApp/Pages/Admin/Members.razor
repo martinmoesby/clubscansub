@@ -1,86 +1,67 @@
 ﻿@page "/admin/members"
+<PageTitle>Member management</PageTitle>
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
+    <RadzenStack>
+        <RadzenText TextStyle="TextStyle.DisplayH6" Text="Member management" />
+        <SearchComponent Reset="@resetSearchFilter" Search="@applySearchFilter" />
+    </RadzenStack>
+    <RadzenDataGrid Data="@members"
+                    @ref=@grid
+                    @bind-Value=@selectedMembers
+                    TItem="ApplicationUser"
+                    AllowVirtualization="true"
+                    AllowAlternatingRows=false
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    AllowFiltering="false"
+                    AllowColumnPicking="true"
+                    ShowPagingSummary="true"
+                    FilterMode="FilterMode.Simple"
+                    LogicalFilterOperator="LogicalFilterOperator.Or"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                    PageSize="15"
+                    Style="width:100%;height:100%;"
+                    SelectionMode="DataGridSelectionMode.Single"
+                    ColumnsText="Optional info..."
+                    RowDoubleClick="@onRowDblCLick"
+                    CellContextMenu="@onCellContextMenu">
+        <HeaderTemplate>
 
-<RadzenRow Gap="5">
-    <RadzenColumn Size="6" SizeSM="10" SizeXS="12">
-        <RadzenRow AlignItems="AlignItems.Center" class="rz-mb-1">
-            <RadzenColumn>
-                <RadzenText TextStyle="TextStyle.DisplayH6" Text="Member management" />
-                <RadzenFormField Style="width:100%">
-                    <Start>
-                        <RadzenIcon Icon="search" />
-                    </Start>
-                    <ChildContent>
-                        <RadzenTextBox @bind-Value="@searchFilter" Change="getMembersByRoleFilter" />
-                    </ChildContent>
-                    <End>
-                        <RadzenIcon Icon="close" @onclick="resetSearchFilter" Style="cursor:pointer" />
-                    </End>
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenDataGrid Data="@members"
-                            @ref=@grid
-                            PageSize="15"
-                            TItem="ApplicationUser"
-                            AllowPaging="true"
-                            AllowVirtualization="true"
-                            AllowSorting="true"
-                            ShowPagingSummary="true"
-                            AllowAlternatingRows=false
-                            AllowFiltering="false"
-                            AllowColumnPicking="true"
-                            FilterMode="FilterMode.Simple"
-                            LogicalFilterOperator="LogicalFilterOperator.Or"
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                            RowDoubleClick="@onRowDblCLick"
-                            Style="width:100%;height:100%;top:0;"
-                            SelectionMode="DataGridSelectionMode.Single"
-                            @bind-Value=@selectedMembers
-                            CellContextMenu="@onCellContextMenu"
-                            ColumnsText="Optional info...">
-                <HeaderTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
 
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
+                <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent MemberRolesChanged="setRoleFilter" ShowStatusFilter="true" MemberStatusFilterChanged="setStatusFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="true" Alignment="AlignItems.Center" Justify="JustifyContent.SpaceBetween" />
 
-                        <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent MemberRolesChanged="setRoleFilter" ShowStatusFilter="true" MemberStatusFilterChanged="setStatusFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="true" Alignment="AlignItems.Center" Justify="JustifyContent.SpaceBetween" />
+                <RadzenButton Icon="person_add" Click="onCreateNewMemberClick" Size="ButtonSize.Small" class="rz-mr-4" />
 
-                        <RadzenButton Icon="person_add" Click="onCreateNewMemberClick" Size="ButtonSize.Small" class="rz-mr-4" />
+            </RadzenStack>
 
-                    </RadzenStack>
+        </HeaderTemplate>
 
-                </HeaderTemplate>
+        <LoadingTemplate>
+            <RadzenProgressBarCircular />
+        </LoadingTemplate>
 
-                <LoadingTemplate>
-                    <RadzenProgressBarCircular />
-                </LoadingTemplate>
+        <Columns>
+            <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Profile status" Filterable=false Width="120px" MinWidth="120px" Frozen="true">
+                <Template Context="member">
+                    <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" Frozen="true"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Name" Property="Name" Width="200px" Frozen="true"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Address" Property="Streetaddress" Filterable=false MinWidth="240px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Postcode" Property="PostalCode" Filterable=false Width="120px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="City" Property="City" Filterable=false Width="180px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Phone" Property="PhoneNumber" Filterable=false Width="120px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Mail" Property="Email" Filterable=false MinWidth="120px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"></RadzenDataGridColumn>
 
-                <Columns>
-                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Profile status" Filterable=false Width="120px" MinWidth="120px" Frozen="true">
-                        <Template Context="member">
-                            <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" Frozen="true"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="First name" Property="Firstname" MinWidth="75px" Frozen="true"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Last name" Property="Lastname" MinWidth="75px" Frozen="true"></RadzenDataGridColumn>
+        </Columns>
 
-                    <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Address" Property="Streetaddress" Filterable=false Width="240px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Postcode" Property="PostalCode" Filterable=false Width="120px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="City" Property="City" Filterable=false Width="180px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="false" TItem="ApplicationUser" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"></RadzenDataGridColumn>
-
-                </Columns>
-
-            </RadzenDataGrid>
-        </RadzenRow>
-    </RadzenColumn>
-    <RadzenColumn Size="6" SizeSM="2" SizeXS="0">
-
-    </RadzenColumn>
-</RadzenRow>
+    </RadzenDataGrid>
+</RadzenStack>
 
 <style>
     .rz-custom-header {

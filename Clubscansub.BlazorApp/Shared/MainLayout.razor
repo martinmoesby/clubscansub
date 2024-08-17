@@ -5,10 +5,10 @@
 <RadzenTooltip />
 <RadzenContextMenu />
 
-<RadzenLayout style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body' 'rz-footer';">
-    
+<RadzenLayout style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body' 'rz-sidebar rz-footer';">
+
     <RadzenHeader>
-        <RadzenRow JustifyContent="JustifyContent.Start"  Gap="0">
+        <RadzenRow JustifyContent="JustifyContent.Start" Gap="0">
 
             <RadzenColumn Size="12">
                 <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
@@ -28,45 +28,48 @@
     </RadzenHeader>
 
     <RadzenBody Expanded="@sidebarExpanded">
-        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;">
+        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;height:100%">
             <RadzenColumn Size="12">
-            @Body
+                @Body
             </RadzenColumn>
         </RadzenRow>
+
     </RadzenBody>
 
-    <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2; display: flex; flex-direction:column">
+    <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2; display: flex; flex-direction:column" >
 
-@*         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
+        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
             <RadzenText Text="Clubscansub.BlazorApp" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" class="rz-mb-0" style="color: var(--rz-sidebar-color);" />
-        </RadzenStack> *@
+        </RadzenStack>
 
         <RadzenPanelMenu Style="text-align: left; flex-grow:1">
             <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
-            @*            <RadzenPanelMenuItem Icon="persons" Text="Members" Path="/admin/members" />*@
+
             <AuthorizeView Roles="@Userroles.Member">
-                <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person"/>
+                <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person" />
+            </AuthorizeView>
+            
+            <AuthorizeView Roles="@Userroles.Divepro">
+                <RadzenPanelMenuItem Text="Workcalender" Path="/divepro/workcalendar" Icon="engineering" />
             </AuthorizeView>
 
             <AuthorizeView Roles="@adminroles">
                 <RadzenPanelMenuItem Text="Administration" Path="/admin/" Icon="admin_panel_settings">
-                    <RadzenPanelMenuItem Icon="persons" Text="Member management" Path="/admin/members" />
+                    <RadzenPanelMenuItem Icon="groups" Text="Member management" Path="/admin/members" />
                     <RadzenPanelMenuItem Icon="place" Text="Site management" Path="/admin/divesites" />
-                    <RadzenPanelMenuItem Icon="school" Text="Course management" Path="/admin/coursemanagement" />
-                    <RadzenPanelMenuItem Icon="engineering" Text="Work management" Path="/admin/workmanagement" />
+                    <RadzenPanelMenuItem Icon="school" Text="Course management" Path="/admin/courses" />
+                    <RadzenPanelMenuItem Icon="engineering" Text="Work management" Path="/admin/work" />
                 </RadzenPanelMenuItem>
             </AuthorizeView>
 
         </RadzenPanelMenu>
-
-
 
     </RadzenSidebar>
 
 
     <RadzenFooter>
         <RadzenRow>
-            <RadzenColumn Size="2" >
+            <RadzenColumn Size="2">
                 <RadzenText Text="Klub Scansub" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
             </RadzenColumn>
             <RadzenColumn Size="8">
@@ -76,9 +79,10 @@
                 <RadzenText Text="©2023 Martin Moesby" TextStyle="Radzen.Blazor.TextStyle.Caption" class="rz-mb-0" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
             </RadzenColumn>
         </RadzenRow>
-@*         <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding);">
+        @*         <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding);">
         </RadzenStack>
- *@    </RadzenFooter>
+        *@
+    </RadzenFooter>
 </RadzenLayout>
 
 @code {
