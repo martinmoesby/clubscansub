@@ -119,14 +119,16 @@ namespace Clubscansub.BlazorApp.Pages.Admin
             selectedMembers = new List<ApplicationUser>() { args.Data };
             var disableEnableMenuText = args.Data.LockoutEnd == DateTime.MaxValue ? "Activate" : "Deactivate";
 
-            contextMenuService.Open(args,
-                new List<ContextMenuItem> {
+            List<ContextMenuItem> contextMenuItems = [
                 new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
                 new ContextMenuItem(){ Text = @disableEnableMenuText, Value = 2, Icon = "change_circle" },
                 new ContextMenuItem(){ Text = "Top off account", Value = 3, Icon = "add" },
                 new ContextMenuItem(){ Text = "Transactions", Value = 4, Icon = "receipt_long" },
-                new ContextMenuItem(){ Text = "Reset Password", Value = 5, Icon = "lock_reset" },
-                },
+                new ContextMenuItem(){ Text = "Reset Password", Value = 5, Icon = "lock_reset" }
+                ];
+
+            contextMenuService.Open(args,
+                contextMenuItems,
                 (e) => {
                     switch (e.Value)
                     {

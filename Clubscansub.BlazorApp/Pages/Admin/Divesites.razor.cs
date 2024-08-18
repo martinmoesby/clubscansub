@@ -1,4 +1,5 @@
-﻿using ClubScansub.Models;
+﻿using Clubscansub.BlazorApp.Components.Divesite;
+using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
@@ -26,8 +27,16 @@ namespace Clubscansub.BlazorApp.Pages.Admin
         private bool isLoading = false;
         private DiveTypeEnum[] typeFilter = [DiveTypeEnum.TechDive, DiveTypeEnum.NatureDive, DiveTypeEnum.WreckDive];
         private string searchFilter = "";
-
         private RadzenDataGrid<Divelocation> grid { get; set; }
+
+        private DialogOptions editDialogOptions = new DialogOptions()
+        {
+            Width = "800px",
+            Height = "600px",
+            AutoFocusFirstElement = true,
+            CloseDialogOnEsc = true,
+        };
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -78,8 +87,107 @@ namespace Clubscansub.BlazorApp.Pages.Admin
 
         void onCellContextMenu(DataGridCellMouseEventArgs<Divelocation> args)
         {
-            selectedSites = new List<Divelocation> { args.Data };
+            List<ContextMenuItem> contextMenuItems = [
+                new ContextMenuItem() { Text = "Edit", Value = 1, Icon = "edit" }
+            ];
 
+            selectedSites = new List<Divelocation> { args.Data };
+            contextMenuService.Open(args,
+                contextMenuItems, 
+                (e) => handleContexteMenuClick(e,args)
+                //{
+                //    switch (e.Value)
+                //    {
+                //        case 1:
+                //            showEditDialog(selectedSites.FirstOrDefault());
+                //            break;
+                //        default:
+
+                //            Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, SiteName: {args.Data.Name}");
+                //            break;
+                //    }
+                //}
+             );
+
+        }
+
+        private void handleContexteMenuClick(MenuItemEventArgs e, DataGridCellMouseEventArgs<Divelocation> args)
+        {
+            switch (e.Value)
+            {
+                case 1:
+                    showEditDialog(selectedSites.FirstOrDefault());
+                    break;
+                default:
+                    Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, SiteName: {args.Data.Name}");
+                    break;
+            }
+        }
+
+        void onRowDblCLick(DataGridRowMouseEventArgs<Divelocation> args)
+        {
+            var site = args.Data;
+            showEditDialog(site);
+        }
+
+        private void showEditDialog(Divelocation site)
+        {
+            var dialogParameters = new Dictionary<string, object>
+            {
+                { "Divesite", site },
+                { "UpdateDivesiteCallback", EventCallback.Factory.Create<Divelocation>(this, updateSite)},
+                { "DeleteDivesiteCallback", EventCallback.Factory.Create<Divelocation>(this, deleteSite)}
+            };
+
+            dialogService.Open<DivesiteDetailsComponent>("Edit Divesite", dialogParameters, editDialogOptions);
+
+        }
+
+        private async void updateSite(Divelocation site)
+        {
+            try
+            {
+                await siteService.UpdateAsync(site);
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Success",
+                    Detail = $"Site '{site.Name}' has been updated"
+                }
+                );
+                await getSitesByTypeFilter();
+
+            }
+            catch (Exception ex)
+            {
+
+                await dialogService.Alert($"An error occurred: {ex.Message}", "Update error!", new AlertOptions() { OkButtonText = "OK" });
+            }
+
+        }
+
+        private async void deleteSite(Divelocation site)
+        {
+            var siteName = site.Name;
+            var deleteSite = await dialogService.Confirm($"Are you sure you want to delete '{siteName}'?", "Delete Site", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+            if (deleteSite.GetValueOrDefault())
+            {
+                await siteService.DeleteAsync(site);
+
+                notificationService.Notify(new NotificationMessage() { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Success", 
+                    Detail = $"Site '{siteName}' has been deleted" }
+                );
+
+                await getSitesByTypeFilter();
+            }
+
+        }
+        private void closeDialog()
+        {
+            dialogService.Close();
         }
     }
 }

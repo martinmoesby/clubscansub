@@ -1,0 +1,114 @@
+﻿<RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        <RadzenTabsItem Text="Name">
+            <RadzenTemplateForm Data="@Divesite"
+                                TItem="Divelocation"
+                                Submit="@((Divelocation divelocation) => UpdateDivesiteCallback.InvokeAsync(divelocation))"
+                                InvalidSubmit="@onInvalidSubmit">
+                <RadzenRow>
+                    <RadzenColumn Size="10">
+                        <RadzenFieldset Text="@($"Divesite: {Divesite.Name}")">
+                            <ChildContent>
+                                <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
+                                    <RadzenColumn Size="12">
+                                        <RadzenFormField Text="Name" Variant="Variant.Text" Style="width:100%">
+                                            <RadzenTextBox @bind-Value="@Divesite.Name"/>
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                </RadzenRow>
+
+                                <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
+                                    <RadzenColumn Size="12">
+                                        <RadzenFormField Text="Description" Variant="Variant.Text" Style="width:100%">
+                                            <RadzenTextArea @bind-Value="@Divesite.Description" Rows="5" >
+
+                                            </RadzenTextArea>
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                </RadzenRow>
+
+
+                                <RadzenRow>
+                                    <RadzenColumn Size="4">
+                                        <RadzenFormField Text="Country" Variant="Variant.Text" Style="width:100%">
+
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="8">
+                                        <RadzenFormField Text="Region" Variant="Variant.Text" Style="width:100%">
+
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                </RadzenRow>
+
+                                <RadzenRow>
+                                    <RadzenColumn Size="4">
+                                        <RadzenFormField Text="Depth" Variant="Variant.Text" Style="width:100%">
+                                            <RadzenNumeric @bind-Value="@Divesite.MinDepth" />
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="4">
+                                        <RadzenFormField Text="Depth" Variant="Variant.Text" Style="width:100%">
+                                            <RadzenNumeric @bind-Value="@Divesite.MaxDepth" />
+                                        </RadzenFormField>
+                                    </RadzenColumn>
+                                </RadzenRow>
+
+                            </ChildContent>
+                        </RadzenFieldset>
+                    </RadzenColumn>
+                </RadzenRow>
+
+            </RadzenTemplateForm>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Details">
+
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Map">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+
+                <RadzenGoogleMap @ref=@locationMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId"
+                                 Style="height:400px;width:400px;"
+                                 Options=@googleMapOptions
+                                 Zoom=8
+                                 Center=@divesitePosition
+                                 MapClick=@onMapClick MarkerClick=@onMarkerClick />
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
+                    <RadzenText Text="Latitude" />
+                    <RadzenText Text="@Divesite.Latitude.ToString()" />
+                    <RadzenText Text="Longitude" />
+                    <RadzenText Text="@Divesite.Longitude.ToString()" />
+
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Meeting Location">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenGoogleMap @ref=@meetingMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId"
+                                 Style="height:400px;width:400px;"
+                                 Options=@googleMapOptions
+                                 Zoom=10
+                                 Center=@meetinLocationPosition
+                                 MapClick=@onMapClick MarkerClick=@onMarkerClick />
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
+                    <RadzenText Text="Latitude" />
+                    <RadzenText Text="@Divesite.MeetingLocation?.Latitude.ToString()" />
+                    <RadzenText Text="Longitude" />
+                    <RadzenText Text="@Divesite.MeetingLocation?.Longitude.ToString()" />
+
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTabsItem>
+    </Tabs>
+
+</RadzenTabs>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-4">
+    <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
+    <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click="deleteDivesiteClick" Size="ButtonSize.Small" />
+</RadzenStack>
