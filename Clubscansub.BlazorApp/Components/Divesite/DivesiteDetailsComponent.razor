@@ -1,4 +1,7 @@
-﻿<RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
     <Tabs>
         <RadzenTabsItem Text="Name">
             <RadzenTemplateForm Data="@Divesite"
@@ -6,8 +9,8 @@
                                 Submit="@((Divelocation divelocation) => UpdateDivesiteCallback.InvokeAsync(divelocation))"
                                 InvalidSubmit="@onInvalidSubmit">
                 <RadzenRow>
-                    <RadzenColumn Size="10">
-                        <RadzenFieldset Text="@($"Divesite: {Divesite.Name}")">
+                    <RadzenColumn Size="7">
+                        <RadzenFieldset  Text="@($"Divesite {Divesite.Name}")">
                             <ChildContent>
                                 <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
                                     <RadzenColumn Size="12">
@@ -27,34 +30,26 @@
                                     </RadzenColumn>
                                 </RadzenRow>
 
-
                                 <RadzenRow>
                                     <RadzenColumn Size="4">
-                                        <RadzenFormField Text="Country" Variant="Variant.Text" Style="width:100%">
-
-                                        </RadzenFormField>
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="8">
-                                        <RadzenFormField Text="Region" Variant="Variant.Text" Style="width:100%">
-
-                                        </RadzenFormField>
-                                    </RadzenColumn>
-                                </RadzenRow>
-
-                                <RadzenRow>
-                                    <RadzenColumn Size="4">
-                                        <RadzenFormField Text="Depth" Variant="Variant.Text" Style="width:100%">
+                                        <RadzenFormField Text="Min. Depth" Variant="Variant.Text" Style="width:100%">
                                             <RadzenNumeric @bind-Value="@Divesite.MinDepth" />
                                         </RadzenFormField>
                                     </RadzenColumn>
                                     <RadzenColumn Size="4">
-                                        <RadzenFormField Text="Depth" Variant="Variant.Text" Style="width:100%">
+                                        <RadzenFormField Text="Max. Depth" Variant="Variant.Text" Style="width:100%">
                                             <RadzenNumeric @bind-Value="@Divesite.MaxDepth" />
                                         </RadzenFormField>
                                     </RadzenColumn>
                                 </RadzenRow>
 
                             </ChildContent>
+                        </RadzenFieldset>
+                    </RadzenColumn>
+                    <RadzenColumn Size="5">
+                        <RadzenFieldset Text="Image" class="rz-p-1">
+                            <img src="@getImageSrc(Divesite.Image)" alt="@Divesite.Name" class="img rounded w-100 rz-mb-2" @onclick="@onImageClick"/>   
+                            <RadzenUpload MaxFileCount="1" ChooseText="Select new image"   />
                         </RadzenFieldset>
                     </RadzenColumn>
                 </RadzenRow>
@@ -66,15 +61,20 @@
 
         </RadzenTabsItem>
 
-        <RadzenTabsItem Text="Map">
+@*         <RadzenTabsItem Text="Map">
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
 
-                <RadzenGoogleMap @ref=@locationMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId"
+                <RadzenGoogleMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId"
                                  Style="height:400px;width:400px;"
                                  Options=@googleMapOptions
                                  Zoom=8
                                  Center=@divesitePosition
-                                 MapClick=@onMapClick MarkerClick=@onMarkerClick />
+                                 MapClick=@onMapClick MarkerClick=@onMarkerClick>
+                                 <Markers>
+                                     <RadzenGoogleMapMarker Position="@divesitePosition" Label="Divesite" />
+                                     <RadzenGoogleMapMarker Position="@meetinLocationPosition" Label="Meeting point" />
+                                 </Markers>
+                             </RadzenGoogleMap>
 
                 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
                     <RadzenText Text="Latitude" />
@@ -84,24 +84,72 @@
 
                 </RadzenStack>
             </RadzenStack>
-        </RadzenTabsItem>
+        </RadzenTabsItem> *@
 
         <RadzenTabsItem Text="Meeting Location">
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                            <RadzenGoogleMap @ref=@meetingMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId"
-                                 Style="height:400px;width:400px;"
-                                 Options=@googleMapOptions
-                                 Zoom=10
-                                 Center=@meetinLocationPosition
-                                 MapClick=@onMapClick MarkerClick=@onMarkerClick />
 
-                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
-                    <RadzenText Text="Latitude" />
-                    <RadzenText Text="@Divesite.MeetingLocation?.Latitude.ToString()" />
-                    <RadzenText Text="Longitude" />
-                    <RadzenText Text="@Divesite.MeetingLocation?.Longitude.ToString()" />
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="5">
+                    <RadzenText Text="Meeting location" />
+                    
+                    <RadzenTemplateForm Data="@Divesite.MeetingLocation" TItem="Address" Style="width:100%" >
+                        <RadzenFormField Style="width:100%" Variant="Variant.Text" Text="Select existing meeting spots">
+                            <RadzenDropDown Data="@meetingLocations" TValue="Address" Value="@Divesite.MeetingLocation?.Id" TextProperty="Name" ValueProperty="Id" Style="width:100%" />
+                        </RadzenFormField>
+
+                        <RadzenRow class="rz-mt-5">
+                            <RadzenColumn Size="12">
+                                <RadzenFormField Variant="Variant.Text" Text="Short name" Style="width:100%">
+                                    <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Name" />
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenFormField Variant="Variant.Text" Text="Streetname" Style="width:100%">
+                                    <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Streetname" />
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow Gap="4">
+                            <RadzenColumn Size="4">
+                                <RadzenFormField Variant="Variant.Text" Text="Postcode" Style="width:100%">
+                                    <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Zipcode" />
+                                </RadzenFormField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="8">
+                                <RadzenFormField Variant="Variant.Text" Text="City" Style="width:100%">
+                                    <RadzenTextBox @bind-Value="@divesiteMeetingLocation.City" />
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenFormField Variant="Variant.Text" Text="Streetname" Style="width:100%">
+                                    <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Country" />
+                                </RadzenFormField>
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                    </RadzenTemplateForm>
 
                 </RadzenStack>
+                <RadzenGoogleMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId" @ref=@map
+                                 Style="height:360px;width:400px;"
+                                 Options=@googleMapOptions
+                                 Zoom=11
+                                 MapClick="@onMapClick"
+                                 MarkerClick="@onMarkerClick"
+                                 FitBoundsToMarkersOnUpdate="@fitBoundsToMarkers"
+                                 Center=@(meetinLocationPosition ?? divesitePosition)>
+                    <Markers>
+                        @foreach (var item in markers)
+                        {
+                            <RadzenGoogleMapMarker Position="@item.Position" Title="@item.Title" />
+                        }
+                    </Markers>
+                </RadzenGoogleMap>
+
             </RadzenStack>
         </RadzenTabsItem>
     </Tabs>

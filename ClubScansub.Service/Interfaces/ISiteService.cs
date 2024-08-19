@@ -9,5 +9,6 @@ namespace ClubScansub.Service.Interfaces
 {
     internal interface ISiteService : IGenericService<Divelocation>
     {
+        Task<List<Address>> GetMeetingLocations();
     }
 }

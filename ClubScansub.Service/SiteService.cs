@@ -57,6 +57,7 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
+
         public Task<Divelocation> UpdateAsync(Divelocation item)
         {
             throw new NotImplementedException();
@@ -70,6 +71,12 @@ namespace ClubScansub.Service
         public Task<IList<Divelocation>> UpdateAsync(params Divelocation[] Items)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<Address>> GetMeetingLocations()
+        {
+            var data = await context.Addresses.ToListAsync();
+            return data;
         }
     }
 }
