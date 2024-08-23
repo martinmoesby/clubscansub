@@ -43,7 +43,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Divelocation>> GetAllAsync()
         {
-            var data = context.Divelocations.Include(x => x.MeetingLocation).Include(x => x.Image);
+            var data = context.Divelocations.Include(x => x.MeetingLocation).Include(x => x.Image).Include(x=>x.Certificate);
             return await data.ToListAsync();
         }
 
@@ -77,6 +77,13 @@ namespace ClubScansub.Service
         {
             var data = await context.Addresses.ToListAsync();
             return data;
+        }
+
+        public async Task<List<Certificate>> GetCertificatesForEvents()
+        {
+            var data = context.Certificates.Where(x => x.IsDiveproCertificate == false);
+            return await data.ToListAsync();
+
         }
     }
 }
