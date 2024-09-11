@@ -36,20 +36,45 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public async Task<IList<Event>> GetAllAsync()
+        public async Task<IList<Event>> GetActiveEventsByDivesiteId(int divesiteId)
         {
-            var data = context.Events.Where(x=> x.StartDateAndTime > DateTime.UtcNow);
+            var data = context.Events.Include(x=>x.Participants).Where(x => x.StartDateAndTime > DateTime.UtcNow && x.Divelocation.Id == divesiteId);
             return await data.ToListAsync();
         }
 
-        public Task<Event> GetAsync(string Id)
+        public async Task<IList<Event>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var data = context.Events.Where(x=> x.EndDateAndTime > DateTime.UtcNow);
+            return await data.ToListAsync();
+        }
+
+        public async Task<IList<Event>> GetAllByDateAsync(DateTime startDate, DateTime endDate)
+        {
+            var data = context.Events.Include(x=>x.Divelocation).Where(x => x.StartDateAndTime >= startDate && x.EndDateAndTime <= endDate);
+            return await data.ToListAsync();
+        }
+
+        public async Task<Event> GetAsync(string Id)
+        {
+            var id = int.Parse(Id);
+
+            var data = await context.Events.Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (data == null)
+                throw new Exception($"Event with Id '{Id}' could nor be retrieved.");
+
+            return data;
+
         }
 
         public Task<Event> GetAsync(Guid Id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IList<Event>> GetCompletedEventsByDivesiteId(int divesiteId)
+        {
+            var data = context.Events.Include(x => x.Participants).Where(x => x.StartDateAndTime < DateTime.UtcNow && x.Divelocation.Id == divesiteId);
+            return await data.ToListAsync();
         }
 
         public Task<Event> UpdateAsync(Event item)

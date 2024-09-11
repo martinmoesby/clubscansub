@@ -1,28 +1,35 @@
 @page "/"
 <PageTitle>Calendar</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
-    <RadzenScheduler TItem="Event"
+    <RadzenScheduler @ref="@scheduler"  
+        TItem="Event"
                      Data="@events"
                      StartProperty="StartDateAndTime"
                      EndProperty="EndDateAndTime"
                      TextProperty="Title"
                      AppointmentRender="OnAppointmentRender"
-                     SelectedIndex="2"
+                     AppointmentSelect="OnAppointmentClick"
+                     AppointmentMouseEnter="OnMouseOverAppointment"
+                     AppointmentMouseLeave="OnMouseLeaveAppointment"
+                     SlotRender="OnSlotRender"
+                     SelectedIndex="1"
+                     LoadData="OnLoadData"
                      style="height: 100%">
+
         <Template Context="context" >
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap">
-                <RadzenIcon Icon="sailing" IconStyle="IconStyle.Light" Style="font-size:12px;" />
-                <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;">@context.Title</span>
-                @* <RadzenText TextStyle="TextStyle.Caption" Text="@context.Title" Style="overflow:hidden;" /> *@
+                <RadzenIcon Icon="@(getAppointmentIcon(context))"  Style="font-size:1.0rem;" />
+                <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem">@context.Title</span>
+                @* <RadzenText TextStyle="TextStyle.Body1" Text="@context.Title" Style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;color:#fff; font-size:0.8rem" /> *@
 
             </RadzenStack>
 
         </Template>
         <ChildContent>
 
-            <RadzenDayView />
-            <RadzenWeekView Text="Uge" />
-            <RadzenMonthView MaxAppointmentsInSlot="6" Text="Måned" />
+            @* <RadzenDayView Text="Dag" TimeFormat="HH:mm" MinutesPerSlot="15" /> *@
+            <RadzenWeekView Text="Uge" TimeFormat="HH:mm" MinutesPerSlot="15" />
+            <RadzenMonthView MaxAppointmentsInSlot="4" Text="Måned" MoreText="More..." />
             <RadzenYearView Text="År" />
             <RadzenYearPlannerView Text="Planner"/>
             <RadzenYearTimelineView Text ="Tidslinje"/>
@@ -62,3 +69,20 @@
     </RadzenColumn>
 </RadzenRow> *@
 
+<style>
+    .holiday {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .holiday:after {
+            text-align:end;
+            font-size:0.7rem;
+            text-decoration: underline;
+            font-style:italic;
+            content: attr(after-text);
+            margin-left:2px;
+            margin-top:2px;
+        }
+</style>

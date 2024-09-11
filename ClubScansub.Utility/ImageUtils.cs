@@ -66,5 +66,15 @@ namespace ClubScansub.Utility
 
             return destImage;
         }
+
+        public static string GetImageSrc(byte[] imageData)
+        {
+            if (imageData != null)
+            {
+                return $"data:image;base64,{Convert.ToBase64String(imageData)}";
+
+            }
+            return "/images/logo-login.png";
+        }
     }
 }

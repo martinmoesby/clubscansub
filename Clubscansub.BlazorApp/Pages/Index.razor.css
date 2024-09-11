@@ -1,0 +1,12 @@
+﻿.holiday {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    .holiday:after {
+        text-align: end;
+        font-size: 0.7rem;
+        content: attr(after-text);
+        margin-left: 15px;
+    }

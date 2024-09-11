@@ -1,0 +1,21 @@
+﻿<RadzenDataGrid TItem="Event" Data="@events" AllowPaging PageSize="5" AllowSorting >
+    <Columns>
+        <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable Width="160px"/>
+        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable/>
+        <RadzenDataGridColumn Title="Participants" Sortable="false" Width="80px">
+            <Template Context="e">
+                <RadzenText Text="@((e.Participants.Count + e.FixedParticipants).ToString())" TextAlign="TextAlign.Center"/>
+            </Template>
+        </RadzenDataGridColumn>
+        @if (CompletedEventsOnly) {
+            <RadzenDataGridColumn Title="Cancel?" Width="80px" >
+                <Template Context="e">
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenCheckBox Value="@e.IsCancelled" TValue="bool" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+
+</RadzenDataGrid>

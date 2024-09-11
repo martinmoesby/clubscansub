@@ -1,20 +1,47 @@
-﻿<RadzenCard Variant="Variant.Filled" Class="rz-my-2 rz-mx-auto" Style="max-width: 420px">
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
-        <RadzenImage Path="" Style="width: 25px; height: 25px; border-radius: 50%;" />
-        <RadzenStack Gap="0">
-            <RadzenText TextStyle="TextStyle.Body1">@(Event?.Title)</RadzenText>
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">
-                    @Event.StartDateAndTime.ToShortTimeString()
-                </RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">
-                    @Event.EndDateAndTime.ToShortTimeString()
-                </RadzenText>
+﻿@using ClubScansub.Utility
+<RadzenText TextStyle="TextStyle.Body1">@(Event?.Details)</RadzenText>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+    <RadzenStack Style="max-width:50%">
+        <img src="@ImageUtils.GetImageSrc(Event.Divelocation?.Image?.ImageData)" alt="@Event.Divelocation?.Name" class="img rounded w-100" />
+    </RadzenStack>
+    <RadzenStack Style="width:50%">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+            <RadzenIcon Icon="calendar_month"></RadzenIcon>
+            <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMMM yyyy")" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Style="width:100%">
+
+                <RadzenIcon Icon="alarm"></RadzenIcon>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToShortTimeString()" />
             </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+
+                <RadzenIcon Icon="alarm_off"></RadzenIcon>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToShortTimeString()" />
+            </RadzenStack>
+
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+            <RadzenIcon Icon="payments"></RadzenIcon>
+            <RadzenText TextStyle="TextStyle.Subtitle2">@Event.PremiumPrice.ToString("C2")</RadzenText>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+            <RadzenIcon Icon="event_seat"></RadzenIcon>
+            <RadzenText TextStyle="TextStyle.Subtitle2">@Event.FreeSpots of @Event.MaxParticipants</RadzenText>
+
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Normal">
+            @if(Event.StartDateAndTime > DateTime.Now)
+            {
+                <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Sign me up" />
+            }
+
         </RadzenStack>
     </RadzenStack>
-        <RadzenStack Gap="0">
-            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@Event.PremiumPrice.ToString("{C2}")</RadzenText>
-            
-        </RadzenStack>
-</RadzenCard>
+</RadzenStack>
+<RadzenStack Gap="0">
+    <RadzenText TextStyle="TextStyle.Body2">@(Event?.Divelocation?.Description)</RadzenText>
+</RadzenStack>

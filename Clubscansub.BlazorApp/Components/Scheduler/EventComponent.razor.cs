@@ -12,7 +12,7 @@ namespace Clubscansub.BlazorApp.Components.Scheduler
         [Parameter]
         public int EventId { get; set; }
 
-        Event Event { get; set; }
+        Event Event { get; set; } = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

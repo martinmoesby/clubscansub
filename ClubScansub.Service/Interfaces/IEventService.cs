@@ -9,5 +9,8 @@ namespace ClubScansub.Service.Interfaces
 {
     internal interface IEventService : IGenericService<Event>
     {
+        Task<IList<Event>> GetActiveEventsByDivesiteId(int divesiteId);
+        Task<IList<Event>> GetAllByDateAsync(DateTime startDate, DateTime endDate);
+        Task<IList<Event>> GetCompletedEventsByDivesiteId(int divesiteId);
     }
 }
