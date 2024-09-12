@@ -12,11 +12,17 @@ namespace Clubscansub.BlazorApp.Components.Scheduler
         [Parameter]
         public int Id { get; set; }
 
-        Course Course { get; set; }
+        Course Course { get; set; } = new();
 
-        protected override async Task OnParametersSetAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Course = await courseService.GetAsync(Id.ToString());
+            await base.OnAfterRenderAsync(firstRender);
+            if (firstRender)
+            {
+                Course = await courseService.GetAsync(Id.ToString());
+                StateHasChanged();
+            }
+
         }
     }
 }

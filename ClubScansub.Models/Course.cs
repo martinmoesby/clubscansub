@@ -1,3 +1,4 @@
+using ClubScansub.Models.Interface;
 using ClubScansub.Utility;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClubScansub.Models
 {
-    
+
     public class Course : Event
     {
         public Course()
@@ -25,11 +26,11 @@ namespace ClubScansub.Models
 
         [NotMapped]
         [Display(Name = "Frie pladser")]
-        new public int FreeSpots => MaxParticipants - FixedParticipants - Participants.Count - Signups.Count;
+        new public int? FreeSpots => MaxParticipants - FixedParticipants - Participants.Count - Signups.Count;
 
         [NotMapped]
         [Display(Name = "Manglende deltagere")]
-        new public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants - Signups.Count < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants - Signups.Count;
+        new public int? RequiredSpots => MinParticipants - Participants.Count - FixedParticipants - Signups.Count < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants - Signups.Count;
 
 
         [NotMapped]

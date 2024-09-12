@@ -1,4 +1,5 @@
 //------------------------------------------------------------------------------
+using ClubScansub.Models.Interface;
 using ClubScansub.Utility;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Linq;
 namespace ClubScansub.Models
 {
 
-    public class CourseSession : BaseModel
+    public class CourseSession : BaseModel, ICalendarEvent
     {
         [Display(Name = "Dato og tidspunkt")]
         public DateTime DateTime { get; set; }
@@ -72,5 +73,31 @@ namespace ClubScansub.Models
 
         public ICollection<CourseSessionInstructor> SessionInstructors { get; set; }
 
+        [NotMapped]
+        public string Title { get => Course?.CourseName; }
+        [NotMapped] 
+        public string Details { get => Course?.Details; }
+        [NotMapped] 
+        public decimal? Price { get => Course?.Price; }
+        [NotMapped] 
+        public decimal? PremiumPrice { get => Course?.PremiumPrice ; }
+        [NotMapped] 
+        public int? MinParticipants { get => Course?.MinParticipants; }
+        [NotMapped] 
+        public int? MaxParticipants { get => Course?.MaxParticipants; }
+        [NotMapped] 
+        public int? FixedParticipants { get => Course?.FixedParticipants; }
+        [NotMapped] 
+        public DateTime EndDateAndTime { get => DateTime.Add(Duration); }
+        [NotMapped] 
+        public DateTime StartDateAndTime { get => DateTime; }
+        [NotMapped] 
+        public ICollection<EventUser> Participants { get => Course!.Participants; }
+
+        [NotMapped] 
+        public int? RequiredSpots => Course?.RequiredSpots;
+
+        [NotMapped] 
+        public int? FreeSpots => Course?.FreeSpots;
     }
 }

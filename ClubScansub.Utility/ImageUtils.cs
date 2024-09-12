@@ -74,7 +74,7 @@ namespace ClubScansub.Utility
                 return $"data:image;base64,{Convert.ToBase64String(imageData)}";
 
             }
-            return "/images/logo-login.png";
+            return "/images/no_location_image.png";
         }
     }
 }

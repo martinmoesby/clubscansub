@@ -64,14 +64,16 @@ namespace ClubScansub.Service
             return members;
         }
 
-        public Task<ApplicationUser> GetAsync(string Id)
+        public async Task<ApplicationUser> GetAsync(string Id)
         {
-            throw new NotImplementedException();
+            var user = await context.ApplicationUsers.Include(x=>x.AccountTransactions).Where(x => x.Id == Id).FirstOrDefaultAsync();
+            return user;
         }
 
-        public Task<ApplicationUser> GetAsync(Guid Id)
+        public async Task<ApplicationUser> GetAsync(Guid Id)
         {
             throw new NotImplementedException();
+
         }
 
         public Task<IList<ApplicationUser>> GetByRolesAsync(params string[] userroles)

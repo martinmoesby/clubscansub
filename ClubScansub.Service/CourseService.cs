@@ -42,9 +42,13 @@ namespace ClubScansub.Service
             return await data.ToListAsync();
         }
 
-        public Task<Course> GetAsync(string Id)
+        public async Task<Course> GetAsync(string Id)
         {
-            throw new NotImplementedException();
+            var id = int.Parse(Id);
+            var course = await context.Courses.Include(x => x.CourseSessions)
+                .ThenInclude(x => x.SessionInstructors)
+                .ThenInclude(x => x.Instructor).FirstAsync(x => x.Id == id);
+            return course;
         }
 
         public Task<Course> GetAsync(Guid Id)

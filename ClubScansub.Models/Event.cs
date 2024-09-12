@@ -1,3 +1,4 @@
+using ClubScansub.Models.Interface;
 using ClubScansub.Utility;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace ClubScansub.Models
 {
 
     [Table("Event")]
-    public class Event : BaseModel
+    public class Event : BaseModel, ICalendarEvent
     {
         public Event()
         {
@@ -27,20 +28,20 @@ namespace ClubScansub.Models
         public EventTypeEnum EventType { get; set; }
 
         [Display(Name = "min. deltagere")]
-        public int MinParticipants { get; set; }
+        public int? MinParticipants { get; set; }
 
         [Display(Name = "Max. pladser")]
-        public int MaxParticipants { get; set; }
+        public int? MaxParticipants { get; set; }
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
         [Display(Name = "Pris")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
         [Display(Name = "Prim (Prem. medlem)")]
-        public decimal PremiumPrice { get; set; }
+        public decimal? PremiumPrice { get; set; }
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
@@ -59,7 +60,7 @@ namespace ClubScansub.Models
         public bool IsCancelled { get; set; }
 
         [Display(Name = "Spærrede pladser")]
-        public int FixedParticipants { get; set; }
+        public int? FixedParticipants { get; set; }
 
         [Display(Name = "Kun for Instruktører?")]
         public bool IsInternal { get; set; }
@@ -86,8 +87,8 @@ namespace ClubScansub.Models
 
         [Display(Name = "Bådfører")]
         public ApplicationUser BoatLeader { get; set; }
-         
-        public virtual ICollection<EventMultiApplicationUser> ExternalClubMembers { get; set; }  
+
+        public virtual ICollection<EventMultiApplicationUser> ExternalClubMembers { get; set; }
 
         public ICollection<EventUser> Participants { get; set; }
 
@@ -95,11 +96,11 @@ namespace ClubScansub.Models
 
         [NotMapped]
         [Display(Name = "Frie pladser")]
-        public int FreeSpots => MaxParticipants - FixedParticipants - Participants.Count - ExternalClubMembersCount;
+        public int? FreeSpots => MaxParticipants - FixedParticipants - Participants.Count - ExternalClubMembersCount;
 
         [NotMapped]
         [Display(Name = "Manglende deltagere")]
-        public int RequiredSpots => MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount;
+        public int? RequiredSpots => MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount < 0 ? 0 : MinParticipants - Participants.Count - FixedParticipants - ExternalClubMembersCount;
 
         public Guid DeeplinkId { get; set; }
 

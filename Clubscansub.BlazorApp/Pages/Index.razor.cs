@@ -1,23 +1,16 @@
-using System.Formats.Asn1;
-using System.Globalization;
-using System.Net.Http;
 using Clubscansub.BlazorApp.Components.Scheduler;
 using ClubScansub.Models;
+using ClubScansub.Models.Interface;
 using ClubScansub.Service;
-using Microsoft.AspNetCore.Authorization;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.JSInterop;
-using Microsoft.Win32;
 using Nager.Date;
 using Nager.Date.Model;
 using Radzen;
 using Radzen.Blazor;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Clubscansub.BlazorApp.Pages
 {
@@ -44,11 +37,35 @@ namespace Clubscansub.BlazorApp.Pages
         [Inject]
         protected EventService eventService { get; set; }
 
-        private RadzenScheduler<Event> scheduler { get; set; }
+        private RadzenScheduler<ICalendarEvent> scheduler { get; set; }
 
         private IList<Event> events = new List<Event>();
-        private IList<Course> courses = new List<Course>();
+        private IList<CourseSession> sessions = new List<CourseSession>();
+
+        private IList<ICalendarEvent> filteredData = new List<ICalendarEvent>();
+        //private IList<Course> courses = new List<Course>();
         private List<object> holidays = new();
+
+        private Dictionary<EventTypeEnum, bool> eventTypeFilters = new Dictionary<EventTypeEnum, bool>() 
+        {
+            { EventTypeEnum.Bådtur, true },
+            { EventTypeEnum.Stranddyk, true },
+            { EventTypeEnum.Klubture, true },
+            { EventTypeEnum.Other, true },
+            { EventTypeEnum.Liveaboard, true },
+            { EventTypeEnum.Rejse, true },
+            { EventTypeEnum.NotAnEvent, false }
+        };
+
+        private Dictionary<CourseTypeEnum, bool> courseTypeFilters = new Dictionary<CourseTypeEnum, bool>() {
+            {    CourseTypeEnum.BaseCourse, true },
+            {    CourseTypeEnum.SpecialtyCourse, true },
+            {    CourseTypeEnum.TechCourse, true },
+            {    CourseTypeEnum.ProCourse, true }
+        };
+
+        private bool showAllEvents { get; set; } = false;
+        private bool showAllCourses { get; set; } = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -62,78 +79,118 @@ namespace Clubscansub.BlazorApp.Pages
             }
         }
 
-        private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Event> args)
+        private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<ICalendarEvent> args)
         {
             string baseClassString = "rz-pl-3 rz-event-content";
             string bgClass = "rz-background-color-primary";
             string fgClass = "rz-color-white";
-
-            switch (args.Data.EventType)
+            if (args.Data is Event)
             {
-                case ClubScansub.Utility.EventTypeEnum.Bådtur:
-                    bgClass = "rz-background-color-primary-darker";
+                switch ((args.Data as Event).EventType)
+                {
+                    case ClubScansub.Utility.EventTypeEnum.Bådtur:
+                        bgClass = "rz-background-color-primary-darker";
 
-                    break;
+                        break;
 
-                case ClubScansub.Utility.EventTypeEnum.Stranddyk:
-                    bgClass = "rz-background-color-primary-lighter";
-                    fgClass = "rz-color-black";
+                    case ClubScansub.Utility.EventTypeEnum.Stranddyk:
+                        bgClass = "rz-background-color-primary-lighter";
+                        fgClass = "rz-color-black";
 
-                    break;
+                        break;
 
-                case ClubScansub.Utility.EventTypeEnum.Klubture:
-                    bgClass = "rz-background-color-primary";
+                    case ClubScansub.Utility.EventTypeEnum.Klubture:
+                        bgClass = "rz-background-color-primary";
 
-                    break;
-
-
-                case ClubScansub.Utility.EventTypeEnum.Other:
-                    bgClass = "rz-background-color-info-darker";
-
-                    break;
+                        break;
 
 
-                case ClubScansub.Utility.EventTypeEnum.Rejse:
-                    bgClass = "rz-background-color-success";
+                    case ClubScansub.Utility.EventTypeEnum.Other:
+                        bgClass = "rz-background-color-info-darker";
 
-                    break;
-
-                case ClubScansub.Utility.EventTypeEnum.Liveaboard:
-                    bgClass = "rz-background-color-success-darker";
-
-                    break;
+                        break;
 
 
-                case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
-                    bgClass = "rz-background-color-danger-light";
+                    case ClubScansub.Utility.EventTypeEnum.Rejse:
+                        bgClass = "rz-background-color-success";
 
-                    break;
-                default:
-                    break;
+                        break;
+
+                    case ClubScansub.Utility.EventTypeEnum.Liveaboard:
+                        bgClass = "rz-background-color-success-darker";
+
+                        break;
+
+
+                    case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
+                        bgClass = "rz-background-color-danger-light";
+
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+            if (args.Data is CourseSession)
+            {
+                switch ((args.Data as CourseSession).Course?.CourseType)
+                {
+                    case CourseTypeEnum.BaseCourse:
+                        bgClass = "rz-background-color-danger-lighter";
+                        break;
+                    case CourseTypeEnum.TechCourse:
+                        bgClass = "rz-background-color-danger-light";
+                        break;
+                    case CourseTypeEnum.ProCourse:
+                        bgClass = "rz-background-color-danger-default";
+                        break;
+                    case CourseTypeEnum.SpecialtyCourse:
+                        bgClass = "rz-background-color-danger-darker";
+                        break;
+                    default:
+                        bgClass = "rz-background-color-warning-default";
+                        break;
+
+                }
             }
             args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
         }
 
-        private async void OnAppointmentClick(SchedulerAppointmentSelectEventArgs<Event> args)
+        private async void OnAppointmentClick(SchedulerAppointmentSelectEventArgs<ICalendarEvent> args)
         {
+            var sideDialogOptions = new SideDialogOptions()
+            {
+                Width = "80%",
+                CloseDialogOnOverlayClick = true,
+                ShowClose = true,
+                Position = DialogPosition.Right,
+                ShowMask = true
+
+            };
+
             Tooltipservice.Close();
-            await Dialogservice.OpenAsync<EventComponent>(args.Data.Title, new Dictionary<string, object>()
+            if (args.Data is Event)
             {
+                await Dialogservice.OpenSideAsync<EventComponent>(args.Data.Title, new Dictionary<string, object>()
                 {
-                "EventId",args.Data.Id
-                }
-            }, new DialogOptions()
+                    {
+                        "EventId",args.Data.Id
+                    }
+                }, 
+                sideDialogOptions);
+            }
+            if (args.Data is CourseSession)
             {
-                Width="800px",
-                Height="600px",
-                CloseDialogOnEsc=false,
-                CloseDialogOnOverlayClick=true,
-                ShowClose=true,
-                Resizable=true,
-                Draggable=true
-            });
+                await Dialogservice.OpenSideAsync<CourseEventComponent>(args.Data.Title, new Dictionary<string, object>()
+                {
+                    {
+                        "Id",((args.Data as CourseSession).Course?.Id)
+                    }
+                }, 
+                sideDialogOptions);
+            }
         }
-        private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<Event> args)
+        private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
         {
             if (args.Data is Event)
             {
@@ -141,13 +198,19 @@ namespace Clubscansub.BlazorApp.Pages
             }
 
         }
-        private void OnMouseLeaveAppointment(SchedulerAppointmentMouseEventArgs<Event> args)
+        private void OnMouseLeaveAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
         {
             Tooltipservice.Close();
         }
         private void OnSlotRender(SchedulerSlotRenderEventArgs args)
         {
             string? holiday = getHolidayName(args.Start.Date);
+
+            if (args.Start.DayOfWeek == DayOfWeek.Sunday || args.Start.DayOfWeek == DayOfWeek.Saturday)
+            {
+                //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
+                args.Attributes["class"] = "rz-background-color-base-lighter";
+            }
 
             if (!string.IsNullOrEmpty(holiday))
             {
@@ -158,11 +221,11 @@ namespace Clubscansub.BlazorApp.Pages
             }
 
             // Highlight today in month view
-            if (args.View.Text == "Måned" && args.Start.Date == DateTime.Today)
+            if ((args.View.Text != "Uge" && args.View.Text != "Dag") && args.Start.Date == DateTime.Today)
             {
                 //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-                args.Attributes["class"] = "holiday rz-background-color-warning-lighter";
-                args.Attributes["after-text"] = "Today";
+                args.Attributes["class"] = "rz-background-color-warning-lighter";
+
             }
 
             // Highlight working hours (9-18)
@@ -177,13 +240,34 @@ namespace Clubscansub.BlazorApp.Pages
         {
             var startDate = scheduler.SelectedView.StartDate;
             var endDate = scheduler.SelectedView.EndDate;
-            events = (await eventService.GetAllByDateAsync(startDate, endDate)).ToList();
+
+
+            events = (await eventService.GetAllByDateAsync(startDate, endDate)).ToList<Event>();
+            sessions = (await eventService.GetAllCourseSessionsByDateAsync(startDate, endDate)).ToList<CourseSession>();
+            applyFilter();
+
             StateHasChanged();
         }
 
-        private string getAppointmentIcon(Event @event)
+        private string getAppointmentIcon(ICalendarEvent item)
         {
-            switch (@event.EventType)
+            if (item is CourseSession)
+            {
+                switch ((item as CourseSession).Course.CourseType)
+                {
+                    case CourseTypeEnum.BaseCourse:
+                        return "school";
+                    case CourseTypeEnum.SpecialtyCourse:
+                        return "military_tech";
+                    case CourseTypeEnum.TechCourse:
+                        return "editor_choice";
+                    case CourseTypeEnum.ProCourse:
+                        return "social_leaderboard";
+
+                }
+            }
+
+            switch ((item as Event).EventType)
             {
                 case ClubScansub.Utility.EventTypeEnum.Bådtur:
 
@@ -234,31 +318,94 @@ namespace Clubscansub.BlazorApp.Pages
 
         }
 
-        private string getToolTipText(Event item)
+        private string getToolTipText(ICalendarEvent item)
         {
 
+            if (item is Course)
+            {
+                return "This is a course";
+            }
+
             return $@"
-<div style='min-width:250px;max-width:400px;display:flex;flex-direction:column' >
-    <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
-    <div style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Divelocation?.Description}</div>
-    <div style='display:flex;justify-content:space-between'>
-        <div>
-            Start: {item.StartDateAndTime.ToShortTimeString()}
-        </div>
-        <div>
-            End: {item.EndDateAndTime.ToShortTimeString()}
-        </div>
-    </div>
-    <div style='display:flex;justify-content:space-between'>
-        <div>
-            Price: {item.PremiumPrice:C2}
-        </div>
-        <div>
-            Free seats: {item.FreeSpots:N0}
-        </div>
-    </div>
-</div>
-";
+            <div style='min-width:250px;max-width:400px;display:flex;flex-direction:column' >
+                <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
+                <div style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Divelocation?.Description}</div>
+                <div style='display:flex;justify-content:space-between'>
+                    <div>
+                        Start: {item.StartDateAndTime.ToShortTimeString()}
+                    </div>
+                    <div>
+                        End: {item.EndDateAndTime.ToShortTimeString()}
+                    </div>
+                </div>
+                <div style='display:flex;justify-content:space-between'>
+                    <div>
+                        Price: {item.Price:C2}
+                    </div>
+                    <div>
+                        Free seats: {item.FreeSpots:N0}
+                    </div>
+                </div>
+            </div>
+            ";
+
+        }
+
+        private bool getEventFilter(EventTypeEnum type)
+        {
+            return eventTypeFilters[type];
+        }
+        private async void setEventFilter(EventTypeEnum type)
+        {
+            eventTypeFilters[type] = !eventTypeFilters[type];
+            var allToggled = !eventTypeFilters.Any(x => x.Value == false);
+            showAllEvents = allToggled;
+            applyFilter();
+        }
+        private void setAllEventFilter()
+        {
+            showAllEvents = !showAllEvents;
+            foreach (var item in eventTypeFilters)
+            {
+                eventTypeFilters[item.Key] = showAllEvents;
+            }
+            applyFilter();
+        }
+
+        private bool getCourseFilter(CourseTypeEnum type)
+        {
+            return courseTypeFilters[type];
+        }
+        private async void setCourseFilter(CourseTypeEnum type)
+        {
+            courseTypeFilters[type] = !courseTypeFilters[type];
+            var allToggled = !courseTypeFilters.Any(x => x.Value == false);
+            showAllCourses = allToggled;
+            applyFilter();
+        }
+        private void setAllCourseFilter()
+        {
+            showAllCourses = !showAllCourses;
+            foreach (var item in courseTypeFilters)
+            {
+                courseTypeFilters[item.Key] = showAllCourses;
+            }
+            applyFilter();
+        }
+
+
+        private void applyFilter()
+        {
+            var selectedEventTypes = eventTypeFilters.Where(x => x.Value == true).Select(x => x.Key);
+            var selectedCourseType = courseTypeFilters.Where(x => x.Value == true).Select(x => x.Key);
+
+            var filteredCoursesessions = sessions.Where(x => selectedCourseType.Contains(x.Course.CourseType)).ToList<ICalendarEvent>();
+            var filteredEvents = events.Where(x => selectedEventTypes.Contains(x.EventType)).ToList<ICalendarEvent>();
+
+            filteredData = [.. filteredCoursesessions, .. filteredEvents];
+            
+
+
         }
     }
 }

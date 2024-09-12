@@ -58,9 +58,13 @@ namespace ClubScansub.Service
         }
 
 
-        public Task<Divelocation> UpdateAsync(Divelocation item)
+        public async Task<Divelocation> UpdateAsync(Divelocation item)
         {
-            throw new NotImplementedException();
+
+            context.Attach<Divelocation>(item);
+            await context.SaveChangesAsync();
+            return item;
+
         }
 
         public Task<IList<Divelocation>> UpdateAsync(IList<Divelocation> Items)

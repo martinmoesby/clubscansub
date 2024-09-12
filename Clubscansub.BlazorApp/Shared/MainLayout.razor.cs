@@ -1,4 +1,7 @@
 using System.Net.Http;
+using ClubScansub.Extensions;
+using ClubScansub.Models;
+using ClubScansub.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -12,8 +15,9 @@ using Radzen.Blazor;
 
 namespace Clubscansub.BlazorApp.Shared
 {
-    public partial class MainLayout
+    public partial class MainLayout : LayoutComponentBase
     {
+
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
 
@@ -33,6 +37,11 @@ namespace Clubscansub.BlazorApp.Shared
         protected NotificationService NotificationService { get; set; }
 
         private bool sidebarExpanded = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+        }
 
         void SidebarToggleClick()
         {

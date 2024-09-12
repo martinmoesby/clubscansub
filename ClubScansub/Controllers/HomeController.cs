@@ -330,7 +330,7 @@ namespace ClubScansub.Controllers
 
             var accounttrans = new ApplicationUserAccountEntry
             {
-                Amount = isPaymentRequired ? -userPrice : 0,
+                Amount = isPaymentRequired ? -userPrice ?? 0 : 0,
                 AccountType = AccountTypeEnum.EventAccountType,
                 Description = $"{item.Title} ,d. {item.StartDateAndTime.ToShortDateString()}",
                 Event = item,
@@ -373,7 +373,7 @@ namespace ClubScansub.Controllers
 
             var accounttrans = new ApplicationUserAccountEntry
             {
-                Amount = -userPrice,
+                Amount = -userPrice ?? 0,
                 AccountType = AccountTypeEnum.EventAccountType,
                 Description = $"{item.Title} med {divers} dykkere, d. {item.StartDateAndTime.ToShortDateString()}",
                 Event = item,

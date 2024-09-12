@@ -25,13 +25,13 @@
                                 <RadzenRow AlignItems="AlignItems.Stretch">
                                     <RadzenColumn Size="12">
                                         <RadzenFormField Text="Description" Variant="Variant.Outlined" Style="width:100%">
-                                            <RadzenHtmlEditor @bind-Value="@Divesite.Description" ShowToolbar="false" Style="height:300px">
+@*                                             <RadzenHtmlEditor @bind-Value="@Divesite.Description" ShowToolbar="false" Style="height:300px" >
 
-                                            </RadzenHtmlEditor>
-                                            @*                                                 <RadzenTextArea @bind-Value="@Divesite.Description" Style="height:100%">
+                                            </RadzenHtmlEditor> *@
+                                            <RadzenTextArea @bind-Value="@Divesite.Description" Rows="12" Style="width:100%;">
 
                                             </RadzenTextArea>
-                                            *@
+                                           
                                         </RadzenFormField>
                                     </RadzenColumn>
                                 </RadzenRow>
@@ -40,7 +40,7 @@
 
                             <RadzenColumn Size="5">
 
-                                <img src="@ImageUtils.GetImageSrc(Divesite.Image.ImageData)" alt="@Divesite.Name" class="img rounded w-100 rz-mb-2" @onclick="@onImageClick" />
+                                <img src="@ImageUtils.GetImageSrc(Divesite.Image?.ImageData)" alt="@Divesite.Name" class="img rounded w-100 rz-mb-2" @onclick="@onImageClick" />
                                 <RadzenUpload MaxFileCount="1" ChooseText="Select new image" />
 
                             </RadzenColumn>

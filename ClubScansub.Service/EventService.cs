@@ -3,6 +3,7 @@ using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 
 namespace ClubScansub.Service
@@ -50,15 +51,21 @@ namespace ClubScansub.Service
 
         public async Task<IList<Event>> GetAllByDateAsync(DateTime startDate, DateTime endDate)
         {
-            var data = context.Events.Include(x=>x.Divelocation).Where(x => x.StartDateAndTime >= startDate && x.EndDateAndTime <= endDate);
-            return await data.ToListAsync();
+            var data = await context.Events.Include(x=>x.Participants).Include(x=>x.ExternalClubMembers).Include(x=>x.Divelocation).Where(x => x.StartDateAndTime >= startDate && x.EndDateAndTime <= endDate && x.EventType != Utility.EventTypeEnum.NotAnEvent).ToListAsync<Event>();
+            return data;
+        }
+
+        public async Task<IList<CourseSession>> GetAllCourseSessionsByDateAsync(DateTime startDate, DateTime endDate)
+        {
+            var data = await context.CourseSessions.Include(x=>x.Course).ThenInclude(x=>x.Participants).Where(x=>x.DateTime >= startDate && x.DateTime <= endDate).ToListAsync();
+            return data;
         }
 
         public async Task<Event> GetAsync(string Id)
         {
             var id = int.Parse(Id);
 
-            var data = await context.Events.Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
+            var data = await context.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
             if (data == null)
                 throw new Exception($"Event with Id '{Id}' could nor be retrieved.");
 

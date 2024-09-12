@@ -286,7 +286,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             //_PageModel.Event = pageModel.Event;
             pageModel.Event.Participants = await db.EventUsers.Where(x => x.EventId == pageModel.Event.Id).Include(x => x.ApplicationUser).ToListAsync();
             pageModel.Event.Divelocation = await db.Divelocations.FindAsync(pageModel.Event.Divelocation.Id);
-            pageModel.Event.SecondaryDivelocation = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation.Id);
+            pageModel.Event.SecondaryDivelocation = await db.Divelocations.FindAsync(pageModel.Event.SecondaryDivelocation?.Id);
             pageModel.LocationsList = await db.Divelocations.Where(x => x.DefaultEventType == pageModel.Event.EventType).Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
             pageModel.UsersList = await db.ApplicationUsers.OrderBy(x => x.Firstname).ThenBy(x => x.Lastname).Select(x => new SelectListItem()
             {
@@ -481,7 +481,7 @@ namespace ClubScansub.Areas.Admin.Controllers
 
                 var newEntry = new ApplicationUserAccountEntry
                 {
-                    Amount = ev.Price * refundFactor,
+                    Amount = ev.Price ?? 0 * refundFactor,
                     ApplicationUser = user,
                     AccountType = AccountTypeEnum.EventAccountType,
                     Event = ev,
@@ -516,7 +516,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
                 {
                     AccountType = AccountTypeEnum.EventAccountType,
-                    Amount = -userprice,
+                    Amount = -userprice ?? 0,
                     Description = $"Betaling for {@event.Title}",
                     PostingDate = DateTime.Now,
                     Event = @event,
@@ -584,7 +584,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
             {
                 AccountType = AccountTypeEnum.EventAccountType,
-                Amount = -userprice * numberofseats,
+                Amount = -userprice ?? 0 * numberofseats,
                 Description = $"Betaling for {numberofseats} dykkere til {@event.Title}",
                 PostingDate = DateTime.Now,
                 Event = @event,
@@ -710,7 +710,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 {
                     var accounttrans = new ApplicationUserAccountEntry
                     {
-                        Amount = accountTransaction,
+                        Amount = accountTransaction ?? 0,
                         AccountType = AccountTypeEnum.EventAccountType,
                         PostingDate = DateTime.Now,
                         Description = $"Tilbageførsel pga. annulering af '{e.Title}' for {item.Count} dykkere",

@@ -497,7 +497,7 @@ namespace ClubScansub.Areas.Admin.Controllers
             db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
             {
                 AccountType = AccountTypeEnum.CourseAccountType,
-                Amount = course.Price,
+                Amount = course.Price ?? 0,
                 Description = $"Refund - Course {course.CourseName}",
                 PostingDate = DateTime.Now,
                 Event = course,
@@ -535,7 +535,7 @@ namespace ClubScansub.Areas.Admin.Controllers
                 db.ApplicationUserAccountEntry.Add(new ApplicationUserAccountEntry()
                 {
                     AccountType = AccountTypeEnum.CourseAccountType,
-                    Amount = -course.Price,
+                    Amount = -course.Price ?? 0,
                     Description = $"Betaling for Kursus {course.CourseName}",
                     PostingDate = DateTime.Now,
                     Event = course,
