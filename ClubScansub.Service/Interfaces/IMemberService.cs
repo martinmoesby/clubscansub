@@ -9,6 +9,7 @@ namespace ClubScansub.Service.Interfaces
 {
     internal interface IMemberService : IGenericService<ApplicationUser>
     {
+        IList<ApplicationUser> FindAll(string filter);
         Task<IList<ApplicationUser>> GetByRolesAsync(params string[] userroles);
 
     }

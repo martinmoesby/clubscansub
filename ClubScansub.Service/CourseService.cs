@@ -3,6 +3,7 @@ using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 
 namespace ClubScansub.Service
@@ -45,9 +46,10 @@ namespace ClubScansub.Service
         public async Task<Course> GetAsync(string Id)
         {
             var id = int.Parse(Id);
-            var course = await context.Courses.Include(x => x.CourseSessions)
-                .ThenInclude(x => x.SessionInstructors)
-                .ThenInclude(x => x.Instructor).FirstAsync(x => x.Id == id);
+            var course = await context.Courses
+                .Include(x => x.CourseSessions)
+                .Include(x=>x.Participants)
+                .FirstAsync(x => x.Id == id);
             return course;
         }
 
@@ -69,6 +71,32 @@ namespace ClubScansub.Service
         public Task<IList<Course>> UpdateAsync(params Course[] Items)
         {
             throw new NotImplementedException();
+        }
+
+
+        public async Task<IList<EventUser>> GetUsersByCourse(int Id)
+        {
+            var users = await context.EventUsers.Include(x => x.ApplicationUser)
+                .Where(x => x.EventId == Id).ToListAsync();
+            return users;
+        }
+
+        public async Task<IList<EventUser>> EnrollUser(string userId, int CourseId)
+        {
+            await context.EventUsers.AddAsync(new EventUser() { ApplicationUserId = userId, EventId = CourseId });
+            await context.SaveChangesAsync();
+            return await GetUsersByCourse(CourseId);
+        }
+
+        public async Task RemoveUserFromCourse(string userId, int courseId)
+        {
+            var eventUser = await context.EventUsers.FindAsync(userId, courseId);
+            if (eventUser != null)
+            {
+                context.EventUsers.Remove(eventUser);
+                //TODO: Refund any payments for this course made to users account...
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

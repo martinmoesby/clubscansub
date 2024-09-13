@@ -20,6 +20,9 @@ namespace Clubscansub.BlazorApp.Components.Account
         [Parameter]
         public EventCallback<RegisterUserResult> OnRegisterSuccess { get; set; }
 
+        [Parameter]
+        public bool ShowAlertOnError { get; set; } = true;
+
         private RegisterUserDTO newUser { get; set; } = new();
 
         private string[] userRoles { get; set; } = new string[] { Userroles.User, Userroles.Student };
@@ -39,8 +42,13 @@ namespace Clubscansub.BlazorApp.Components.Account
                 if (registerResult != null && !registerResult.IsSucceesfull) 
                 {
                     var errorMessage = registerResult.Errors.FirstOrDefault();
-
-                    await dialogService.Alert($"{errorMessage}", "Error", new AlertOptions() { CloseDialogOnEsc = true, OkButtonText = "OK - got it" });
+                    if (ShowAlertOnError)
+                    {
+                        await dialogService.Alert($"{errorMessage}", "Error", new AlertOptions() { CloseDialogOnEsc = true, OkButtonText = "OK - got it" });
+                    } else
+                    {
+                        await OnRegisterSuccess.InvokeAsync(registerResult);
+                    }
                 }
             }
         }

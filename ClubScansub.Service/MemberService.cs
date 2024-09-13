@@ -158,6 +158,12 @@ namespace ClubScansub.Service
 
         }
 
-
+        public IList<ApplicationUser> FindAll(string filter)
+        {
+            filter = filter.ToLower();
+            var users = context.ApplicationUsers.AsQueryable();
+            users = users.Where(x=>x.Firstname.ToLower().Contains(filter) || x.Lastname.ToLower().Contains(filter) || x.AccountNumber.Contains(filter));
+            return users.ToList();
+        }
     }
 }

@@ -1,4 +1,5 @@
-using Clubscansub.BlazorApp.Components.Scheduler;
+using Clubscansub.BlazorApp.Components.Events;
+using Clubscansub.BlazorApp.Components.Courses;
 using ClubScansub.Models;
 using ClubScansub.Models.Interface;
 using ClubScansub.Service;
@@ -106,7 +107,7 @@ namespace Clubscansub.BlazorApp.Pages
 
 
                     case ClubScansub.Utility.EventTypeEnum.Other:
-                        bgClass = "rz-background-color-info-darker";
+                        bgClass = "rz-background-color-info";
 
                         break;
 
@@ -137,18 +138,19 @@ namespace Clubscansub.BlazorApp.Pages
                 {
                     case CourseTypeEnum.BaseCourse:
                         bgClass = "rz-background-color-danger-lighter";
-                        break;
-                    case CourseTypeEnum.TechCourse:
-                        bgClass = "rz-background-color-danger-light";
-                        break;
-                    case CourseTypeEnum.ProCourse:
-                        bgClass = "rz-background-color-danger-default";
+                        fgClass = "rz-color-black";
                         break;
                     case CourseTypeEnum.SpecialtyCourse:
+                        bgClass = "rz-background-color-danger";
+                        break;
+                    case CourseTypeEnum.TechCourse:
+                        bgClass = "rz-background-color-danger-dark";
+                        break;
+                    case CourseTypeEnum.ProCourse:
                         bgClass = "rz-background-color-danger-darker";
                         break;
                     default:
-                        bgClass = "rz-background-color-warning-default";
+                        bgClass = "rz-background-color-info-lighter";
                         break;
 
                 }
@@ -167,27 +169,33 @@ namespace Clubscansub.BlazorApp.Pages
                 ShowMask = true
 
             };
+            var dialogOptions = new DialogOptions()
+            {
+                Width = "800px",
+                Height="80%",
+                CloseDialogOnOverlayClick = true,
+                ShowClose = true,
+            };
 
             Tooltipservice.Close();
             if (args.Data is Event)
             {
-                await Dialogservice.OpenSideAsync<EventComponent>(args.Data.Title, new Dictionary<string, object>()
+                await Dialogservice.OpenAsync<EventComponent>(args.Data.Title, new Dictionary<string, object>()
                 {
                     {
                         "EventId",args.Data.Id
                     }
                 }, 
-                sideDialogOptions);
+                dialogOptions);
             }
             if (args.Data is CourseSession)
             {
-                await Dialogservice.OpenSideAsync<CourseEventComponent>(args.Data.Title, new Dictionary<string, object>()
+                await Dialogservice.OpenAsync<CourseEventComponent>(args.Data.Title, new Dictionary<string, object>()
                 {
-                    {
-                        "Id",((args.Data as CourseSession).Course?.Id)
-                    }
+                    { "Id",((args.Data as CourseSession).Course?.Id)},
+                    { "SessionId",args.Data.Id }
                 }, 
-                sideDialogOptions);
+                dialogOptions);
             }
         }
         private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
@@ -392,7 +400,6 @@ namespace Clubscansub.BlazorApp.Pages
             }
             applyFilter();
         }
-
 
         private void applyFilter()
         {

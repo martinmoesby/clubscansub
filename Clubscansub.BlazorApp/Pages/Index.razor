@@ -36,15 +36,15 @@
                 </RadzenStack>
 
                 <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="school" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
-                <RadzenToggleButton title="Specialer" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="military_tech" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))"  />
-                <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="editor_choice" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))"  />
+                <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="military_tech" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))"  />
+                <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="editor_choice" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))"  />
                 <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="social_leaderboard" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))"  />
 
             </RadzenStack>
         </RadzenStack>
 
     </RadzenStack>
-    <RadzenScheduler @ref="@scheduler"  
+    <RadzenScheduler @ref="@scheduler"
         TItem="ICalendarEvent"
                      Data="@filteredData"
                      StartProperty="StartDateAndTime"

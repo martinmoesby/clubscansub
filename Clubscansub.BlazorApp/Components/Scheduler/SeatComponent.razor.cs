@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Clubscansub.BlazorApp.Components.Scheduler
 {
-    public partial class EventSeatComponent : ComponentBase
+    public partial class SeatComponent : ComponentBase
     {
         [Parameter]
         public Event Event { get; set; }

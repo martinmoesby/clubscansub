@@ -5,7 +5,7 @@ using ClubScansub.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace Clubscansub.BlazorApp.Components.Scheduler
+namespace Clubscansub.BlazorApp.Components.Events
 {
     public partial class EventComponent : ComponentBase
     {
@@ -24,6 +24,8 @@ namespace Clubscansub.BlazorApp.Components.Scheduler
         private ApplicationUser currentUser { get; set; } = new();
         Event Event { get; set; } = new Event();
 
+        private bool isLoading = true;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -38,7 +40,7 @@ namespace Clubscansub.BlazorApp.Components.Scheduler
                 if (item != null) { 
                     Event = item;
                 }
-
+                isLoading = false;
                 StateHasChanged();
             }
         }

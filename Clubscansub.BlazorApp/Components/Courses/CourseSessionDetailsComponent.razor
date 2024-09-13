@@ -1,0 +1,71 @@
+﻿
+<RadzenDataGrid Data="@Sessions" TItem="CourseSession" AllowSorting="false" AllowFiltering ="false">
+    <Columns>
+        <RadzenDataGridColumn Width="40px" Title="Type" TextAlign="TextAlign.Start" >
+            <Template Context="item">
+                <RadzenStack AlignItems="AlignItems.Start">
+                    <RadzenIcon Icon="@iconsDictionary[item.Sessiontype]" title="@item.Sessiontype.ToString()" />
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Dato" Width="140px" >
+            <Template Context="item">
+                <RadzenText Text="@item.StartDateAndTime.ToLongDateString()" TextStyle="TextStyle.Body2" />
+            </Template>
+        </RadzenDataGridColumn>
+        
+        <RadzenDataGridColumn Title="Start" Width="60px" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                <RadzenText Text="@item.StartDateAndTime.ToShortTimeString()" TextStyle="TextStyle.Body2" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Slut (ca.)" Width="60px" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                <RadzenText Text="@item.StartDateAndTime.Add(item.Duration).ToShortTimeString()" TextStyle="TextStyle.Body2" />
+            </Template>
+        </RadzenDataGridColumn>
+        
+        <RadzenDataGridColumn Title="Beskrivelse" >
+            <Template Context="item">
+                <RadzenText TextStyle="TextStyle.Subtitle1">
+                    @item.SessionName
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">
+                    @item.SessionDescription
+                </RadzenText>
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+@* <RadzenRow Gap="5" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" RowGap="8" >
+    <RadzenColumn >
+        <RadzenIcon Icon="@iconsDictionary[Session.Sessiontype]" />
+    </RadzenColumn>
+
+    <RadzenColumn Size="4">
+        
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenIcon Icon="alarm" />
+            <RadzenText Text="@Session.StartDateAndTime.ToString("dd-MM-yyyy HH:mm")" TextStyle="TextStyle.Body2" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        
+            <RadzenIcon Icon="alarm_off" />
+            <RadzenText Text="@(Session.StartDateAndTime.Add(Session.Duration).ToString("dd-MM-yyyy HH:mm"))" TextStyle="TextStyle.Body1" />
+
+        </RadzenStack>
+
+    </RadzenColumn>
+
+    <RadzenColumn Size="7">
+        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Session.SessionName" />
+        <RadzenText TextStyle="TextStyle.Body2" Text="@Session.SessionDescription" />
+    </RadzenColumn>
+
+</RadzenRow>
+ *@
+
