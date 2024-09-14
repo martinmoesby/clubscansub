@@ -20,6 +20,9 @@ namespace Clubscansub.BlazorApp.Components.Courses
         protected CourseService courseService { get; set; }
 
         [Inject]
+        protected EventUserService eventUserService { get; set; }
+
+        [Inject]
         protected MemberService memberService { get; set; }
 
         [Parameter]
@@ -33,29 +36,8 @@ namespace Clubscansub.BlazorApp.Components.Courses
         private CourseSession session = new();
 
         private IList<EventUser> enrolledUsers = new List<EventUser>();
-        private IEnumerable<ApplicationUser> filteredUsers = new List<ApplicationUser>();
-        private string selectedUser = string.Empty;
-
 
         private string courseBrief = "";
-
-        private async Task addNewStudent_Click()
-        {
-            var dialogOptions = new SideDialogOptions()
-            {
-                Width = "800px",
-                Position = DialogPosition.Left,
-                ShowClose = true
-            };
-
-            var dialogParameters = new Dictionary<string, object>()
-            {
-                {"OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this, addNewStudent) },
-                {"ShowAlertOnError", false }
-            };
-
-            await dialogService.OpenSideAsync<RegisterUserComponent>("Add new student", dialogParameters, dialogOptions);
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -64,7 +46,7 @@ namespace Clubscansub.BlazorApp.Components.Courses
             {
                 course = await courseService.GetAsync(Id.ToString());
                 session = course.CourseSessions.FirstOrDefault(x => x.Id == SessionId);
-                enrolledUsers = await courseService.GetUsersByCourse(Id);
+                enrolledUsers = await eventUserService.GetUsersByEvent(Id);
                 isLoading = false;
                 courseBrief = @$"I forløbet har vi  
                 {course.CourseSessions.Count(x => x.Sessiontype == ClubScansub.Utility.CourseSessionTypeEnum.AcademicSession)} dag(e) med teori i klasselokale,
@@ -75,23 +57,19 @@ namespace Clubscansub.BlazorApp.Components.Courses
 
         }
 
-        private void OnLoadExistingUsers(LoadDataArgs args)
-        {
-            if (!string.IsNullOrEmpty(args.Filter))
-            {
-                filteredUsers = memberService.FindAll(args.Filter);
-                InvokeAsync(StateHasChanged);
-            }
-        }
-
         private async Task OnLoadEnrolledUsers()
         {
-            enrolledUsers = await courseService.GetUsersByCourse(Id);
+            enrolledUsers = await eventUserService.GetUsersByEvent(Id);
+            course.Participants = enrolledUsers;
             StateHasChanged();
         }
 
-        private async Task enrollExistingUser()
+        private async Task enrollExistingUser(string selectedUser)
         {
+            if (string.IsNullOrEmpty(selectedUser)) {
+                return;
+            }
+
             if (enrolledUsers.Any(x => x.ApplicationUserId == selectedUser))
             {
                 notificationService.Notify(NotificationSeverity.Warning, "This user is already enrolled to the course");
@@ -99,8 +77,7 @@ namespace Clubscansub.BlazorApp.Components.Courses
             }
             else
             {
-                await courseService.EnrollUser(selectedUser, Id);
-                selectedUser = string.Empty;
+                await eventUserService.AddUserToEvent(selectedUser, Id);
                 await OnLoadEnrolledUsers();
                 notificationService.Notify(NotificationSeverity.Success, $"User enrolled for the course");
             }
@@ -111,7 +88,7 @@ namespace Clubscansub.BlazorApp.Components.Courses
             if (confirm.Value)
             {
                 //TODO: Remove user from course and return any deposits made for the enrollment
-                await courseService.RemoveUserFromCourse(user.Id, Id);
+                await eventUserService.RemoveUserFromEvent(user.Id, Id);
                 await OnLoadEnrolledUsers();
             }
         }
@@ -120,7 +97,7 @@ namespace Clubscansub.BlazorApp.Components.Courses
             dialogService.CloseSide();
             if (registeredUserResult.IsSucceesfull)
             {
-                await courseService.EnrollUser(registeredUserResult.User.Id, Id);
+                await eventUserService.AddUserToEvent(registeredUserResult.User.Id, Id);
                 await OnLoadEnrolledUsers();
 
                 notificationService.Notify(NotificationSeverity.Success, $"{registeredUserResult.User.UserName} {registeredUserResult.User.Email} created and added submitted to the course");

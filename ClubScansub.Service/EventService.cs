@@ -2,6 +2,7 @@
 using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
+using Mailjet.Client.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
@@ -65,7 +66,7 @@ namespace ClubScansub.Service
         {
             var id = int.Parse(Id);
 
-            var data = await context.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
+            var data = await context.Events.Include(x=>x.Participants).Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
             if (data == null)
                 throw new Exception($"Event with Id '{Id}' could nor be retrieved.");
 
@@ -98,5 +99,7 @@ namespace ClubScansub.Service
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

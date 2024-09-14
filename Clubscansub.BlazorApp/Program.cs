@@ -81,6 +81,7 @@ builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<MemberService>();
 builder.Services.AddTransient<SiteService>();
 builder.Services.AddTransient<EventService>();
+builder.Services.AddTransient<EventUserService>();
 builder.Services.AddTransient<CourseService>();
 
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));

@@ -1,0 +1,20 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal" Gap="50" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-5" Visible="@Visible">
+
+    <RadzenStack Orientation="Orientation.Horizontal" Style="flex:1" Gap="5">
+        <RadzenDropDown AllowFiltering="true"
+                        AllowClear="true"
+                        AllowSelectAll="false"
+                        Data="@filteredUsers"
+                        @bind-Value="@selectedUser"
+                        TextProperty="@nameof(ApplicationUser.Name)"
+                        ValueProperty="@nameof(ApplicationUser.Id)"
+                        LoadData="@onLoadExistingUsers">
+
+        </RadzenDropDown>
+        <RadzenButton Click="enrollExistingUserCallback" Text="Enroll user" Icon="person_check" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
+    </RadzenStack>
+
+    <RadzenButton Text="Add user" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" Icon="person_add" Click="addNewUser_Click" Visible ="ShowAddNewUser" />
+
+</RadzenStack>

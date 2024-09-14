@@ -1,6 +1,7 @@
 ﻿using ClubScansub.Data;
 using ClubScansub.Models;
 using ClubScansub.Service.Communication;
+using ClubScansub.Service.Exceptions;
 using ClubScansub.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,9 @@ namespace ClubScansub.Service
         public async Task<ApplicationUser> GetAsync(string Id)
         {
             var user = await context.ApplicationUsers.Include(x=>x.AccountTransactions).Where(x => x.Id == Id).FirstOrDefaultAsync();
+            if (user == null)
+                throw new UserNotFoundException($"User with Id {Id} was not found.");
+
             return user;
         }
 

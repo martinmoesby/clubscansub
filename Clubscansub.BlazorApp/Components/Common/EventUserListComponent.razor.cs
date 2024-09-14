@@ -1,0 +1,21 @@
+﻿using ClubScansub.Models;
+using ClubScansub.Service;
+using Microsoft.AspNetCore.Components;
+
+namespace Clubscansub.BlazorApp.Components.Common
+{
+    public partial class EventUserListComponent : ComponentBase
+    {
+
+        [Parameter]
+        public IList<EventUser> EventUsers { get; set; } = new List<EventUser>();
+
+        [Parameter]
+        public EventCallback<ApplicationUser> OnRemoveUser { get; set; }
+
+        private void removeUserFromEvent_Click(ApplicationUser user)
+        {
+            OnRemoveUser.InvokeAsync(user);
+        }
+    }
+}

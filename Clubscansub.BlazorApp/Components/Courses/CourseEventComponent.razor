@@ -79,29 +79,11 @@
 
                     <RadzenTabsItem Text="Tilmeldte" Icon="social_leaderboard">
 
-                        <RadzenStack Orientation="Orientation.Horizontal" Gap="50" JustifyContent="JustifyContent.SpaceBetween" Visible="@(course.FreeSpots > 0)" class="rz-mb-5">
-
-                            <RadzenStack Orientation="Orientation.Horizontal" Style="flex:1" Gap="5">
-                                <RadzenDropDown AllowFiltering="true"
-                                                AllowClear="true"
-                                                AllowSelectAll="false"
-                                                Data="@filteredUsers"
-                                                @bind-Value="@selectedUser"
-                                                TextProperty="@nameof(ApplicationUser.Name)"
-                                                ValueProperty="@nameof(ApplicationUser.Id)"
-                                                LoadData="@OnLoadExistingUsers">
-
-                                </RadzenDropDown>
-                                <RadzenButton Click="@enrollExistingUser" Text="Enroll user" Icon="person_check" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
-                            </RadzenStack>
-
-                            <RadzenButton Text="Add user" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" Icon="person_add" Click="addNewStudent_Click" />
-
-                        </RadzenStack>
-
-                    <RadzenDataGrid TItem="EventUser" Data="@enrolledUsers" LoadData="OnLoadEnrolledUsers">
+                        <EventUserActionsComponent AddNewUser="addNewStudent" AddExistingUser="enrollExistingUser" Visible="@(course.FreeSpots > 0)" ShowAddNewUser="true" />
+                            <EventUserListComponent EventUsers="enrolledUsers" OnRemoveUser="removeUserFromCourse" />
+@*                     <RadzenDataGrid TItem="EventUser" Data="@enrolledUsers" LoadData="OnLoadEnrolledUsers">
                             <Columns>
-                                <RadzenDataGridColumn Title="Kontonummer" Width="120px">
+                                <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
                                     <Template Context="item">
                                         <RadzenText Text="@item.ApplicationUser?.AccountNumber" TextStyle="TextStyle.Body1" />
                                     </Template>
@@ -134,7 +116,7 @@
                         </Columns>
                     
                     </RadzenDataGrid>
-                </RadzenTabsItem>
+ *@                </RadzenTabsItem>
             </AuthorizeView>
 
         </Tabs>

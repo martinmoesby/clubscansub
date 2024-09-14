@@ -113,14 +113,15 @@ else
                 </RadzenTabsItem>
                 <AuthorizeView Roles="Administrator, Owner, Divepro">
                     <RadzenTabsItem Text="Tilmeldte" Icon="social_leaderboard">
-                        <RadzenDataGrid TItem="EventUser" Data="@Event.Participants">
-                                <HeaderTemplate>
-                                    <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
-                                        <RadzenButton ButtonStyle="ButtonStyle.Primary" Icon="person_add" Text="Add..." />
-                                    </AuthorizeView>
-                                </HeaderTemplate>
+
+                        <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
+                            <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0" />
+                        </AuthorizeView>
+
+                        <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" />
+@*                         <RadzenDataGrid TItem="EventUser" Data="@enrolledUsers" LoadData="OnLoadEnrolledUsers">
                             <Columns>
-                                    <RadzenDataGridColumn Title="Kontonummer" Width="120px">
+                                    <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
                                         <Template Context="item">
                                             <RadzenText Text="@item.ApplicationUser?.AccountNumber" TextStyle="TextStyle.Body1" />
                                         </Template>
@@ -148,7 +149,7 @@ else
                             </Columns>
 
                         </RadzenDataGrid>
-
+ *@
                     </RadzenTabsItem>
                 </AuthorizeView>
             </Tabs>
