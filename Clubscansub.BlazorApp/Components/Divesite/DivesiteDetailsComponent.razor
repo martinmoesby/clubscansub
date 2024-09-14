@@ -17,7 +17,7 @@
         <RadzenColumn Size="12">
             <RadzenTabs RenderMode="TabRenderMode.Client" TabPosition="TabPosition.Top">
                 <Tabs>
-                    <RadzenTabsItem Text="Info">
+                    <RadzenTabsItem Text="Info" Icon="@IconsTextsAndColors.Icons.INFORMATION">
                         <RadzenRow>
 
 
@@ -63,7 +63,7 @@
                                 <RadzenColumn Size="4">
                                     <RadzenFormField Text="Min. Depth" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
-                                            <RadzenIcon Icon="vertical_align_top"></RadzenIcon>
+                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.MIN_DEPTH"></RadzenIcon>
                                         </End>
                                         <ChildContent>
                                             <RadzenNumeric @bind-Value="@Divesite.MinDepth" />
@@ -74,7 +74,7 @@
                                 <RadzenColumn Size="4">
                                     <RadzenFormField Text="Max. Depth" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
-                                            <RadzenIcon Icon="vertical_align_bottom"></RadzenIcon>
+                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.MAX_DEPTH"></RadzenIcon>
                                         </End>
                                         <ChildContent>
                                             <RadzenNumeric @bind-Value="@Divesite.MaxDepth" />
@@ -93,7 +93,7 @@
                                 <RadzenColumn Size="6">
                                     <RadzenFormField Text="Min. participants" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
-                                            <RadzenIcon Icon="person_remove"></RadzenIcon>
+                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MIN"></RadzenIcon>
                                         </End>
                                         <ChildContent>
                                             <RadzenNumeric @bind-Value="Divesite.MinParticipants" />
@@ -104,7 +104,7 @@
                                 <RadzenColumn Size="6">
                                     <RadzenFormField Text="Max. participants" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
-                                            <RadzenIcon Icon="person_add"></RadzenIcon>
+                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MAX"></RadzenIcon>
                                         </End>
                                         <ChildContent>
                                             <RadzenNumeric @bind-Value="Divesite.MaxParticipants" />'
@@ -133,7 +133,7 @@
 
                                 <RadzenColumn Size="4">
                                     <RadzenFormField Text="Price" Variant="Variant.Outlined" Style="width:100%">
-                                        <End><RadzenIcon Icon="payments" /></End>
+                                        <End><RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" /></End>
                                         <ChildContent>
                                             <RadzenNumeric @bind-Value="Divesite.Price"></RadzenNumeric>
                                         </ChildContent>
@@ -218,196 +218,8 @@
     </RadzenRow>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-8">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
-        <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Click="deleteDivesiteClick" Size="ButtonSize.Small" />
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="@IconsTextsAndColors.Icons.SAVE" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
+        <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="@IconsTextsAndColors.Icons.DELETE" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Click="deleteDivesiteClick" Size="ButtonSize.Small" />
     </RadzenStack>
 
 </RadzenTemplateForm>
-@*
-<RadzenTemplateForm Data="@Divesite"
-                    TItem="Divelocation"
-                    Submit="@((Divelocation divelocation) => UpdateDivesiteCallback.InvokeAsync(divelocation))"
-                    InvalidSubmit="@onInvalidSubmit">
-
-    <RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
-        <Tabs>
-
-            <RadzenTabsItem Text="Name">
-
-                <RadzenRow>
-                    <RadzenColumn Size="7">
-
-
-
-                        <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
-                            <RadzenColumn Size="12">
-                                <RadzenFormField Text="Name" Variant="Variant.Outlined" Style="width:100%">
-                                    <RadzenTextBox @bind-Value="@Divesite.Name" />
-                                </RadzenFormField>
-                            </RadzenColumn>
-                        </RadzenRow>
-
-                        <RadzenRow>
-                            <RadzenColumn>
-                                <RadzenFormField Text="Min. Depth" Variant="Variant.Outlined" Style="width:100%">
-                                    <RadzenNumeric @bind-Value="@Divesite.MinDepth" />
-                                </RadzenFormField>
-                            </RadzenColumn>
-                            <RadzenColumn>
-                                <RadzenFormField Text="Max. Depth" Variant="Variant.Outlined" Style="width:100%">
-                                    <RadzenNumeric @bind-Value="@Divesite.MaxDepth" />
-                                </RadzenFormField>
-                            </RadzenColumn>
-                        </RadzenRow>
-
-                        <RadzenRow>
-                            <RadzenColumn>
-                                <RadzenFormField Text="Dive Type" Variant="Variant.Outlined" Style="width:100%">
-
-                                </RadzenFormField>
-                            </RadzenColumn>
-                            <RadzenColumn>
-                                <RadzenFormField Text="Event type" Variant="Variant.Outlined" Style="width:100%">
-
-                                </RadzenFormField>
-                            </RadzenColumn>
-                        </RadzenRow>
-
-                        <RadzenRow>
-                            <RadzenColumn Size="12">
-                                <RadzenFormField Text="Min. certificate requirement" Variant="Variant.Outlined" Style="width:100%">
-                                    <RadzenDropDown Data="@certificates" TextProperty="Name" ValueProperty="ShortName" TValue="Certificate" @bind-Value="@Divesite.Certificate" />
-                                </RadzenFormField>
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-
-
-                    </RadzenColumn>
-                    <RadzenColumn Size="5">
-
-                        <img src="@getImageSrc(Divesite.Image)" alt="@Divesite.Name" class="img rounded w-100 rz-mb-2" @onclick="@onImageClick" />
-                        <RadzenUpload MaxFileCount="1" ChooseText="Select new image" />
-
-                    </RadzenColumn>
-                </RadzenRow>
-
-
-            </RadzenTabsItem>
-
-            <RadzenTabsItem Text="Details">
-                <RadzenRow Style="margin-bottom:20px" AlignItems="AlignItems.Stretch">
-                    <RadzenColumn Size="12">
-                        <RadzenFormField Text="Description" Variant="Variant.Outlined" Style="width:100%">
-                            <RadzenTextArea @bind-Value="@Divesite.Description" Rows="5">
-
-                            </RadzenTextArea>
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenColumn>
-                        <RadzenFormField Text="Min. participants" Variant="Variant.Outlined" Style="width:100%">
-                            <RadzenNumeric @bind-Value="Divesite.MinParticipants" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn>
-                        <RadzenFormField Text="Default duration" Variant="Variant.Outlined" Style="width:100%">
-                            <RadzenNumeric @bind-Value="Divesite.MaxParticipants" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenColumn>
-                        <RadzenFormField Text="Default start time" Variant="Variant.Outlined" Style="width:100%">
-                            <RadzenDatePicker TimeOnly TValue="TimeSpan" @bind-Value="Divesite.DefaultStartTime" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn>
-                        <RadzenFormField Text="Default duration" Variant="Variant.Outlined" Style="width:100%">
-                            <RadzenDatePicker TimeOnly TValue="TimeSpan" @bind-Value="Divesite.DefaultDuration" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-
-            </RadzenTabsItem>
-
-            <RadzenTabsItem Text="Meeting Location">
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-
-                    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="5">
-                        <RadzenText Text="Meeting location" />
-
-                        <RadzenTemplateForm Data="@Divesite.MeetingLocation" TItem="Address" Style="width:100%">
-                            <RadzenFormField Style="width:100%" Variant="Variant.Outlined" Text="Select existing meeting spots">
-                                <RadzenDropDown Data="@meetingLocations" TValue="Address" Value="@Divesite.MeetingLocation?.Id" TextProperty="Name" ValueProperty="Id" Style="width:100%" />
-                            </RadzenFormField>
-
-                            <RadzenRow class="rz-mt-5">
-                                <RadzenColumn Size="12">
-                                    <RadzenFormField Variant="Variant.Outlined" Text="Short name" Style="width:100%">
-                                        <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Name" />
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            </RadzenRow>
-                            <RadzenRow>
-                                <RadzenColumn Size="12">
-                                    <RadzenFormField Variant="Variant.Outlined" Text="Streetname" Style="width:100%">
-                                        <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Streetname" />
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            </RadzenRow>
-                            <RadzenRow Gap="4">
-                                <RadzenColumn>
-                                    <RadzenFormField Variant="Variant.Outlined" Text="Postcode" Style="width:100%">
-                                        <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Zipcode" />
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                                <RadzenColumn Size="8">
-                                    <RadzenFormField Variant="Variant.Outlined" Text="City" Style="width:100%">
-                                        <RadzenTextBox @bind-Value="@divesiteMeetingLocation.City" />
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            </RadzenRow>
-                            <RadzenRow>
-                                <RadzenColumn Size="12">
-                                    <RadzenFormField Variant="Variant.Outlined" Text="Streetname" Style="width:100%">
-                                        <RadzenTextBox @bind-Value="@divesiteMeetingLocation.Country" />
-                                    </RadzenFormField>
-                                </RadzenColumn>
-                            </RadzenRow>
-
-                        </RadzenTemplateForm>
-
-                    </RadzenStack>
-                    <RadzenGoogleMap ApiKey="@googleMapsAPIKey" MapId="@googleMapsMapId" @ref=@map
-                                     Style="height:360px;width:400px;"
-                                     Options=@googleMapOptions
-                                     Zoom=11
-                                     MapClick="@onMapClick"
-                                     MarkerClick="@onMarkerClick"
-                                     FitBoundsToMarkersOnUpdate="@fitBoundsToMarkers"
-                                     Center=@(meetinLocationPosition ?? divesitePosition)>
-                        <Markers>
-                            @foreach (var item in markers)
-                            {
-                                <RadzenGoogleMapMarker Position="@item.Position" Title="@item.Title" />
-                            }
-                        </Markers>
-                    </RadzenGoogleMap>
-
-                </RadzenStack>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mt-4">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
-        <RadzenButton ButtonType="ButtonType.Button" Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Click="deleteDivesiteClick" Size="ButtonSize.Small" />
-    </RadzenStack>
-
-</RadzenTemplateForm>
- *@

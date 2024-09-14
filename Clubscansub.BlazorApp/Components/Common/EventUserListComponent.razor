@@ -1,4 +1,5 @@
-﻿<RadzenDataGrid TItem="EventUser" Data="@EventUsers">
+﻿@using ClubScansub.Utility
+<RadzenDataGrid TItem="EventUser" Data="@EventUsers">
     <Columns>
         <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
             <Template Context="item">
@@ -27,7 +28,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Width="40px">
             <Template Context="item">
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter" Click="@(() => removeUserFromEvent_Click(item.ApplicationUser))" />
+                <RadzenButton Icon="@IconsTextsAndColors.Icons.DELETE" Size="ButtonSize.Small" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter" Click="@(() => removeUserFromEvent_Click(item.ApplicationUser))" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>

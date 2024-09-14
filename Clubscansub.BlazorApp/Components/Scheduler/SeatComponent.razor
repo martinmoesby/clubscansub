@@ -1,4 +1,5 @@
-﻿@if (ShowText)
+﻿@using ClubScansub.Utility
+@if (ShowText)
 {
     <RadzenText Text="@Text" TextStyle="TextStyle.Caption" />
 }
@@ -6,46 +7,46 @@
     <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Light" Variant="Variant.Outlined" Style="width:100%">
         @for (int i = 0; i < Event.FixedParticipants; i++)
         {
-            <RadzenIcon Icon="person" IconStyle="IconStyle.Info" />
-            @* <i class="fas fa-user-check text-info" title="Plads optaget af DkDiver"></i> *@
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Info" />
+
         }
 
         @foreach (var user in Event.Participants)
         {
             @if (user.ApplicationUser != null)
             {
-                <RadzenIcon Icon="person_check" IconStyle="IconStyle.Success" title="@user.ApplicationUser?.Firstname" />
+                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="@user.ApplicationUser?.Firstname" />
             }
             else
             {
-                <RadzenIcon Icon="person_check" IconStyle="IconStyle.Success" title="Plads optaget" />
+                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="Plads optaget" />
             }
         }
 
 
         @for (int i = 0; i < Event.RequiredSpots % 10; i++)
         {
-            <RadzenIcon Icon="person" IconStyle="IconStyle.Warning" title="1 påkrævet plads" />
-            @* <i class="far fa-user text-warning" title="1 påkrævet plads"></i> *@
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Warning" title="1 påkrævet plads" />
+
         }
 
 
         @for (int i = 0; i < Event.RequiredSpots / 10; i++)
         {
-            <RadzenIcon Icon="group" IconStyle="IconStyle.Warning" title="10 påkrævede plads" />
-            @* <i class="fas fa-users text-warning" title="10 påkrævede pladser"></i> *@
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Warning" title="10 påkrævede plads" />
+
         }
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) % 10; i++)
         {
-            <RadzenIcon Icon="person" IconStyle="IconStyle.Dark" title="Ledig plads" />
-            @* <i class="far fa-user text-dark" title="Ledig plads"></i> *@
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Dark" title="Ledig plads" />
+
         }
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) / 10; i++)
         {
-            <RadzenIcon Icon="group" IconStyle="IconStyle.Dark" title="10 ledige plads" />
-            @* <i class="fas fa-users text-dark" title="10 ledige pladser"></i> *@
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Dark" title="10 ledige plads" />
+
         }
     </RadzenBadge>
 </RadzenStack>

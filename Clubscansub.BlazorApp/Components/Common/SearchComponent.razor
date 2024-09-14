@@ -1,13 +1,14 @@
-﻿
+﻿@using ClubScansub.Utility
+
 <RadzenFormField Style="width:100%">
     <Start>
-        <RadzenIcon Icon="search" />
+        <RadzenIcon Icon="@IconsTextsAndColors.Icons.SEARCH" />
     </Start>
     <ChildContent>
         <RadzenTextBox @bind-Value="@searchFilter" Change="onSearchFilterChanged" />
     </ChildContent>
     <End>
-        <RadzenIcon Icon="close" @onclick="resetSearchFilter" Style="cursor:pointer" />
+        <RadzenIcon Icon="@IconsTextsAndColors.Icons.CLOSE" @onclick="resetSearchFilter" Style="cursor:pointer" />
     </End>
 </RadzenFormField>
 

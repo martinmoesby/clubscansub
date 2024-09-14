@@ -22,8 +22,8 @@ namespace Clubscansub.BlazorApp.Components.Courses
         [Inject]
         protected EventUserService eventUserService { get; set; }
 
-        [Inject]
-        protected MemberService memberService { get; set; }
+        //[Inject]
+        //protected MemberService memberService { get; set; }
 
         [Parameter]
         public int Id { get; set; }

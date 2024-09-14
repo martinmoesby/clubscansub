@@ -10,9 +10,9 @@ namespace Clubscansub.BlazorApp.Components.Courses
         public ICollection<CourseSession> Sessions { get; set; } = new List<CourseSession>();
 
         private Dictionary<CourseSessionTypeEnum, string> iconsDictionary = new Dictionary<CourseSessionTypeEnum, string>() {
-            {    CourseSessionTypeEnum.PoolSession, "pool" },
-            {    CourseSessionTypeEnum.AcademicSession, "school" },
-            {    CourseSessionTypeEnum.OpenWaterSession, "scuba_diving" }
+            {    CourseSessionTypeEnum.PoolSession, IconsTextsAndColors.Icons.COURSE_SESSION_POOL },
+            {    CourseSessionTypeEnum.AcademicSession, IconsTextsAndColors.Icons.COURSE_SESSION_ACADEMIC },
+            {    CourseSessionTypeEnum.OpenWaterSession, IconsTextsAndColors.Icons.COURSE_SESSION_OW }
         }; 
 
         protected override Task OnAfterRenderAsync(bool firstRender)

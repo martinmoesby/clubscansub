@@ -12,6 +12,7 @@ using Radzen;
 using Radzen.Blazor;
 using System.Diagnostics;
 using System.Globalization;
+using System.Drawing;
 
 namespace Clubscansub.BlazorApp.Pages
 {
@@ -83,48 +84,48 @@ namespace Clubscansub.BlazorApp.Pages
         private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<ICalendarEvent> args)
         {
             string baseClassString = "rz-pl-3 rz-event-content";
-            string bgClass = "rz-background-color-primary";
-            string fgClass = "rz-color-white";
+            string bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
+            string fgClass = IconsTextsAndColors.ColorClasses.FG_DEFAULT;
             if (args.Data is Event)
             {
                 switch ((args.Data as Event).EventType)
                 {
                     case ClubScansub.Utility.EventTypeEnum.Bådtur:
-                        bgClass = "rz-background-color-primary-darker";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_BOAT;
 
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Stranddyk:
-                        bgClass = "rz-background-color-primary-lighter";
-                        fgClass = "rz-color-black";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_BEACH;
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_BEACH;
 
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Klubture:
-                        bgClass = "rz-background-color-primary";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_CLUB;
 
                         break;
 
 
                     case ClubScansub.Utility.EventTypeEnum.Other:
-                        bgClass = "rz-background-color-info";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_OTHER;
 
                         break;
 
 
                     case ClubScansub.Utility.EventTypeEnum.Rejse:
-                        bgClass = "rz-background-color-success";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_TRAVEL;
 
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Liveaboard:
-                        bgClass = "rz-background-color-success-darker";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_LIVEABOARD;
 
                         break;
 
 
                     case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
-                        bgClass = "rz-background-color-danger-light";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_NOTEVENT;
 
                         break;
                     default:
@@ -137,20 +138,20 @@ namespace Clubscansub.BlazorApp.Pages
                 switch ((args.Data as CourseSession).Course?.CourseType)
                 {
                     case CourseTypeEnum.BaseCourse:
-                        bgClass = "rz-background-color-danger-lighter";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
                         fgClass = "rz-color-black";
                         break;
                     case CourseTypeEnum.SpecialtyCourse:
-                        bgClass = "rz-background-color-danger";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
                         break;
                     case CourseTypeEnum.TechCourse:
-                        bgClass = "rz-background-color-danger-dark";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
                         break;
                     case CourseTypeEnum.ProCourse:
-                        bgClass = "rz-background-color-danger-darker";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
                         break;
                     default:
-                        bgClass = "rz-background-color-info-lighter";
+                        bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
                         break;
 
                 }
@@ -217,30 +218,30 @@ namespace Clubscansub.BlazorApp.Pages
             if (args.Start.DayOfWeek == DayOfWeek.Sunday || args.Start.DayOfWeek == DayOfWeek.Saturday)
             {
                 //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
-                args.Attributes["class"] = "rz-background-color-base-lighter";
+                args.Attributes["class"] = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WEEKEND;
             }
 
             if (!string.IsNullOrEmpty(holiday))
             {
                 //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
-                args.Attributes["class"] = "holiday rz-background-color-danger-lighter";
-                if (args.View.Text == "Måned")
+                args.Attributes["class"] = "holiday " + IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_HOLIDAY;
+                if (args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_MONTH)
                     args.Attributes["after-text"] = holiday;
             }
 
             // Highlight today in month view
-            if ((args.View.Text != "Uge" && args.View.Text != "Dag") && args.Start.Date == DateTime.Today)
+            if ((args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_WEEK && args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Date == DateTime.Today)
             {
                 //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-                args.Attributes["class"] = "rz-background-color-warning-lighter";
+                args.Attributes["class"] = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_TODAY;
 
             }
 
             // Highlight working hours (9-18)
-            if ((args.View.Text == "Uge" || args.View.Text == "Dag") && args.Start.Hour > 8 && args.Start.Hour < 19)
+            if ((args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_WEEK || args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Hour > 8 && args.Start.Hour < 19)
             {
                 //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-                args.Attributes["class"] = "rz-background-color-success-lighter";
+                args.Attributes["class"] = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WORKHOURS;
             }
         }
 
@@ -264,13 +265,13 @@ namespace Clubscansub.BlazorApp.Pages
                 switch ((item as CourseSession).Course.CourseType)
                 {
                     case CourseTypeEnum.BaseCourse:
-                        return "school";
+                        return IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE;
                     case CourseTypeEnum.SpecialtyCourse:
-                        return "military_tech";
+                        return IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE;
                     case CourseTypeEnum.TechCourse:
-                        return "editor_choice";
+                        return IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE;
                     case CourseTypeEnum.ProCourse:
-                        return "social_leaderboard";
+                        return IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE;
 
                 }
             }
@@ -279,31 +280,46 @@ namespace Clubscansub.BlazorApp.Pages
             {
                 case ClubScansub.Utility.EventTypeEnum.Bådtur:
 
-                    return "sailing";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_BOAT;
 
                 case ClubScansub.Utility.EventTypeEnum.Stranddyk:
-                    return "beach_access";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_BEACH;
 
                 case ClubScansub.Utility.EventTypeEnum.Klubture:
-                    return "groups";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_CLUB;
 
                 case ClubScansub.Utility.EventTypeEnum.Other:
-                    return "other_admission";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_OTHER;
 
                 case ClubScansub.Utility.EventTypeEnum.Rejse:
-                    return "flight_takeoff";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL;
 
                 case ClubScansub.Utility.EventTypeEnum.Liveaboard:
-                    return "houseboat";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD;
 
                 case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
-                    return "unknown_document";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT;
 
                 default:
-                    return "";
+                    return IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT;
             }
         }
-
+        private string getCourseSessionIcon(ICalendarEvent item)
+        {
+            if (item is CourseSession)
+            {
+                switch ((item as CourseSession).Sessiontype)
+                {
+                    case CourseSessionTypeEnum.AcademicSession:
+                        return IconsTextsAndColors.Icons.COURSE_SESSION_ACADEMIC;
+                    case CourseSessionTypeEnum.PoolSession:
+                        return IconsTextsAndColors.Icons.COURSE_SESSION_POOL;
+                    case CourseSessionTypeEnum.OpenWaterSession:
+                        return IconsTextsAndColors.Icons.COURSE_SESSION_OW;
+                }
+            }
+            return "";
+        }
         private string? getHolidayName(DateTime date)
         {
             if (scheduler.DefaultCulture != null)

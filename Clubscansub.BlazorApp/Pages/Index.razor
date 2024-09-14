@@ -14,14 +14,14 @@
                     <RadzenSwitch Value="@showAllEvents" Change="setAllEventFilter" />
                 </RadzenStack>
 
-                <RadzenToggleButton title="Bådture åben for alle medlemmer" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="sailing" Value="getEventFilter(EventTypeEnum.Bådtur)" 
+                <RadzenToggleButton title="Bådture åben for alle medlemmer" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)" 
                     Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
-                <RadzenToggleButton title="Strandture åbent for alle medlemmer" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="beach_access" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
-                <RadzenToggleButton title="Klubture åbnet for premium medlemmer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="groups" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" />
-                <RadzenToggleButton title="Andre arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="other_admission" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
-                <RadzenToggleButton title="Rejser ell. længerevarende arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="flight_takeoff" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
-                <RadzenToggleButton title="Liveaboards og Ferier" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="houseboat" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
-                <RadzenToggleButton title="Ikke angivet arrangement" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="unknown_document" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
+                <RadzenToggleButton title="Strandture åbent for alle medlemmer" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
+                <RadzenToggleButton title="Klubture åbnet for premium medlemmer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" />
+                <RadzenToggleButton title="Andre arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
+                <RadzenToggleButton title="Rejser ell. længerevarende arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
+                <RadzenToggleButton title="Liveaboards og Ferier" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
+                <RadzenToggleButton title="Ikke angivet arrangement" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
 
             </RadzenStack>
         </RadzenStack>
@@ -35,10 +35,10 @@
                     <RadzenSwitch Value="@showAllCourses" Change="setAllCourseFilter" />
                 </RadzenStack>
 
-                <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="school" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
-                <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="military_tech" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))"  />
-                <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="editor_choice" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))"  />
-                <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="social_leaderboard" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))"  />
+                <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
+                <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))"  />
+                <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))"  />
+                <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))"  />
 
             </RadzenStack>
         </RadzenStack>
@@ -61,7 +61,13 @@
 
         <Template Context="context" >
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap">
-                <RadzenIcon Icon="@(getAppointmentIcon(context))"  Style="font-size:1.0rem;" />
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                    <RadzenIcon Icon="@(getAppointmentIcon(context))"  Style="font-size:1.0rem;" />
+                    @if (context is CourseSession)
+                    {
+                        <RadzenIcon Icon="@(getCourseSessionIcon(context))" Style="font-size:1.0rem;" />
+                    }
+                </RadzenStack>
                 <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem">@context.Title</span>
                 @* <RadzenText TextStyle="TextStyle.Body1" Text="@context.Title" Style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;color:#fff; font-size:0.8rem" /> *@
 
@@ -71,46 +77,17 @@
         <ChildContent>
 
             @* <RadzenDayView Text="Dag" TimeFormat="HH:mm" MinutesPerSlot="15" /> *@
-            <RadzenWeekView Text="Uge" TimeFormat="HH:mm" MinutesPerSlot="15" />
-            <RadzenMonthView MaxAppointmentsInSlot="4" Text="Måned" MoreText="More..." />
-            <RadzenYearView Text="År" />
-            <RadzenYearPlannerView Text="Planner"/>
-            <RadzenYearTimelineView Text ="Tidslinje"/>
+            <RadzenWeekView Text="@IconsTextsAndColors.Texts.SCHEDULER_WEEK" TimeFormat="HH:mm" MinutesPerSlot="15" />
+            <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
+            <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
+            <RadzenYearPlannerView Text="@IconsTextsAndColors.Texts.SCHEDULER_PLANNER" />
+            <RadzenYearTimelineView Text="@IconsTextsAndColors.Texts.SCHEDULER_TIMELINE" />
 
         </ChildContent>
 
     </RadzenScheduler>
 
 </RadzenStack>
-
-@* <RadzenRow Gap="5" RowGap="5">
-    <RadzenColumn Size="12">
-        <RadzenText Text="Scansub Events" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
-        <RadzenText Text="Your Success Is Our Biggest Priority" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H5" class="mt-5"></RadzenText>
-        <RadzenText Text="With Radzen Blazor Studio, application development is just one-click away." TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-4" Style="font-size: 20px; line-height: 24px"></RadzenText>
-        <RadzenText Text="Simple to setup, maintain and update." TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-3" Style="font-size: 20px; line-height: 24px"></RadzenText>
-        <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px;">
-            <RadzenRow>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenIcon Icon="smart_button" Style="margin-top: 20px; width: 48px; height: 48px; font-size: 48px; color: var(--rz-text-title-color);"></RadzenIcon>
-                    <RadzenText Text="Learn the Fundamentals" TextStyle="Radzen.Blazor.TextStyle.DisplayH6" TagName="Radzen.Blazor.TagName.H3"></RadzenText>
-                    <RadzenLink Text="Docs" Path="https://www.radzen.com/blazor-studio/documentation/" Icon="east" Target="_blank" Style="font-size: 18px"></RadzenLink>
-                    <RadzenLink Text="Videos" Path="https://youtube.com/playlist?list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc" Icon="east" Target="_blank" Style="display: block; font-size: 18px"></RadzenLink>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenIcon Icon="code" Style="margin-top: 20px; width: 48px; height: 48px; font-size: 48px; color: var(--rz-text-title-color);"></RadzenIcon>
-                    <RadzenText Text="Radzen Blazor Components" TextStyle="Radzen.Blazor.TextStyle.DisplayH6" TagName="Radzen.Blazor.TagName.H3"></RadzenText>
-                    <RadzenLink Text="Demos" Path="https://blazor.radzen.com" Icon="east" Target="_blank" Style="font-size: 18px"></RadzenLink>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenIcon Icon="people_outline" Style="margin-top: 20px; width: 48px; height: 48px; font-size: 48px; color: var(--rz-text-title-color);"></RadzenIcon>
-                    <RadzenText Text="Radzen Community" TextStyle="Radzen.Blazor.TextStyle.DisplayH6" TagName="Radzen.Blazor.TagName.H3"></RadzenText>
-                    <RadzenLink Text="Radzen Blazor Studio Forums" Path="https://forum.radzen.com/c/radzen-blazor-studio/12" Icon="east" Target="_blank" Style="font-size: 18px"></RadzenLink>
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenCard>
-    </RadzenColumn>
-</RadzenRow> *@
 
 <style>
     .holiday {

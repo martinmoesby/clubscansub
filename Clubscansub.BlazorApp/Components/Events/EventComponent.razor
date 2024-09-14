@@ -29,17 +29,17 @@ else
                 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="calendar_month"></RadzenIcon>
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.CALENDAR"></RadzenIcon>
                         <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMM yyyy")" />
                     </RadzenStack>
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="alarm"></RadzenIcon>
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME"></RadzenIcon>
                         <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToShortTimeString()" />
                     </RadzenStack>
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="alarm_off"></RadzenIcon>
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME"></RadzenIcon>
                         <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToShortTimeString()" />
                     </RadzenStack>
 
@@ -48,12 +48,12 @@ else
                 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="payments"></RadzenIcon>
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT"></RadzenIcon>
                         <RadzenText TextStyle="TextStyle.Subtitle2">@Event.Price?.ToString("C2")</RadzenText>
                     </RadzenStack>
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="event_seat"></RadzenIcon>
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.ENROLLED"></RadzenIcon>
                         <RadzenText TextStyle="TextStyle.Subtitle2">@Event.FreeSpots of @Event.MaxParticipants</RadzenText>
                     </RadzenStack>
 
@@ -65,13 +65,13 @@ else
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Normal">
                 @if (Event.StartDateAndTime < DateTime.Now)
                 {
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="check_circle" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="@IconsTextsAndColors.Icons.COMPLETED" />
                 }
                 else
                 {
                     if (Event.IsCancelled)
                     {
-                        <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="cancel" Shade="Shade.Lighter" Text="Event cancelled" Disabled />
+                        <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="@IconsTextsAndColors.Icons.CANCELLED" Shade="Shade.Lighter" Text="Event cancelled" Disabled />
                     }
                     else
                     {
@@ -80,17 +80,17 @@ else
                         {
                             if (currentUser.Balance > Event.Price)
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="person_add" Text="Sign me up" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" />
                             }
                             else
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="payments" Shade="Shade.Lighter" Text="Low balance" Disabled />
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="@IconsTextsAndColors.Icons.AMOUNT" Shade="Shade.Lighter" Text="Low balance" Disabled />
                             }
 
                         }
                         else
                         {
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="login" Shade="Shade.Lighter" Text="Please login first" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="@IconsTextsAndColors.Icons.LOGIN" Shade="Shade.Lighter" Text="Please login first" />
                         }
                     }
                 }
@@ -108,48 +108,18 @@ else
     <RadzenStack Gap="0">
         <RadzenTabs RenderMode="TabRenderMode.Client" SelectedIndex="0" TabPosition="TabPosition.Top">
             <Tabs>
-                <RadzenTabsItem Text="Description" Icon="info">
+                <RadzenTabsItem Text="Description" Icon="@IconsTextsAndColors.Icons.INFORMATION">
                     <RadzenText TextStyle="TextStyle.Body2">@(Event?.Divelocation?.Description)</RadzenText>
                 </RadzenTabsItem>
                 <AuthorizeView Roles="Administrator, Owner, Divepro">
-                    <RadzenTabsItem Text="Tilmeldte" Icon="social_leaderboard">
+                    <RadzenTabsItem Text="Tilmeldte" Icon="@IconsTextsAndColors.Icons.ENROLLED">
 
                         <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
                             <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0" />
                         </AuthorizeView>
 
                         <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" />
-@*                         <RadzenDataGrid TItem="EventUser" Data="@enrolledUsers" LoadData="OnLoadEnrolledUsers">
-                            <Columns>
-                                    <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
-                                        <Template Context="item">
-                                            <RadzenText Text="@item.ApplicationUser?.AccountNumber" TextStyle="TextStyle.Body1" />
-                                        </Template>
-                                    </RadzenDataGridColumn>
 
-                                    <RadzenDataGridColumn Title="Navn">
-                                        <Template Context="item">
-                                            <RadzenText TextStyle="TextStyle.Subtitle1">
-                                                @($"{item.ApplicationUser?.Firstname} {@item.ApplicationUser?.Lastname}")
-                                            </RadzenText>
-                                        </Template>
-                                    </RadzenDataGridColumn>
-
-                                    <RadzenDataGridColumn Title="Alder" TextAlign="TextAlign.Center" Width="60px">
-                                        <Template Context="item">
-                                            <RadzenText Text="@((new DateTime((DateTime.Now - item.ApplicationUser.DayOfbirth).Ticks).Year-1).ToString())" TextStyle="TextStyle.Body1" />
-                                        </Template>
-                                    </RadzenDataGridColumn>
-
-                                    <RadzenDataGridColumn Title="Telefon" TextAlign="TextAlign.Center" Width="120px">
-                                        <Template Context="item">
-                                            <RadzenText Text="@item.ApplicationUser?.PhoneNumber" TextStyle="TextStyle.Body1" />
-                                        </Template>
-                                    </RadzenDataGridColumn>
-                            </Columns>
-
-                        </RadzenDataGrid>
- *@
                     </RadzenTabsItem>
                 </AuthorizeView>
             </Tabs>
