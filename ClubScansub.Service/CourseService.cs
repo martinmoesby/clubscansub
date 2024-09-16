@@ -39,7 +39,19 @@ namespace ClubScansub.Service
 
         public async Task<IList<Course>> GetAllAsync()
         {
-            var data = context.Courses.Where(x=> x.StartDateAndTime > DateTime.UtcNow);
+            var data = context.Courses
+                .Include(x=>x.CourseSessions)
+                .Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
+                .Where(x=> x.StartDateAndTime > DateTime.UtcNow);
+            return await data.ToListAsync();
+        }
+
+        public async Task<IList<Course>> GetStartedOrCompletedAsync()
+        {
+            var data = context.Courses
+                .Include(x => x.CourseSessions)
+                .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
+                .Where(x => x.StartDateAndTime < DateTime.UtcNow);
             return await data.ToListAsync();
         }
 
@@ -58,6 +70,7 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
+
         public Task<Course> UpdateAsync(Course item)
         {
             throw new NotImplementedException();
@@ -73,6 +86,14 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
+        // Session functions
 
+
+        // Template functions
+        public async Task<IList<CourseTemplate>> GetTemplatesAsync()
+        {
+            var data = context.CourseTemplates.Include(x => x.Sessions);
+            return await data.ToListAsync();   
+        }
     }
 }

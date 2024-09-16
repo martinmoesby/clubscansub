@@ -3,6 +3,7 @@ using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
             return await GetUsersByEvent(EventId);
         }
-        public async Task RemoveUserFromEvent(string userId, int courseId)
+        public async Task<IList<EventUser>> RemoveUserFromEvent(string userId, int courseId)
         {
             var eventUser = await context.EventUsers.FindAsync(userId, courseId);
             if (eventUser != null)
@@ -43,6 +44,7 @@ namespace ClubScansub.Service
                 //TODO: Refund any payments for this course made to users account...
                 await context.SaveChangesAsync();
             }
+            return await GetUsersByEvent(courseId);
         }
 
     }

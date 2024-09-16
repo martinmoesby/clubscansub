@@ -26,7 +26,7 @@
                 <RadzenText Text="@item.ApplicationUser?.PhoneNumber" TextStyle="TextStyle.Body1" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Width="40px">
+        <RadzenDataGridColumn Width="40px" Visible="!ReadOnly">
             <Template Context="item">
                 <RadzenButton Icon="@IconsTextsAndColors.Icons.DELETE" Size="ButtonSize.Small" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter" Click="@(() => removeUserFromEvent_Click(item.ApplicationUser))" />
             </Template>

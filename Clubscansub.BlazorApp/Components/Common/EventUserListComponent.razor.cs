@@ -13,6 +13,8 @@ namespace Clubscansub.BlazorApp.Components.Common
         [Parameter]
         public EventCallback<ApplicationUser> OnRemoveUser { get; set; }
 
+        [Parameter]
+        public bool ReadOnly { get; set; } = false;
         private void removeUserFromEvent_Click(ApplicationUser user)
         {
             OnRemoveUser.InvokeAsync(user);

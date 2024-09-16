@@ -51,19 +51,19 @@ namespace Clubscansub.BlazorApp.Pages
         private Dictionary<EventTypeEnum, bool> eventTypeFilters = new Dictionary<EventTypeEnum, bool>() 
         {
             { EventTypeEnum.Bådtur, true },
-            { EventTypeEnum.Stranddyk, true },
+            { EventTypeEnum.Stranddyk, false },
             { EventTypeEnum.Klubture, true },
             { EventTypeEnum.Other, true },
-            { EventTypeEnum.Liveaboard, true },
-            { EventTypeEnum.Rejse, true },
+            { EventTypeEnum.Liveaboard, false },
+            { EventTypeEnum.Rejse, false },
             { EventTypeEnum.NotAnEvent, false }
         };
 
         private Dictionary<CourseTypeEnum, bool> courseTypeFilters = new Dictionary<CourseTypeEnum, bool>() {
             {    CourseTypeEnum.BaseCourse, true },
             {    CourseTypeEnum.SpecialtyCourse, true },
-            {    CourseTypeEnum.TechCourse, true },
-            {    CourseTypeEnum.ProCourse, true }
+            {    CourseTypeEnum.TechCourse, false },
+            {    CourseTypeEnum.ProCourse, false }
         };
 
         private bool showAllEvents { get; set; } = false;
@@ -92,42 +92,39 @@ namespace Clubscansub.BlazorApp.Pages
                 {
                     case ClubScansub.Utility.EventTypeEnum.Bådtur:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_BOAT;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_BOAT;
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Stranddyk:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_BEACH;
                         fgClass = IconsTextsAndColors.ColorClasses.FG_BEACH;
-
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Klubture:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_CLUB;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_CLUB;
                         break;
-
 
                     case ClubScansub.Utility.EventTypeEnum.Other:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_OTHER;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_OTHER;
                         break;
-
 
                     case ClubScansub.Utility.EventTypeEnum.Rejse:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_TRAVEL;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_TRAVEL;
                         break;
 
                     case ClubScansub.Utility.EventTypeEnum.Liveaboard:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_LIVEABOARD;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_LIVEABOARD;
                         break;
-
 
                     case ClubScansub.Utility.EventTypeEnum.NotAnEvent:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_NOTEVENT;
-
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_NOTEVENT;
                         break;
+
                     default:
                         break;
                 }
@@ -139,19 +136,21 @@ namespace Clubscansub.BlazorApp.Pages
                 {
                     case CourseTypeEnum.BaseCourse:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
-                        fgClass = "rz-color-black";
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
                         break;
                     case CourseTypeEnum.SpecialtyCourse:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
                         break;
                     case CourseTypeEnum.TechCourse:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
                         break;
                     case CourseTypeEnum.ProCourse:
                         bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
+                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
                         break;
                     default:
-                        bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
                         break;
 
                 }

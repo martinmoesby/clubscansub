@@ -9,6 +9,6 @@ namespace ClubScansub.Service.Interfaces
 {
     internal interface ICourseService : IGenericService<Course>
     {
-
+        Task<IList<CourseTemplate>> GetTemplatesAsync();
     }
 }

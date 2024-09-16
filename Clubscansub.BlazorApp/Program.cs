@@ -65,14 +65,18 @@ builder.Services.Configure<ServiceOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddRazorComponents();
+builder.Services.AddRadzenComponents();
+
 builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 {
     o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
 });
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+//builder.Services.AddScoped<ThemeService>();
+//builder.Services.AddScoped<DialogService>();
+//builder.Services.AddScoped<NotificationService>();
+//builder.Services.AddScoped<TooltipService>();
+//builder.Services.AddScoped<ContextMenuService>();
 
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddSingleton<ISmsSender, SmsSender>();
