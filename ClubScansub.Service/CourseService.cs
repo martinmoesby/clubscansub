@@ -22,9 +22,21 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task<IList<Course>> AddAsync(IList<Course> Items)
+        public async Task<IList<Course>> AddAsync(IList<Course> Items)
         {
-            throw new NotImplementedException();
+            foreach (var item in Items)
+            {
+                
+                context.Attach(item).State = Microsoft.EntityFrameworkCore.EntityState.Added; 
+                //foreach (var subitem in item.CourseSessions)
+                //{
+                //    context.Attach(subitem).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                //}
+                
+            }
+            await context.SaveChangesAsync();
+            return Items;
+
         }
 
         public Task<IList<Course>> AddAsync(params Course[] Items)

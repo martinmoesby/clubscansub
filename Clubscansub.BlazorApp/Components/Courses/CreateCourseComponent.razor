@@ -3,30 +3,55 @@
 @using System.Globalization
 @using Nager.Date
 @using Nager.Date.Model
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;border:1px solid red">
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;border:1px solid green">
-        <RadzenDropDown Data="@courseTemplates" TValue="CourseTemplate" @bind-Value="@selectedTemplate" TextProperty="@nameof(CourseTemplate.TemplateName)" class="rz-mb-5" Style="width:100%" />
-        @if (selectedTemplate != null)
-        {
-            <RadzenDataList Data="@selectedTemplate?.Sessions" TItem="CourseSessionTemplate">
-                <Template Context="item">
-                    <RadzenText draggable="true" Text="@item.Name" />
-                </Template>
-            </RadzenDataList>
 
-        }
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;border:">
+
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;">
+        <CourseTypeToggleButtonsComponent OnFilter="@((args) => filterCourseTemplates(args))" Alignment="JustifyContent.Start" InitialFilters="@initialCoursetypeFilter">
+@*             <End>
+                <RadzenButton Icon="reset" ButtonStyle ="ButtonStyle.Success" Click="resetSelectedTemplate" />
+            </End> *@
+        </CourseTypeToggleButtonsComponent>   
+
+        <RadzenRadioButtonList Data="@filteredTemplates" TValue="CourseTemplate" TextProperty="@nameof(CourseTemplate.TemplateName)" Orientation="Orientation.Vertical" Value="selectedTemplate" Change="@(args => setSelectedTemplate(args))" Style="flex:1"/>
+
+        <RadzenStack JustifyContent="JustifyContent.End" Style="flex:1">
+            <RadzenText Text="New courses to be created" TextStyle="TextStyle.Subtitle2" />
+        <RadzenDataGrid Data="@courses" TItem="Course">
+
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
+                    <Template Context="item">
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name" />
+
+                <RadzenDataGridColumn Property="@nameof(Course.StartDateAndTime)" Width="160px" Title="Start Date" />
+                <RadzenDataGridColumn Property="@nameof(Course.EndDateAndTime)" Width="160px" Title="End Date" />
+
+            </Columns>
+        </RadzenDataGrid>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitCourses" Text="Save courses" Icon="save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetCourses" Text="Reset" Icon="cancel" />
+        </RadzenStack>
     </RadzenStack>
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;border:1px solid blue">
+
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
 
         <RadzenScheduler TItem="CourseSession"
                          AppointmentMove="onAppointmentMove"
+                         AppointmentRender="onAppointmentRender"
                          SlotSelect="setStartDate"
                          SlotRender="OnSlotRender"
                          StartProperty="@nameof(CourseSession.StartDateAndTime)"
                          EndProperty="@nameof(CourseSession.EndDateAndTime)"
                          TextProperty="@nameof(CourseSession.SessionName)"
                          SelectedIndex="0"
-                         Data="@courseSessions"
+                         Data="@activeCourseSessions"
                          Style="width:100%;height:100%"
                          >
             <ChildContent>
@@ -35,6 +60,15 @@
                 <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
 
             </ChildContent>
+            <Template Context="item">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.Course.CourseType)" />
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon(item.Sessiontype)" />
+                    </RadzenStack>
+                    <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@item.Course.CourseName</span>
+                </RadzenStack>
+            </Template>
 
         </RadzenScheduler>
     </RadzenStack>
@@ -57,10 +91,18 @@
 
 
     private IList<CourseTemplate> courseTemplates = new List<CourseTemplate>();
+    private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTemplate selectedTemplate;
 
-    private Course course = new();
-    private IList<CourseSession> courseSessions; // = new List<CourseSession>();
+    private IList<Course> courses = new List<Course>();
+    private IList<CourseSession> activeCourseSessions = new List<CourseSession>();
+    private Dictionary<CourseTypeEnum, bool> initialCoursetypeFilter = new Dictionary<CourseTypeEnum, bool>()
+    {
+        { CourseTypeEnum.BaseCourse, true},
+        { CourseTypeEnum.SpecialtyCourse, false},
+        { CourseTypeEnum.TechCourse, false},
+        { CourseTypeEnum.ProCourse, false}
+    };
 
 
     private DateTime? selectedStartDate;
@@ -72,14 +114,31 @@
         if (firstRender)
         {
             courseTemplates = await courseService.GetTemplatesAsync();
-            StateHasChanged();
+            filterCourseTemplates(initialCoursetypeFilter);
         }
     }
 
+    private void setSelectedTemplate(CourseTemplate template) 
+    {
+        selectedStartDate = null;
+        selectedTemplate = template;
+    }
+
+    private void filterCourseTemplates(Dictionary<CourseTypeEnum,bool> courseTypes)
+    {
+        selectedTemplate = null;
+        selectedStartDate = null;
+        var selectedTypes = courseTypes.Where(x => x.Value == true).Select(x => x.Key);
+        filteredTemplates = courseTemplates.Where(x => selectedTypes.Contains(x.CourseType)).ToList();
+        StateHasChanged();
+    }
 
     private void setStartDate(SchedulerSlotSelectEventArgs args)
     {
         args.PreventDefault();
+
+        if (args.Start.Date < DateTime.Now.Date)
+            return;
 
         if (selectedStartDate == null)
         {
@@ -88,15 +147,18 @@
             if (firstSession == null)
                 return;
 
-            course = new Course()
+            var course = new Course()
                 {
                     CourseName = selectedTemplate.TemplateName,
                     CourseTemplate = selectedTemplate,
                     CourseType = selectedTemplate.CourseType,
                     MinParticipants = selectedTemplate.MinStudents,
                     MaxParticipants = selectedTemplate.MaxStudents,
+                    FixedParticipants = 0,
+                    Title = $"{selectedTemplate.TemplateName} - {args.Start.ToString("MMM")}",
                     StartDateAndTime = args.Start,
                     Price = selectedTemplate.DefaultPrice,
+                    PremiumPrice = selectedTemplate.DefaultPrice,
                     EventType = EventTypeEnum.NotAnEvent
                 };
 
@@ -105,7 +167,7 @@
             if (selectedTemplate.Sessions.Count > 0)
             {
                 course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
-                courseSessions = new List<CourseSession>();
+                var courseSessions = new List<CourseSession>();
 
                 foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
                 {
@@ -126,23 +188,59 @@
                             Duration = item.DefaultDuration,
                             Address = item.Address,
                             SessionName = item.Name,
-                            SessionDescription = item.Description
+                            SessionDescription = item.Description,
+                            Course = course
                         });
 
                     currentDate = currentDate.AddDays(1);
                     currentWeekDay = currentDate.DayOfWeek;
                 }
+                course.CourseSessions = courseSessions;
             }
 
-            course.CourseSessions = courseSessions;
+            courses.Add(course);
+            activeCourseSessions = courses.SelectMany(x => x.CourseSessions).ToList();
+            selectedStartDate = null;
             StateHasChanged();
         }
+    }
+
+    private void onAppointmentRender(SchedulerAppointmentRenderEventArgs<CourseSession> args)
+    {
+        string baseClassString = "rz-pl-3 rz-event-content";
+        string bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
+        string fgClass = IconsTextsAndColors.ColorClasses.FG_DEFAULT;
+
+        switch ((args.Data as CourseSession).Course?.CourseType)
+        {
+            case CourseTypeEnum.BaseCourse:
+                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
+                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
+                break;
+            case CourseTypeEnum.SpecialtyCourse:
+                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
+                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
+                break;
+            case CourseTypeEnum.TechCourse:
+                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
+                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
+                break;
+            case CourseTypeEnum.ProCourse:
+                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
+                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
+                break;
+            default:
+                break;
+
+        }
+        args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
     }
 
     private void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
     {
         Console.WriteLine(args.Appointment.Data.ToString());
     }
+
     private string? getHolidayName(DateTime date)
     {
 
@@ -163,6 +261,9 @@
 
     private void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
+        if (args.Start.Date < DateTime.Now.Date)
+            return;
+
         string? holiday = getHolidayName(args.Start.Date);
         string additionalClass = "";
 
@@ -198,5 +299,15 @@
         args.Attributes["class"] = $"scheduler-slot {additionalClass}";
     }
 
-
+    private async void commitCourses()
+    {
+        await courseService.AddAsync(courses);
+        resetCourses();
+    }
+    private void resetCourses()
+    {
+        courses = new List<Course>();
+        activeCourseSessions = null;
+        StateHasChanged();
+    }
 }

@@ -1,5 +1,5 @@
 ﻿@using ClubScansub.Utility
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width:100%">
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@Alignment" AlignItems="AlignItems.Center" Style="width:100%">
     @Start
     <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.BaseCourse))" />
     <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.SpecialtyCourse))" />
@@ -12,6 +12,9 @@
 
     [Parameter]
     public RenderFragment Start { get; set; }
+
+    [Parameter]
+    public JustifyContent Alignment { get; set; } = JustifyContent.Normal;
 
     [Parameter]
     public Dictionary<CourseTypeEnum, bool> InitialFilters { get; set; } = new Dictionary<CourseTypeEnum, bool>() {
