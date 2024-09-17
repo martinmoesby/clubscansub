@@ -17,7 +17,8 @@
 
         <RadzenStack JustifyContent="JustifyContent.End" Style="flex:1">
             <RadzenText Text="New courses to be created" TextStyle="TextStyle.Subtitle2" />
-        <RadzenDataGrid Data="@courses" TItem="Course">
+
+            <RadzenDataGrid Data="@newCourses" TItem="Course" @ref=newCoursesGrid>
 
             <Columns>
                 <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
@@ -31,7 +32,7 @@
                 <RadzenDataGridColumn Property="@nameof(Course.EndDateAndTime)" Width="160px" Title="End Date" />
 
             </Columns>
-        </RadzenDataGrid>
+            </RadzenDataGrid>
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
@@ -89,12 +90,12 @@
     [Inject]
     CourseService courseService { get; set; }
 
-
+    private RadzenDataGrid<Course> newCoursesGrid;
     private IList<CourseTemplate> courseTemplates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTemplate selectedTemplate;
 
-    private IList<Course> courses = new List<Course>();
+    private IList<Course> newCourses = new List<Course>();
     private IList<CourseSession> activeCourseSessions = new List<CourseSession>();
     private Dictionary<CourseTypeEnum, bool> initialCoursetypeFilter = new Dictionary<CourseTypeEnum, bool>()
     {
@@ -137,7 +138,7 @@
     {
         args.PreventDefault();
 
-        if (args.Start.Date < DateTime.Now.Date)
+        if (args.Start.Date < DateTime.Now.Date || selectedTemplate == null)
             return;
 
         if (selectedStartDate == null)
@@ -194,12 +195,15 @@
 
                     currentDate = currentDate.AddDays(1);
                     currentWeekDay = currentDate.DayOfWeek;
+
                 }
+                course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);
                 course.CourseSessions = courseSessions;
             }
 
-            courses.Add(course);
-            activeCourseSessions = courses.SelectMany(x => x.CourseSessions).ToList();
+            newCourses.Add(course);
+            InvokeAsync(newCoursesGrid.RefreshDataAsync);
+            activeCourseSessions = newCourses.SelectMany(x => x.CourseSessions).ToList();
             selectedStartDate = null;
             StateHasChanged();
         }
@@ -301,12 +305,12 @@
 
     private async void commitCourses()
     {
-        await courseService.AddAsync(courses);
+        await courseService.AddAsync(newCourses);
         resetCourses();
     }
     private void resetCourses()
     {
-        courses = new List<Course>();
+        newCourses = new List<Course>();
         activeCourseSessions = null;
         StateHasChanged();
     }

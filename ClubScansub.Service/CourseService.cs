@@ -44,9 +44,11 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Course Item)
+        public async Task DeleteAsync(Course Item)
         {
-            throw new NotImplementedException();
+            context.Attach(Item).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await context.SaveChangesAsync();
+
         }
 
         public async Task<IList<Course>> GetAllAsync()

@@ -3,7 +3,7 @@
 @using ClubScansub.Utility
 
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5">
-    <RadzenButton ButtonStyle="ButtonStyle.Success" Click="createNewCourse" Text="New..." Icon="add_circle" Shade="Shade.Light" />
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Click="createNewCourse" Text="Courseplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" />
 </RadzenStack>
 
 <RadzenDataGrid Data="@courses" TItem="Course">
@@ -27,7 +27,11 @@
                 <RadzenText Text="@item.Participants.Count.ToString()" TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center" />
             </Template>
         </RadzenDataGridColumn>
-
+        <RadzenDataGridColumn Width="80px">
+            <Template Context="item">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Shade="Shade.Light" Icon="delete" Click="@(() => deleteCourse(item))" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 @code {
@@ -53,6 +57,21 @@
             StateHasChanged();
         }
 
+    }
+
+    private async void deleteCourse(Course item)
+    {
+        if (item.Participants.Count > 0)
+        {
+            await dialogService.Alert("Move participants to a different course before deleting the course from the system", "Cannot delete a course with participants", new AlertOptions()
+                {
+                    OkButtonText = "OK",
+                });
+            return;
+        }
+        await courseService.DeleteAsync(item);
+        courses = await courseService.GetAllAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async void addNewStudent(RegisterUserResult newUser, int CourseId)
@@ -92,6 +111,8 @@
                 Height = "100%",
                 ContentCssClass = "fullHeight"
             });
+        courses = await courseService.GetAllAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
 }
