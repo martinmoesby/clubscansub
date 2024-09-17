@@ -1,0 +1,202 @@
+﻿@using ClubScansub.Service
+@using ClubScansub.Utility
+@using System.Globalization
+@using Nager.Date
+@using Nager.Date.Model
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;border:1px solid red">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;border:1px solid green">
+        <RadzenDropDown Data="@courseTemplates" TValue="CourseTemplate" @bind-Value="@selectedTemplate" TextProperty="@nameof(CourseTemplate.TemplateName)" class="rz-mb-5" Style="width:100%" />
+        @if (selectedTemplate != null)
+        {
+            <RadzenDataList Data="@selectedTemplate?.Sessions" TItem="CourseSessionTemplate">
+                <Template Context="item">
+                    <RadzenText draggable="true" Text="@item.Name" />
+                </Template>
+            </RadzenDataList>
+
+        }
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;border:1px solid blue">
+
+        <RadzenScheduler TItem="CourseSession"
+                         AppointmentMove="onAppointmentMove"
+                         SlotSelect="setStartDate"
+                         SlotRender="OnSlotRender"
+                         StartProperty="@nameof(CourseSession.StartDateAndTime)"
+                         EndProperty="@nameof(CourseSession.EndDateAndTime)"
+                         TextProperty="@nameof(CourseSession.SessionName)"
+                         SelectedIndex="0"
+                         Data="@courseSessions"
+                         Style="width:100%;height:100%"
+                         >
+            <ChildContent>
+
+                <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
+                <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
+
+            </ChildContent>
+
+        </RadzenScheduler>
+    </RadzenStack>
+</RadzenStack>
+<style>
+    .scheduler-slot {
+       
+    }
+
+        .scheduler-slot:hover {
+            cursor:pointer;
+            background-color: var(--rz-secondary-lighter) !important;
+    }
+</style>
+
+@code {
+
+    [Inject]
+    CourseService courseService { get; set; }
+
+
+    private IList<CourseTemplate> courseTemplates = new List<CourseTemplate>();
+    private CourseTemplate selectedTemplate;
+
+    private Course course = new();
+    private IList<CourseSession> courseSessions; // = new List<CourseSession>();
+
+
+    private DateTime? selectedStartDate;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            courseTemplates = await courseService.GetTemplatesAsync();
+            StateHasChanged();
+        }
+    }
+
+
+    private void setStartDate(SchedulerSlotSelectEventArgs args)
+    {
+        args.PreventDefault();
+
+        if (selectedStartDate == null)
+        {
+            selectedStartDate = args.Start;
+            var firstSession = selectedTemplate.Sessions.First();
+            if (firstSession == null)
+                return;
+
+            course = new Course()
+                {
+                    CourseName = selectedTemplate.TemplateName,
+                    CourseTemplate = selectedTemplate,
+                    CourseType = selectedTemplate.CourseType,
+                    MinParticipants = selectedTemplate.MinStudents,
+                    MaxParticipants = selectedTemplate.MaxStudents,
+                    StartDateAndTime = args.Start,
+                    Price = selectedTemplate.DefaultPrice,
+                    EventType = EventTypeEnum.NotAnEvent
+                };
+
+            var currentDate = course.StartDateAndTime;
+            var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+            if (selectedTemplate.Sessions.Count > 0)
+            {
+                course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
+                courseSessions = new List<CourseSession>();
+
+                foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
+                {
+                    if (item.UseDefaultWeekDay)
+                    {
+                        while (currentWeekDay != item.DefaultWeekday)
+                        {
+                            currentDate = currentDate.AddDays(1);
+                            currentWeekDay = currentDate.DayOfWeek;
+                        }
+                    }
+
+                    courseSessions.Add(new CourseSession()
+                        {
+                            CourseSessionTemplate = item,
+                            DateTime = currentDate.Add(item.DefaultStartTime),
+                            Sessiontype = item.SessionType,
+                            Duration = item.DefaultDuration,
+                            Address = item.Address,
+                            SessionName = item.Name,
+                            SessionDescription = item.Description
+                        });
+
+                    currentDate = currentDate.AddDays(1);
+                    currentWeekDay = currentDate.DayOfWeek;
+                }
+            }
+
+            course.CourseSessions = courseSessions;
+            StateHasChanged();
+        }
+    }
+
+    private void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        Console.WriteLine(args.Appointment.Data.ToString());
+    }
+    private string? getHolidayName(DateTime date)
+    {
+
+        var year = date.Year;
+        var culture = CultureInfo.CurrentUICulture;
+
+        var region = new RegionInfo(culture.LCID);
+        CountryCode countryCode = (CountryCode)Enum.Parse(typeof(CountryCode), region.Name);
+        PublicHoliday[] holidays;
+        var IsHoliday = DateSystem.IsPublicHoliday(date, countryCode, out holidays);
+        if (holidays.Length != 0)
+        {
+            return holidays.FirstOrDefault(x => x.Date == date)?.LocalName;
+        }
+        return null;
+
+    }
+
+    private void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        string? holiday = getHolidayName(args.Start.Date);
+        string additionalClass = "";
+
+        if (args.Start.DayOfWeek == DayOfWeek.Sunday || args.Start.DayOfWeek == DayOfWeek.Saturday)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WEEKEND;
+        }
+
+        if (!string.IsNullOrEmpty(holiday))
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
+            additionalClass = "holiday " + IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_HOLIDAY;
+            if (args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_MONTH)
+                args.Attributes["after-text"] = holiday;
+        }
+
+        // Highlight today in month view
+        if ((args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_WEEK && args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Date == DateTime.Today)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_TODAY;
+
+        }
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_WEEK || args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WORKHOURS;
+        }
+
+        args.Attributes["class"] = $"scheduler-slot {additionalClass}";
+    }
+
+
+}

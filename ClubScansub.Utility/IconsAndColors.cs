@@ -100,5 +100,36 @@
             public static string SCHEDULER_SLOT_BG_WORKHOURS = "rz-background-color-success-lighter";
 
         }
+
+        public static string GetCourseIcon(CourseTypeEnum item)
+        {
+            switch (item)
+            {
+                case CourseTypeEnum.BaseCourse:
+                    return Icons.EVENTTYPE_BASE_COURSE;
+                case CourseTypeEnum.SpecialtyCourse:
+                    return Icons.EVENTTYPE_SPEC_COURSE;
+                case CourseTypeEnum.TechCourse:
+                    return Icons.EVENTTYPE_TECH_COURSE;
+                case CourseTypeEnum.ProCourse:
+                    return Icons.EVENTTYPE_PRO_COURSE;
+
+            }
+            return "";
+        }
+
+        public static string GetCourseSessionIcon(CourseSessionTypeEnum item)
+        {
+            switch (item)
+            {
+                case CourseSessionTypeEnum.AcademicSession:
+                    return Icons.COURSE_SESSION_ACADEMIC;
+                case CourseSessionTypeEnum.PoolSession:
+                    return Icons.COURSE_SESSION_POOL;
+                case CourseSessionTypeEnum.OpenWaterSession:
+                    return Icons.COURSE_SESSION_OW;
+            }
+            return "";
+        }
     }
 }

@@ -5,12 +5,14 @@ namespace Clubscansub.BlazorApp.Components.Common
     public partial class SearchComponent : ComponentBase
     {
         [Parameter]
+        public string Placeholder { get; set; }
+        [Parameter]
         public EventCallback<string> Search { get; set; }
 
         [Parameter]
         public EventCallback Reset { get; set; }
 
-        private string searchFilter = "";
+        private string searchFilter;
 
         async void onSearchFilterChanged()
         {
@@ -19,7 +21,7 @@ namespace Clubscansub.BlazorApp.Components.Common
 
         async void resetSearchFilter()
         {
-            searchFilter = "";
+            searchFilter = null;
             await Reset.InvokeAsync();
         }
     }

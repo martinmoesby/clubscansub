@@ -1,0 +1,42 @@
+﻿@using ClubScansub.Utility
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width:100%">
+    @Start
+    <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.BaseCourse))" />
+    <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.SpecialtyCourse))" />
+    <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.TechCourse))" />
+    <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.ProCourse))" />
+    @End
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public RenderFragment Start { get; set; }
+
+    [Parameter]
+    public Dictionary<CourseTypeEnum, bool> InitialFilters { get; set; } = new Dictionary<CourseTypeEnum, bool>() {
+            {    CourseTypeEnum.BaseCourse, true },
+            {    CourseTypeEnum.SpecialtyCourse, true },
+            {    CourseTypeEnum.TechCourse, true },
+            {    CourseTypeEnum.ProCourse, true }
+        };
+
+    [Parameter]
+    public RenderFragment End { get; set; }
+
+    [Parameter]
+    public EventCallback<Dictionary<CourseTypeEnum, bool>> OnFilter { get; set; }
+
+    private bool getCourseFilter(CourseTypeEnum type)
+    {
+        bool value = true;
+        InitialFilters.TryGetValue(type, out value);
+        return value;
+    }
+
+    private void setCourseFilter(CourseTypeEnum type)
+    {
+        InitialFilters[type] = !InitialFilters[type];
+        OnFilter.InvokeAsync(InitialFilters);
+    }
+}

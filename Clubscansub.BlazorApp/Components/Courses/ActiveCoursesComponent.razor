@@ -1,0 +1,102 @@
+﻿@using ClubScansub.Service
+@using ClubScansub.Service.ServiceResults
+@using ClubScansub.Utility
+
+<RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5">
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Click="createNewCourse" Text="New..." Icon="add_circle" Shade="Shade.Light" />
+</RadzenStack>
+
+<RadzenDataGrid Data="@courses" TItem="Course">
+    <Template Context="course">
+        <EventUserActionsComponent AddNewUser="@((args) => addNewStudent(args, course.Id))" AddExistingUser="@((args) => enrollExistingUser(args,course.Id))" Visible="@(course.FreeSpots > 0 || course.StartDateAndTime> DateTime.Now)" ShowAddNewUser="true" />
+        <EventUserListComponent EventUsers="course.Participants.ToList()" OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))" />
+    </Template>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
+            <Template Context="item">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Property="@nameof(Course.StartDateAndTime)" Width="160px" Title="Start Date" />
+        <RadzenDataGridColumn Property="@nameof(Course.EndDateAndTime)" Width="160px" Title="End Date" />
+        <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name" />
+
+        <RadzenDataGridColumn Title="Participants" Width="120px">
+            <Template Context="item">
+                <RadzenText Text="@item.Participants.Count.ToString()" TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center" />
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+@code {
+
+    [Inject]
+    DialogService dialogService { get; set; }
+
+    [Inject]
+    EventUserService eventUserService { get; set; }
+
+    [Inject]
+    CourseService courseService { get; set; }
+
+    private IList<Course> courses = new List<Course>();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            courses = await courseService.GetAllAsync();
+            StateHasChanged();
+        }
+
+    }
+
+    private async void addNewStudent(RegisterUserResult newUser, int CourseId)
+    {
+        dialogService.CloseSide();
+        enrollExistingUser(newUser.User.Id, CourseId);
+    }
+
+    private async void enrollExistingUser(string selectedUserId, int CourseId)
+    {
+        var activecourse = courses.FirstOrDefault(x => x.Id == CourseId);
+
+        //TODO: Remove user from course and return any deposits made for the enrollment
+        activecourse.Participants = await eventUserService.AddUserToEvent(selectedUserId, CourseId);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void removeUserFromCourse(ApplicationUser user, int CourseId)
+    {
+        var confirm = (await dialogService.Confirm($"Do you want to remove {user.Name} from the course?", "Remove user"));
+        if (confirm.Value)
+        {
+            var activecourse = courses.FirstOrDefault(x => x.Id == CourseId);
+
+            //TODO: Remove user from course and return any deposits made for the enrollment
+            activecourse.Participants = await eventUserService.RemoveUserFromEvent(user.Id, CourseId);
+            await InvokeAsync(StateHasChanged);
+
+        }
+    }
+
+    private async void createNewCourse()
+    {
+        await dialogService.OpenAsync<CreateCourseComponent>("Create New Course", null, new DialogOptions()
+            {
+                Width = "80%",
+                Height = "100%",
+                ContentCssClass = "fullHeight"
+            });
+    }
+
+}
+<style>
+    .fullHeight {
+        height:100%
+    }
+</style>

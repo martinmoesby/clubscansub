@@ -1,5 +1,5 @@
 ﻿@page "/admin/courses"
-@using ClubScansub.Utility
+
 <PageTitle>Course Management</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
 
@@ -7,155 +7,24 @@
         <RadzenText TextStyle="TextStyle.DisplayH6" Text="Course management" />
         @* <SearchComponent Reset="@resetSearchFilter" Search="@applySearchFilter" /> *@
     </RadzenStack>
+
     <RadzenTabs RenderMode="TabRenderMode.Server">
         <Tabs>
             <RadzenTabsItem Text="Course templates">
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-5">
 
-                    <RadzenSelectBar Size="ButtonSize.Small" TValue="CourseTypeEnum" @bind-Value="@selectedCourseType" Change="() => applyTemplateFilter()">
-                        <Items>
-                            <RadzenSelectBarItem Icon="@getCourseIcon(CourseTypeEnum.BaseCourse)" Value="CourseTypeEnum.BaseCourse" Text="Basis kurser" />
-                            <RadzenSelectBarItem Icon="@getCourseIcon(CourseTypeEnum.SpecialtyCourse)" Value="CourseTypeEnum.SpecialtyCourse" Text="Specialer" />
-                            <RadzenSelectBarItem Icon="@getCourseIcon(CourseTypeEnum.TechCourse)" Value="CourseTypeEnum.TechCourse" Text="Tekniske kurser" />
-                            <RadzenSelectBarItem Icon="@getCourseIcon(CourseTypeEnum.ProCourse)" Value="CourseTypeEnum.ProCourse" Text="Dive Professionel kurser" />
-                        </Items>
-                    </RadzenSelectBar>
+                <CourseTemplatesComponent />
 
-                </RadzenStack>
-
-                <RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate">
-                    <Template Context="sessiondetails">
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenText Text="Course sessions" TextStyle="TextStyle.Subtitle1"></RadzenText>
-                            <RadzenDataGrid Data="@sessiondetails.Sessions.OrderBy(x=>x.SessionNumber)" TItem="CourseSessionTemplate">
-                            <Columns>
-                                <RadzenDataGridColumn Width="40px">
-                                    <Template Context="sessionItem">
-                                        <RadzenIcon Icon="@getCourseSessionIcon(@sessionItem.SessionType)" />
-                                    </Template>
-                                </RadzenDataGridColumn>
-                                <RadzenDataGridColumn Property="@nameof(CourseSessionTemplate.Description)" Title="Description">
-                                    <Template Context="sessionItem">
-                                        <RadzenText Text="@sessionItem.Name" TextStyle="TextStyle.Subtitle2" />
-                                        <RadzenText Text="@sessionItem.Description" Style="white-space:normal" TextStyle="TextStyle.Body2" />
-                                    </Template>
-                                </RadzenDataGridColumn>
-                                <RadzenDataGridColumn Property="@nameof(CourseSessionTemplate.DefaultWeekday)" Title="Default weekday and time" Width="180px;">
-                                    <Template Context="sessionItem">
-
-                                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.CALENDAR" />
-                                            <RadzenText Text="@sessionItem.DefaultWeekday.ToString()" TextStyle="TextStyle.Body2" />
-                                        </RadzenStack>
-
-                                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" />
-                                            <RadzenText Text="@sessionItem.DefaultStartTime.ToString(@"hh\:mm")" TextStyle="TextStyle.Body2" />
-                                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" />
-                                            <RadzenText Text="@sessionItem.DefaultStartTime.Add(sessionItem.DefaultDuration).ToString(@"hh\:mm")" TextStyle="TextStyle.Body2" />
-                                        </RadzenStack>
-
-                                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-
-                                        </RadzenStack>
-                                    </Template>
-                                </RadzenDataGridColumn>
-                            </Columns>
-                        </RadzenDataGrid>
-
-                        </RadzenStack>
-                    </Template> 
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(CourseTemplate.CourseType)" Title="Course Type" Width="40px">
-                            <Template Context="item">
-                                <RadzenIcon Icon="@getCourseIcon(item.CourseType)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(CourseTemplate.TemplateName)" Title="Course Name">
-                            <Template Context="item">
-                                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@item.TemplateName" />
-                                <RadzenText TextStyle="TextStyle.Body2" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Title="Attendance requirements" Width="120px" TextAlign="TextAlign.Center">
-                            <Template Context="item">
-                                <RadzenStack Orientation="Orientation.Horizontal">
-                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MIN" />
-                                    <RadzenText TextStyle="TextStyle.Body2" Text="@item.MinStudents.ToString()" />
-                                </RadzenStack>
-                                <RadzenStack Orientation="Orientation.Horizontal">
-                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MAX" />
-                                    <RadzenText TextStyle="TextStyle.Body2" Text="@item.MaxStudents.ToString()" />
-                                </RadzenStack>
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(CourseTemplate.DefaultPrice)" Title="Price" Width="80px" TextAlign="TextAlign.Right" >
-                            <Template Context="item">
-                                <RadzenText TextStyle="TextStyle.Body2" Text="@item.DefaultPrice.ToString("C0")" />
-
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Active courses">
-                <RadzenDataGrid Data="@courses" TItem="Course">
-                    <Template Context="course">
-                           <EventUserActionsComponent AddNewUser="@((args) => addNewStudent(args, course.Id))" AddExistingUser="@((args) => enrollExistingUser(args,course.Id))" Visible="@(course.FreeSpots > 0 || course.StartDateAndTime> DateTime.Now)" ShowAddNewUser="true" />
-                            <EventUserListComponent EventUsers="course.Participants.ToList()" OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))" />
-                    </Template>
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Course Type" Width="40px">
-                            <Template Context="item">
-                                <RadzenIcon Icon="@getCourseIcon(item.CourseType)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name">
-
-                        </RadzenDataGridColumn>
-
-                    </Columns>
-                </RadzenDataGrid>
+                
+                <ActiveCoursesComponent />
 
             </RadzenTabsItem>
+
             <RadzenTabsItem Text="Completed courses">
-                <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
-
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
-                            <RadzenToggleButton @bind-Value="showOnlyExecutedCourses" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" ToggleShade="Shade.Lighter" Change="filterCompletedCourses" ToggleIcon="filter_list" Icon="filter_list_off" />
-                            <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.BaseCourse))" />
-                            <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.SpecialtyCourse))" />
-                            <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.TechCourse))" />
-                            <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.ProCourse))" />
-                        </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.End" Style="width:100%">
-                            <RadzenText Text="Student" TextStyle="TextStyle.Body2" />
-                            <SearchComponent Search="(args) => filterCompletedCoursesByUser(args)" Reset="() => resetCompletedCoursesParticipantsFilter()" />
-                        </RadzenStack>
-                </RadzenStack>
-                <RadzenDataGrid Data="@filteredCompletedCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowPaging PageSize="15" AllowSorting>
-                    <Template Context="course">
-                        <EventUserListComponent EventUsers="course.Participants.ToList()" OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))" ReadOnly="true" />
-                    </Template>
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
-                            <Template Context="item">
-                                <RadzenIcon Icon="@getCourseIcon(item.CourseType)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(Course.StartDateAndTime)" Width="160px" Title="Start Date" />
-                        <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name">
-
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Title="Participants" Width="120px">
-                            <Template Context="item">
-                                <RadzenText Text="@item.Participants.Count.ToString()"  TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center"/>
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-
-                </RadzenDataGrid>
+                <CompletedCoursesComponent />
             </RadzenTabsItem>
+
         </Tabs>
     </RadzenTabs>
 
