@@ -2,14 +2,7 @@
 @using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-5">
 
-    <RadzenSelectBar Size="ButtonSize.Small" TValue="CourseTypeEnum" @bind-Value="@selectedCourseType" Change="() => applyTemplateFilter()">
-        <Items>
-            <RadzenSelectBarItem Icon="@IconsTextsAndColors.GetCourseIcon(CourseTypeEnum.BaseCourse)" Value="CourseTypeEnum.BaseCourse" Text="Basis kurser" />
-            <RadzenSelectBarItem Icon="@IconsTextsAndColors.GetCourseIcon(CourseTypeEnum.SpecialtyCourse)" Value="CourseTypeEnum.SpecialtyCourse" Text="Specialer" />
-            <RadzenSelectBarItem Icon="@IconsTextsAndColors.GetCourseIcon(CourseTypeEnum.TechCourse)" Value="CourseTypeEnum.TechCourse" Text="Tekniske kurser" />
-            <RadzenSelectBarItem Icon="@IconsTextsAndColors.GetCourseIcon(CourseTypeEnum.ProCourse)" Value="CourseTypeEnum.ProCourse" Text="Dive Professionel kurser" />
-        </Items>
-    </RadzenSelectBar>
+    <CourseTypeToggleButtonsComponent OnFilter="applyTemplateFilter" SingleSelect="true" InitialFilters="initialFilters" />
 
 </RadzenStack>
 
@@ -20,7 +13,7 @@
 
             <RadzenDataGrid Data="@sessiondetails.Sessions.OrderBy(x=>x.SessionNumber)" TItem="CourseSessionTemplate">
                 <Columns>
-                    <RadzenDataGridColumn Width="40px">
+                    <RadzenDataGridColumn Width="40px" Title="Type">
                         <Template Context="sessionItem">
                             <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon(@sessionItem.SessionType)" />
                         </Template>
@@ -57,7 +50,7 @@
         </RadzenStack>
     </Template>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(CourseTemplate.CourseType)" Title="Course Type" Width="40px">
+        <RadzenDataGridColumn Property="@nameof(CourseTemplate.CourseType)" Title="Type" Width="40px">
             <Template Context="item">
                 <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" />
             </Template>
@@ -98,6 +91,13 @@
     private IList<CourseTemplate> templates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTypeEnum selectedCourseType = CourseTypeEnum.BaseCourse;
+    private Dictionary<CourseTypeEnum, bool> initialFilters = new Dictionary<CourseTypeEnum, bool>()
+    {
+        {CourseTypeEnum.BaseCourse, true},
+        {CourseTypeEnum.SpecialtyCourse, false},
+        {CourseTypeEnum.TechCourse, false},
+        {CourseTypeEnum.ProCourse, false}
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -105,13 +105,14 @@
         if (firstRender)
         {
             templates = await courseService.GetTemplatesAsync();
-            applyTemplateFilter();
+            applyTemplateFilter(initialFilters);
         }
     }
 
-    private void applyTemplateFilter()
+    private void applyTemplateFilter(Dictionary<CourseTypeEnum,bool> filter)
     {
-        filteredTemplates = templates.Where(x => x.CourseType == selectedCourseType).ToList();
+        var selectedCouorseTypes = filter.Where(x => x.Value == true).Select(x => x.Key).ToList();
+        filteredTemplates = templates.Where(x => selectedCouorseTypes.Contains(x.CourseType)).ToList();
         StateHasChanged();
     }
 

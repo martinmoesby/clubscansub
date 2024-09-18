@@ -2,11 +2,9 @@
 @using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
 
-    <CourseTypeToggleButtonsComponent OnFilter="(args) => setcourseTypeFilter(args)" InitialFilters="completedCourseTypeFilters">
-        <Start>
-            <SearchComponent Placeholder="Student name, number..." Search="(args) => filterCompletedCoursesByUser(args)" Reset="() => resetCompletedCoursesParticipantsFilter()" />
-        </Start>
+    <CourseTypeToggleButtonsComponent OnFilter="(args) => setcourseTypeFilter(args)" InitialFilters="completedCourseTypeFilters" SingleSelect="false">
         <End>
+            <SearchComponent Placeholder="Student name, number..." Search="(args) => filterCompletedCoursesByUser(args)" Reset="() => resetCompletedCoursesParticipantsFilter()" />
             <RadzenToggleButton @bind-Value="showOnlyExecutedCourses" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" ToggleShade="Shade.Lighter" Change="applyFilter" ToggleIcon="filter_list" Icon="filter_list_off" />
         </End>
     </CourseTypeToggleButtonsComponent>
@@ -52,21 +50,19 @@
     private bool showOnlyExecutedCourses = true;
     private string completedFilterString = "";
 
-    private Dictionary<CourseTypeEnum, bool> completedCourseTypeFilters = new Dictionary<CourseTypeEnum, bool>();
+    private Dictionary<CourseTypeEnum, bool> completedCourseTypeFilters = new Dictionary<CourseTypeEnum, bool>
+            {
+            {    CourseTypeEnum.BaseCourse, true },
+            {    CourseTypeEnum.SpecialtyCourse, true },
+            {    CourseTypeEnum.TechCourse, true },
+            {    CourseTypeEnum.ProCourse, true }
+            };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            completedCourseTypeFilters = new Dictionary<CourseTypeEnum, bool>
-            {
-            {    CourseTypeEnum.BaseCourse, true },
-            {    CourseTypeEnum.SpecialtyCourse, true },
-            {    CourseTypeEnum.TechCourse, false },
-            {    CourseTypeEnum.ProCourse, false }
-            };
-
             completedCourses = await courseService.GetStartedOrCompletedAsync();
             filteredCompletedCourses = completedCourses;
             applyFilter();

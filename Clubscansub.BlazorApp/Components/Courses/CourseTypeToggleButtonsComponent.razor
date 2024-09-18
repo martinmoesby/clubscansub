@@ -9,6 +9,8 @@
 </RadzenStack>
 
 @code {
+    [Parameter]
+    public bool SingleSelect { get; set; } = false;
 
     [Parameter]
     public RenderFragment Start { get; set; }
@@ -39,7 +41,19 @@
 
     private void setCourseFilter(CourseTypeEnum type)
     {
-        InitialFilters[type] = !InitialFilters[type];
+        if (SingleSelect)
+        {
+            foreach (var item in InitialFilters)
+            {
+                if (item.Key != type)
+                    InitialFilters[item.Key] = false;
+            }
+            InitialFilters[type] = true;
+        } else
+        {
+            InitialFilters[type] = !InitialFilters[type];
+            
+        }
         OnFilter.InvokeAsync(InitialFilters);
     }
 }
