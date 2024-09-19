@@ -51,6 +51,20 @@ namespace ClubScansub.Service
 
         }
 
+        public async Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date)
+        {
+            var start = new DateTime(date.Year, date.Month, 1);
+            var end = start.AddMonths(1).AddSeconds(-1);
+
+            var data = await context.CourseSessions
+                .Include(x => x.SessionInstructors)
+                    .ThenInclude(x => x.Instructor)
+                .Include(x => x.Course).ToListAsync();
+
+            return data.Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end).ToList();
+
+        }
+
         public async Task<IList<Course>> GetAllAsync()
         {
             var data = context.Courses

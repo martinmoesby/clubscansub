@@ -1,0 +1,82 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+@using ClubScansub.Utility
+
+<RadzenStack class="@($"rz-border-base-400 {GetBackgroundColor()} rz-border-radius rz-mb-1 rz-mx-1 rz-p-2")" JustifyContent="JustifyContent.Center">
+    
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(Session.Course.CourseType)" class="@($"rz-mr-1 {IconsTextsAndColors.GetCourseColor(Session.Course.CourseType)}")" />
+        <RadzenText TextStyle="TextStyle.Caption" class="@IconsTextsAndColors.GetCourseColor(Session.Course.CourseType)">@Session.Course.CourseName</RadzenText>
+    </RadzenStack>
+    
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon(Session.Sessiontype)" class="@($"rz-mr-1 {IconsTextsAndColors.GetCourseColor(Session.Course.CourseType)}")" />
+        <RadzenText TextStyle="TextStyle.Overline" class="@IconsTextsAndColors.GetCourseColor(Session.Course.CourseType)">@Session.SessionName</RadzenText>
+    </RadzenStack>
+    @if(currentUser != null)
+    {
+        @if(ReadOnly)
+        {
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Shade="Shade.Darker" Variant="Variant.Flat" Size="ButtonSize.Small" Disabled Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Session completed" />
+
+        } else
+        {
+            
+            @if(!hasSignedUp)
+            {
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Size="ButtonSize.Small" Click="onButtonClick" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" />
+            } 
+            else
+            {
+                <RadzenButton ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Small" Icon="@IconsTextsAndColors.Icons.USER" Text="Retract" />
+            }
+        }
+    }
+</RadzenStack>
+@code {
+    [Inject]
+    AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = true;
+
+    [Parameter]
+    public CourseSession Session { get; set; }
+
+
+    [Parameter]
+    public EventCallback<int> OnCLick { get; set; }
+
+    private ApplicationUser currentUser = null;
+    private bool hasSignedUp = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            currentUser = await memberService.GetAsync(authState.User.GetIdentityId());
+            hasSignedUp = Session.SessionInstructors.Any(x => x.Instructor == currentUser);
+            StateHasChanged();
+        }
+    }
+
+    private string GetBackgroundColor()
+    {
+        var color = IconsTextsAndColors.GetCourseBackgroundColor(Session.Course.CourseType);
+        if(ReadOnly)
+        {
+            color = color.Replace("-light", "").Replace("-darker","") + "-lighter";
+        }
+        return color;
+    }
+
+    private void onButtonClick()
+    {
+        OnCLick.InvokeAsync(Session.Id);
+    }
+
+}

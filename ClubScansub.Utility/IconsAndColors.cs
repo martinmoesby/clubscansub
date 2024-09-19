@@ -131,5 +131,63 @@
             }
             return "";
         }
+
+        public static string GetCourseBackgroundColor(CourseTypeEnum item)
+        {
+            switch (item)
+            {
+                case CourseTypeEnum.BaseCourse:
+                    return ColorClasses.BG_COURSE_BASE;
+                case CourseTypeEnum.TechCourse:
+                    return ColorClasses.BG_COURSE_TECH;
+                case CourseTypeEnum.ProCourse:
+                    return ColorClasses.BG_COURSE_PRO;
+                case CourseTypeEnum.SpecialtyCourse:
+                    return ColorClasses.BG_COURSE_SPEC;
+                default:
+                    return ColorClasses.BG_DEFAULT;
+            }
+        }
+
+        public static string GetCourseColor(CourseTypeEnum item)
+        {
+            switch (item)
+            {
+                case CourseTypeEnum.BaseCourse:
+                    return ColorClasses.FG_COURSE_BASE;
+                case CourseTypeEnum.TechCourse:
+                    return ColorClasses.FG_COURSE_TECH;
+                case CourseTypeEnum.ProCourse:
+                    return ColorClasses.FG_COURSE_PRO;
+                case CourseTypeEnum.SpecialtyCourse:
+                    return ColorClasses.FG_COURSE_SPEC;
+                default:
+                    return ColorClasses.FG_DEFAULT;
+            }
+        }
+
+        public static string GetEventBackgroundColor(EventTypeEnum item)
+        {
+            switch (item)
+            {
+                case EventTypeEnum.Bådtur:
+                    return ColorClasses.BG_BOAT;
+                case EventTypeEnum.Stranddyk:
+                    return ColorClasses.BG_BEACH;
+                case EventTypeEnum.Rejse:
+                    return ColorClasses.BG_TRAVEL;
+                case EventTypeEnum.Liveaboard:
+                    return ColorClasses.BG_LIVEABOARD;
+                case EventTypeEnum.Klubture:
+                    return ColorClasses.BG_CLUB;
+                case EventTypeEnum.Other:
+                    return ColorClasses.BG_OTHER;
+                case EventTypeEnum.NotAnEvent:
+                    return ColorClasses.BG_NOTEVENT;
+                default:
+                    return ColorClasses.BG_DEFAULT;
+            }
+        }
+
     }
 }
