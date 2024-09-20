@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ClubScansub.Utility.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClubScansub.Models
@@ -23,6 +24,17 @@ namespace ClubScansub.Models
         public bool InstructorApproved { get; set; }
 
         public bool InstructorRetracted { get; set; }
+
+        [NotMapped]
+        public SessionInstructorStatusEnum InstructorStatus{ 
+            get 
+            { 
+                if (InstructorApproved) return SessionInstructorStatusEnum.Approved;
+                if (InstructorRetracted) return SessionInstructorStatusEnum.Retracted;
+                return SessionInstructorStatusEnum.SignedUp;
+
+            } 
+        }
 
     }
 }

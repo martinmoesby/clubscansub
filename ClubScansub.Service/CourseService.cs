@@ -3,6 +3,7 @@ using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 
@@ -116,6 +117,31 @@ namespace ClubScansub.Service
 
         // Session functions
 
+        public async Task<IList<CourseSession>> UpdateSessionAsync(params CourseSession[] items )
+        {
+            context.CourseSessions.UpdateRange(items);
+            await context.SaveChangesAsync();
+            return items.ToList();
+        }
+
+        public async Task SignupSessionInstructor(CourseSession session, ApplicationUser instructor)
+        {
+            await context.CourseSessionInstructors.AddAsync(new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = false, InstructorRetracted = false });
+            await context.SaveChangesAsync();
+        }
+        public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor)
+        {
+            var sessionInstructor = new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = true, InstructorRetracted = false };
+            context.Attach(sessionInstructor).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RetractSessionInstructor(CourseSession session, ApplicationUser instructor)
+        {
+            var sessionInstructor = new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = false, InstructorRetracted = true };
+            context.Attach(sessionInstructor).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            await context.SaveChangesAsync();
+        }
 
         // Template functions
         public async Task<IList<CourseTemplate>> GetTemplatesAsync()
