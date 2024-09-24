@@ -1,0 +1,102 @@
+﻿<RadzenStack Gap="10">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Component="" Text="User name:" />
+            <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Light" Text="@User.UserName" Variant="Variant.Text" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Assigned roles:" />
+            @foreach (var role in UserRoles)
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Light" Text="@role" Variant="Variant.Outlined" />
+            }
+        </RadzenStack>
+    </RadzenStack>
+
+    <RadzenRow>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="Account number" Style="width:100%">
+                <RadzenTextBox @bind-Value="@User.AccountNumber" ReadOnly />
+            </RadzenFormField>
+
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="E-mail" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.Email />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="Phone number" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.PhoneNumber />
+                @if (!User.PhoneNumberConfirmed)
+                {
+                    <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Darker" Text="Click to verify phonenumber" />
+                }
+            </RadzenFormField>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="First Name" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.Firstname />
+            </RadzenFormField>
+
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="Last Name" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.Lastname />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="Birthday" Style="width:100%">
+                <RadzenDatePicker @bind-Value=@User.DayOfbirth ShowTime="false" DateFormat="dd. MMMM yyyy" />
+            </RadzenFormField>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenFormField Variant="Variant.Outlined" Text="Street adress" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.Streetaddress />
+            </RadzenFormField>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenColumn Size="4">
+            <RadzenFormField Variant="Variant.Outlined" Text="Zip code" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.PostalCode />
+            </RadzenFormField>
+
+        </RadzenColumn>
+        <RadzenColumn Size="8">
+            <RadzenFormField Variant="Variant.Outlined" Text="Last Name" Style="width:100%">
+                <RadzenTextBox @bind-Value=@User.City />
+            </RadzenFormField>
+        </RadzenColumn>
+
+    </RadzenRow>
+
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.End" class="rz-mt-12">
+    </RadzenStack>
+</RadzenStack>
+
+<RadzenButton Text="Save changes" Icon="save" ButtonStyle="ButtonStyle.Success" Shade="Shade.Default" Click="@(() => OnSaveChanges.InvokeAsync(User))"/>
+
+@code {
+
+
+    [Parameter]
+    public ApplicationUser User { get; set; }
+
+    [Parameter]
+    public EventCallback<ApplicationUser> OnSaveChanges { get; set; }
+
+    [Parameter]
+    public IList<string> UserRoles { get; set; }
+}
+

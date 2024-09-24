@@ -67,7 +67,7 @@ namespace ClubScansub.Service
 
         public async Task<ApplicationUser> GetAsync(string Id)
         {
-            var user = await context.ApplicationUsers.Include(x=>x.AccountTransactions).Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var user = await context.ApplicationUsers.Include(x=>x.AccountTransactions).Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).Where(x => x.Id == Id).FirstOrDefaultAsync();
             if (user == null)
                 throw new UserNotFoundException($"User with Id {Id} was not found.");
 

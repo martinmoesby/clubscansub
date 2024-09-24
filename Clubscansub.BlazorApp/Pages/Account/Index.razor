@@ -4,143 +4,36 @@
 <PageTitle>Member management</PageTitle>
 <RadzenText TextStyle="TextStyle.DisplayH6" Text="Profile management" />
 
-@if(IsLoading) {
+@if (IsLoading)
+{
     <RadzenStack Style="height:100%;width:100%" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
         <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Mode="ProgressBarMode.Indeterminate" />
         <RadzenText TextStyle=" TextStyle.Overline" Text="Loading..." />
     </RadzenStack>
+}
+else
+{
 
-} else {
 
 
+    <RadzenTabs TabPosition="TabPosition.Top" SelectedIndex="0" >
 
-<RadzenTabs TabPosition="TabPosition.Top" SelectedIndex="0" >
+        <Tabs>
+            <RadzenTabsItem Text="My Profile" Icon="@IconsTextsAndColors.Icons.USER">
+                <ProfileDetailsComponent User="@currentUser" UserRoles="@roles" OnSaveChanges="saveUserProfile"/>
+            </RadzenTabsItem>
 
-    <Tabs>
-        <RadzenTabsItem Text="My Profile" Icon="@IconsTextsAndColors.Icons.USER">
-            <RadzenStack Gap="10">
+            <RadzenTabsItem Text="Balance" Icon="@IconsTextsAndColors.Icons.AMOUNT" >
+                <ProfileAccountBalanceComponent Entries="@currentUser.AccountTransactions" />
+            </RadzenTabsItem>
 
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                            <RadzenLabel Component="" Text="User name:" />
-                            <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Light" Text="@currentUser.UserName"Variant="Variant.Text" />
-                        </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" >
-                            <RadzenLabel Text="Assigned roles:" />
-                            @foreach (var role in roles)
-                            {
-                                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Light" Text="@role" Variant="Variant.Outlined" />
-                            }
-                        </RadzenStack>
-                    </RadzenStack>
-
-                <RadzenRow>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Account number" Style="width:100%">
-                            <RadzenTextBox @bind-Value="@currentUser.AccountNumber" ReadOnly  />
-                        </RadzenFormField>
-
-                    </RadzenColumn>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="E-mail" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.Email  />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Phone number" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.PhoneNumber  />
-                            @if (!currentUser.PhoneNumberConfirmed)
-                            {
-                                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Darker" Text="Click to verify phonenumber" />
-                            }
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="First Name" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.Firstname />
-                        </RadzenFormField>
-
-                    </RadzenColumn>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Last Name" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.Lastname  />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Birthday" Style="width:100%">
-                            <RadzenDatePicker @bind-Value=@currentUser.DayOfbirth ShowTime="false" DateFormat="dd. MMMM yyyy" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenColumn Size="12">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Street adress" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.Streetaddress />
-                        </RadzenFormField>
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenColumn Size="4">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Zip code" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.PostalCode />
-                        </RadzenFormField>
-
-                    </RadzenColumn>
-                    <RadzenColumn Size="8">
-                        <RadzenFormField Variant="Variant.Outlined" Text="Last Name" Style="width:100%">
-                            <RadzenTextBox @bind-Value=@currentUser.City />
-                        </RadzenFormField>
-                    </RadzenColumn>
-
-                </RadzenRow>
-
-                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.End" class="rz-mt-12">
-                </RadzenStack>
-            </RadzenStack>
-                    <RadzenButton Text="Save changes" Icon="save" ButtonStyle="ButtonStyle.Success" Shade="Shade.Default" />
-        </RadzenTabsItem>
-        
-        <RadzenTabsItem Text="Balance" Icon="@IconsTextsAndColors.Icons.AMOUNT" >
-                <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" Gap="10" JustifyContent="JustifyContent.SpaceBetween">
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenText Text="Event account balance" />
-                        <RadzenText Text="@(eventBalance.ToString("N2"))" />
-                    </RadzenStack>
-
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenText Text="Course account balance" />
-                        <RadzenText Text="@(courseBalance.ToString("N2"))" />
-                    </RadzenStack>
-
-                </RadzenStack>
-
-            <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" Gap="10" JustifyContent="JustifyContent.SpaceBetween">
-                <RadzenToggleButton Value="getAccountTypeFilter(AccountTypeEnum.EventAccountType)" Change="@(() => setAccountTypeFilter(AccountTypeEnum.EventAccountType))" Text="Event account" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" ToggleShade="Shade.Default" />
-                <RadzenToggleButton Value="getAccountTypeFilter(AccountTypeEnum.CourseAccountType)" Change="@(() => setAccountTypeFilter(AccountTypeEnum.CourseAccountType))" Text="Course account" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" ToggleShade="Shade.Default" />
-            </RadzenStack>
-
-            <RadzenDataGrid TItem="ApplicationUserAccountEntry" Data="@filteredAccountEntries" AllowSorting AllowPaging PageSize="15">
-                <Columns>
-                        <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.Id)" Title="Entry no." Width="80px" />
-                    <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.PostingDate)" Title="Posting Date" Width="180px" />
-                    <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.Description)" Title="Description" />
-                    <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.Amount)" Title="Amount" TextAlign="TextAlign.Right" Width="180px"/>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
-
-        <RadzenTabsItem Text="Certificeringer" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" />
-        <RadzenTabsItem Text="Eksterne konti" Visible="false" />
-        <RadzenTabsItem Text="Slet konto" Icon="delete" Style="color:var(--rz-color-danger)" />
-    </Tabs>
-</RadzenTabs>
+            <RadzenTabsItem Text="Certificeringer" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" >
+                <ProfileCertificatesComponent Certificates="@currentUser.Certificates" />
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Eksterne konti" Visible="false" />
+            <RadzenTabsItem Text="Slet konto" Icon="delete" Style="color:var(--rz-color-danger)" />
+        </Tabs>
+    </RadzenTabs>
 }
 
 
@@ -154,22 +47,14 @@
     [Inject]
     UserService userService { get; set; }
 
+    [Inject]
+    NotificationService notificationService { get; set; }
+
     ApplicationUser currentUser = new();
 
     IList<string> roles = new List<string>();
-    IList<ApplicationUserAccountEntry> accountEntries = new List<ApplicationUserAccountEntry>();
-    IList<ApplicationUserAccountEntry> filteredAccountEntries = new List<ApplicationUserAccountEntry>();
-    decimal eventBalance = 0M;
-    decimal courseBalance = 0M;
+
     bool IsLoading = true;
-
-
-    private Dictionary<AccountTypeEnum, bool> accountTypeFilter = new Dictionary<AccountTypeEnum, bool>()
-    {
-       { AccountTypeEnum.CourseAccountType, true},
-       { AccountTypeEnum.EventAccountType, true}
-    };
-
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -184,35 +69,38 @@
                 currentUser = await memberService.GetAsync(authState.User.GetIdentityId());
                 roles = await userService.GetRolesByUserId(currentUser);
 
-                accountEntries = currentUser.AccountTransactions.ToList();
-                eventBalance = accountEntries.Where(x=> x.AccountType == AccountTypeEnum.EventAccountType).Sum(x => x.Amount);
-                courseBalance = accountEntries.Where(x => x.AccountType == AccountTypeEnum.CourseAccountType).Sum(x => x.Amount);
-                filterAccountEntries();
+
                 IsLoading = false;
+                StateHasChanged();
 
             }
         }
     }
 
-    private void setAccountTypeFilter(AccountTypeEnum typeEnum)
+    private async void saveUserProfile(ApplicationUser user)
     {
-        var currentValue = accountTypeFilter[typeEnum];
-        accountTypeFilter[AccountTypeEnum.CourseAccountType] = false;
-        accountTypeFilter[AccountTypeEnum.EventAccountType] = false;
-        accountTypeFilter[typeEnum] = !currentValue;
-        filterAccountEntries();
+        try
+        {
+            user.Roles = roles.ToArray();
+            currentUser = await memberService.UpdateAsync(user);
+            notificationService.Notify(new NotificationMessage() {  
+                Detail =  $"Profile '{currentUser.Name}' has been updated",
+                Severity = NotificationSeverity.Info,
+            });
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            notificationService.Notify(new NotificationMessage()
+                {
+                    Summary = $"Profile '{currentUser.Name}' has NOT been updated",
+                    Detail = ex.Message,
+                    Severity = NotificationSeverity.Error,
+                });
+
+        }
     }
 
-    private bool getAccountTypeFilter(AccountTypeEnum typeEnum)
-    {
-        return accountTypeFilter.Where(x => x.Key == typeEnum).First().Value;
-    }
 
-    private void filterAccountEntries()
-    {
-        var accountTYpeFilters = accountTypeFilter.Where(x => x.Value == true).Select(x => x.Key);
-        filteredAccountEntries = accountEntries.Where(x => accountTYpeFilters.Contains(x.AccountType)).ToList();
-        StateHasChanged();
-
-    }
 }

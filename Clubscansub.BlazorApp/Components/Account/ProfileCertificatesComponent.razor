@@ -1,0 +1,30 @@
+﻿
+<RadzenRow Gap="10">
+    @if (!IsLoading && Certificates != null) {
+        foreach (var item in Certificates)
+        {
+            <ProfileCertificateDetailsComponent Certificate="@item" />
+        }
+    }
+</RadzenRow>
+
+@code {
+    [Parameter]
+    public ICollection<UserCertificat> Certificates { get; set; }
+
+    private bool IsLoading = true;
+
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+}

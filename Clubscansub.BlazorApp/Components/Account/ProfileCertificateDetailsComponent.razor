@@ -1,0 +1,49 @@
+﻿<RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3" SizeXL="2">
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle1" Text="@Certificate.Certificate.Name" Style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" />
+        <RadzenStack @onmousedown="setShowBack" @onmouseup="setShowFront">
+            @if (showBack)
+            {
+                <img src="@ImageUtils.GetImageSrc(Certificate.BackSideImage)" style="width:100%;" class="rz-border-radius-4" />
+
+            }
+            else
+            {
+                <img src="@ImageUtils.GetImageSrc(Certificate.FrontSideImage)" style="width:100%;" class="rz-border-radius-4" />
+
+            }
+        </RadzenStack>
+
+        <RadzenStack Orientation=" Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack>
+                <RadzenText Text="Achieved date" TextStyle="TextStyle.Caption" />
+                <RadzenText Text="@Certificate.VerifiedDate.ToShortDateString()" TextStyle="TextStyle.Body2" />
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenText Text="Certified by" TextStyle="TextStyle.Caption" />
+                <RadzenText Text="@Certificate.VerifiedBy?.Name" TextStyle="TextStyle.Body2" />
+
+            </RadzenStack>
+        </RadzenStack>
+
+    </RadzenCard>
+</RadzenColumn>
+
+@code {
+
+
+    [Parameter]
+    public UserCertificat Certificate { get; set; }
+
+    private bool showBack = false;
+
+    private void setShowFront()
+    {
+        showBack = false;
+    }
+
+    private void setShowBack()
+    {
+        showBack = true;
+    }
+}
