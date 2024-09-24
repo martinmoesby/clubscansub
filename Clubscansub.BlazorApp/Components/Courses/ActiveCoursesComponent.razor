@@ -9,8 +9,8 @@
 
 <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting>
     <Template Context="course">
-        <EventUserActionsComponent AddNewUser="@((args) => addNewStudent(args, course.Id))" AddExistingUser="@((args) => enrollExistingUser(args,course.Id))" Visible="@(course.FreeSpots > 0 || course.StartDateAndTime> DateTime.Now)" ShowAddNewUser="true" />
-        <EventUserListComponent EventUsers="course.Participants.ToList()" OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))" />
+            <EventUserActionsComponent AddNewUser="@((args) => addNewStudent(args, course.Id))" AddExistingUser="@((args) => enrollExistingUser(args,course.Id))" Visible="@(course.FreeSpots > 0 && course.StartDateAndTime> DateTime.Now)" ShowAddNewUser="true" />
+            <EventUserListComponent EventUsers="course.Participants.ToList()" OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))" />
     </Template>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">

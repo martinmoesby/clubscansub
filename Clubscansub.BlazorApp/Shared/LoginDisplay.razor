@@ -1,4 +1,6 @@
-﻿<AuthorizeView>
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+<AuthorizeView>
     <NotAuthorized>
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
@@ -8,33 +10,53 @@
 
     </NotAuthorized>
     <Authorized>
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
-            <RadzenButton @onclick="OnManageClick" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Icon="person" />
-            <form method="post" action="/Account/LogOut">
+        <form method="post" action="/Account/LogOut">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="10" AlignItems="AlignItems.Stretch">
+                <RadzenButton Text="@userName" Click="OnManageClick" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Dark" Icon="person" Variant="Variant.Text" />
                 <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" />
-            </form>
-        </RadzenStack>
+            </RadzenStack>
+        </form>
     </Authorized>
 </AuthorizeView>
 
 @code {
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+    [Inject]
+    MemberService memberService { get; set; }
+
     [Inject]
     NavigationManager nav { get; set; }
 
     [CascadingParameter(Name = "currentUser")]
     ApplicationUser? currentUser { get; set; }
 
+    private string userName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            currentUser = await memberService.GetAsync(authState?.User?.GetIdentityId());
+            userName = currentUser?.Name ?? authState?.User?.Identity?.Name ?? "";
+        }
+    }
+
+
     private void OnRegisterClick()
     {
         nav.NavigateTo("/account/register");
     }
+
     private void OnLoginClick()
     {
-        Console.WriteLine("Trying to open login.form");
         nav.NavigateTo("/account/login");
     }
+
     private void OnManageClick()
     {
-        nav.NavigateTo("/account/Manage");
+        nav.NavigateTo("/profile");
     }
 }

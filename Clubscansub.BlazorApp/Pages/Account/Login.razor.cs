@@ -27,6 +27,8 @@ namespace Clubscansub.BlazorApp.Pages.Account
         [Parameter]
         public string returnUrl { get; set; } = "";
 
+        [Parameter]
+        public EventCallback<ApplicationUser> OnLoginSuccessFull { get; set; }
 
         protected override async Task OnParametersSetAsync()
         {
@@ -37,8 +39,10 @@ namespace Clubscansub.BlazorApp.Pages.Account
 
         private async Task onLogin(LoginArgs args)
         {
+            model.Error = string.Empty;
             try
             {
+
                 var returnString = string.IsNullOrEmpty(returnUrl) ? "" : $"&returnUrl= {returnUrl}";
                 model.Username = args.Username;
                 model.Password = args.Password;

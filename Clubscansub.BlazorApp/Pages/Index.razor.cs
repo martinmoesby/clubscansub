@@ -18,11 +18,8 @@ namespace Clubscansub.BlazorApp.Pages
 {
     public partial class Index
     {
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
-
-        [Inject]
-        protected NavigationManager Navigationmanager { get; set; }
+        //[Inject]
+        //protected IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         protected DialogService Dialogservice { get; set; }
@@ -30,11 +27,11 @@ namespace Clubscansub.BlazorApp.Pages
         [Inject]
         protected TooltipService Tooltipservice { get; set; }
 
-        [Inject]
-        protected ContextMenuService ContextMenuservice { get; set; }
+        //[Inject]
+        //protected ContextMenuService ContextMenuservice { get; set; }
 
-        [Inject]
-        protected NotificationService Notificationservice { get; set; }
+        //[Inject]
+        //protected NotificationService Notificationservice { get; set; }
 
         [Inject]
         protected EventService eventService { get; set; }
@@ -200,10 +197,8 @@ namespace Clubscansub.BlazorApp.Pages
         }
         private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
         {
-            if (args.Data is Event)
-            {
-                Tooltipservice.Open(args.Element, getToolTipText(args.Data), new TooltipOptions() { Delay=500, Duration=5000 });
-            }
+
+            Tooltipservice.Open(args.Element, getToolTipText(args.Data), new TooltipOptions() { Delay=500, Duration=5000 });
 
         }
         private void OnMouseLeaveAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)

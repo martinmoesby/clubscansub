@@ -2,7 +2,7 @@
 @using ClubScansub.Service
 @using Nager.Date
 
-<RadzenStack Style="width:100%;height:100%;display:flex;background-color:var(--rz-base)">
+<RadzenStack Style="min-width:1200px;width:100%;height:100%;display:flex;background-color:var(--rz-base)">
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width:100%;" class="rz-p-4">
         <RadzenButton Click="prevMonth" Icon="chevron_backward" />
@@ -173,14 +173,28 @@
 
     private async void approveInstructor(CourseSession session, ApplicationUser instructor)
     {
-        await courseService.ApproveSessionInstructor(session, instructor);
+        var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
+        if (sessionInstructor != null)
+        {
+            sessionInstructor.InstructorRetracted = false;
+            sessionInstructor.InstructorApproved = true;
+        }
+        await courseService.UpdateSessionAsync(item);
 
         await refreshSessions();
 
     }
     private async void signupInstructor(CourseSession session, ApplicationUser instructor)
     {
-        await courseService.SignupSessionInstructor(session, instructor);
+        var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
+        if (sessionInstructor != null)
+        {
+            sessionInstructor.InstructorRetracted = false;
+            sessionInstructor.InstructorApproved = false;
+        }
+        await courseService.UpdateSessionAsync(item);
 
         await refreshSessions();
 
