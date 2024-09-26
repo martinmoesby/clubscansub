@@ -52,20 +52,6 @@ namespace ClubScansub.Service
 
         }
 
-        public async Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date)
-        {
-            var start = new DateTime(date.Year, date.Month, 1);
-            var end = start.AddMonths(1).AddSeconds(-1);
-
-            var data = await context.CourseSessions
-                .Include(x => x.SessionInstructors)
-                    .ThenInclude(x => x.Instructor)
-                .Include(x => x.Course).ToListAsync();
-
-            return data.Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end).ToList();
-
-        }
-
         public async Task<IList<Course>> GetAllAsync()
         {
             var data = context.Courses
@@ -117,6 +103,22 @@ namespace ClubScansub.Service
 
         // Session functions
 
+        public async Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date)
+        {
+            var start = new DateTime(date.Year, date.Month, 1);
+            var end = start.AddMonths(1).AddSeconds(-1);
+
+            var data = await context.CourseSessions
+                .Include(x => x.SessionInstructors)
+                    .ThenInclude(x => x.Instructor)
+                .Include(x => x.Course)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return data.Where(x => x.StartDateAndTime >= start && x.EndDateAndTime <= end).ToList();
+
+        }
+
         public async Task<IList<CourseSession>> UpdateSessionAsync(params CourseSession[] items )
         {
             context.CourseSessions.UpdateRange(items);
@@ -126,21 +128,34 @@ namespace ClubScansub.Service
 
         public async Task SignupSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
-            await context.CourseSessionInstructors.AddAsync(new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = false, InstructorRetracted = false });
+            await context.CourseSessionInstructors.AddAsync(new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = false, InstructorRetracted = false });
             await context.SaveChangesAsync();
         }
-        public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor)
+        public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor, bool approved = true)
         {
-            var sessionInstructor = new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = true, InstructorRetracted = false };
-            context.Attach(sessionInstructor).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await context.SaveChangesAsync();
+            var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();  //new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = true, InstructorRetracted = false };
+            if (sessionInstructor != null)
+            {
+                sessionInstructor.InstructorApproved = approved;
+                sessionInstructor.InstructorRetracted = false;
+                context.CourseSessionInstructors.Update(sessionInstructor);
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task RetractSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
-            var sessionInstructor = new CourseSessionInstructor { CourseSession = session, Instructor = instructor, InstructorApproved = false, InstructorRetracted = true };
-            context.Attach(sessionInstructor).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await context.SaveChangesAsync();
+            var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();  //new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = true, InstructorRetracted = false };
+            if (sessionInstructor != null)
+            {
+                sessionInstructor.InstructorApproved = false;
+                sessionInstructor.InstructorRetracted = !sessionInstructor.InstructorRetracted;
+                context.CourseSessionInstructors.Update(sessionInstructor);
+                await context.SaveChangesAsync();
+            }
+
+            //context.Update(session);
+            //await context.SaveChangesAsync();
         }
 
         // Template functions

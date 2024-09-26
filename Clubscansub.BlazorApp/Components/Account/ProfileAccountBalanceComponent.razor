@@ -8,11 +8,10 @@
         <RadzenText Text="Course account balance" />
         <RadzenText Text="@(courseBalance.ToString("N2"))" />
     </RadzenStack>
-
 </RadzenStack>
 
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" Gap="10" JustifyContent="JustifyContent.SpaceBetween">
-    <RadzenToggleButton Value="getAccountTypeFilter(AccountTypeEnum.EventAccountType)" Change="@(() => setAccountTypeFilter(AccountTypeEnum.EventAccountType))" Text="Event account" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" ToggleShade="Shade.Default" />
+    <RadzenToggleButton Value="getAccountTypeFilter(AccountTypeEnum.EventAccountType)" Change="@(() => setAccountTypeFilter(AccountTypeEnum.EventAccountType))" Text="Event account" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" ToggleShade="Shade.Default" Variant="Variant.Flat" />
     <RadzenToggleButton Value="getAccountTypeFilter(AccountTypeEnum.CourseAccountType)" Change="@(() => setAccountTypeFilter(AccountTypeEnum.CourseAccountType))" Text="Course account" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" ToggleShade="Shade.Default" />
 </RadzenStack>
 
@@ -51,7 +50,7 @@
 
     private Dictionary<AccountTypeEnum, bool> accountTypeFilter = new Dictionary<AccountTypeEnum, bool>()
     {
-       { AccountTypeEnum.CourseAccountType, true},
+       { AccountTypeEnum.CourseAccountType, false},
        { AccountTypeEnum.EventAccountType, true}
     };
 

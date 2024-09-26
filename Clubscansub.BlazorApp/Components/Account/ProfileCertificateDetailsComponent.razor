@@ -1,4 +1,5 @@
-﻿<RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3" SizeXL="2">
+﻿
+<RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3" SizeXL="2">
     <RadzenCard>
         <RadzenText TextStyle="TextStyle.Subtitle1" Text="@Certificate.Certificate.Name" Style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" />
         <RadzenStack @onmousedown="setShowBack" @onmouseup="setShowFront">
@@ -14,22 +15,25 @@
             }
         </RadzenStack>
 
-        <RadzenStack Orientation=" Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenStack>
+        <RadzenStack AlignItems="AlignItems.Start" class="rz-mt-4">
+
+            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
                 <RadzenText Text="Achieved date" TextStyle="TextStyle.Caption" />
                 <RadzenText Text="@Certificate.VerifiedDate.ToShortDateString()" TextStyle="TextStyle.Body2" />
             </RadzenStack>
-            <RadzenStack>
-                <RadzenText Text="Certified by" TextStyle="TextStyle.Caption" />
+            
+            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                <RadzenText Text="VerifiedBy by" TextStyle="TextStyle.Caption" />
                 <RadzenText Text="@Certificate.VerifiedBy?.Name" TextStyle="TextStyle.Body2" />
-
             </RadzenStack>
+
         </RadzenStack>
 
     </RadzenCard>
 </RadzenColumn>
 
 @code {
+
 
 
     [Parameter]
@@ -46,4 +50,6 @@
     {
         showBack = true;
     }
+
+
 }

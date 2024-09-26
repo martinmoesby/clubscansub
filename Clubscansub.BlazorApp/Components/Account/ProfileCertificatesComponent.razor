@@ -1,6 +1,8 @@
 ﻿
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="newCertificate" Text="Create new certificate" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" class="rz-mb-4"/>
 <RadzenRow Gap="10">
-    @if (!IsLoading && Certificates != null) {
+    @if (!IsLoading && Certificates != null)
+    {
         foreach (var item in Certificates)
         {
             <ProfileCertificateDetailsComponent Certificate="@item" />
@@ -9,6 +11,9 @@
 </RadzenRow>
 
 @code {
+    [Inject]
+    DialogService dialogService { get; set; }
+
     [Parameter]
     public ICollection<UserCertificat> Certificates { get; set; }
 
@@ -25,6 +30,32 @@
             StateHasChanged();
         }
     }
+    private void onSave(UserCertificat newUserCertificate)
+    {
 
+    }
+
+    private async void newCertificate()
+    {
+
+        var certificate = new UserCertificat();
+
+        var dialogOptions = new DialogOptions()
+            {
+                Width = "800px",
+                Height="600px",
+                ShowClose = true
+            };
+
+        var dialogParameters = new Dictionary<string, object>()
+                {
+                    { "OnSave", EventCallback.Factory.Create<UserCertificat>(this, onSave)},
+                    { "UserCertificate", certificate }
+                };
+
+        await dialogService.OpenAsync<ProfileCertificateAddEditComponent>("Add new Certificate", dialogParameters, dialogOptions);
+
+
+    }
 
 }

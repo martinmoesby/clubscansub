@@ -52,7 +52,12 @@
                             <RadzenStack Style="flex:1;padding:1px">
                                 @foreach (var session in GetSessionsForDay(day).OrderBy(x=>x.StartDateAndTime))
                                 {
-                                    <WorkCalendarSessionComponent Session="session"  OnRetractInstructor ="(args)=>retractInstructor(args.Item1, args.Item2) " OnApproveInstructor = "(args)=>approveInstructor(args.Item1, args.Item2) " OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)" ReadOnly="(day < DateTime.Now)" />
+                                    <WorkCalendarSessionComponent Session="session"  
+                                        OnRetractInstructor ="(args)=>retractInstructor(args.Item1, args.Item2) " 
+                                        OnApproveInstructor = "(args)=>approveInstructor(args.Item1, args.Item2) "
+                                                                      OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+                                                                      OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)" 
+                                        ReadOnly="(day < DateTime.Now)" />
                                 }
                             </RadzenStack>
 
@@ -160,41 +165,55 @@
     private async void retractInstructor(CourseSession session, ApplicationUser instructor)
     {
 
-        var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
-        var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
-        if (sessionInstructor != null) {
-            sessionInstructor.InstructorRetracted = true;
-            sessionInstructor.InstructorApproved = false;
-        }
-        await courseService.UpdateSessionAsync(item);
+        // var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        // var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
+        // if (sessionInstructor != null) {
+        //     sessionInstructor.InstructorRetracted = true;
+        //     sessionInstructor.InstructorApproved = false;
+        // }
+        await courseService.RetractSessionInstructor(session, instructor);
 
         await refreshSessions();
+    }
+    private async void unApproveInstructor(CourseSession session, ApplicationUser instructor)
+    {
+        // var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        // var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
+        // if (sessionInstructor != null)
+        // {
+        //     sessionInstructor.InstructorRetracted = false;
+        //     sessionInstructor.InstructorApproved = true;
+        // }
+        await courseService.ApproveSessionInstructor(session, instructor, false);
+
+        await refreshSessions();
+
     }
 
     private async void approveInstructor(CourseSession session, ApplicationUser instructor)
     {
-        var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
-        var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
-        if (sessionInstructor != null)
-        {
-            sessionInstructor.InstructorRetracted = false;
-            sessionInstructor.InstructorApproved = true;
-        }
-        await courseService.UpdateSessionAsync(item);
+        // var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        // var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
+        // if (sessionInstructor != null)
+        // {
+        //     sessionInstructor.InstructorRetracted = false;
+        //     sessionInstructor.InstructorApproved = true;
+        // }
+        await courseService.ApproveSessionInstructor(session, instructor);
 
         await refreshSessions();
 
     }
     private async void signupInstructor(CourseSession session, ApplicationUser instructor)
     {
-        var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
-        var sessionInstructor = item.SessionInstructors.FirstOrDefault(x => x.InstructorId == instructor.Id);
-        if (sessionInstructor != null)
-        {
-            sessionInstructor.InstructorRetracted = false;
-            sessionInstructor.InstructorApproved = false;
-        }
-        await courseService.UpdateSessionAsync(item);
+        // var item = sessions.FirstOrDefault(x => x.Id == session.Id); //.FirstOrDefault(x => x.InstructorId == instructor);
+        // item.SessionInstructors.Add(new CourseSessionInstructor() { CourseSession = session, Instructor= instructor, CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = false, InstructorRetracted = false });
+        // if (sessionInstructor != null)
+        // {
+        //     sessionInstructor.InstructorRetracted = false;
+        //     sessionInstructor.InstructorApproved = false;
+        // }
+        await courseService.SignupSessionInstructor(session, instructor);
 
         await refreshSessions();
 

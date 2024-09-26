@@ -1,0 +1,86 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+@if(isLoading)
+{
+    
+} else
+{
+    
+    <RadzenTabs TabPosition="TabPosition.Top">
+        <Tabs>
+            <RadzenTabsItem Text="Details">
+                <RadzenStack AlignItems="AlignItems.Start">
+                    <RadzenFormField Text="Select sertificate" Style="width:100%">
+                        <RadzenDropDown Style="width:100%" TValue="Certificate" Data="@availableCertificates" TextProperty="@nameof(Certificate.Name)" @bind-Value="UserCertificate.Certificate" />
+                    </RadzenFormField>
+
+                    <RadzenFormField Text="Issue date" Style="width:100%">
+                        <RadzenDatePicker ShowTime="false" @bind-Value="UserCertificate.IssuedDate" DateFormat="dd. MMMM yyyy"/>
+                    </RadzenFormField>
+
+
+                </RadzenStack>
+
+
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Front">
+                <RadzenStack JustifyContent="JustifyContent.Center" Style="width:100%">
+                    <img src="@ImageUtils.GetImageSrc(UserCertificate?.FrontSideImage)" style="width:80%;" class="rz-border-radius-4" />
+                </RadzenStack>
+
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Backside">
+                <img src="@ImageUtils.GetImageSrc(UserCertificate?.BackSideImage)" style="width:80%;" class="rz-border-radius-4" />
+
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Verification">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="10">
+
+                    <RadzenFormField Text="Verification Date">
+                        <RadzenDatePicker ShowTime="false" @bind-Value="UserCertificate.VerifiedDate" ReadOnly="true" ShowButton="false"  DateFormat="dd. MMMM yyyy"/>
+                    </RadzenFormField>
+                    <RadzenFormField Text="Verified by">
+                        <RadzenText Text="UserCertificate.VerifiedBy?.Name" TextStyle="TextStyle.Body1" class="rz-my-2 rz-ml-2" />
+                    </RadzenFormField>
+
+                    <RadzenText Text="Take your certificate to the club and get it verified by a registered administrator from the club." TextStyle="TextStyle.Caption" Style="margin-top:20px" Visible="@(!UserCertificate.IsVerified)" />
+
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+
+
+@code {
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
+    [Parameter]
+    public EventCallback<UserCertificat> OnSave { get; set; }
+
+    [Parameter]
+    public UserCertificat UserCertificate { get; set; }
+
+    private IList<Certificate> availableCertificates = new List<Certificate>();
+    private Certificate selectedCertificateType = new();
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var authUser = await authStateProvider.GetAuthenticationStateAsync();
+            
+            bool includeProCertificates = authUser.User.IsInRole(Userroles.Divepro);
+            availableCertificates = await memberService.GetAvailableCertificatesAsync(includeProCertificates);
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+}

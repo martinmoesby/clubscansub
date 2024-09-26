@@ -169,5 +169,13 @@ namespace ClubScansub.Service
             users = users.Where(x=>x.Firstname.ToLower().Contains(filter) || x.Lastname.ToLower().Contains(filter) || x.AccountNumber.Contains(filter));
             return users.ToList();
         }
+
+        public async Task<IList<Certificate>> GetAvailableCertificatesAsync(bool inclProCertificates)
+        {
+            var data = context.Certificates.AsQueryable();
+            if (inclProCertificates)
+                return await data.ToListAsync();
+
+            return await data.Where(x => x.IsDiveproCertificate == false).ToListAsync();        }
     }
 }
