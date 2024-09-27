@@ -46,7 +46,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Event>> GetAllAsync()
         {
-            var data = context.Events.Where(x=> x.EndDateAndTime > DateTime.UtcNow);
+            var data = context.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).Where(x=>x.EventType != Utility.EventTypeEnum.NotAnEvent);
             return await data.ToListAsync();
         }
 
@@ -85,9 +85,12 @@ namespace ClubScansub.Service
             return await data.ToListAsync();
         }
 
-        public Task<Event> UpdateAsync(Event item)
+        public async Task<Event> UpdateAsync(Event item)
         {
-            throw new NotImplementedException();
+            context.Update(item);
+            await context.SaveChangesAsync();
+            return item;
+
         }
 
         public Task<IList<Event>> UpdateAsync(IList<Event> Items)

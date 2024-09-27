@@ -1,5 +1,30 @@
 ﻿@using ClubScansub.Utility
-<RadzenDataGrid TItem="EventUser" Data="@EventUsers">
+<RadzenDataGrid TItem="EventUser" Data="@EventUsers" class="rz-mb-4">
+    <FooterTemplate>
+        @if (Event?.FixedParticipants != null && Event?.FixedParticipants > 0)
+        {
+            <RadzenStack class="rz-py-4">
+
+                <RadzenText TextStyle="TextStyle.Caption" Text="Reserved spots:" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
+
+                    @for (int i = 0; i < Event.FixedParticipants; i++)
+                    {
+                        @if(!ReadOnly) {
+
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Default" Variant="Variant.Filled">
+                            <RadzenButton Icon="@IconsTextsAndColors.Icons.USER_MIN" ButtonStyle="ButtonStyle.Info" Click="removeFixedUser" Size="ButtonSize.ExtraSmall" Text="Scansub" />
+                            </RadzenBadge>
+                        }
+                        else
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Default" Variant="Variant.Filled" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="Scansub"/>
+                        }
+                    }
+                </RadzenStack>
+            </RadzenStack>
+        }
+    </FooterTemplate>
     <Columns>
         <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
             <Template Context="item">

@@ -65,6 +65,11 @@ namespace Clubscansub.BlazorApp.Components.Common
             selectedUser = string.Empty;
         }
 
+        private void reserveSpotCallback()
+        {
+            AddExistingUser.InvokeAsync("scansub");
+        }
+
         private void addNewUserCallback(RegisterUserResult registerdUser)
         {
             AddNewUser.InvokeAsync(registerdUser);

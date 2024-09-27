@@ -1,0 +1,136 @@
+﻿@using ClubScansub.Service
+
+<RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
+    <EventTypeToggleButtonsComponent OnFilter="setFilter" InitialFilters="InitialFilters" SingleSelect="!ActiveEventsOnly" />
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Eventsplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" Visible="ActiveEventsOnly" />
+</RadzenStack>
+
+<RadzenDataGrid TItem="Event" Data="@filteredEvents" AllowPaging PageSize="15" AllowSorting>
+    <Template Context="e">
+        <EventUserActionsComponent ShowAddNewUser="false" Visible="@(e.EndDateAndTime > DateTime.Now && e.FreeSpots > 0)" AddExistingUser="@((args) => enrollUser(e,args))"  />
+        <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" ReadOnly="@(e.EndDateAndTime < DateTime.Now)" OnRemoveUser="@((args) => removeUser(e,args))" OnReleaseSpot="@(() => releaseSpot(e))" />
+    </Template>
+    <Columns>
+        <RadzenDataGridColumn Title="Type" Width="50px">
+            <Template Context="item">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.EventType)" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable Width="160px"/>
+
+        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable/>
+        <RadzenDataGridColumn Property="@(nameof(Event.MinParticipants))" Title="Min" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@(nameof(Event.MaxParticipants))" Title="Max" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@(nameof(Event.PremiumPrice))" Title="Price" Width="80px" TextAlign="TextAlign.Right" FormatString="{0:c2}" />
+
+        <RadzenDataGridColumn Title="Seat status" Sortable="false" Width="340px" TextAlign="TextAlign.Right">
+            <Template Context="e">
+                <SeatComponent Event="e" ShowText="false" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        @if (CompletedEventsOnly) {
+            <RadzenDataGridColumn Title="Cancel?" Width="80px" >
+                <Template Context="e">
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenCheckBox Value="@e.IsCancelled" TValue="bool" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+
+</RadzenDataGrid>
+
+@code {
+    [Inject]
+    public EventService eventService { get; set; }
+
+    [Parameter]
+    public bool ActiveEventsOnly { get; set; } = true;
+
+    [Parameter]
+    public bool CompletedEventsOnly { get; set; } = false;
+
+    private IList<Event> allEvents = new List<Event>();
+    private IList<Event> filteredEvents = new List<Event>();
+
+    private Dictionary<EventTypeEnum, bool> InitialFilters { get; set; } = new Dictionary<EventTypeEnum, bool>() {
+            {    EventTypeEnum.Klubture, true },
+            {    EventTypeEnum.Stranddyk, true },
+            {    EventTypeEnum.Bådtur, true },
+            {    EventTypeEnum.Liveaboard, false },
+            {    EventTypeEnum.Rejse, false },
+            {    EventTypeEnum.Other, false },
+        };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            allEvents = await eventService.GetAllAsync();
+
+            setFilter(InitialFilters);
+            StateHasChanged();
+        }
+    }
+
+    private void setFilter(Dictionary<EventTypeEnum, bool> filter)
+    {
+        InitialFilters = filter;
+
+        var selectedEventTypes = filter.Where(x => x.Value == true).Select(x => x.Key);
+
+        if (ActiveEventsOnly)
+            filteredEvents = allEvents.Where(x => x.StartDateAndTime > DateTime.Now).ToList();
+        else if (CompletedEventsOnly)
+            filteredEvents = allEvents.Where(x => x.EndDateAndTime < DateTime.Now).ToList();
+
+        filteredEvents = filteredEvents.Where(x => selectedEventTypes.Contains(x.EventType)).ToList();
+
+    }
+
+    private async void enrollUser(Event e, string userId)
+    {
+        var evnt = allEvents.Where(x => x.Id == e.Id).FirstOrDefault();
+        if (userId == "scansub")
+        {
+            if (e.FreeSpots > 0)
+            {
+                e.FixedParticipants++;
+                await eventService.UpdateAsync(e);
+            }
+        }
+        else
+        {
+            var eu = new EventUser()
+                {
+                    EventId = e.Id,
+                    ApplicationUserId = userId
+                };
+
+            e.Participants.Add(eu);
+            await eventService.UpdateAsync(e);
+        }
+    }
+
+    private async void releaseSpot(Event e)
+    {
+        e.FixedParticipants--;
+        if (e.FixedParticipants < 0)
+            e.FixedParticipants = 0;
+        await eventService.UpdateAsync(e);
+    }
+
+    private async void removeUser(Event e, ApplicationUser user)
+    {
+        var eu = e.Participants.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+        if (eu!= null)
+        {
+            e.Participants.Remove(eu);
+            await eventService.UpdateAsync(e);
+        }
+    }
+}

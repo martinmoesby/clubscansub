@@ -1,101 +1,25 @@
 ﻿@page "/admin/divesites"
-@using ClubScansub.Utility
 <PageTitle>Ditvesites</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
+
     <RadzenStack>
-
         <RadzenText TextStyle="TextStyle.DisplayH6" Text="Divesite management" />
-        <SearchComponent Reset="@resetFilter" Search="@applySearch" />
     </RadzenStack>
-    <RadzenDataGrid Data="@sites"
-                    @ref=@grid
-                    @bind-Value=@selectedSites
-                    TItem="Divelocation" 
-                    AllowVirtualization="true"
-                    AllowAlternatingRows=false
-                    AllowPaging="true"
-                    AllowSorting="true"
-                    AllowFiltering="false"
-                    AllowColumnPicking="true"
-                    ShowPagingSummary="true"
-                    FilterMode="FilterMode.Simple"
-                    LogicalFilterOperator="LogicalFilterOperator.Or"
-                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                    FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                    PageSize="8"
-                    Style="width:100%;height:100%;"
-                    SelectionMode="DataGridSelectionMode.Single"
-                    RowDoubleClick="@onRowDblCLick"
-                    CellContextMenu="@onCellContextMenu">
-        <HeaderTemplate>
 
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
+    <RadzenTabs TabPosition="TabPosition.Top">
+        <Tabs>
+            <RadzenTabsItem Text="Active events">
+                <DivesiteEventsListComponent ActiveEventsOnly="true" />
+            </RadzenTabsItem>
 
-                
+            <RadzenTabsItem Text="Completed events">
+                <DivesiteEventsListComponent CompletedEventsOnly="true" ActiveEventsOnly="false" />
+            </RadzenTabsItem>
 
-                <RadzenButton Icon="add_location" Size="ButtonSize.Small" class="rz-mr-4" />
-
-            </RadzenStack>
-
-        </HeaderTemplate>
-
-        <LoadingTemplate>
-            <RadzenProgressBarCircular />
-        </LoadingTemplate>
-        <Columns>
-            <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="120px" Pickable="false" TextAlign="TextAlign.Left" Sortable="false" >
-                <Template Context="location">
-                    <img src="@ImageUtils.GetImageSrc(location.Image?.ImageData)" height="0" class="img rounded w-100 h-100" />
-                </Template>
-            </RadzenDataGridColumn>
-
-            <RadzenDataGridColumn TItem="Divelocation" Title="Name" MinWidth="100px" Frozen="true" Pickable="false" SortProperty="Name">
-                <Template Context="Location">
-                    <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
-                        <RadzenColumn Size="12">
-                            <RadzenText TextStyle="TextStyle.Subtitle1">@Location.Name</RadzenText>
-                            
-                        </RadzenColumn>
-                    </RadzenRow>
-                    <RadzenRow>
-                        <RadzenColumn Size="12">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" Style="text-overflow:ellipsis;overflow:hidden;">
-                                @Location.Description
-                            </RadzenText>
-                        </RadzenColumn>
-                    </RadzenRow>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Divelocation" Title="Dive Type" Property="DiveType" Width="140px"></RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Divelocation" Title="Event type" Property="DefaultEventType" Width="140px"></RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Divelocation" Title="Meeting location" Property="MeetingLocation.Name" Width="140px"></RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Divelocation" Title="Depth" Width="120px" SortProperty="MinDepth">
-                <Template Context="Location">
-                    <RadzenRow AlignItems="AlignItems.Start">
-                        <RadzenIcon Icon="vertical_align_top" IconStyle="IconStyle.Primary" />
-                        <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MinDepth} m.")</RadzenText>
-                    </RadzenRow>
-                    <RadzenRow AlignItems="AlignItems.Start">
-                        <RadzenIcon Icon="vertical_align_bottom" IconStyle="IconStyle.Primary" />
-                        <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MaxDepth} m.")</RadzenText>
-                    </RadzenRow>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Visible="false" Pickable="true" TItem="Divelocation" Title="Economics" Width="160px">
-                <Template Context="location">
-                    <RadzenRow>
-                        <RadzenIcon Icon="payments" IconStyle="IconStyle.Primary" />
-                        <RadzenText Text="@location.Price.ToString("C2")" />
-                    </RadzenRow>
-                    <RadzenRow AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">
-                        <RadzenIcon Icon="groups" IconStyle="IconStyle.Primary" />
-                        <RadzenText Text="@($"{location.MinParticipants.ToString()} - {location.MaxParticipants.ToString()}")" /> 
-                    </RadzenRow>
-                </Template>
-            </RadzenDataGridColumn>
-            
-        </Columns>
-
-    </RadzenDataGrid>
+            <RadzenTabsItem Text="Divesites">
+                <DivesiteListComponent />
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
 
 </RadzenStack>

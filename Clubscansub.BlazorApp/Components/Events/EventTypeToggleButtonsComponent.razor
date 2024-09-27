@@ -1,0 +1,63 @@
+﻿@using ClubScansub.Utility
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@Alignment" AlignItems="AlignItems.Center" Style="width:100%">
+    @Start
+    <RadzenToggleButton title="Bådture åben for alle medlemmer" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)"                        Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
+    <RadzenToggleButton title="Klubture åbnet for premium medlemmer" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" class="rz-mr-5" />
+    <RadzenToggleButton title="Strandture åbent for alle medlemmer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
+    <RadzenToggleButton title="Andre arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
+    <RadzenToggleButton title="Rejser ell. længerevarende arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
+    <RadzenToggleButton title="Liveaboards og Ferier" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
+    @End
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public bool SingleSelect { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment Start { get; set; }
+
+    [Parameter]
+    public JustifyContent Alignment { get; set; } = JustifyContent.Normal;
+
+    [Parameter]
+    public Dictionary<EventTypeEnum, bool> InitialFilters { get; set; } = new Dictionary<EventTypeEnum, bool>() {
+            {    EventTypeEnum.Klubture, true },
+            {    EventTypeEnum.Stranddyk, true },
+            {    EventTypeEnum.Bådtur, true },
+            {    EventTypeEnum.Liveaboard, false },
+            {    EventTypeEnum.Rejse, false },
+            {    EventTypeEnum.Other, false },
+        };
+
+    [Parameter]
+    public RenderFragment End { get; set; }
+
+    [Parameter]
+    public EventCallback<Dictionary<EventTypeEnum, bool>> OnFilter { get; set; }
+
+    private bool getEventFilter(EventTypeEnum type)
+    {
+        bool value = true;
+        InitialFilters.TryGetValue(type, out value);
+        return value;
+    }
+
+    private void setEventFilter(EventTypeEnum type)
+    {
+        if (SingleSelect)
+        {
+            foreach (var item in InitialFilters)
+            {
+                if (item.Key != type)
+                    InitialFilters[item.Key] = false;
+            }
+            InitialFilters[type] = true;
+        } else
+        {
+            InitialFilters[type] = !InitialFilters[type];
+            
+        }
+        OnFilter.InvokeAsync(InitialFilters);
+    }
+}

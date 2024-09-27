@@ -188,6 +188,49 @@
                     return ColorClasses.BG_DEFAULT;
             }
         }
+        public static string GetEventColor(EventTypeEnum item)
+        {
+            switch (item)
+            {
+                case EventTypeEnum.Bådtur:
+                    return ColorClasses.FG_BOAT;
+                case EventTypeEnum.Stranddyk:
+                    return ColorClasses.FG_BEACH;
+                case EventTypeEnum.Rejse:
+                    return ColorClasses.FG_TRAVEL;
+                case EventTypeEnum.Liveaboard:
+                    return ColorClasses.FG_LIVEABOARD;
+                case EventTypeEnum.Klubture:
+                    return ColorClasses.FG_CLUB;
+                case EventTypeEnum.Other:
+                    return ColorClasses.FG_OTHER;
+                case EventTypeEnum.NotAnEvent:
+                    return ColorClasses.FG_NOTEVENT;
+                default:
+                    return ColorClasses.FG_DEFAULT;
+            }
+        }
+        public static string GetEventIcon(EventTypeEnum item)
+        {
+            switch (item)
+            {
+                case EventTypeEnum.Bådtur:
+                    return Icons.EVENTTYPE_BOAT;
+                case EventTypeEnum.Stranddyk:
+                    return Icons.EVENTTYPE_BEACH;
+                case EventTypeEnum.Rejse:
+                    return Icons.EVENTTYPE_TRAVEL;
+                case EventTypeEnum.Liveaboard:
+                    return Icons.EVENTTYPE_LIVEABOARD;
+                case EventTypeEnum.Klubture:
+                    return Icons.EVENTTYPE_CLUB;
+                case EventTypeEnum.Other:
+                    return Icons.EVENTTYPE_OTHER;
+                case EventTypeEnum.NotAnEvent:
+                default:
+                    return Icons.EVENTTYPE_NOT_EVENT;
+            }
 
+        }
     }
 }
