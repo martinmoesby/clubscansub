@@ -86,19 +86,23 @@ namespace ClubScansub.Service
         }
 
 
-        public Task<Course> UpdateAsync(Course item)
+        public async Task<Course> UpdateAsync(Course item)
         {
-            throw new NotImplementedException();
+            context.Update(item);
+            await context.SaveChangesAsync();
+            return item;
         }
 
-        public Task<IList<Course>> UpdateAsync(IList<Course> Items)
+        public async Task<IList<Course>> UpdateAsync(IList<Course> Items)
         {
-            throw new NotImplementedException();
+            context.UpdateRange(Items);
+            await context.SaveChangesAsync();
+            return Items;
         }
 
-        public Task<IList<Course>> UpdateAsync(params Course[] Items)
+        public async Task<IList<Course>> UpdateAsync(params Course[] Items)
         {
-            throw new NotImplementedException();
+            return await UpdateAsync(Items.ToList());
         }
 
         // Session functions

@@ -10,11 +10,11 @@
     <RadzenTabs RenderMode="TabRenderMode.Server">
         <Tabs>
             <RadzenTabsItem Text="Active courses">
-                <ActiveCoursesComponent />
+                <CourseListComponent ActiveCoursesOnly="true" />
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="Completed courses">
-                <CompletedCoursesComponent />
+                <CourseListComponent ActiveCoursesOnly="false" />
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="Course templates">

@@ -70,6 +70,13 @@ namespace Clubscansub.BlazorApp.Components.Courses
                 return;
             }
 
+            if(selectedUser == "scansub")
+            {
+                course.FixedParticipants++;
+                await courseService.UpdateAsync(course);
+                return;
+            }
+
             if (enrolledUsers.Any(x => x.ApplicationUserId == selectedUser))
             {
                 notificationService.Notify(NotificationSeverity.Warning, "This user is already enrolled to the course");
@@ -91,6 +98,16 @@ namespace Clubscansub.BlazorApp.Components.Courses
                 await eventUserService.RemoveUserFromEvent(user.Id, Id);
                 await OnLoadEnrolledUsers();
             }
+        }
+        private async void releaseSpot()
+        {
+            course.FixedParticipants--;
+            if(course.FixedParticipants < 0)
+            {
+                course.FixedParticipants = 0;
+            }
+            await courseService.UpdateAsync(course);
+
         }
         private async Task addNewStudent(RegisterUserResult registeredUserResult)
         {

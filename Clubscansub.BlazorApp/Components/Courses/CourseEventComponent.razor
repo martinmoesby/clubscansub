@@ -82,7 +82,7 @@
                 <RadzenTabsItem Text="Tilmeldte" Icon="@IconsTextsAndColors.Icons.ENROLLED">
 
                     <EventUserActionsComponent AddNewUser="addNewStudent" AddExistingUser="enrollExistingUser" Visible="@(course.FreeSpots > 0 && course.StartDateAndTime > DateTime.Now)" ShowAddNewUser="true" />
-                    <EventUserListComponent EventUsers="enrolledUsers" OnRemoveUser="removeUserFromCourse" />
+                    <EventUserListComponent Event="course" EventUsers="enrolledUsers" OnRemoveUser="removeUserFromCourse" OnReleaseSpot="releaseSpot" />
 
                 </RadzenTabsItem>
             </AuthorizeView>
