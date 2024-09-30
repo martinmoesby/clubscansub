@@ -1,0 +1,247 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+@using ClubScansub.Utility
+
+<RadzenStack class="rz-border-base-400 rz-background-color-base-200 rz-border-radius rz-mb-1 rz-mx-1 rz-p-2" JustifyContent="JustifyContent.Center">
+    <RadzenStack Orientation="Orientation.Horizontal">
+
+        <RadzenStack Style="flex:1">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(Session.Course.CourseType)" class="rz-mr-1 " />
+                <RadzenText TextStyle="TextStyle.Caption">@Session.Course.CourseName</RadzenText>
+            </RadzenStack>
+    
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon(Session.Sessiontype)" class="rz-mr-1" />
+                <RadzenText TextStyle="TextStyle.Overline">@Session.SessionName</RadzenText>
+            </RadzenStack>
+
+        </RadzenStack>
+        <RadzenStack Style="flex:0.1" AlignItems="AlignItems.Center">
+            <AuthorizeView Roles="Divepro">
+
+            @if (IsSignedUp())
+            {
+                if (IsApproved())
+                {
+                    <RadzenIcon Icon="radio_button_checked" IconStyle="IconStyle.Success" />
+                } else {
+                    if (IsRetracted())
+                    {
+                        <RadzenIcon Icon="radio_button_checked" IconStyle="IconStyle.Danger" />
+                    } else
+                    {
+                        <RadzenIcon Icon="radio_button_checked" IconStyle="IconStyle.Warning" />
+                    }
+                }
+            
+            } else 
+            {
+                <RadzenIcon Icon="radio_button_unchecked" IconStyle="IconStyle.Dark" />
+            }
+            </AuthorizeView>
+            <AuthorizeView Roles="Administrator">
+                @if(Session.InstructorsMissing > 0 ) {
+                    <RadzenIcon Icon="radio_button_checked" IconStyle="IconStyle.Danger" />
+                }
+                else if (Session.SessionInstructors.Count() == 0)
+                {
+                    <RadzenIcon Icon="radio_button_unchecked" IconStyle="IconStyle.Warning" />
+                } else {
+                    <RadzenIcon Icon="radio_button_checked" IconStyle="IconStyle.Success" />
+                }
+            </AuthorizeView>
+
+        </RadzenStack>
+    </RadzenStack>
+    
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
+        <RadzenStack Gap="2" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="flex:1">
+            <AuthorizeView Roles="Administrator,Owner">
+                <RadzenStack Style="flex:1">
+
+
+                    @foreach (var item in Session.SessionInstructors)
+                    {
+                        switch (item.InstructorStatus)
+                        {
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.Approved:
+                                if (ReadOnly)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" IsPill Text="@item.Instructor.Name" />
+                                }
+                                else
+                                {
+                                    <AuthorizeView Roles="Administrator, Owner" Context="innerAuthorizeView">
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name">
+                                            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="@item.Instructor?.Name.ToUpper()" Click="@(() => onUnapproveInstructor(item.Instructor))" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" />
+                                        </RadzenBadge>
+                                    </AuthorizeView>
+                                }
+
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.SignedUp:
+                                if (ReadOnly)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                }
+                                else
+                                {
+                                    <AuthorizeView Roles="Administrator, Owner" Context="innerAuthorizeView">
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name">
+                                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="@item.Instructor?.Name.ToUpper()" Click="@(() => onApproveInstructor(item.Instructor))" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" />
+                                        </RadzenBadge>
+                                    </AuthorizeView>
+                                }
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.Retracted:
+                                <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.None:
+                                <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                break;
+                            default:
+                                <RadzenBadge BadgeStyle="BadgeStyle.Dark" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                break;
+                        }
+                    }
+                </RadzenStack>
+            </AuthorizeView>
+            <AuthorizeView Roles="Divepro">
+                <RadzenStack Style="flex:1">
+
+
+                    @if (!Session.SessionInstructors.Any(x => x.InstructorId == CurrentUser?.Id) && !ReadOnly)
+                    {
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="SIGN ME UP" Click="onSignupInstructor" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" />
+                        </RadzenBadge>
+                    }
+                    @foreach (var item in Session.SessionInstructors)
+                    {
+                        switch (item.InstructorStatus)
+                        {
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.Approved:
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" IsPill Text="@item.Instructor.Name" />
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.SignedUp:
+                                @if (item.InstructorId == CurrentUser?.Id && !ReadOnly)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" title="Not available - please retract my signing up">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="@item.Instructor?.Name.ToUpper()" Click="onRetractSubmission" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" />
+                                    </RadzenBadge>
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                }
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.Retracted:
+                                @if (item.InstructorId == CurrentUser?.Id && !ReadOnly)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" title="Available - sign me up again">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="@item.Instructor?.Name.ToUpper()" Click="onRetractSubmission" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" />
+                                    </RadzenBadge>
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                }
+                                break;
+
+                            case ClubScansub.Utility.Enums.SessionInstructorStatusEnum.None:
+                            default:
+                                <RadzenBadge BadgeStyle="BadgeStyle.Dark" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill Text="@item.Instructor?.Name" />
+                                break;
+                        }
+                    }
+                </RadzenStack>
+            </AuthorizeView>
+        </RadzenStack>
+
+    </RadzenStack>
+
+</RadzenStack>
+
+
+@code {
+
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = true;
+
+    [Parameter]
+    public CourseSession Session { get; set; }
+
+    [Parameter]
+    public ApplicationUser CurrentUser { get; set; } = new();
+
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnApproveInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession,ApplicationUser)> OnRetractInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnSignUpInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnUnaproveInstructor { get; set; }
+
+    private bool IsSignedUp()
+    {
+        foreach (var item in Session.SessionInstructors)
+        {
+            if (item.InstructorId == CurrentUser?.Id)
+                return true;
+        }
+        return false;
+    }
+
+    private bool IsApproved()
+    {
+        foreach (var item in Session.SessionInstructors)
+        {
+            if (item.InstructorId == CurrentUser?.Id)
+                return item.InstructorApproved;
+        }
+        return false;
+    }
+
+    private bool IsRetracted()
+    {
+        foreach (var item in Session.SessionInstructors)
+        {
+            if (item.InstructorId == CurrentUser?.Id)
+                return item.InstructorRetracted;
+        }
+        return false;
+    }
+
+    private void onApproveInstructor(ApplicationUser instructor)
+    {
+        OnApproveInstructor.InvokeAsync((Session, instructor));
+    }
+
+    private void onUnapproveInstructor(ApplicationUser instructor)
+    {
+        OnUnaproveInstructor.InvokeAsync((Session, instructor));
+    }
+
+    private void onRetractSubmission()
+    {
+        OnRetractInstructor.InvokeAsync((Session, CurrentUser));
+    }
+
+    private void onSignupInstructor()
+    {
+        OnSignUpInstructor.InvokeAsync((Session, CurrentUser));
+    }
+
+}

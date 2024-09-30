@@ -13,7 +13,7 @@ using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
 
-namespace Clubscansub.BlazorApp.Shared
+namespace ClubScansub.BlazorApp.Shared
 {
     public partial class MainLayout : LayoutComponentBase
     {

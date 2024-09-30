@@ -174,7 +174,7 @@ namespace ClubScansub.API
 
             var accounttrans = new ApplicationUserAccountEntry
             {
-                Amount = isPaymentRequired ? -item.Price : 0,
+                Amount = isPaymentRequired ? -item.Price ?? 0 : 0,
                 AccountType = AccountTypeEnum.EventAccountType,
                 Description = $"{item.Title} ,d. {item.StartDateAndTime.ToShortDateString()}",
                 Event = item,

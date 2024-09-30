@@ -1,5 +1,5 @@
-using Clubscansub.BlazorApp;
-using Clubscansub.BlazorApp.Areas.Identity;
+using ClubScansub.BlazorApp;
+using ClubScansub.BlazorApp.Areas.Identity;
 using ClubScansub.Data;
 using ClubScansub.Models;
 using ClubScansub.Service;

@@ -1,5 +1,5 @@
-﻿using Clubscansub.BlazorApp.Components.Account;
-using Clubscansub.BlazorApp.Components.Member;
+﻿using ClubScansub.Blazor.UIComponents.Account;
+using ClubScansub.Blazor.UIComponents.Member;
 using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen;
 using Radzen.Blazor;
 
-namespace Clubscansub.BlazorApp.Pages.Admin
+namespace ClubScansub.BlazorApp.Pages.Admin
 {
     public partial class Members : ComponentBase
     {

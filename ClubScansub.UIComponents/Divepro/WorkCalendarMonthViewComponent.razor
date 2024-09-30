@@ -1,0 +1,151 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+@using Nager.Date
+
+    <RadzenStack Style="width:100%;flex:1;border:1px solid; background-color:var(--rz-base-400)" class="rz-border-color-base-400" Gap="0">
+            <RadzenRow AlignItems="AlignItems.Center" Gap="0">
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Monday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Tuesday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Wednesday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Thursday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Friday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Saturday</RadzenColumn>
+                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Sunday</RadzenColumn>
+            </RadzenRow>
+
+                @foreach (var item in weeks)
+                {
+
+                    <RadzenRow style="flex:1;border-top:1px solid;" class="rz-border-color-base-400" Gap="0">
+                        @foreach (var day in EachDay(item.Start, item.End))
+                        {
+                            string bgClass = "rz-background-color-base-100 rz-border-color-base-400";
+                            string borderStyle = "border-right:1px solid";
+                            if (Nager.Date.DateSystem.IsWeekend(day, CountryCode.DK))
+                            {
+                                bgClass = "rz-background-color-base-400 rz-border-color-base-400";
+                            }
+                            if (day.DayOfWeek == DayOfWeek.Sunday)
+                            {
+                                borderStyle = "border-right:none;";
+                            }
+                            if (day.Month == Start.Month)
+                            {
+                                <RadzenColumn Style=@($"flex:1;height:100%;display:flex;flex-direction:column;{borderStyle}") class="@bgClass">
+                                    <RadzenText TextStyle="TextStyle.Caption" Text="@day.Day.ToString()" />
+                                    <RadzenStack Style="flex:1;padding:1px">
+                                        @foreach (var session in GetSessionsForDay(day).OrderBy(x => x.StartDateAndTime))
+                                        {
+                                            <WorkCalendarSessionComponent Session="session"
+                                                              OnRetractInstructor="@(async (args)=>await OnRetractInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                              OnApproveInstructor="@(async (args)=> await OnApproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                              OnUnaproveInstructor="@(async (args)=>await OnUnaproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                              OnSignUpInstructor="@(async (args) => await OnSignUpInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                                          ReadOnly="(day < DateTime.Now)" CurrentUser="CurrentUser" />
+                                        }
+                                    </RadzenStack>
+
+                                </RadzenColumn>
+                            }
+                            else
+                            {
+                                <RadzenColumn Style="height:100%;flex:1;border-right:1px solid" class="rz-background-color-base-200 rz-border-color-base-400" />
+                            }
+                        }
+                    </RadzenRow>
+                }
+
+        </RadzenStack>
+    
+
+@code {
+
+    [Parameter]
+    public IList<CourseSession> Sessions { get; set; } = new List<CourseSession>();
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnApproveInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnRetractInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnSignUpInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnUnaproveInstructor { get; set; }
+
+    [Parameter]
+    public DateTime Start { get; set; }
+    [Parameter]
+    public DateTime End { get; set; }
+
+    [Parameter]
+    public ApplicationUser CurrentUser { get; set; } = new();
+    private DateTime calendarStart;
+    private DateTime calendarEnd;
+    private double daysInCalendarView;
+    private double weeksInCalendarView;
+    private IList<Week> weeks = new List<Week>();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Start != null && End != null) {
+        calculateInternalVariables();
+            
+        }
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    private void calculateInternalVariables()
+    {
+        weeks.Clear();
+        int daysInFirstWeekOfMonth = Start.DayOfWeek == DayOfWeek.Sunday ? 1 : 7 - (int)Start.DayOfWeek + 1;
+        int daysInLastWeekOfMonth = (int)End.DayOfWeek;
+        calendarStart = Start.AddDays(-(7 - daysInFirstWeekOfMonth));
+        calendarEnd = End.AddDays(7 - daysInLastWeekOfMonth);
+        daysInCalendarView = (calendarEnd - calendarStart).TotalDays + 1;
+        weeksInCalendarView = daysInCalendarView / 7;
+        for (int i = 0; i < weeksInCalendarView; i++)
+        {
+            var newWeek = new Week()
+                {
+                    Start = calendarStart.AddDays(i * 7),
+                    End = calendarStart.AddDays(i * 7).AddDays(6)
+                };
+            if (newWeek.Start.Month == Start.Month || newWeek.End.Month == Start.Month)
+            {
+                weeks.Add(newWeek);
+            }
+        }
+
+    }
+
+    private class Week
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+    }
+
+    private IEnumerable<CourseSession> GetSessionsForDay(DateTime date)
+    {
+        var daysSessions = Sessions.Where(x => x.DateTime.Date == date.Date);
+
+        if (daysSessions.Count() > 0)
+            return daysSessions;
+
+        return daysSessions;
+    }
+
+    private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru, int interval = 1)
+    {
+        for (var day = from; day <= thru; day = day.AddDays(interval))
+            yield return day;
+    }
+
+}

@@ -1,5 +1,5 @@
-using Clubscansub.BlazorApp.Components.Events;
-using Clubscansub.BlazorApp.Components.Courses;
+using ClubScansub.Blazor.UIComponents.Events;
+using ClubScansub.Blazor.UIComponents.Courses;
 using ClubScansub.Models;
 using ClubScansub.Models.Interface;
 using ClubScansub.Service;
@@ -14,9 +14,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Drawing;
 
-namespace Clubscansub.BlazorApp.Pages
+namespace ClubScansub.BlazorApp.Pages
 {
-    public partial class Index
+    public partial class Index : ComponentBase
     {
         //[Inject]
         //protected IJSRuntime JSRuntime { get; set; }

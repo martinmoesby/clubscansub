@@ -3,9 +3,9 @@ using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Clubscansub.BlazorApp.Pages.Account
+namespace ClubScansub.BlazorApp.Pages.Account
 {
-    public partial class ConfirmEmail
+    public partial class ConfirmEmail : ComponentBase
     {
         [Inject]
         NavigationManager navigationManager { get; set; }

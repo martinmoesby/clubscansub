@@ -1,0 +1,77 @@
+﻿        @if (Sessions.Count == 0 || Sessions == null)
+        {
+<RadzenStack class="rz-border rz-border-radius-5" Gap="10" Style="flex:1" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
+    <RadzenText Text="No available Courses to sign up for" TextStyle="TextStyle.DisplayH5" />
+</RadzenStack>
+        } else {
+
+
+@foreach (var item in uniqueDates.OrderBy(x => x.Date))
+{
+    <RadzenRow class="rz-border rz-border-radius-4 rz-p-4" RowGap="5" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">
+        <RadzenColumn SizeXS="12" SizeSM="4" SizeMD="3" SizeLG="2">
+            <RadzenText TextStyle="TextStyle.DisplayH6" Text="@item.ToString("dddd 'd.' dd.")" />
+        </RadzenColumn>
+        <RadzenColumn SizeXS="12" SizeSM="8" SizeMD="9" SizeLG="10">
+            <RadzenRow AlignItems="AlignItems.Start">
+
+                @foreach (var session in GetSessionsForDay(item))
+                {
+                    <RadzenColumn Size="12" SizeSM="6" SizeLG="4" SizeXL="3">
+                        <WorkCalendarSessionComponent Session="session"
+                                                      OnRetractInstructor="@(async (args)=>await OnRetractInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                      OnApproveInstructor="@(async (args)=> await OnApproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                      OnUnaproveInstructor="@(async (args)=>await OnUnaproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                      OnSignUpInstructor="@(async (args) => await OnSignUpInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                                      ReadOnly="(session.StartDateAndTime < DateTime.Now)" CurrentUser="CurrentUser" />
+                    </RadzenColumn>
+
+                }
+            </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
+}
+        }
+
+@code {
+    [Parameter]
+    public IList<CourseSession> Sessions { get; set; } = new List<CourseSession>();
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnApproveInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnRetractInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnSignUpInstructor { get; set; }
+
+    [Parameter]
+    public EventCallback<(CourseSession, ApplicationUser)> OnUnaproveInstructor { get; set; }
+
+    [Parameter]
+    public ApplicationUser CurrentUser { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Sessions.Count > 0)
+        {
+            uniqueDates = Sessions.Select(x => x.StartDateAndTime).DistinctBy(x => x.Date).ToList();
+        }
+    }
+
+    private IList<DateTime> uniqueDates = new List<DateTime>();
+
+    private IEnumerable<CourseSession> GetSessionsForDay(DateTime date)
+    {
+        var daysSessions = Sessions.Where(x => x.DateTime.Date == date.Date);
+
+        if (daysSessions.Count() > 0)
+            return daysSessions;
+
+        return daysSessions;
+    }
+
+
+}

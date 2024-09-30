@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace Clubscansub.BlazorApp.Pages.Admin
+namespace ClubScansub.BlazorApp.Pages.Admin
 {
     public partial class Courses : ComponentBase
     {

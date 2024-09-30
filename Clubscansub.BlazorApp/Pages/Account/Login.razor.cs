@@ -1,4 +1,4 @@
-﻿using Clubscansub.BlazorApp.Components.Account;
+﻿using ClubScansub.Blazor.UIComponents.Account;
 using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service;
@@ -10,9 +10,9 @@ using Radzen;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 
-namespace Clubscansub.BlazorApp.Pages.Account
+namespace ClubScansub.BlazorApp.Pages.Account
 {
-    public partial class Login
+    public partial class Login : ComponentBase
     {
 
         [Inject]

@@ -1,4 +1,4 @@
-﻿using Clubscansub.BlazorApp.Components.Divesite;
+﻿using ClubScansub.Blazor.UIComponents.Divesite;
 using ClubScansub.Models;
 using ClubScansub.Service;
 using ClubScansub.Utility;
@@ -7,7 +7,7 @@ using Radzen;
 using Radzen.Blazor;
 using System.Drawing;
 
-namespace Clubscansub.BlazorApp.Pages.Admin
+namespace ClubScansub.BlazorApp.Pages.Admin
 {
     public partial class Divesites : ComponentBase
     {

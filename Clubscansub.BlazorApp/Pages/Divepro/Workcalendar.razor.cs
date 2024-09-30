@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace Clubscansub.BlazorApp.Pages.Divepro
+namespace ClubScansub.BlazorApp.Pages.Divepro
 {
     public partial class Workcalendar: ComponentBase
     {

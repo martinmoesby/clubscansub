@@ -30,7 +30,7 @@
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
 
-                <Clubscansub.BlazorApp.Components.Member.MemberRolesComponent MemberRolesChanged="setRoleFilter" ShowStatusFilter="true" MemberStatusFilterChanged="setStatusFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="true" Alignment="AlignItems.Center" Justify="JustifyContent.SpaceBetween" />
+                <MemberRolesComponent MemberRolesChanged="setRoleFilter" ShowStatusFilter="true" MemberStatusFilterChanged="setStatusFilter" Orientation="Orientation.Horizontal" IsLoading=@isLoading InitialRoles="@roleFilter" ShowLabel="true" Alignment="AlignItems.Center" Justify="JustifyContent.SpaceBetween" />
 
                 <RadzenButton Icon="person_add" Click="onCreateNewMemberClick" Size="ButtonSize.Small" class="rz-mr-4" />
 
@@ -45,7 +45,7 @@
         <Columns>
             <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Profile status" Filterable=false Width="120px" MinWidth="120px" Frozen="true">
                 <Template Context="member">
-                    <Clubscansub.BlazorApp.Components.Member.ProfileStatusComponent Profile="@member" />
+                    <ProfileStatusComponent Profile="@member" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" Frozen="true"></RadzenDataGridColumn>

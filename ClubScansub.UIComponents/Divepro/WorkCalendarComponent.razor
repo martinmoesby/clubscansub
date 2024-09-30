@@ -1,0 +1,144 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Utility
+@using ClubScansub.Service
+@using ClubScansub.Utility.Enums
+@using Nager.Date
+
+<RadzenStack Style="width:100%;height:100%;display:flex;">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width:100%;" class="rz-p-4">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+            <RadzenButton Click="prevMonth" Icon="chevron_backward" Disabled="@(Start < DateTime.Now)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" />
+            <RadzenButton Click="nextMonth" Icon="chevron_forward" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" />
+        </RadzenStack>
+        <RadzenText Text="@Start.ToString("MMMM yyyy")" TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" />
+
+        @if (AllowViews)
+        {
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenToggleButton Change="@(() => setViewMode(WorkCalendarViewModeEnum.List))" Value="@(ViewMode == WorkCalendarViewModeEnum.List)" Icon="list" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
+                <RadzenToggleButton Change="@(() => setViewMode(WorkCalendarViewModeEnum.Calendar))" Value="@(ViewMode == WorkCalendarViewModeEnum.Calendar)" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Icon="calendar_month" />
+            </RadzenStack>
+        }
+    </RadzenStack>
+
+    @switch (ViewMode)
+    {
+        case WorkCalendarViewModeEnum.List:
+            <WorkCalendarListViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+                                           OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+                                           OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+                                           OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+            Sessions="sessions" CurrentUser="currentUser" />
+
+            break;
+        case WorkCalendarViewModeEnum.Calendar:
+            <WorkCalendarMonthViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+                                            OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+                                            OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+                                            OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+                                            Start="Start" End="End"
+                                            Sessions="sessions" CurrentUser="currentUser" />
+
+            break;
+        default:
+            break;
+    }
+
+</RadzenStack>
+@code {
+    [Inject]
+    AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
+    [Inject]
+    CourseService courseService { get; set; }
+
+    [Parameter]
+    public WorkCalendarViewModeEnum ViewMode { get; set; } = WorkCalendarViewModeEnum.List;
+
+    [Parameter]
+    public bool AllowViews { get; set; } = true;
+
+    private IList<CourseSession> sessions = new List<CourseSession>();
+
+    private DateTime Start;
+    private DateTime End;
+    private bool isLoading = true;
+    private ApplicationUser currentUser = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        End = Start.AddMonths(1).AddDays(-1);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        await base.OnParametersSetAsync();
+        if (firstrender)
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User != null)
+            {
+                currentUser = await memberService.GetAsync(authState.User.GetIdentityId());
+            }
+            await refreshSessions();
+        }
+    }
+
+    private async void nextMonth()
+    {
+
+        Start = Start.AddMonths(1);
+        End = Start.AddMonths(1).AddDays(-1);
+        await refreshSessions();
+    }
+    private async void prevMonth()
+    {
+
+        Start = Start.AddMonths(-1);
+        End = Start.AddMonths(1).AddDays(-1);
+        await refreshSessions();
+
+    }
+
+    private async Task refreshSessions()
+    {
+        isLoading = true;
+        sessions = await courseService.GetCourseSessionsByMonth(Start);
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void setViewMode(WorkCalendarViewModeEnum mode) {
+        ViewMode = mode;
+    }
+
+    private async void retractInstructor(CourseSession session, ApplicationUser instructor)
+    {
+        await courseService.RetractSessionInstructor(session, instructor);
+        await refreshSessions();
+    }
+    private async void unApproveInstructor(CourseSession session, ApplicationUser instructor)
+    {
+        await courseService.ApproveSessionInstructor(session, instructor, false);
+        await refreshSessions();
+    }
+
+    private async void approveInstructor(CourseSession session, ApplicationUser instructor)
+    {
+        await courseService.ApproveSessionInstructor(session, instructor);
+        await refreshSessions();
+    }
+    private async void signupInstructor(CourseSession session, ApplicationUser instructor)
+    {
+        await courseService.SignupSessionInstructor(session, instructor);
+        await refreshSessions();
+    }
+
+}

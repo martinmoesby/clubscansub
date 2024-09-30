@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Concurrent;
 using ClubScansub.Models.DTO;
 
-namespace Clubscansub.BlazorApp
+namespace ClubScansub.BlazorApp
 {
     public class BlazorLoginMiddleware<TUser> where TUser : class
     {

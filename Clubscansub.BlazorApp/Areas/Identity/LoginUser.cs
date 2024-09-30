@@ -1,4 +1,4 @@
-﻿namespace Clubscansub.BlazorApp.Areas.Identity
+﻿namespace ClubScansub.BlazorApp.Areas.Identity
 {
     public class LoginUser<TUser> where TUser : class
     {

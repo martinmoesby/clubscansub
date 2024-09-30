@@ -1,0 +1,239 @@
+﻿@using ClubScansub.Service
+@using ClubScansub.Service.ServiceResults
+@using ClubScansub.Utility
+<RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
+
+    <CourseTypeToggleButtonsComponent OnFilter="(args) => setcourseTypeFilter(args)" InitialFilters="completedCourseTypeFilters" SingleSelect="false">
+        <End>
+            <SearchComponent Placeholder="Student name, number..." Search="(args) => filterCompletedCoursesByUser(args)" Reset="() => resetCompletedCoursesParticipantsFilter()" />
+            <RadzenToggleButton Visible="!ActiveCoursesOnly" @bind-Value="showOnlyExecutedCourses" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" ToggleShade="Shade.Lighter" Change="applyFilter" ToggleIcon="filter_list" Icon="filter_list_off" />
+        </End>
+    </CourseTypeToggleButtonsComponent>
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Click="createNewCourse" Text="Courseplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" Visible="ActiveCoursesOnly" />
+
+</RadzenStack>
+
+<RadzenStack>
+
+    <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting PageSize="14" AllowPaging>
+
+        <Template Context="course">
+            <EventUserActionsComponent AddNewUser = "@((args) => addNewStudent(args, course.Id))" AddExistingUser = "@((args) => enrollExistingUser(args,course.Id))" Visible = "@(course.FreeSpots > 0 && course.StartDateAndTime> DateTime.Now && ActiveCoursesOnly)" ShowAddNewUser = "true" />
+            <EventUserListComponent Event="course" EventUsers="course.Participants.ToList()" 
+                OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))"
+                OnReleaseSpot="@(() => removeReservedSeat(course))"
+                ReadOnly="!ActiveCoursesOnly" />
+        </Template>
+
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Width="60px" SortProperty="@nameof(Course.CourseType)">
+                <Template Context="item">
+                    <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name" />
+            <RadzenDataGridColumn Property="@nameof(Course.StartDateAndTime)" Width="160px" Title="Start Date" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn Property="@nameof(Course.EndDateAndTime)" Width="160px" Title="End Date" TextAlign="TextAlign.Center" />
+
+            <RadzenDataGridColumn Title="Participants" Width="240px" Sortable="false" TextAlign="TextAlign.Center">
+                <Template Context="item">
+                    <SeatComponent Event="item" ShowText="false" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="60px" TextAlign="TextAlign.Center" Visible="ActiveCoursesOnly">
+                    <Template Context="item">
+                        @if(item.StartDateAndTime < DateTime.Now) {
+                            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" title="Course has started"  ProgressBarStyle="ProgressBarStyle.Success" ShowValue="false" Size="ProgressBarCircularSize.ExtraSmall" Style="margin:0 auto"/>
+                        } else {
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Shade="Shade.Light" Icon="delete" Click="@(() => deleteCourse(item))" Size="ButtonSize.Small" />
+
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+
+        </Columns>
+
+    </RadzenDataGrid>
+</RadzenStack>
+
+<style>
+    .fullHeight {
+        height: 100%
+    }
+</style>
+
+
+@code {
+
+    [Inject]
+    DialogService dialogService { get; set; }
+
+    [Inject]
+    EventUserService eventUserService { get; set; }
+
+    [Inject]
+    CourseService courseService { get; set; }
+
+    [Parameter]
+    public bool ActiveCoursesOnly { get; set; } = true;
+
+    private IList<Course> courses = new List<Course>();
+    private IList<Course> filteredCourses = new List<Course>();
+    private bool showOnlyExecutedCourses = true;
+    private string completedFilterString = "";
+
+    private Dictionary<CourseTypeEnum, bool> completedCourseTypeFilters = new Dictionary<CourseTypeEnum, bool>
+            {
+            {    CourseTypeEnum.BaseCourse, true },
+            {    CourseTypeEnum.SpecialtyCourse, true },
+            {    CourseTypeEnum.TechCourse, true },
+            {    CourseTypeEnum.ProCourse, true }
+            };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            if (!ActiveCoursesOnly)
+            {
+                courses = await courseService.GetStartedOrCompletedAsync();
+
+            } else
+            {
+                showOnlyExecutedCourses = false;
+                courses = await courseService.GetAllAsync();
+            }
+            filteredCourses = courses;
+            applyFilter();
+        }
+    }
+
+    private async void addNewStudent(RegisterUserResult newUser, int CourseId)
+    {
+
+        if (newUser.IsSucceesfull) {
+            dialogService.CloseSide();
+            enrollExistingUser(newUser.User!.Id, CourseId);
+
+        } else
+        {
+            var message = newUser.Errors[0];
+            await dialogService.Alert(message, "Cannot create this user", new AlertOptions()
+                {
+                    OkButtonText = "OK"
+                });
+        }
+    }
+
+    private async void removeReservedSeat(Course course)
+    {
+        course.FixedParticipants--;
+        await courseService.UpdateAsync(course);
+        applyFilter();
+
+    }
+
+    private async void removeUserFromCourse(ApplicationUser user, int CourseId)
+    {
+        var confirm = (await dialogService.Confirm($"Do you want to remove {user.Name} from the course?", "Remove user"));
+        if (confirm.Value)
+        {
+            var activecourse = courses.FirstOrDefault(x => x.Id == CourseId);
+
+            //TODO: Remove user from course and return any deposits made for the enrollment
+            activecourse.Participants = await eventUserService.RemoveUserFromEvent(user.Id, CourseId);
+            applyFilter();
+
+        }
+    }
+
+    private async void enrollExistingUser(string selectedUserId, int CourseId)
+    {
+        var activecourse = courses.FirstOrDefault(x => x.Id == CourseId);
+        if(selectedUserId =="scansub")
+        {
+            activecourse.FixedParticipants++;
+            await courseService.UpdateAsync(activecourse);
+        } else
+        {
+            //TODO: Remove user from course and return any deposits made for the enrollment
+            activecourse.Participants = await eventUserService.AddUserToEvent(selectedUserId, CourseId);
+        }
+        applyFilter();
+    }
+
+    private async void deleteCourse(Course item)
+    {
+        if (item.Participants.Count > 0 || item.FixedParticipants > 0)
+        {
+            await dialogService.Alert("Move participants to a different course before deleting the course from the system", "Cannot delete a course with participants", new AlertOptions()
+                {
+                    OkButtonText = "OK",
+                });
+            return;
+        } else
+        {
+            var reply = await dialogService.Confirm("Do you want to remove this course from the calendar?", "Delete a course", new ConfirmOptions()
+                {
+                    CancelButtonText = "No",
+                    OkButtonText = "Yes",
+                });
+
+            if (reply.GetValueOrDefault()) {
+                await courseService.DeleteAsync(item);
+                courses = await courseService.GetAllAsync();
+                applyFilter();
+
+            }
+        }
+    }
+
+    private async void createNewCourse()
+    {
+        await dialogService.OpenAsync<CoursePlannerComponent>("Course planner", null, new DialogOptions()
+            {
+                Width = "75%",
+                Height = "90%",
+                ContentCssClass = "fullHeight"
+            });
+        courses = await courseService.GetAllAsync();
+        applyFilter();
+    }
+
+    private void filterCompletedCoursesByUser(string filter)
+    {
+        completedFilterString = filter.ToLower();
+        applyFilter();
+    }
+
+    private void setcourseTypeFilter(Dictionary<CourseTypeEnum, bool> filters)
+    {
+        completedCourseTypeFilters = filters;
+        applyFilter();
+    }
+
+    private void resetCompletedCoursesParticipantsFilter()
+    {
+        completedFilterString = string.Empty;
+        applyFilter();
+    }
+
+    private void applyFilter()
+    {
+        var completedCoursesEventUsers = courses.SelectMany(x => x.Participants);
+        var completedCoursesFilteredEvents = completedCoursesEventUsers.Where(x => x.ApplicationUser.Name.ToLower().Contains(completedFilterString) || x.ApplicationUser.AccountNumber.Contains(completedFilterString)).Select(x => x.EventId);
+
+        filteredCourses = courses.Where(x => completedCoursesFilteredEvents.Contains(x.Id) || x.Participants.Count == 0).ToList();
+        var completedCourseTypes = completedCourseTypeFilters.Where(x => x.Value == true).Select(x => x.Key);
+
+        filteredCourses = filteredCourses.Where(x => completedCourseTypes.Contains(x.CourseType)).ToList();
+        if (showOnlyExecutedCourses)
+            filteredCourses = filteredCourses.Where(x => x.Participants.Count > 0).ToList();
+        else
+            filteredCourses = filteredCourses.Where(x => x.Participants.Count >= 0).ToList();
+
+        StateHasChanged();
+    }
+}
