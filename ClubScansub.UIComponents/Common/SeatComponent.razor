@@ -3,8 +3,10 @@
 {
     <RadzenText Text="@Text" TextStyle="TextStyle.Caption" />
 }
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
-    <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Light" Variant="Variant.Outlined" Style="width:100%">
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" >
+    <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Info" Variant="Variant.Filled" Shade="Shade.Lighter" Style="width:100%; text-align:start">
+
+
         @for (int i = 0; i < Event.FixedParticipants; i++)
         {
             <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Info" />
@@ -39,13 +41,13 @@
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) % 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Dark" title="Ledig plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Secondary" title="Ledig plads" />
 
         }
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) / 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Dark" title="10 ledige plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Secondary" title="10 ledige plads" />
 
         }
     </RadzenBadge>

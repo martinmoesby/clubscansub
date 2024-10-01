@@ -22,37 +22,31 @@
         }
     </RadzenStack>
 
-    @switch (ViewMode)
-    {
-        case WorkCalendarViewModeEnum.List:
-            <WorkCalendarListViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
-                                           OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
-                                           OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
-                                           OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
-            Sessions="sessions" CurrentUser="currentUser" />
+        @switch (ViewMode)
+        {
+            case WorkCalendarViewModeEnum.List:
+                <WorkCalendarListViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+                                               OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+                                               OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+                                               OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+                Sessions="sessions" />
 
-            break;
-        case WorkCalendarViewModeEnum.Calendar:
-            <WorkCalendarMonthViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
-                                            OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
-                                            OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
-                                            OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
-                                            Start="Start" End="End"
-                                            Sessions="sessions" CurrentUser="currentUser" />
+                break;
+            case WorkCalendarViewModeEnum.Calendar:
+                <WorkCalendarMonthViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+                                                OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+                                                OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+                                                OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+                                                Start="Start" End="End"
+                                                Sessions="sessions"  />
 
-            break;
-        default:
-            break;
-    }
+                break;
+            default:
+                break;
+        }
 
 </RadzenStack>
 @code {
-    [Inject]
-    AuthenticationStateProvider authenticationStateProvider { get; set; }
-
-    [Inject]
-    MemberService memberService { get; set; }
-
     [Inject]
     CourseService courseService { get; set; }
 
@@ -67,7 +61,7 @@
     private DateTime Start;
     private DateTime End;
     private bool isLoading = true;
-    private ApplicationUser currentUser = new();
+
 
     protected override void OnInitialized()
     {
@@ -82,11 +76,6 @@
         await base.OnParametersSetAsync();
         if (firstrender)
         {
-            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User != null)
-            {
-                currentUser = await memberService.GetAsync(authState.User.GetIdentityId());
-            }
             await refreshSessions();
         }
     }

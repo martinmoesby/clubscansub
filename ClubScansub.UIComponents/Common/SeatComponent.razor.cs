@@ -2,7 +2,7 @@
 using ClubScansub.Models.Interface;
 using Microsoft.AspNetCore.Components;
 
-namespace ClubScansub.Blazor.UIComponents.Scheduler
+namespace ClubScansub.Blazor.UIComponents.Common
 {
     public partial class SeatComponent : ComponentBase
     {

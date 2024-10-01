@@ -6,42 +6,29 @@
 
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-        <RadzenStack>
-            <RadzenText Text="Show event types" TextStyle="TextStyle.Caption" />
+
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
             <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenLabel Text="All" />
-                    <RadzenSwitch Value="@showAllEvents" Change="setAllEventFilter" />
-                </RadzenStack>
-
-                <RadzenToggleButton title="Bådture åben for alle medlemmer" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)" 
-                    Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
-                <RadzenToggleButton title="Klubture åbnet for premium medlemmer" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" class="rz-mr-5" />
-
-                <RadzenToggleButton title="Strandture åbent for alle medlemmer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
-                <RadzenToggleButton title="Andre arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
-                <RadzenToggleButton title="Rejser ell. længerevarende arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
-                <RadzenToggleButton title="Liveaboards og Ferier" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
-                <RadzenToggleButton title="Ikke angivet arrangement" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
-
+                <RadzenLabel Text="All events" Component="eventswitch" Style="font-size:0.8rem; margin-top:6px" />
+                <RadzenSwitch Value="@showAllEvents" Change="setAllEventFilter" Name="eventswitch" />
             </RadzenStack>
+            <RadzenStack>
+                <EventTypeToggleButtonsComponent InitialFilters="eventTypeFilters" OnFilter="setEventFilters" />
+            </RadzenStack>
+
         </RadzenStack>
 
-        <RadzenStack>
-            <RadzenText Text="Show course types" TextStyle="TextStyle.Caption" />
 
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
             <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenLabel Text="All" />
-                    <RadzenSwitch Value="@showAllCourses" Change="setAllCourseFilter" />
-                </RadzenStack>
-
-                <RadzenToggleButton title="Basis kurser" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
-                <RadzenToggleButton title="Specialer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))"  />
-                <RadzenToggleButton title="Tech. kurser" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))"  />
-                <RadzenToggleButton title="Pro kurser" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))"  />
-
+                <RadzenLabel Text="All courses" Style="font-size:0.8rem; margin-top:6px" Component="courseswitch" />
+                <RadzenSwitch Value="@showAllCourses" Change="setAllCourseFilter" Name="courseswitch" />
             </RadzenStack>
+            <RadzenStack>
+                <CourseTypeToggleButtonsComponent OnFilter="setCourseFilters" InitialFilters="courseTypeFilters" />
+            </RadzenStack>
+
         </RadzenStack>
 
     </RadzenStack>
@@ -63,20 +50,19 @@
         <Template Context="context" >
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap">
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                    <RadzenIcon Icon="@(getAppointmentIcon(context))"  Style="font-size:0.8rem;" />
+                    <RadzenIcon Icon="@(getAppointmentIcon(context))"  />
                     @if (context is CourseSession)
                     {
-                        <RadzenIcon Icon="@(getCourseSessionIcon(context))" Style="font-size:0.8rem;" />
+                        <RadzenIcon Icon="@(getCourseSessionIcon(context))" />
                     }
                 </RadzenStack>
-                <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@context.Title</span>
+                <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.9rem;">@context.Title</span>
 
             </RadzenStack>
 
         </Template>
         <ChildContent>
 
-            @* <RadzenDayView Text="Dag" TimeFormat="HH:mm" MinutesPerSlot="15" /> *@
             <RadzenWeekView Text="@IconsTextsAndColors.Texts.SCHEDULER_WEEK" TimeFormat="HH:mm" MinutesPerSlot="15" />
             <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
             <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />

@@ -65,36 +65,44 @@
 
         public static class ColorClasses
         {
-            public static string BG_BOAT = "rz-background-color-primary-darker";
-            public static string BG_CLUB = "rz-background-color-primary-lighter";
-            public static string BG_BEACH = "rz-background-color-primary";
-            public static string BG_OTHER = "rz-background-color-info";
-            public static string BG_TRAVEL = "rz-background-color-success";
-            public static string BG_LIVEABOARD = "rz-background-color-success-darker";
-            public static string BG_NOTEVENT = "rz-background-color-danger-light";
+            public static string BG_BOAT = "rz-background-color-success-dark";
+            public static string FG_BOAT = "rz-color-on-success-dark";
 
-            public static string FG_BOAT = "rz-color-on-primary-darker";
-            public static string FG_CLUB = "rz-color-on-primary-lighter";
-            public static string FG_BEACH = "rz-color-on-primary";
-            public static string FG_OTHER = "rz-color-on-info";
-            public static string FG_TRAVEL = "rz-color-on-success";
-            public static string FG_LIVEABOARD = "rz-color-on-success-darker";
-            public static string FG_NOTEVENT = "rz-color-on-danger-light";
+            public static string BG_CLUB = "rz-background-color-success";
+            public static string FG_CLUB = "rz-color-on-success";
+            
+            public static string BG_BEACH = "rz-background-color-success-light";
+            public static string FG_BEACH = "rz-color-on-success-light";
 
-            public static string BG_COURSE_BASE = "rz-background-color-danger-light";
-            public static string BG_COURSE_SPEC = "rz-background-color-danger";
-            public static string BG_COURSE_TECH = "rz-background-color-danger-dark";
-            public static string BG_COURSE_PRO = "rz-background-color-danger-darker";
+            public static string BG_OTHER = "rz-background-color-info-dark";
+            public static string FG_OTHER = "rz-color-on-info-dark";
+            
+            public static string BG_TRAVEL = "rz-background-color-info";
+            public static string FG_TRAVEL = "rz-color-on-info";
+            
+            public static string BG_LIVEABOARD = "rz-background-color-info-light";
+            public static string FG_LIVEABOARD = "rz-color-on-info-light";
 
-            public static string FG_COURSE_BASE = "rz-color-on-danger-light";
-            public static string FG_COURSE_SPEC = "rz-color-on-danger";
-            public static string FG_COURSE_TECH = "rz-color-on-danger-dark";
-            public static string FG_COURSE_PRO = "rz-color-on-danger-darker";
+            public static string BG_NOTEVENT = "rz-background-color-danger";
+            public static string FG_NOTEVENT = "rz-color-on-danger";
+
+
+            public static string BG_COURSE_BASE = "rz-background-color-warning-light";
+            public static string FG_COURSE_BASE = "rz-color-on-warning-light";
+
+            public static string BG_COURSE_SPEC = "rz-background-color-warning";
+            public static string FG_COURSE_SPEC = "rz-color-on-warning";
+
+            public static string BG_COURSE_TECH = "rz-background-color-warning-dark";
+            public static string FG_COURSE_TECH = "rz-color-on-warning-dark";
+
+            public static string BG_COURSE_PRO = "rz-background-color-warning-darker";
+            public static string FG_COURSE_PRO = "rz-color-on-warning-darker";
 
             public static string BG_DEFAULT = "rz-background-color-info-lighter";
             public static string FG_DEFAULT = "rz-color-on-info-lighter";
 
-            public static string SCHEDULER_SLOT_BG_TODAY = "rz-background-color-warning-lighter";
+            public static string SCHEDULER_SLOT_BG_TODAY = "rz-background-color-info-lighter";
             public static string SCHEDULER_SLOT_BG_WEEKEND = "rz-background-color-secondary-lighter";
             public static string SCHEDULER_SLOT_BG_HOLIDAY = "rz-background-color-danger-lighter";
             public static string SCHEDULER_SLOT_BG_WORKHOURS = "rz-background-color-success-lighter";

@@ -1,2 +1,20 @@
 ﻿@page "/admin/work"
-<WorkCalendarComponent AllowViews="false" ViewMode="Utility.Enums.WorkCalendarViewModeEnum.Calendar"/>
+
+
+    <RadzenTabs>
+        <Tabs>
+            <RadzenTabsItem Text="Current Work">
+                <WorkCalendarComponent AllowViews="false" ViewMode="WorkCalendarViewModeEnum.Calendar" />
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Completed work">
+
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+
+
+<style>
+    .rz-tabview, .rz-tabview-panel {
+        height:100%
+    }
+</style>

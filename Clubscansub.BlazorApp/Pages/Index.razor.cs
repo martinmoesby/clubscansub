@@ -18,20 +18,11 @@ namespace ClubScansub.BlazorApp.Pages
 {
     public partial class Index : ComponentBase
     {
-        //[Inject]
-        //protected IJSRuntime JSRuntime { get; set; }
-
         [Inject]
         protected DialogService Dialogservice { get; set; }
 
         [Inject]
         protected TooltipService Tooltipservice { get; set; }
-
-        //[Inject]
-        //protected ContextMenuService ContextMenuservice { get; set; }
-
-        //[Inject]
-        //protected NotificationService Notificationservice { get; set; }
 
         [Inject]
         protected EventService eventService { get; set; }
@@ -42,7 +33,7 @@ namespace ClubScansub.BlazorApp.Pages
         private IList<CourseSession> sessions = new List<CourseSession>();
 
         private IList<ICalendarEvent> filteredData = new List<ICalendarEvent>();
-        //private IList<Course> courses = new List<Course>();
+
         private List<object> holidays = new();
 
         private Dictionary<EventTypeEnum, bool> eventTypeFilters = new Dictionary<EventTypeEnum, bool>() 
@@ -53,7 +44,7 @@ namespace ClubScansub.BlazorApp.Pages
             { EventTypeEnum.Other, true },
             { EventTypeEnum.Liveaboard, false },
             { EventTypeEnum.Rejse, false },
-            { EventTypeEnum.NotAnEvent, false }
+            //{ EventTypeEnum.NotAnEvent, false }
         };
 
         private Dictionary<CourseTypeEnum, bool> courseTypeFilters = new Dictionary<CourseTypeEnum, bool>() {
@@ -369,17 +360,6 @@ namespace ClubScansub.BlazorApp.Pages
 
         }
 
-        private bool getEventFilter(EventTypeEnum type)
-        {
-            return eventTypeFilters[type];
-        }
-        private async void setEventFilter(EventTypeEnum type)
-        {
-            eventTypeFilters[type] = !eventTypeFilters[type];
-            var allToggled = !eventTypeFilters.Any(x => x.Value == false);
-            showAllEvents = allToggled;
-            applyFilter();
-        }
         private void setAllEventFilter()
         {
             showAllEvents = !showAllEvents;
@@ -389,18 +369,6 @@ namespace ClubScansub.BlazorApp.Pages
             }
             applyFilter();
         }
-
-        private bool getCourseFilter(CourseTypeEnum type)
-        {
-            return courseTypeFilters[type];
-        }
-        private async void setCourseFilter(CourseTypeEnum type)
-        {
-            courseTypeFilters[type] = !courseTypeFilters[type];
-            var allToggled = !courseTypeFilters.Any(x => x.Value == false);
-            showAllCourses = allToggled;
-            applyFilter();
-        }
         private void setAllCourseFilter()
         {
             showAllCourses = !showAllCourses;
@@ -408,6 +376,19 @@ namespace ClubScansub.BlazorApp.Pages
             {
                 courseTypeFilters[item.Key] = showAllCourses;
             }
+            applyFilter();
+        }
+
+        private void setCourseFilters(Dictionary<CourseTypeEnum, bool> filters)
+        {
+            courseTypeFilters = filters;
+            showAllCourses = !filters.Any(x => x.Value == false);
+            applyFilter();
+        }
+        private void setEventFilters(Dictionary<EventTypeEnum, bool> filters)
+        {
+            eventTypeFilters = filters;
+            showAllEvents = !filters.Any(x => x.Value == false);
             applyFilter();
         }
 

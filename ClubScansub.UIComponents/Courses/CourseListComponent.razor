@@ -1,6 +1,7 @@
 ﻿@using ClubScansub.Service
 @using ClubScansub.Service.ServiceResults
 @using ClubScansub.Utility
+
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
 
     <CourseTypeToggleButtonsComponent OnFilter="(args) => setcourseTypeFilter(args)" InitialFilters="completedCourseTypeFilters" SingleSelect="false">
@@ -18,11 +19,32 @@
     <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting PageSize="14" AllowPaging>
 
         <Template Context="course">
-            <EventUserActionsComponent AddNewUser = "@((args) => addNewStudent(args, course.Id))" AddExistingUser = "@((args) => enrollExistingUser(args,course.Id))" Visible = "@(course.FreeSpots > 0 && course.StartDateAndTime> DateTime.Now && ActiveCoursesOnly)" ShowAddNewUser = "true" />
-            <EventUserListComponent Event="course" EventUsers="course.Participants.ToList()" 
-                OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))"
-                OnReleaseSpot="@(() => removeReservedSeat(course))"
-                ReadOnly="!ActiveCoursesOnly" />
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Participants">
+                        <EventUserActionsComponent AddNewUser = "@((args) => addNewStudent(args, course.Id))" AddExistingUser = "@((args) => enrollExistingUser(args,course.Id))" Visible = "@(course.FreeSpots > 0 && course.StartDateAndTime> DateTime.Now && ActiveCoursesOnly)" ShowAddNewUser = "true" />
+                        <EventUserListComponent Event="course" EventUsers="course.Participants.ToList()" 
+                            OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))"
+                            OnReleaseSpot="@(() => removeReservedSeat(course))"
+                            ReadOnly="!ActiveCoursesOnly" />
+
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Sessions">
+                        <RadzenDataGrid Data="@course.CourseSessions" TItem="CourseSession" EditMode="DataGridEditMode.Single">
+                            <Columns>
+                                <RadzenDataGridColumn Property="@nameof(CourseSession.Sessiontype)" Title="Type" Width="60px">
+                                    <Template Context="session">
+                                        <RadzenIcon Icon="@(IconsTextsAndColors.GetCourseSessionIcon(session.Sessiontype))" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(CourseSession.StartDateAndTime)" Title="Start" Width="160px" />
+                                <RadzenDataGridColumn Property="@nameof(CourseSession.EndDateAndTime)" Title="End"  Width="160px"/>
+                                <RadzenDataGridColumn Property="@nameof(CourseSession.SessionName)" Title="Description" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
         </Template>
 
         <Columns>

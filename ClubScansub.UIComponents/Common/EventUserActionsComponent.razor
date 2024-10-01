@@ -14,7 +14,7 @@
                         LoadData="@onLoadExistingUsers">
 
         </RadzenDropDown>
-        <RadzenButton Click="enrollExistingUserCallback" Text="Enroll user" Size="ButtonSize.ExtraSmall" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
+        <RadzenButton Click="enrollExistingUserCallback" Text="Enroll user" Size="ButtonSize.ExtraSmall" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
     </RadzenStack>
 
     <RadzenButton Text="Add user" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.USER_ADD" Click="addNewUser_Click" Visible ="ShowAddNewUser" />

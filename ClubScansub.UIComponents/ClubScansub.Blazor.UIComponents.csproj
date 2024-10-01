@@ -23,4 +23,8 @@
     <ProjectReference Include="..\ClubScansub.Utility\ClubScansub.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Scheduler\" />
+  </ItemGroup>
+
 </Project>

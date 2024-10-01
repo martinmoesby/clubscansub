@@ -1,12 +1,23 @@
 ﻿@using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@Alignment" AlignItems="AlignItems.Center" Style="width:100%">
     @Start
-    <RadzenToggleButton title="Bådture åben for alle medlemmer" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)"                        Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
-    <RadzenToggleButton title="Klubture åbnet for premium medlemmer" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" class="rz-mr-5" />
-    <RadzenToggleButton title="Strandture åbent for alle medlemmer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
-    <RadzenToggleButton title="Andre arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
-    <RadzenToggleButton title="Rejser ell. længerevarende arrangementer" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
-    <RadzenToggleButton title="Liveaboards og Ferier" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
+@*     <RadzenToggleButton ToggleShade="Shade.Darker"  ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)"                        Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
+    <RadzenToggleButton ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" class="rz-mr-5" />
+    <RadzenToggleButton ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Primary" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
+    <RadzenToggleButton ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
+    <RadzenToggleButton ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
+    <RadzenToggleButton  ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
+ *@
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Bådtur)" ToggleShade="Shade.Dark"    ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)" Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Klubture)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" />
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Stranddyk)" ToggleShade="Shade.Light"   ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" class="rz-mr-5" />
+
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Other)" ToggleShade="Shade.Dark"    ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Rejse)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.Liveaboard)" ToggleShade="Shade.Light"   ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" class="rz-mr-5" />
+
+    <RadzenToggleButton Visible="@isActive(EventTypeEnum.NotAnEvent)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Dark" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
+
     @End
 </RadzenStack>
 
@@ -28,6 +39,7 @@
             {    EventTypeEnum.Liveaboard, false },
             {    EventTypeEnum.Rejse, false },
             {    EventTypeEnum.Other, false },
+            {    EventTypeEnum.NotAnEvent, false }
         };
 
     [Parameter]
@@ -45,6 +57,8 @@
 
     private void setEventFilter(EventTypeEnum type)
     {
+        bool typeExisits = InitialFilters.Any(x=>x.Key == type);
+
         if (SingleSelect)
         {
             foreach (var item in InitialFilters)
@@ -52,12 +66,14 @@
                 if (item.Key != type)
                     InitialFilters[item.Key] = false;
             }
-            InitialFilters[type] = true;
-        } else
-        {
-            InitialFilters[type] = !InitialFilters[type];
-            
         }
+        if (typeExisits)
+            InitialFilters[type] = !InitialFilters[type];
         OnFilter.InvokeAsync(InitialFilters);
+    }
+
+    private bool isActive(EventTypeEnum type)
+    {
+        return InitialFilters.Any(x => x.Key == type);
     }
 }

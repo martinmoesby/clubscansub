@@ -1,4 +1,32 @@
 ﻿@page "/divepro/workcalendar"
+@using ClubScansub.Service
+@using ClubScansub.Extensions
 
-<WorkCalendarComponent AllowViews="true"  />
+<CascadingValue Name="CurrentUser" TValue="ApplicationUser" Value="applicationUser">
+    <WorkCalendarComponent AllowViews="true"  />
+</CascadingValue>
 
+@code {
+    [Inject]
+    AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
+    private ApplicationUser applicationUser;
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        await base.OnParametersSetAsync();
+        if (firstrender)
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User != null)
+            {
+                applicationUser = await memberService.GetAsync(authState.User.GetIdentityId());
+                StateHasChanged();
+            }
+
+        }
+    }
+}
