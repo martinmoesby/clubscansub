@@ -57,7 +57,7 @@ namespace ClubScansub.Service
             var data = context.Courses
                 .Include(x=>x.CourseSessions)
                 .Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
-                .Where(x=> x.StartDateAndTime > DateTime.UtcNow);
+                .Where(x=> x.EndDateAndTime > DateTime.UtcNow);
             return await data.ToListAsync();
         }
 
@@ -67,6 +67,17 @@ namespace ClubScansub.Service
                 .Include(x => x.CourseSessions)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
                 .Where(x => x.StartDateAndTime < DateTime.UtcNow);
+            return await data.ToListAsync();
+        }
+
+        public async Task<IList<CourseSessionInstructor>> GetCourseSessionInstructorAsync()
+        {
+            var data = context.CourseSessionInstructors
+                .Include(x => x.CourseSession)
+                .ThenInclude(x=>x.Course)
+                .Include(x=>x.Instructor)
+                .Where(x => x.CourseSession.DateTime < DateTime.UtcNow && x.InstructorApproved == true)
+                .OrderBy(x=>x.CourseSession.Course.StartDateAndTime).ThenBy(x=>x.CourseSession.DateTime).ThenBy(x =>x.Instructor.UserName);
             return await data.ToListAsync();
         }
 

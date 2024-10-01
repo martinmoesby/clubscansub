@@ -30,16 +30,46 @@
 
                     </RadzenTabsItem>
                     <RadzenTabsItem Text="Sessions">
-                        <RadzenDataGrid Data="@course.CourseSessions" TItem="CourseSession" EditMode="DataGridEditMode.Single">
+                        <RadzenDataGrid 
+                            @ref="sessionsGrid"
+                            Data="@course.CourseSessions.OrderBy(x=>x.StartDateAndTime)" 
+                            TItem="CourseSession" 
+                            EditMode="DataGridEditMode.Single" 
+                            RowUpdate="updateRow"
+                            AllowSorting="false">
                             <Columns>
                                 <RadzenDataGridColumn Property="@nameof(CourseSession.Sessiontype)" Title="Type" Width="60px">
                                     <Template Context="session">
                                         <RadzenIcon Icon="@(IconsTextsAndColors.GetCourseSessionIcon(session.Sessiontype))" />
                                     </Template>
                                 </RadzenDataGridColumn>
-                                <RadzenDataGridColumn Property="@nameof(CourseSession.StartDateAndTime)" Title="Start" Width="160px" />
-                                <RadzenDataGridColumn Property="@nameof(CourseSession.EndDateAndTime)" Title="End"  Width="160px"/>
+                                <RadzenDataGridColumn Title="Start" Width="160px">
+                                    <Template Context="session">
+                                        <RadzenText Text="@session.StartDateAndTime.ToString("dd-MM-yyyy HH:mm")" TextStyle="TextStyle.Body2"/>
+                                    </Template>
+                                    <EditTemplate Context="session">
+                                        <RadzenDatePicker @bind-Value="@session.DateTime" ShowTime Style="width:160px" />
+                                    </EditTemplate>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(CourseSession.EndDateAndTime)" Title="End"  Width="160px">
+                                    <Template Context="session">
+                                        <RadzenText Text="@session.EndDateAndTime.ToString("dd-MM-yyyy HH:mm")" TextStyle="TextStyle.Body2" />
+                                    </Template>
+                                    <EditTemplate Context="session">
+                                        <RadzenTimePicker @bind-TimeValue="@session.Duration" Name="Duration" />
+                                    </EditTemplate>
+                                </RadzenDataGridColumn>
                                 <RadzenDataGridColumn Property="@nameof(CourseSession.SessionName)" Title="Description" />
+                                <RadzenDataGridColumn Width="90px" TextAlign="TextAlign.Center">
+                                    <Template Context="session">
+                                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => editRow(session))" />
+                                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => deleteRow(session))" />
+                                    </Template>
+                                    <EditTemplate Context="session">
+                                        <RadzenButton Icon="save" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => saveRow(session))" />
+                                        <RadzenButton Icon="cancel" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Small" Click="@((args) => cancelEdit(session))" />
+                                    </EditTemplate>
+                                </RadzenDataGridColumn>
                             </Columns>
                         </RadzenDataGrid>
                     </RadzenTabsItem>
@@ -100,6 +130,8 @@
     [Parameter]
     public bool ActiveCoursesOnly { get; set; } = true;
 
+    private RadzenDataGrid<CourseSession> sessionsGrid;
+
     private IList<Course> courses = new List<Course>();
     private IList<Course> filteredCourses = new List<Course>();
     private bool showOnlyExecutedCourses = true;
@@ -118,16 +150,7 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            if (!ActiveCoursesOnly)
-            {
-                courses = await courseService.GetStartedOrCompletedAsync();
-
-            } else
-            {
-                showOnlyExecutedCourses = false;
-                courses = await courseService.GetAllAsync();
-            }
-            filteredCourses = courses;
+            await reloadCourses();
             applyFilter();
         }
     }
@@ -224,6 +247,53 @@
         applyFilter();
     }
 
+
+    #region Grid edit functions
+    private CourseSession editSessionOriginal = null;
+
+    private async Task editRow(CourseSession session)
+    {
+        editSessionOriginal = session;
+        await sessionsGrid.EditRow(session);
+    }
+
+    private async Task saveRow(CourseSession session)
+    {
+        await sessionsGrid.UpdateRow(session);
+    }
+
+
+    private async void updateRow(CourseSession session)
+    {
+        await courseService.UpdateSessionAsync(session);
+
+    }
+
+    private async void cancelEdit(CourseSession session)
+    {
+        sessionsGrid.CancelEditRow(session);
+        session = editSessionOriginal;
+        // await reloadCourses();
+        // applyFilter();
+    }
+
+    private async void deleteRow(CourseSession session)
+    {
+        var doDelete = (await dialogService.Confirm("Remove session?", "Do you want to remove this session form the current course?", new ConfirmOptions()
+            {
+                CancelButtonText = "No",
+                OkButtonText = "Yes"
+            }));
+        if (doDelete.GetValueOrDefault())
+        {
+            // Implement Session delete function in service and 
+            // refresh the course list
+            // StateHasChanged()
+        }
+    }
+    #endregion
+
+
     private void filterCompletedCoursesByUser(string filter)
     {
         completedFilterString = filter.ToLower();
@@ -240,6 +310,20 @@
     {
         completedFilterString = string.Empty;
         applyFilter();
+    }
+
+    private async Task reloadCourses()
+    {
+        if (!ActiveCoursesOnly)
+        {
+            courses = await courseService.GetStartedOrCompletedAsync();
+        }
+        else
+        {
+            showOnlyExecutedCourses = false;
+            courses = await courseService.GetAllAsync();
+        }
+        filteredCourses = courses;
     }
 
     private void applyFilter()
