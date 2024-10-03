@@ -16,7 +16,7 @@
 
 <RadzenStack>
 
-    <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting PageSize="14" AllowPaging>
+    <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting PageSize="14" AllowPaging AllowAlternatingRows="false">
 
         <Template Context="course">
             <RadzenTabs>

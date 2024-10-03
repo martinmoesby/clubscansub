@@ -1,0 +1,159 @@
+﻿@using ClubScansub.Service
+<h3>WorkCompletedComponent</h3>
+<RadzenDataGrid AllowGrouping Data="instructorWork" TItem="InstructorWork" AllowFiltering Render="OnRender" HideGroupedColumn="true" AllGroupsExpanded="false" Style="flex:1" AllowAlternatingRows="false">
+    <GroupHeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText TextStyle="TextStyle.Body2">
+                @($"{context.Data.Key}")
+            </RadzenText>
+            <RadzenText Text="@($"Total hours: {GetTotal(context).ToString("N2")}")" TextStyle="TextStyle.Body2" />
+        </RadzenStack>
+        @*
+        @($"{context.Data.Key} - lEVEL HAS DATA: {context.Data != null} - Data has Subgroups:{context.Data?.Subgroups?.Count()} - Level has Items :{context.Data.Items.Cast<InstructorWork>().ToList().Sum(x=>x.Hours).ToString()} ")
+        *@
+        @*
+        <RadzenStack Orientation=" Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.Body2">
+        @($"{context.Data.Key}")
+        </RadzenText>
+        <RadzenText Text="@(context.Data.Items.Cast<InstructorWork>().ToList().Sum(x=>x.Hours).ToString())" />
+        </RadzenStack>
+        *@
+    </GroupHeaderTemplate>
+    <Columns>
+
+        <RadzenDataGridColumn Title="Instructor name" GroupProperty="@nameof(InstructorWork.InstructorName)" Width="200px">
+            <Template Context="item">
+                <RadzenText Text="@item.InstructorName" />
+            </Template>
+            <GroupFooterTemplate>
+                @context.Data.Key - total:<b>@(String.Format("{0:n2}", context.Data.Items.Cast<InstructorWork>().Sum(x => x.Hours)))</b>
+            </GroupFooterTemplate>
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Year" GroupProperty="@nameof(InstructorWork.Year)" Width="100px" Filterable>
+            <Template Context="item">
+                <RadzenText Text="@item.Year.ToString()" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Month" GroupProperty="@nameof(InstructorWork.Month)" Width="140px" SortProperty="@nameof(InstructorWork.MonthNumber)">
+            <Template Context="item">
+                <RadzenText Text="@item.Month" />
+            </Template>
+        </RadzenDataGridColumn>
+
+
+        <RadzenDataGridColumn Title="Course Name" GroupProperty="@nameof(InstructorWork.CourseName)" Width="240px">
+            <Template Context="item">
+                <RadzenText Text="@item.CourseName" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn GroupProperty="@nameof(InstructorWork.SessionName)" Width="240px" Title="Session">
+            <Template Context="item">
+                <RadzenText Text="@item.SessionName" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="Date and duration" Groupable="false">
+            <Template Context="item">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Style="flex:1">
+                    <RadzenText Text="@item.StartDate.ToString()" TextStyle="TextStyle.Caption" />
+                    <RadzenText Text="@item.EndDate.ToString()" TextStyle="TextStyle.Caption" />
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Property="@nameof(InstructorWork.Hours)" FormatString="{0:N2}" TextAlign="TextAlign.Right" Title="Total Hours">
+
+        </RadzenDataGridColumn>
+
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Inject]
+    public CourseService courseService { get; set; }
+
+    private IList<InstructorWork> instructorWork = new List<InstructorWork>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            var data = await courseService.GetCourseSessionInstructorAsync();
+            instructorWork = data.Select(x => new InstructorWork()
+                {
+                    CourseId = x.CourseSession.Course.Id,
+                    CourseName = x.CourseSession.Course.CourseName,
+                    SessionId = x.CourseSessionId,
+                    SessionName = x.CourseSession.SessionName,
+                    InstructorId = x.InstructorId,
+                    InstructorName = x.Instructor.Name,
+                    StartDate = x.CourseSession.StartDateAndTime,
+                    EndDate = x.CourseSession.EndDateAndTime,
+                    Duration = x.CourseSession.Duration
+                }).ToList();
+
+
+            StateHasChanged();
+        }
+    }
+
+
+    void OnRender(DataGridRenderEventArgs<InstructorWork> args)
+    {
+        if (args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.InstructorName), SortOrder = SortOrder.Descending, Title = "Instructor" });
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.Year), SortOrder = SortOrder.Descending, Title = "Year" });
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.Month), SortOrder = SortOrder.Ascending, Title = "Month" });
+            args.Grid.CollapseAll();
+            StateHasChanged();
+        }
+    }
+
+    private double GetTotal(Group group)
+    {
+        try
+        {
+            Console.WriteLine("Current Level:" + group.Level + ", Current Descriptor:" + group.GroupDescriptor.GetTitle());
+            var data = group.Data.Items.Cast<InstructorWork>();
+            return data.Sum(x => x.Hours);
+            // return 0;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(group.Data.Key);
+            Console.WriteLine(group.Data.Items.Cast<InstructorWork>().Count().ToString());
+            Console.WriteLine(ex.Message);
+            return 0;
+        }
+    }
+
+    private class InstructorWork
+    {
+        public string CourseName { get; set; }
+        public int CourseId { get; set; }
+        public string SessionName { get; set; }
+        public int SessionId { get; set; }
+        public string InstructorId { get; set; }
+        public string InstructorName { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public TimeSpan Duration { get; set; }
+
+        public int Year => StartDate.Year;
+        public string Month => StartDate.ToString("MM MMMM");
+        public int MonthNumber => StartDate.Month;
+        public double Hours => Duration.TotalHours;
+
+
+    }
+}

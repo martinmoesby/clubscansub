@@ -6,12 +6,12 @@
 
 </RadzenStack>
 
-<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate">
+<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false">
     <Template Context="sessiondetails">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText Text="Course sessions" TextStyle="TextStyle.Subtitle1"></RadzenText>
 
-            <RadzenDataGrid Data="@sessiondetails.Sessions.OrderBy(x=>x.SessionNumber)" TItem="CourseSessionTemplate">
+            <RadzenDataGrid Data="@sessiondetails.Sessions.OrderBy(x=>x.SessionNumber)" TItem="CourseSessionTemplate" AllowAlternatingRows="false">
                 <Columns>
                     <RadzenDataGridColumn Width="40px" Title="Type">
                         <Template Context="sessionItem">

@@ -30,6 +30,8 @@ namespace ClubScansub.Blazor.UIComponents.Events
 
         [Parameter]
         public int EventId { get; set; }
+        [Parameter]
+        public EventCallback<Event> EventStatusChanged { get; set; }
 
         private ApplicationUser currentUser { get; set; } = new();
         Event Event { get; set; } = new Event();
@@ -74,6 +76,14 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 return;
             }
 
+            if (selectedUser == "scansub")
+            {
+                Event.FixedParticipants++;
+                await eventService.UpdateAsync(Event);
+                StateHasChanged();
+                return;
+            }
+
             if (Event.Participants.Any(x => x.ApplicationUserId == selectedUser))
             {
                 notificationService.Notify(NotificationSeverity.Warning, "This user is already signed up for this event");
@@ -87,6 +97,16 @@ namespace ClubScansub.Blazor.UIComponents.Events
             }
         }
 
+        private async Task releaseReservedSpot()
+        {
+            Event.FixedParticipants--;
+            if (Event.FixedParticipants < 0)
+                Event.FixedParticipants = 0;
+
+            await eventService.UpdateAsync(Event);
+            StateHasChanged();
+            return;
+        }
         private async Task removeUserFromEvent(ApplicationUser user)
         {
             var confirm = (await dialogService.Confirm($"Do you want to remove {user.Name} from this trip?", "Remove user"));
@@ -97,5 +117,36 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 await OnLoadEnrolledUsers();
             }
         }
+
+        private async Task cancelEvent()
+        {
+            var doCancel = await dialogService.Confirm("Do you want to cancel this event? Participants will be refunded 100%", "Cancel Event?", new ConfirmOptions()
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            });
+            if (doCancel.GetValueOrDefault())
+            {
+                Event.IsCancelled = true;
+                await eventService.CancelEventAsync(Event);
+                await EventStatusChanged.InvokeAsync(Event);
+            }
+        }
+
+        private async Task reactivateEvent()
+        {
+            var doCancel = await dialogService.Confirm("Do you want to activate this event?", "Activate Event?", new ConfirmOptions()
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            });
+            if (doCancel.GetValueOrDefault())
+            {
+                Event.IsCancelled = false;
+                await eventService.ActivateEventAsync(Event);
+                await EventStatusChanged.InvokeAsync(Event);
+            }
+        }
+
     }
 }

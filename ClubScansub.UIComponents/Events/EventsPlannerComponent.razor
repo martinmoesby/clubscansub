@@ -1,0 +1,205 @@
+﻿@using ClubScansub.Models.Interface
+@using ClubScansub.Service
+@using ClubScansub.Utility
+@using System.Globalization
+@using Nager.Date
+@using Nager.Date.Model
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;">
+
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;">
+        <RadzenStack Style="flex:1">
+
+            <RadzenStack Orientation="Orientation.Vertical" Style="flex:1;width:100%;" JustifyContent="JustifyContent.SpaceBetween">
+                <EventTypeToggleButtonsComponent InitialFilters="initialEventTypeFilter" OnFilter="filterSitesList" SingleSelect="true">
+                    <Start>
+                        <RadzenText Text="Event type filter:" TextStyle="TextStyle.Caption" />
+                    </Start>
+                    <End>
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Style="flex:1" AlignItems="AlignItems.Center">
+                            <RadzenText Text="Divetype filter:" TextStyle="TextStyle.Caption" />
+                            <RadzenToggleButton title="Show wreck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
+                            <RadzenToggleButton title="Show nature/muck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
+                            <RadzenToggleButton title="Show Technical dive locations in the list"  Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
+                        </RadzenStack>
+                    </End>
+                </EventTypeToggleButtonsComponent>
+                <RadzenRadioButtonList Style="flex:1;width:100%;" class="rz-p-4 rz-border rz-border-color-base-700 rz-overflow-auto rz-border-radius-2" Data="@filteredDivesites" TValue="Divelocation" TextProperty="@nameof(Divelocation.Name)" Orientation="Orientation.Vertical" Value="selectedLocation" Change="@(args => setSelectedSite(args))" />
+            </RadzenStack>
+
+            <RadzenStack>
+
+                <RadzenText Text="New Events to be created" TextStyle="TextStyle.Subtitle2" />
+                <RadzenDataGrid Data="@newEvents" TItem="Event" @ref=eventsGrid AllowAlternatingRows="false">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Date" Width="120px" />
+                        <RadzenDataGridColumn Property="@nameof(Event.EventType)" Title="Event Type" Width="60px" TextAlign="TextAlign.Center">
+                            <Template Context="item">
+                                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.EventType)" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Dive type" Width="60px" TextAlign="TextAlign.Center">
+                            <Template>
+                                <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(context.Divelocation.DiveType)" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(Event.Title)" Title="Divesite / Location" TextAlign="TextAlign.Left" />
+                        <RadzenDataGridColumn Width="40px" TextAlign="TextAlign.Center">
+                            <Template>
+                                <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Danger" Click="@(() => removeNewEvent(context))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+
+            </RadzenStack>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitEvents" Text="Save events" Icon="save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetEvents" Text="Reset" Icon="cancel" />
+        </RadzenStack>
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
+        <PlannerComponent OnSlotClicked="addSelectedLocationAsEvent" DoReloadData="doReloadData" NewItems="eventsList"/>
+    </RadzenStack>
+</RadzenStack>
+<style>
+    .scheduler-slot {
+    }
+
+        .scheduler-slot:hover {
+            cursor: pointer;
+            background-color: var(--rz-secondary-lighter) !important;
+        }
+</style>
+
+@code {
+    [Inject]
+    EventService eventService { get; set; }
+
+    [Inject]
+    SiteService siteService { get; set; }
+
+    [Inject]
+    TooltipService tooltipService { get; set; }
+
+    private RadzenDataGrid<Event> eventsGrid;
+
+    private Divelocation? selectedLocation;
+    private IList<Divelocation> divesites = new List<Divelocation>();
+    private IList<Divelocation> filteredDivesites = new List<Divelocation>();
+
+
+    private IList<Event> newEvents = new List<Event>();
+    private IList<ICalendarEvent> eventsList = [];
+    private bool doReloadData = false;
+
+    private Dictionary<DiveTypeEnum, bool> diveTypeFilter = new Dictionary<DiveTypeEnum, bool>
+    {
+        { DiveTypeEnum.NatureDive, false },
+        { DiveTypeEnum.WreckDive, true },
+        { DiveTypeEnum.TechDive, false },
+    };
+    private Dictionary<EventTypeEnum, bool> initialEventTypeFilter = new Dictionary<EventTypeEnum, bool>()
+    {
+        { EventTypeEnum.Bådtur, true},
+        { EventTypeEnum.Stranddyk, false},
+        { EventTypeEnum.Klubture, false},
+        { EventTypeEnum.Other, false}
+    };
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            divesites = await siteService.GetAllAsync();
+
+            eventsList = [];
+            filterSitesList(initialEventTypeFilter);
+        }
+    }
+
+    private void setSelectedSite(Divelocation site)
+    {
+        selectedLocation = site;
+    }
+
+    private void filterSitesList(Dictionary<EventTypeEnum, bool> eventTypes)
+    {
+        var selectedEventtype = eventTypes.Where(x => x.Value == true).Select(x => x.Key);
+        var selectedDiveTYpes = diveTypeFilter.Where(x => x.Value == true).Select(x => x.Key);
+        filteredDivesites = divesites.Where(x => selectedEventtype.Contains(x.DefaultEventType) && selectedDiveTYpes.Contains(x.DiveType)).ToList();
+        StateHasChanged();
+    }
+
+    private void changeDiveTypeFilter()
+    {
+        filterSitesList(initialEventTypeFilter);
+    }
+
+    private void addSelectedLocationAsEvent(SchedulerSlotSelectEventArgs args)
+    {
+        if (selectedLocation == null)
+            return;
+        if (args.Start < DateTime.Now)
+            return;
+
+        args.PreventDefault();
+        var newEvent = new Event()
+            {
+                Title = selectedLocation.Name,
+                Divelocation = selectedLocation,
+                StartDateAndTime = args.Start.Date.Add(selectedLocation.DefaultStartTime),
+                EndDateAndTime = args.Start.Date.Add(selectedLocation.DefaultStartTime).Add(selectedLocation.DefaultDuration),
+                EventType = selectedLocation.DefaultEventType,
+                Details = selectedLocation.Description,
+                MinParticipants = selectedLocation.MinParticipants,
+                MaxParticipants = selectedLocation.MaxParticipants,
+                Price = selectedLocation.Price,
+                PremiumPrice = selectedLocation.Price,
+                Address = selectedLocation.MeetingLocation,
+                RequiredCertificate = selectedLocation.Certificate,
+                FixedParticipants = 0
+            };
+        newEvents.Add(newEvent);
+        InvokeAsync(eventsGrid.RefreshDataAsync);
+
+        eventsList = newEvents.ToList<ICalendarEvent>();
+
+        StateHasChanged();
+    }
+
+
+
+
+    private void removeNewEvent(Event item)
+    {
+        newEvents.Remove(item);
+        InvokeAsync(eventsGrid.RefreshDataAsync);
+
+        eventsList = newEvents.ToList<ICalendarEvent>();
+
+    }
+
+    private async void commitEvents()
+    {
+        await eventService.CreateEventsAsync(newEvents);
+        doReloadData = true;
+        resetEvents();
+        // await courseService.AddAsync(newCourses);
+        // existingCourses = await courseService.GetAllAsync();
+        // resetCourses();
+    }
+    private void resetEvents()
+    {
+        newEvents = [];
+        eventsList = [];
+        // scheduler.Reload();
+        StateHasChanged();
+    }
+}

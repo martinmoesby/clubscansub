@@ -19,7 +19,7 @@
 </RadzenStack>
  *@
 
-<RadzenDataGrid TItem="ApplicationUserAccountEntry" Data="@filteredAccountEntries" AllowSorting AllowPaging PageSize="15">
+<RadzenDataGrid TItem="ApplicationUserAccountEntry" Data="@filteredAccountEntries" AllowSorting AllowPaging PageSize="15" AllowAlternatingRows="false">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.Id)" Title="Entry no." Width="80px" />
         <RadzenDataGridColumn Property="@nameof(ApplicationUserAccountEntry.PostingDate)" Title="Posting Date" Width="180px" />

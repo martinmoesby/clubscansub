@@ -2,8 +2,10 @@
 using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
+using ClubScansub.Utility;
 using Mailjet.Client.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 
@@ -23,19 +25,22 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task<IList<Event>> AddAsync(IList<Event> Items)
+        public async Task<IList<Event>> AddAsync(IList<Event> Items)
         {
-            throw new NotImplementedException();
+            await context.AddRangeAsync(Items);
+            await context.SaveChangesAsync();
+            return Items;
         }
 
-        public Task<IList<Event>> AddAsync(params Event[] Items)
+        public async Task<IList<Event>> AddAsync(params Event[] Items)
         {
-            throw new NotImplementedException();
+            return await AddAsync(Items.ToList());
         }
 
-        public Task DeleteAsync(Event Item)
+        public async Task DeleteAsync(Event Item)
         {
-            throw new NotImplementedException();
+            context.Events.Remove(Item);
+            await context.SaveChangesAsync();
         }
 
         public async Task<IList<Event>> GetActiveEventsByDivesiteId(int divesiteId)
@@ -103,6 +108,84 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
+        public async Task CreateEventsAsync(IList<Event> events)
+        {
+            foreach (var @event in events)
+            {
+
+                var location = context.Divelocations.Include(x => x.Certificate).Include(x => x.MeetingLocation).FirstOrDefault(x => x.Id ==@event.Divelocation.Id);
+                if (location != null)
+                {
+                    var certificate = location.Certificate;
+
+                    var item = new Event();
+                    item.EventType = location.DefaultEventType;
+                    item.StartDateAndTime = @event.StartDateAndTime;
+                    item.MinParticipants = location.MinParticipants;
+                    item.MaxParticipants = location.MaxParticipants;
+                    item.FixedParticipants = 0;
+                    item.EndDateAndTime = @event.EndDateAndTime;
+                    item.Address = location.MeetingLocation;
+                    item.DeeplinkId = Guid.NewGuid();
+                    item.Details += $"{@event.Title?.TrimEnd('.')} - kræver mindst {@event.MinParticipants} deltagere og der er plads til maksimalt {@event.MaxParticipants}";
+
+                    if (@event.Price == 0)
+                    {
+                        item.Price = location.Price;
+                        item.PremiumPrice = item.EventType != EventTypeEnum.Klubture ? location.Price : 0;
+                    } else
+                    {
+                        item.PremiumPrice = @event.PremiumPrice;
+                        item.Price = @event.Price;
+                    }
+
+                    item.Divelocation = location;
+                    item.RequiredCertificate = certificate;
+
+                    if (string.IsNullOrEmpty(item.Title))
+                    {
+                        switch (item.EventType)
+                        {
+                            case EventTypeEnum.Bådtur:
+                                item.Title = $"Bådtur til {location.Name}.";
+                                break;
+                            case EventTypeEnum.Stranddyk:
+                                item.Title = $"Strandtur til {location.Name}.";
+                                break;
+                            case EventTypeEnum.Rejse:
+                                item.Title = $"Rejse til {location.Name}.";
+                                break;
+                            case EventTypeEnum.Liveaboard:
+                                item.Title = $"Liveaboard tur til {location.Name}";
+                                break;
+                            case EventTypeEnum.Klubture:
+                            default:
+                                item.Title = location.Name;
+                                break;
+                        }
+                    }
+                    context.Events.Add(item);
+                }
+            }
+
+
+            await context.SaveChangesAsync();
+        }
+
+        public async Task CancelEventAsync(Event item)
+        {
+            item.IsCancelled = true;
+            // TODO: Refund users
+            context.Update(item);
+            await context.SaveChangesAsync();
+        }
+        public async Task ActivateEventAsync(Event item)
+        {
+            item.IsCancelled = false;
+            // TODO: Refund users
+            context.Update(item);
+            await context.SaveChangesAsync();
+        }
 
     }
 }

@@ -51,6 +51,12 @@
             public static string COURSE_SESSION_ACADEMIC = "dictionary";
             public static string COURSE_SESSION_OW= "scuba_diving";
 
+            public static string DIVETYPE_WRECK = "houseboat";
+            public static string DIVETYPE_POOL = COURSE_SESSION_POOL;
+            public static string DIVETYPE_NATURE = "emoji_nature";
+            public static string DIVETYPE_TECH = EVENTTYPE_TECH_COURSE;
+
+
         }
 
         public static class Texts
@@ -107,6 +113,7 @@
             public static string SCHEDULER_SLOT_BG_HOLIDAY = "rz-background-color-danger-lighter";
             public static string SCHEDULER_SLOT_BG_WORKHOURS = "rz-background-color-success-lighter";
 
+            public static string BG_ISCANCELLED = "rz-background-color-secondary-lighter";
         }
 
         public static string GetCourseIcon(CourseTypeEnum item)
@@ -124,6 +131,23 @@
 
             }
             return "";
+        }
+
+        public static string GetDiveTypeIcon(DiveTypeEnum item)
+        {
+            switch (item)
+            {
+                case DiveTypeEnum.WreckDive:
+                    return Icons.DIVETYPE_WRECK;
+                case DiveTypeEnum.NatureDive:
+                    return Icons.DIVETYPE_NATURE;
+                case DiveTypeEnum.TechDive:
+                    return Icons.DIVETYPE_TECH;
+                case DiveTypeEnum.PoolDive:
+                    return Icons.DIVETYPE_POOL;
+                default:
+                    return "";
+            }
         }
 
         public static string GetCourseSessionIcon(CourseSessionTypeEnum item)

@@ -1,0 +1,304 @@
+﻿@using System.Globalization
+@using ClubScansub.Models.Interface
+@using ClubScansub.Service
+@using Nager.Date
+@using Nager.Date.Model
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;width:100%">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+
+            <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="setActiveItemsList"/>
+            <RadzenLabel Text="Show existing courses" Component="existingCourses" />
+
+            <RadzenCheckBox @bind-Value="showExistingEvents" Name="existingEvents" @onclick="setActiveItemsList" />
+            <RadzenLabel Text="Show existing Events" Component="existingEvents" />
+
+        </RadzenStack>
+
+        <RadzenScheduler @ref="scheduler" TItem="ICalendarEvent"
+                         AppointmentMove="onAppointmentMove"
+                         AppointmentRender="onAppointmentRender"
+                         SlotSelect="onSlotClicked"
+                         SlotRender="onSlotRender"
+                     StartProperty="@nameof(ICalendarEvent.StartDateAndTime)"
+                     EndProperty="@nameof(ICalendarEvent.EndDateAndTime)"
+                     TextProperty="@nameof(ICalendarEvent.Title)"
+                         SelectedIndex="0"
+                         Data="@activeItems"
+                         Style="width:100%;height:100%"
+                         >
+            <ChildContent>
+
+                <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
+                <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
+
+            </ChildContent>
+            <Template Context="item">
+            @if (item is CourseSession)
+            {
+                
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon((item as CourseSession).Course.CourseType)" />
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon((item as CourseSession).Sessiontype)" />
+                    </RadzenStack>
+                    <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
+                </RadzenStack>
+            }
+            @if (item is Event)
+            {
+
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon((item as Event).EventType)" />
+                    </RadzenStack>
+                    <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
+                </RadzenStack>
+            }
+            </Template>
+
+        </RadzenScheduler>
+    </RadzenStack>
+
+
+@code {
+
+    [Inject]
+    CourseService courseService { get; set; }
+
+    [Inject]
+    EventService eventService { get; set; }
+
+    [Parameter]
+    public EventCallback<SchedulerSlotSelectEventArgs> OnSlotClicked { get; set; }
+
+    [Parameter]
+    public IList<ICalendarEvent> NewItems { get; set; } = new List<ICalendarEvent>();
+
+    [Parameter]
+    public bool DoReloadData { get; set; }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            existingCourseSessions = (await courseService.GetAllAsync()).SelectMany(x => x.CourseSessions).ToList<ICalendarEvent>();
+            existingEvents = (await eventService.GetAllAsync()).ToList<ICalendarEvent>();
+            setActiveItemsList();
+            // filterCourseTemplates(initialCoursetypeFilter);
+        }
+    }
+
+    protected override async void OnParametersSet()
+    {
+        if (NewItems != null)
+        {
+            activeItems = [.. NewItems];
+            setActiveItemsList();
+        }
+
+        if (DoReloadData)
+        {
+            existingCourseSessions = (await courseService.GetAllAsync()).SelectMany(x => x.CourseSessions).ToList<ICalendarEvent>();
+            existingEvents = (await eventService.GetAllAsync()).ToList<ICalendarEvent>();
+            DoReloadData = false;
+            setActiveItemsList();
+        }
+    }
+
+    private bool showExistingCourses = true;
+    private bool showExistingEvents = true;
+
+    private IList<ICalendarEvent> existingCourseSessions = new List<ICalendarEvent>();
+    private IList<ICalendarEvent> existingEvents = new List<ICalendarEvent>();
+    private IList<ICalendarEvent> activeItems = new List<ICalendarEvent>();
+
+    private RadzenScheduler<ICalendarEvent> scheduler;
+
+    private void onSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        if (args.Start.Date < DateTime.Now.Date)
+            return;
+
+        string? holiday = getHolidayName(args.Start.Date);
+        string additionalClass = "";
+
+        if (args.Start.DayOfWeek == DayOfWeek.Sunday || args.Start.DayOfWeek == DayOfWeek.Saturday)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WEEKEND;
+        }
+
+        if (!string.IsNullOrEmpty(holiday))
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
+            additionalClass = "holiday " + IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_HOLIDAY;
+            if (args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_MONTH)
+                args.Attributes["after-text"] = holiday;
+        }
+
+        // Highlight today in month view
+        if ((args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_WEEK && args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Date == DateTime.Today)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_TODAY;
+
+        }
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_WEEK || args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WORKHOURS;
+        }
+
+        args.Attributes["class"] = $"scheduler-slot {additionalClass}";
+    }
+    private void onAppointmentRender(SchedulerAppointmentRenderEventArgs<ICalendarEvent> args)
+    {
+        string baseClassString = "rz-pl-3 rz-event-content";
+        string bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
+        string fgClass = IconsTextsAndColors.ColorClasses.FG_DEFAULT;
+
+        if (args.Data is CourseSession)
+        {
+
+            switch ((args.Data as CourseSession).Course?.CourseType)
+            {
+                case CourseTypeEnum.BaseCourse:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
+                    break;
+                case CourseTypeEnum.SpecialtyCourse:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
+                    break;
+                case CourseTypeEnum.TechCourse:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
+                    break;
+                case CourseTypeEnum.ProCourse:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
+                    break;
+                default:
+                    break;
+
+            }
+            if ((args.Data as CourseSession).Course.Id != 0)
+            {
+                bgClass = "rz-background-color-base-600";
+                fgClass = "rz-color-base-100";
+            }
+        }
+
+        if (args.Data is Event)
+        {
+
+            switch ((args.Data as Event).EventType)
+            {
+                case EventTypeEnum.Bådtur:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_BOAT;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_BOAT;
+                    break;
+                case EventTypeEnum.Stranddyk:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_BEACH;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_BEACH;
+                    break;
+                case EventTypeEnum.Klubture:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_CLUB;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_CLUB;
+                    break;
+                case EventTypeEnum.Other:
+                    bgClass = IconsTextsAndColors.ColorClasses.BG_OTHER;
+                    fgClass = IconsTextsAndColors.ColorClasses.FG_OTHER;
+                    break;
+                default:
+                    break;
+
+            }
+            if ((args.Data as Event).Id != 0)
+            {
+                bgClass = "rz-background-color-base-600";
+                fgClass = "rz-color-base-100";
+            }
+        }
+
+
+        args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
+    }
+
+    private void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+
+        if (args.Appointment.Data is CourseSession)
+        {
+            var session = args.Appointment.Data as CourseSession;
+            if (session?.Course?.Id == 0)
+            {
+                var draggedAppointment = activeItems.FirstOrDefault(x => x == session) as CourseSession;
+                if (draggedAppointment != null)
+                {
+                    draggedAppointment.DateTime = draggedAppointment.DateTime + args.TimeSpan;
+                    scheduler.Reload();
+                }
+            }
+            return;
+        }
+        if (args.Appointment.Data is Event)
+        {
+            var item = args.Appointment.Data as Event;
+
+            var draggedAppointment = activeItems.FirstOrDefault(x => x == item) as Event;
+            if (draggedAppointment != null)
+            {
+                draggedAppointment.StartDateAndTime = draggedAppointment.StartDateAndTime + args.TimeSpan;
+                scheduler.Reload();
+            }
+        }
+
+
+    }
+
+    private void onSlotClicked(SchedulerSlotSelectEventArgs args)
+    {
+        args.PreventDefault();
+        OnSlotClicked.InvokeAsync(args);
+
+    }
+
+    private void setActiveItemsList()
+    {
+        activeItems = [..NewItems];
+
+        if (showExistingCourses && showExistingEvents)
+            activeItems = [..activeItems,.. existingCourseSessions, .. existingEvents];
+        if (showExistingCourses && !showExistingEvents)
+            activeItems = [.. activeItems, .. existingCourseSessions];
+        if (!showExistingCourses && showExistingEvents)
+            activeItems = [.. activeItems, .. existingEvents];
+
+        StateHasChanged();
+    }
+
+
+    private string? getHolidayName(DateTime date)
+    {
+
+        var year = date.Year;
+        var culture = CultureInfo.CurrentUICulture;
+
+        var region = new RegionInfo(culture.LCID);
+        CountryCode countryCode = (CountryCode)Enum.Parse(typeof(CountryCode), region.Name);
+        PublicHoliday[] holidays;
+        var IsHoliday = DateSystem.IsPublicHoliday(date, countryCode, out holidays);
+        if (holidays.Length != 0)
+        {
+            return holidays.FirstOrDefault(x => x.Date == date)?.LocalName;
+        }
+        return null;
+
+    }
+}

@@ -1,48 +1,17 @@
 ﻿@page "/admin/work"
-@using ClubScansub.Service
+
 <PageTitle>Work management</PageTitle>
 
-    <RadzenTabs>
-        <Tabs>
-            <RadzenTabsItem Text="Current Work">
-                <WorkCalendarComponent AllowViews="false" ViewMode="WorkCalendarViewModeEnum.Calendar" />
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Completed work">
-            <RadzenDataGrid AllowGrouping Data="courseSessionInstructors" TItem="CourseSessionInstructor" AllowPaging PageSize="15">
-                <Columns>
-                    
-                    <RadzenDataGridColumn Title="Instructor name" GroupProperty="@nameof(CourseSessionInstructor.Instructor.UserName)" >
-                        <Template Context="item">
-                            <RadzenText Text="@item.Instructor.Name" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    
-                    <RadzenDataGridColumn Title="Course Name" GroupProperty="@nameof(CourseSessionInstructor.CourseSession.Course.CourseName)">
-                        <Template Context="item">
-                            <RadzenText Text="@item.CourseSession.Course.CourseName" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    
-                    <RadzenDataGridColumn GroupProperty="@nameof(CourseSessionInstructor.CourseSession.SessionName)" >
-                        <Template Context="item">
-                            <RadzenText Text="@item.CourseSession.SessionName" />
-                        </Template>
-                    </RadzenDataGridColumn>
-
-                    <RadzenDataGridColumn Title="Date and duration" Groupable="false">
-                        <Template Context="item">
-                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="flex:1">
-                                <RadzenText Text="@item.CourseSession.StartDateAndTime.ToString()" />
-                                <RadzenText Text="@item.CourseSession.EndDateAndTime.ToString()" />
-                                <RadzenText Text="@item.CourseSession.Duration.ToString()" />
-                            </RadzenStack>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Current Work">
+            <WorkCalendarComponent AllowViews="false" ViewMode="WorkCalendarViewModeEnum.Calendar" />
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Completed work">
+            <WorkCompletedComponent />
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
 
 
 <style>
@@ -53,19 +22,5 @@
 
 @code {
 
-    [Inject]
-    public CourseService courseService { get; set; }
 
-    private IList<CourseSessionInstructor> courseSessionInstructors = new List<CourseSessionInstructor>();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            courseSessionInstructors = await courseService.GetCourseSessionInstructorAsync();
-            StateHasChanged();
-        }
-    }
 }

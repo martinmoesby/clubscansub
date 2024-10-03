@@ -117,7 +117,14 @@ namespace ClubScansub.BlazorApp.Pages
                         break;
                 }
 
+                if ((args.Data as Event).IsCancelled)
+                {
+                    bgClass = "rz-background-color-secondary-lighter";
+                    fgClass = "rz-border rz-border-color-secondary rz-color-base-300";
+                    args.Attributes["style"] = "text-decoration:line-through;";
+                }
             }
+
             if (args.Data is CourseSession)
             {
                 switch ((args.Data as CourseSession).Course?.CourseType)
@@ -170,11 +177,12 @@ namespace ClubScansub.BlazorApp.Pages
             {
                 await Dialogservice.OpenAsync<EventComponent>(args.Data.Title, new Dictionary<string, object>()
                 {
-                    {
-                        "EventId",args.Data.Id
-                    }
-                }, 
+                    { "EventId", args.Data.Id },
+                    { "EventStatusChanged", EventCallback.Factory.Create<Event>(this, updateEventStatus) }
+                },
                 dialogOptions);
+
+               
             }
             if (args.Data is CourseSession)
             {
@@ -403,6 +411,18 @@ namespace ClubScansub.BlazorApp.Pages
             filteredData = [.. filteredCoursesessions, .. filteredEvents];
             
 
+
+        }
+
+        private void updateEventStatus(Event item)
+        {
+            var e = events.FirstOrDefault(x => x.Id == item.Id);
+            if (e != null)
+            {
+                e.IsCancelled = item.IsCancelled;
+                applyFilter();
+                StateHasChanged();
+            }
 
         }
     }

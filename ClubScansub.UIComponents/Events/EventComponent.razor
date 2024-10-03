@@ -63,15 +63,20 @@ else
             </RadzenStack>
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Normal">
+                <AuthorizeView Roles="Administrator">
+                    <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
+                    <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
+
+                </AuthorizeView>
                 @if (Event.StartDateAndTime < DateTime.Now)
                 {
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="@IconsTextsAndColors.Icons.COMPLETED" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="@IconsTextsAndColors.Icons.COMPLETED" Size="ButtonSize.Small" />
                 }
                 else
                 {
                     if (Event.IsCancelled)
                     {
-                        <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="@IconsTextsAndColors.Icons.CANCELLED" Shade="Shade.Lighter" Text="Event cancelled" Disabled />
+                        <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="@IconsTextsAndColors.Icons.CANCELLED" Shade="Shade.Lighter" Text="Event cancelled" Disabled Size="ButtonSize.Small" />
                     }
                     else
                     {
@@ -80,17 +85,17 @@ else
                         {
                             if (currentUser.Balance > Event.Price)
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
                             }
                             else
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="@IconsTextsAndColors.Icons.AMOUNT" Shade="Shade.Lighter" Text="Low balance" Disabled />
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="@IconsTextsAndColors.Icons.AMOUNT" Shade="Shade.Lighter" Text="Low balance" Disabled Size="ButtonSize.Small" />
                             }
 
                         }
                         else
                         {
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="@IconsTextsAndColors.Icons.LOGIN" Shade="Shade.Lighter" Text="Please login first" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="@IconsTextsAndColors.Icons.LOGIN" Shade="Shade.Lighter" Text="Please login first" Size="ButtonSize.Small" />
                         }
                     }
                 }
@@ -115,10 +120,10 @@ else
                     <RadzenTabsItem Text="Tilmeldte" Icon="@IconsTextsAndColors.Icons.ENROLLED">
 
                         <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
-                            <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0" />
+                            <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
                         </AuthorizeView>
 
-                        <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" />
+                        <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" ReadOnly=Event.IsCancelled OnReleaseSpot="releaseReservedSpot" Event="Event"/>
 
                     </RadzenTabsItem>
                 </AuthorizeView>

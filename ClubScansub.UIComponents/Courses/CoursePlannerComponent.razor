@@ -1,4 +1,5 @@
-﻿@using ClubScansub.Service
+﻿@using ClubScansub.Models.Interface
+@using ClubScansub.Service
 @using ClubScansub.Utility
 @using System.Globalization
 @using Nager.Date
@@ -17,7 +18,7 @@
             </RadzenStack>
             <RadzenText Text="New courses to be created" TextStyle="TextStyle.Subtitle2" />
 
-            <RadzenDataGrid Data="@newCourses" TItem="Course" @ref=newCoursesGrid>
+            <RadzenDataGrid Data="@newCourses" TItem="Course" @ref=newCoursesGrid AllowAlternatingRows="false">
 
             <Columns>
                 <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
@@ -41,42 +42,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
-
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-
-            <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="onShowExistingCourses_Click"/>
-            <RadzenLabel Text="Show existing courses" Component="eexistingCoursesx" />
-        </RadzenStack>
-
-        <RadzenScheduler @ref="scheduler" TItem="CourseSession"
-                         AppointmentMove="onAppointmentMove"
-                         AppointmentRender="onAppointmentRender"
-                         SlotSelect="setStartDate"
-                         SlotRender="OnSlotRender"
-                         StartProperty="@nameof(CourseSession.StartDateAndTime)"
-                         EndProperty="@nameof(CourseSession.EndDateAndTime)"
-                         TextProperty="@nameof(CourseSession.SessionName)"
-                         SelectedIndex="0"
-                         Data="@activeCourseSessions"
-                         Style="width:100%;height:100%"
-                         >
-            <ChildContent>
-
-                <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
-                <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
-
-            </ChildContent>
-            <Template Context="item">
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.Course.CourseType)" />
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon(item.Sessiontype)" />
-                    </RadzenStack>
-                    <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@item.Course.CourseName</span>
-                </RadzenStack>
-            </Template>
-
-        </RadzenScheduler>
+        <PlannerComponent NewItems="activeItems" OnSlotClicked="addNewCourse" DoReloadData="shouldDataReload" />
     </RadzenStack>
 </RadzenStack>
 <style>
@@ -96,16 +62,18 @@
     CourseService courseService { get; set; }
 
     private RadzenDataGrid<Course> newCoursesGrid;
-    private RadzenScheduler<CourseSession> scheduler;
+
+    private bool shouldDataReload = false;
+
     private IList<CourseTemplate> courseTemplates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTemplate selectedTemplate;
 
     private IList<Course> newCourses = new List<Course>();
-    private IList<Course> existingCourses = new List<Course>();
-    private IList<Course> courseList = new List<Course>();
 
     private IList<CourseSession> activeCourseSessions = new List<CourseSession>();
+
+    private IList<ICalendarEvent> activeItems = new List<ICalendarEvent>();
     private Dictionary<CourseTypeEnum, bool> initialCoursetypeFilter = new Dictionary<CourseTypeEnum, bool>()
     {
         { CourseTypeEnum.BaseCourse, true},
@@ -114,9 +82,6 @@
         { CourseTypeEnum.ProCourse, false}
     };
 
-    private bool showExistingCourses = true;
-    private DateTime? selectedStartDate;
-
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -124,245 +89,109 @@
         if (firstRender)
         {
             courseTemplates = await courseService.GetTemplatesAsync();
-            existingCourses = await courseService.GetAllAsync();
-            courseList = existingCourses.Concat(newCourses).ToList();
-            activeCourseSessions = courseList.SelectMany(x => x.CourseSessions).ToList();
             filterCourseTemplates(initialCoursetypeFilter);
-        }
-    }
-    private void onShowExistingCourses_Click(MouseEventArgs args)
-    {
-        if (showExistingCourses)
-        {
-            activeCourseSessions = existingCourses.SelectMany(x => x.CourseSessions).ToList();
-            activeCourseSessions.Concat(newCourses.SelectMany(x => x.CourseSessions).ToList());
-        } else
-        {
-            activeCourseSessions = newCourses.SelectMany(x => x.CourseSessions).ToList();
         }
     }
     private void setSelectedTemplate(CourseTemplate template) 
     {
-        selectedStartDate = null;
         selectedTemplate = template;
     }
 
     private void filterCourseTemplates(Dictionary<CourseTypeEnum,bool> courseTypes)
     {
         selectedTemplate = null;
-        selectedStartDate = null;
         var selectedTypes = courseTypes.Where(x => x.Value == true).Select(x => x.Key);
         filteredTemplates = courseTemplates.Where(x => selectedTypes.Contains(x.CourseType)).ToList();
         StateHasChanged();
     }
 
-    private void setStartDate(SchedulerSlotSelectEventArgs args)
+    private void addNewCourse(SchedulerSlotSelectEventArgs args)
     {
         args.PreventDefault();
+        shouldDataReload = false;
 
         if (args.Start.Date < DateTime.Now.Date || selectedTemplate == null)
             return;
 
-        if (selectedStartDate == null)
-        {
-            selectedStartDate = args.Start;
-            var firstSession = selectedTemplate.Sessions.First();
-            if (firstSession == null)
-                return;
-
-            var course = new Course()
-                {
-                    CourseName = selectedTemplate.TemplateName,
-                    CourseTemplate = selectedTemplate,
-                    CourseType = selectedTemplate.CourseType,
-                    MinParticipants = selectedTemplate.MinStudents,
-                    MaxParticipants = selectedTemplate.MaxStudents,
-                    FixedParticipants = 0,
-                    Title = $"{selectedTemplate.TemplateName} - {args.Start.ToString("MMM")}",
-                    StartDateAndTime = args.Start,
-                    Price = selectedTemplate.DefaultPrice,
-                    PremiumPrice = selectedTemplate.DefaultPrice,
-                    EventType = EventTypeEnum.NotAnEvent
-                };
-
-            var currentDate = course.StartDateAndTime;
-            var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
-            if (selectedTemplate.Sessions.Count > 0)
-            {
-                course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
-                var courseSessions = new List<CourseSession>();
-
-                foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
-                {
-                    if (item.UseDefaultWeekDay)
-                    {
-                        while (currentWeekDay != item.DefaultWeekday)
-                        {
-                            currentDate = currentDate.AddDays(1);
-                            currentWeekDay = currentDate.DayOfWeek;
-                        }
-                    }
-
-                    courseSessions.Add(new CourseSession()
-                        {
-                            CourseSessionTemplate = item,
-                            DateTime = currentDate.Add(item.DefaultStartTime),
-                            Sessiontype = item.SessionType,
-                            Duration = item.DefaultDuration,
-                            Address = item.Address,
-                            SessionName = item.Name,
-                            SessionDescription = item.Description,
-                            Course = course
-                        });
-
-                    currentDate = currentDate.AddDays(1);
-                    currentWeekDay = currentDate.DayOfWeek;
-
-                }
-                course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);
-                course.CourseSessions = courseSessions;
-            }
-
-            newCourses.Add(course);
-            courseList = newCourses;
-
-            InvokeAsync(newCoursesGrid.RefreshDataAsync);
-
-            activeCourseSessions = newCourses.SelectMany(x => x.CourseSessions).ToList();
-
-            if(showExistingCourses)
-                courseList = newCourses.Concat(existingCourses).ToList();
-
-            activeCourseSessions = courseList.SelectMany(x => x.CourseSessions).ToList();
-
-            selectedStartDate = null;
-            StateHasChanged();
-        }
-    }
-
-    private void onAppointmentRender(SchedulerAppointmentRenderEventArgs<CourseSession> args)
-    {
-        string baseClassString = "rz-pl-3 rz-event-content";
-        string bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
-        string fgClass = IconsTextsAndColors.ColorClasses.FG_DEFAULT;
-
-        switch ((args.Data as CourseSession).Course?.CourseType)
-        {
-            case CourseTypeEnum.BaseCourse:
-                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
-                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
-                break;
-            case CourseTypeEnum.SpecialtyCourse:
-                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
-                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
-                break;
-            case CourseTypeEnum.TechCourse:
-                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
-                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
-                break;
-            case CourseTypeEnum.ProCourse:
-                bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
-                fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
-                break;
-            default:
-                break;
-
-        }
-        if ((args.Data as CourseSession).Course.Id != 0)
-        {
-            bgClass = "rz-background-color-base-600";
-            fgClass = "rz-color-base-100";
-        }
-
-        args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
-    }
-
-    private void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
-    {
-        var session = args.Appointment.Data as CourseSession;
-        if (session?.Course?.Id == 0) {
-            var draggedAppointment = activeCourseSessions.FirstOrDefault(x => x == session);
-            if (draggedAppointment != null)
-            {
-                draggedAppointment.DateTime = draggedAppointment.DateTime + args.TimeSpan;
-                scheduler.Reload();
-            }
-        }
-
-    }
-
-    private string? getHolidayName(DateTime date)
-    {
-
-        var year = date.Year;
-        var culture = CultureInfo.CurrentUICulture;
-
-        var region = new RegionInfo(culture.LCID);
-        CountryCode countryCode = (CountryCode)Enum.Parse(typeof(CountryCode), region.Name);
-        PublicHoliday[] holidays;
-        var IsHoliday = DateSystem.IsPublicHoliday(date, countryCode, out holidays);
-        if (holidays.Length != 0)
-        {
-            return holidays.FirstOrDefault(x => x.Date == date)?.LocalName;
-        }
-        return null;
-
-    }
-
-    private void OnSlotRender(SchedulerSlotRenderEventArgs args)
-    {
-        if (args.Start.Date < DateTime.Now.Date)
+        var firstSession = selectedTemplate.Sessions.First();
+        if (firstSession == null)
             return;
 
-        string? holiday = getHolidayName(args.Start.Date);
-        string additionalClass = "";
+        var course = new Course()
+            {
+                CourseName = selectedTemplate.TemplateName,
+                CourseTemplate = selectedTemplate,
+                CourseType = selectedTemplate.CourseType,
+                MinParticipants = selectedTemplate.MinStudents,
+                MaxParticipants = selectedTemplate.MaxStudents,
+                FixedParticipants = 0,
+                Title = $"{selectedTemplate.TemplateName} - {args.Start.ToString("MMM")}",
+                StartDateAndTime = args.Start,
+                Price = selectedTemplate.DefaultPrice,
+                PremiumPrice = selectedTemplate.DefaultPrice,
+                EventType = EventTypeEnum.NotAnEvent
+            };
 
-        if (args.Start.DayOfWeek == DayOfWeek.Sunday || args.Start.DayOfWeek == DayOfWeek.Saturday)
+        var currentDate = course.StartDateAndTime;
+        var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+        if (selectedTemplate.Sessions.Count > 0)
         {
-            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
-            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WEEKEND;
+            course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
+            var courseSessions = new List<CourseSession>();
+
+            foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
+            {
+                if (item.UseDefaultWeekDay)
+                {
+                    while (currentWeekDay != item.DefaultWeekday)
+                    {
+                        currentDate = currentDate.AddDays(1);
+                        currentWeekDay = currentDate.DayOfWeek;
+                    }
+                }
+
+                courseSessions.Add(new CourseSession()
+                    {
+                        CourseSessionTemplate = item,
+                        DateTime = currentDate.Add(item.DefaultStartTime),
+                        Sessiontype = item.SessionType,
+                        Duration = item.DefaultDuration,
+                        Address = item.Address,
+                        SessionName = item.Name,
+                        SessionDescription = item.Description,
+                        Course = course
+                    });
+
+                currentDate = currentDate.AddDays(1);
+                currentWeekDay = currentDate.DayOfWeek;
+
+            }
+            course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);
+            course.CourseSessions = courseSessions;
         }
 
-        if (!string.IsNullOrEmpty(holiday))
-        {
-            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(220,220,220,1));";
-            additionalClass = "holiday " + IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_HOLIDAY;
-            if (args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_MONTH)
-                args.Attributes["after-text"] = holiday;
-        }
+        newCourses.Add(course);
 
-        // Highlight today in month view
-        if ((args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_WEEK && args.View.Text != IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Date == DateTime.Today)
-        {
-            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_TODAY;
+        InvokeAsync(newCoursesGrid.RefreshDataAsync);
 
-        }
+        activeCourseSessions = newCourses.SelectMany(x => x.CourseSessions).ToList();
+        activeItems = activeCourseSessions.ToList<ICalendarEvent>();
 
-        // Highlight working hours (9-18)
-        if ((args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_WEEK || args.View.Text == IconsTextsAndColors.Texts.SCHEDULER_DAY) && args.Start.Hour > 8 && args.Start.Hour < 19)
-        {
-            //args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
-            additionalClass = IconsTextsAndColors.ColorClasses.SCHEDULER_SLOT_BG_WORKHOURS;
-        }
-
-        args.Attributes["class"] = $"scheduler-slot {additionalClass}";
+        StateHasChanged();
     }
 
     private async void commitCourses()
     {
         await courseService.AddAsync(newCourses);
-        existingCourses = await courseService.GetAllAsync();
         resetCourses();
+
+
     }
     private void resetCourses()
     {
         newCourses = new List<Course>();
-        activeCourseSessions = null;
-        if (showExistingCourses)
-        {
-            activeCourseSessions = existingCourses.SelectMany(x => x.CourseSessions).ToList();
-        }
+        activeItems = [];
+        shouldDataReload = true;
         // scheduler.Reload();
         StateHasChanged();
     }
