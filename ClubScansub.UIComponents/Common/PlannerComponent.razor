@@ -4,13 +4,20 @@
 @using Nager.Date
 @using Nager.Date.Model
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;width:100%">
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+        
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceEvenly" Style="width:100%" class="rz-border rz-border-radius-4 rz-p-2">
 
-            <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="setActiveItemsList"/>
-            <RadzenLabel Text="Show existing courses" Component="existingCourses" />
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="setActiveItemsList" />
+                <RadzenLabel Text="Show planned courses" Component="existingCourses" />
+            </RadzenStack>
 
-            <RadzenCheckBox @bind-Value="showExistingEvents" Name="existingEvents" @onclick="setActiveItemsList" />
-            <RadzenLabel Text="Show existing Events" Component="existingEvents" />
+            
+
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenCheckBox @bind-Value="showExistingEvents" Name="existingEvents" @onclick="setActiveItemsList" />
+                <RadzenLabel Text="Show planned events" Component="existingEvents" />
+            </RadzenStack>
 
         </RadzenStack>
 
@@ -35,22 +42,20 @@
             <Template Context="item">
             @if (item is CourseSession)
             {
-                
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon((item as CourseSession).Course.CourseType)" />
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon((item as CourseSession).Sessiontype)" />
-                    </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+@*                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1" AlignItems="AlignItems.Center">
+                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon((item as CourseSession).Course.CourseType)" Style="font-size:0.8rem;" />
+                    </RadzenStack> *@
+                    <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon((item as CourseSession).Sessiontype)" Style="font-size:0.8rem;" />
                     <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
                 </RadzenStack>
             }
             @if (item is Event)
             {
 
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon((item as Event).EventType)" />
-                    </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                    <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon((item as Event).EventType)" Style="font-size:0.8rem;" />
                     <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
                 </RadzenStack>
             }

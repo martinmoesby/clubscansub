@@ -11,42 +11,28 @@
         <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" ReadOnly="@(e.EndDateAndTime < DateTime.Now || e.IsCancelled)" OnRemoveUser="@((args) => removeUser(e,args))" OnReleaseSpot="@(() => releaseSpot(e))" />
     </Template>
     <Columns>
-        <RadzenDataGridColumn Title="Type" Width="50px">
-            <Template Context="item">
-                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.EventType)" />
+        <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable MinWidth="80px" Width="120px"/>
+
+        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable>
+            <Template>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="5">
+                    <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(context.EventType)" Style="font-size:1rem" />
+                    <RadzenText Text="@context.Title" TextStyle="TextStyle.Subtitle2" />
+                </RadzenStack>
+                <SeatComponent Event="context" ShowText="false" />
             </Template>
         </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable Width="160px"/>
-
-        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable/>
-        <RadzenDataGridColumn Property="@(nameof(Event.MinParticipants))" Title="Min" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn Property="@(nameof(Event.MaxParticipants))" Title="Max" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Property="@(nameof(Event.PremiumPrice))" Title="Price" Width="80px" TextAlign="TextAlign.Right" FormatString="{0:c2}" />
 
-        <RadzenDataGridColumn Title="Seat status" Sortable="false" Width="340px" TextAlign="TextAlign.Center">
-            <Template Context="e">
-                <SeatComponent Event="e" ShowText="false" />
-            </Template>
-        </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn Title="Cancelled?" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="e">
-                <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
-                    <RadzenCheckBox Value="@e.IsCancelled" TValue="bool" ReadOnly="true" />
-                </RadzenStack>
-            </Template>
-        </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn Width="75px" TextAlign="TextAlign.End" Visible="@ActiveEventsOnly">
+        <RadzenDataGridColumn MinWidth="40px" Width="60px" TextAlign="TextAlign.Center" Visible="@ActiveEventsOnly" >
             <Template>
                 @if(context.IsCancelled)
                 {
-                    <RadzenButton Click="@(() => reactivateEvent(context))" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Icon="refresh" />
-                    <RadzenButton Click="@(() => removeEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Icon="delete" />
+                    <RadzenButton Click="@(() => reactivateEvent(context))" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Icon="refresh" Variant="Variant.Text" />
+                    <RadzenButton Click="@(() => removeEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="delete" />
                 } else
                 {
-                    <RadzenButton Click="@(() => cancelEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Icon="cancel" />
+                    <RadzenButton Click="@(() => cancelEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="cancel" />
                 }
             </Template>
         </RadzenDataGridColumn>
@@ -150,8 +136,8 @@
     {
         await dialogService.OpenAsync<EventsPlannerComponent>("Events planner", null, new DialogOptions()
             {
-                Width = "75%",
-                Height = "90%",
+                Width = "95%",
+                Height = "95%",
                 ContentCssClass = "fullHeight"
             });
         allEvents = await eventService.GetAllAsync();

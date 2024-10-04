@@ -7,20 +7,17 @@
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;">
 
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
         <RadzenStack Style="flex:1">
 
             <RadzenStack Orientation="Orientation.Vertical" Style="flex:1;width:100%;" JustifyContent="JustifyContent.SpaceBetween">
                 <EventTypeToggleButtonsComponent InitialFilters="initialEventTypeFilter" OnFilter="filterSitesList" SingleSelect="true">
-                    <Start>
-                        <RadzenText Text="Event type filter:" TextStyle="TextStyle.Caption" />
-                    </Start>
                     <End>
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Style="flex:1" AlignItems="AlignItems.Center">
-                            <RadzenText Text="Divetype filter:" TextStyle="TextStyle.Caption" />
-                            <RadzenToggleButton title="Show wreck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
-                            <RadzenToggleButton title="Show nature/muck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
-                            <RadzenToggleButton title="Show Technical dive locations in the list"  Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
+@*                         <RadzenText Text="Divetype filter:" TextStyle="TextStyle.Caption" /> *@
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Style="flex:1" AlignItems="AlignItems.Center" Gap="5">
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show wreck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show nature/muck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show Technical dive locations in the list"  Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
                         </RadzenStack>
                     </End>
                 </EventTypeToggleButtonsComponent>
@@ -32,21 +29,13 @@
                 <RadzenText Text="New Events to be created" TextStyle="TextStyle.Subtitle2" />
                 <RadzenDataGrid Data="@newEvents" TItem="Event" @ref=eventsGrid AllowAlternatingRows="false">
                     <Columns>
-                        <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Date" Width="120px" />
-                        <RadzenDataGridColumn Property="@nameof(Event.EventType)" Title="Event Type" Width="60px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}"/>
+                        <RadzenDataGridColumn Title="Event" MinWidth="60px" TextAlign="TextAlign.Center">
                             <Template Context="item">
-                                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.EventType)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="Dive type" Width="60px" TextAlign="TextAlign.Center">
-                            <Template>
-                                <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(context.Divelocation.DiveType)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(Event.Title)" Title="Divesite / Location" TextAlign="TextAlign.Left" />
-                        <RadzenDataGridColumn Width="40px" TextAlign="TextAlign.Center">
-                            <Template>
-                                <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Danger" Click="@(() => removeNewEvent(context))" />
+                              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start">       
+                                    <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Danger" Click="@(() => removeNewEvent(item))" />
+                                    <RadzenText Text="@item.Title" TextStyle="TextStyle.Body2" />
+                                </RadzenStack>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -55,13 +44,13 @@
             </RadzenStack>
         </RadzenStack>
 
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
-            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitEvents" Text="Save events" Icon="save" />
-            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetEvents" Text="Reset" Icon="cancel" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%" class="rz-mb-2">
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitEvents" Text="Save events" Icon="save" Size="ButtonSize.Small" Variant="Variant.Text" />
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetEvents" Text="Reset" Icon="cancel" Size="ButtonSize.Small" Variant="Variant.Text"/>
         </RadzenStack>
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:3;">
         <PlannerComponent OnSlotClicked="addSelectedLocationAsEvent" DoReloadData="doReloadData" NewItems="eventsList"/>
     </RadzenStack>
 </RadzenStack>

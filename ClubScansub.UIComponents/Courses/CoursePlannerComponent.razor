@@ -8,40 +8,45 @@
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="height:100%;">
 
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:0.5;">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
         <RadzenStack JustifyContent="JustifyContent.End" Style="flex:1">
-                <CourseTypeToggleButtonsComponent SingleSelect="true" OnFilter="@((args) => filterCourseTemplates(args))" Alignment="JustifyContent.Start" InitialFilters="@initialCoursetypeFilter">
-                </CourseTypeToggleButtonsComponent>
-            <RadzenStack Orientation="Orientation.Horizontal" Style="flex:1;width:100%" JustifyContent="JustifyContent.SpaceBetween">
-                <RadzenRadioButtonList Data="@filteredTemplates" TValue="CourseTemplate" TextProperty="@nameof(CourseTemplate.TemplateName)" Orientation="Orientation.Vertical" Value="selectedTemplate" Change="@(args => setSelectedTemplate(args))" Style="flex:1" />
+            <CourseTypeToggleButtonsComponent SingleSelect="true" OnFilter="@((args) => filterCourseTemplates(args))" Alignment="JustifyContent.Start" InitialFilters="@initialCoursetypeFilter" />
+            <RadzenRadioButtonList Data="@filteredTemplates" TValue="CourseTemplate" TextProperty="@nameof(CourseTemplate.TemplateName)" Orientation="Orientation.Vertical" Value="selectedTemplate" Change="@(args => setSelectedTemplate(args))" Style="flex:1" />
 
-            </RadzenStack>
             <RadzenText Text="New courses to be created" TextStyle="TextStyle.Subtitle2" />
 
             <RadzenDataGrid Data="@newCourses" TItem="Course" @ref=newCoursesGrid AllowAlternatingRows="false">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="40px" SortProperty="@nameof(Course.CourseType)">
+                        <Template Context="item">
+                            <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" Style="font-size:1rem" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
+                                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" Click="@(() => removeCourse(context))"/>
+                                <RadzenText Text="@context.Title" TextStyle="TextStyle.Body2"/>
+                            </RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                <RadzenText Text="@context.StartDateAndTime.ToString("dd-MM-yy")" TextStyle="TextStyle.Caption" /> 
+                                <RadzenText Text="@context.EndDateAndTime.ToString("dd-MM-yy")" TextStyle="TextStyle.Caption"  />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
 
-            <Columns>
-                <RadzenDataGridColumn Property="@nameof(Course.CourseType)" Title="Type" Width="60px" SortProperty="@nameof(Course.CourseType)">
-                    <Template Context="item">
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon(item.CourseType)" />
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(Course.CourseName)" Title="Course Name" />
-
-                <RadzenDataGridColumn Property="@nameof(Course.StartDateAndTime)" Width="160px" Title="Start Date" />
-                <RadzenDataGridColumn Property="@nameof(Course.EndDateAndTime)" Width="160px" Title="End Date" />
-
-            </Columns>
+                </Columns>
             </RadzenDataGrid>
+
         </RadzenStack>
 
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
-            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitCourses" Text="Save courses" Icon="save" />
-            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetCourses" Text="Reset" Icon="cancel" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%" class="rz-mb-2">
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Click="commitCourses" Text="Save courses" Icon="save" Size="ButtonSize.Small" Variant="Variant.Text" />
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light" Click="resetCourses" Text="Reset" Icon="cancel" Size="ButtonSize.Small" Variant="Variant.Text" />
         </RadzenStack>
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:3;">
         <PlannerComponent NewItems="activeItems" OnSlotClicked="addNewCourse" DoReloadData="shouldDataReload" />
     </RadzenStack>
 </RadzenStack>
@@ -194,5 +199,13 @@
         shouldDataReload = true;
         // scheduler.Reload();
         StateHasChanged();
+    }
+
+    private void removeCourse(Course item)
+    {
+        newCourses.Remove(item);
+        InvokeAsync(newCoursesGrid.RefreshDataAsync);
+        activeCourseSessions = newCourses.SelectMany(x => x.CourseSessions).ToList();
+        activeItems = activeCourseSessions.ToList<ICalendarEvent>();
     }
 }
