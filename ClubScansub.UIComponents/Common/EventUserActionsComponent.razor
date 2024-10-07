@@ -3,7 +3,7 @@
 <RadzenStack Orientation="Orientation.Horizontal" Gap="50" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-5" Visible="@Visible">
 
     <RadzenStack Orientation="Orientation.Horizontal" Style="flex:1" Gap="5">
-        <RadzenButton Click="reserveSpotCallback" Text="Seat reservation" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Size="ButtonSize.ExtraSmall"/>
+        <RadzenButton Click="reserveSpotCallback" Text="Seat reservation" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Info" Shade="Shade.Dark" Size="ButtonSize.Small"/>
         <RadzenDropDown AllowFiltering="true"
                         AllowClear="true"
                         AllowSelectAll="false"
@@ -14,9 +14,9 @@
                         LoadData="@onLoadExistingUsers">
 
         </RadzenDropDown>
-        <RadzenButton Click="enrollExistingUserCallback" Text="Enroll user" Size="ButtonSize.ExtraSmall" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
+        <RadzenButton Click="enrollExistingUserCallback" Text="Enroll user" Size="ButtonSize.Small" Icon="@IconsTextsAndColors.Icons.USER_CHECK" ButtonStyle="ButtonStyle.Success" Shade="Shade.Default" Disabled="@(string.IsNullOrEmpty(selectedUser))" />
     </RadzenStack>
 
-    <RadzenButton Text="Add user" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.USER_ADD" Click="addNewUser_Click" Visible ="ShowAddNewUser" />
+    <RadzenButton Text="Create..." Size="ButtonSize.Small"  ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Variant="Variant.Text" Icon="@IconsTextsAndColors.Icons.USER_ADD" Click="addNewUser_Click" Visible="ShowAddNewUser" />
 
 </RadzenStack>

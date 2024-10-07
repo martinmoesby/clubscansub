@@ -42,10 +42,17 @@ namespace ClubScansub.Blazor.UIComponents.Common
 
         private async Task addNewUser_Click()
         {
-            var dialogOptions = new SideDialogOptions()
+            var sideDialogOptions = new SideDialogOptions()
             {
                 Width = "800px",
                 Position = DialogPosition.Left,
+                ShowClose = true
+            };
+
+            var dialogOptions = new DialogOptions()
+            {
+                Width = "95%",
+                Height="95%",
                 ShowClose = true
             };
 
@@ -55,7 +62,7 @@ namespace ClubScansub.Blazor.UIComponents.Common
                 {"ShowAlertOnError", false }
             };
 
-            await dialogService.OpenSideAsync<RegisterUserComponent>("Add new User", dialogParameters, dialogOptions);
+            await dialogService.OpenAsync<RegisterUserComponent>("Create new User", dialogParameters, dialogOptions);
         }
 
         private void enrollExistingUserCallback()

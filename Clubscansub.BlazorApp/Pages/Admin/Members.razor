@@ -27,7 +27,7 @@
 
                 <RadzenDataGrid Data="@filteredMembers"
                                 @ref=@grid
-                                @bind-Value=@selectedMembers
+                                @bind-Value="@selectedMembers"
                                 TItem="ApplicationUser"
                                 AllowAlternatingRows="false"
                                 AllowPaging="true"
