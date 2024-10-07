@@ -43,15 +43,30 @@ namespace ClubScansub.BlazorApp.Pages.Admin
             await base.OnAfterRenderAsync(firstRender);
             if (firstRender)
             {
-                await getMembersByRoleFilter();
+                var roleFilter = InitialFilters.Where(x => x.Value == true).Select(x => x.Key).ToArray();
+                var members = await memberService.GetAllByRolesAsync(roleFilter);
+
+                filteredMembers = members.ToList();
+
+                isLoading = false;
+                
                 StateHasChanged();
             }
         }
 
-        private IList<ApplicationUser> members;
+        //private IList<ApplicationUser> members;
+        private IList<ApplicationUser> filteredMembers = new List<ApplicationUser>();
         IList<ApplicationUser> selectedMembers;
-        private bool isLoading = false;
-        private string[] roleFilter = [Userroles.Member, Userroles.Student , Userroles.User];
+        private bool isLoading = true;
+        private Dictionary<string, bool> InitialFilters { get; set; } = new Dictionary<string, bool>()
+        {
+            { Userroles.Owner, false } ,
+            { Userroles.Administrator, false } ,
+            { Userroles.Divepro,false} ,
+            { Userroles.Member,true} ,
+            { Userroles.User, false} ,
+            { Userroles.Student ,false}
+        };
         private string searchFilter = "";
         private bool showDeactivated = false;
 
@@ -63,9 +78,9 @@ namespace ClubScansub.BlazorApp.Pages.Admin
             CloseDialogOnEsc = true,
         };
 
-        private async Task setRoleFilter(string[] newFilter)
+        private async Task setRoleFilter(Dictionary<string, Boolean> newFilter)
         {
-            roleFilter = newFilter;
+            InitialFilters = newFilter;
             await getMembersByRoleFilter();
         }
 
@@ -77,11 +92,17 @@ namespace ClubScansub.BlazorApp.Pages.Admin
 
         private async Task getMembersByRoleFilter()
         {
-            isLoading = true;
+            //isLoading = true;
+            var roleFilter = InitialFilters.Where(x => x.Value == true).Select(x => x.Key).ToArray();
+            //filteredMembers = members.Where(x => 
+            //    roleFilter.Contains(string.Join(",", x.Roles))
+            //    && x.SearchStringValue.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)
+            //    && x.IsActive != showDeactivated
+            //).ToList();  
+            
+            filteredMembers = (await memberService.GetAllByRolesAsync(roleFilter)).OrderBy(x => x.UserName).Where(x=> x.SearchStringValue.Contains(searchFilter,StringComparison.OrdinalIgnoreCase) && x.IsActive != showDeactivated).ToList();
+            //isLoading = false;
 
-            members = (await memberService.GetAllByRolesAsync(roleFilter)).OrderBy(x => x.UserName).Where(x=> x.SearchStringValue.Contains(searchFilter,StringComparison.OrdinalIgnoreCase) && x.IsActive != showDeactivated).ToList();
-
-            isLoading = false;
             StateHasChanged();
         }
 
@@ -239,7 +260,7 @@ namespace ClubScansub.BlazorApp.Pages.Admin
             {
                 var updateMember = await memberService.AddTransactionAsync(transaction.ApplicationUser, transaction);
                 dialogService.Close();
-                members.Where(x => x.Id == updateMember.Id).First().AccountTransactions = updateMember.AccountTransactions;
+                filteredMembers.Where(x => x.Id == updateMember.Id).First().AccountTransactions = updateMember.AccountTransactions;
                 StateHasChanged();
 
                 notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Duration = 2500, Summary = $"'{transaction.ApplicationUser.Name}' has receiced a deposit of {transaction.Amount.ToString("C")}", CloseOnClick = true });
@@ -256,7 +277,7 @@ namespace ClubScansub.BlazorApp.Pages.Admin
             if (confirmAnswer.GetValueOrDefault())
             {
                 member = await memberService.ToggleActiveStatus(member);
-                members.Where(x => x.Id == member.Id).First().LockoutEnd = member.LockoutEnd;
+                filteredMembers.Where(x => x.Id == member.Id).First().LockoutEnd = member.LockoutEnd;
                 StateHasChanged();
                 await grid.RefreshDataAsync();
                // await getMembersByRoleFilter();

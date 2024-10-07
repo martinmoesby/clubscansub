@@ -29,7 +29,7 @@
                 <RadzenText Text="@item.ApplicationUser?.PhoneNumber" TextStyle="TextStyle.Body1" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Width="40px" Visible="!ReadOnly">
+        <RadzenDataGridColumn Width="40px" Visible="!readOnly">
             <Template Context="item">
                 <RadzenButton Icon="@IconsTextsAndColors.Icons.DELETE" Size="ButtonSize.Small" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter" Click="@(() => removeUserFromEvent_Click(item.ApplicationUser))" />
             </Template>
@@ -38,27 +38,53 @@
 
 </RadzenDataGrid>
 
+@* <RadzenPanel Style="flex:1" Text="Participants" class="rz-border-radius-2 rz-p-2">
+
+    @if(Event.Participants != null && Event.Participants.Count > 0)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10" class="rz-mt-2">
+            @foreach (var item in EventUsers)
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Success" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Visible="!readOnly">
+                    <RadzenButton Icon="@IconsTextsAndColors.Icons.USER_MIN" ButtonStyle="ButtonStyle.Info" Variant="Variant.Text" Shade="Shade.Default" Click="@(() => removeUserFromEvent_Click(item.ApplicationUser))" Size="ButtonSize.ExtraSmall" Text="@($"{item.ApplicationUser?.Firstname} {@item.ApplicationUser?.Lastname}")" />
+                </RadzenBadge>
+                <RadzenBadge BadgeStyle="BadgeStyle.Success" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="@item.ApplicationUser.Name" Visible="readOnly" />
+            }
+
+            @for (int i = 0; i < Event.FixedParticipants; i++)
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Visible="!readOnly">
+                    <RadzenButton Icon="@IconsTextsAndColors.Icons.USER_MIN" ButtonStyle="ButtonStyle.Info" Variant="Variant.Text" Shade="Shade.Default" Click="removeFixedUser" Size="ButtonSize.ExtraSmall" Text="Scansub" />
+                </RadzenBadge>
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="Scansub" Visible="readOnly" />
+            }
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenText Text="No participants" TextStyle="TextStyle.DisplayH6">
+            
+        </RadzenText>
+    }
+</RadzenPanel> *@
+
+
+
 @if (Event?.FixedParticipants != null && Event?.FixedParticipants > 0)
 {
-    <RadzenPanel AllowCollapse Collapsed CollapseTitle="Hide other participants" ExpandTitle="Show other participants" Style="flex:1" Text="Other participants" class="rz-border-radius-2 rz-p-2" >
+    <RadzenPanel AllowCollapse Collapsed CollapseTitle="Hide other participants" ExpandTitle="Show other participants" Style="flex:1" Text="Other participants" class="rz-border-radius-2 rz-p-2">
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10" class="rz-mt-2">
 
             @for (int i = 0; i < Event.FixedParticipants; i++)
             {
-                @if (!ReadOnly)
-                {
-
-                    <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled">
-                        <RadzenButton Icon="@IconsTextsAndColors.Icons.USER_MIN" ButtonStyle="ButtonStyle.Info" Variant="Variant.Text" Shade="Shade.Default" Click="removeFixedUser" Size="ButtonSize.ExtraSmall" Text="Scansub" />
-                    </RadzenBadge>
-                }
-                else
-                {
-                    <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="Scansub" />
-                }
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Visible="!readOnly">
+                    <RadzenButton Icon="@IconsTextsAndColors.Icons.USER_MIN" ButtonStyle="ButtonStyle.Info" Variant="Variant.Text" Shade="Shade.Default" Click="removeFixedUser" Size="ButtonSize.ExtraSmall" Text="Scansub" />
+                </RadzenBadge>
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill Shade="Shade.Lighter" Variant="Variant.Filled" Icon="@IconsTextsAndColors.Icons.USER_MIN" Text="Scansub" Visible="readOnly" />
             }
         </RadzenStack>
-   
+
     </RadzenPanel>
 }
+

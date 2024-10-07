@@ -1,13 +1,13 @@
 ﻿@page "/account/login"
 @using ClubScansub.Models.DTO
 
-
+<PageTitle>Club Scansub Login </PageTitle>
 <RadzenStack Gap="0" Class="rz-my-auto rz-mx-auto rz-border-radius-1 rz-shadow-1" Style="width: 480px;">
     <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-p-6" style="text-align: center;">
         <RadzenText TextStyle="TextStyle.DisplayH4">Login</RadzenText>
     
-        <RadzenTemplateForm Data=@("LoginUserDTO")>
-            <RadzenLogin 
+        <RadzenTemplateForm Data=@("LoginUserDTO") >
+            <RadzenLogin  
                 FormFieldVariant="Variant.Outlined" 
                 Login="@(args => onLogin(args))" 
                 Register="@onRegister" 

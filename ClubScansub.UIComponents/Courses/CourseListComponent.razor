@@ -26,7 +26,7 @@
                         <EventUserListComponent Event="course" EventUsers="course.Participants.ToList()" 
                             OnRemoveUser="@((args) => removeUserFromCourse(args,course.Id))"
                             OnReleaseSpot="@(() => removeReservedSeat(course))"
-                            ReadOnly="!ActiveCoursesOnly" />
+                             />
 
                     </RadzenTabsItem>
                     <RadzenTabsItem Text="Sessions">

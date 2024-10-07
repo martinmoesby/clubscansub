@@ -1,6 +1,6 @@
 ﻿using ClubScansub.Models;
-using ClubScansub.Service;
 using Microsoft.AspNetCore.Components;
+
 
 namespace ClubScansub.Blazor.UIComponents.Common
 {
@@ -18,11 +18,15 @@ namespace ClubScansub.Blazor.UIComponents.Common
         [Parameter]
         public EventCallback OnReleaseSpot { get; set; }
 
-        [Parameter]
-        public bool ReadOnly { get; set; } = false;
+        private bool readOnly { get; set; } = false;
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
+            if (firstRender)
+            {
+                readOnly = Event.IsCancelled || Event.EndDateAndTime < DateTime.Now;
+                StateHasChanged();
+            }
             return base.OnAfterRenderAsync(firstRender);
         }
         private void removeUserFromEvent_Click(ApplicationUser user)

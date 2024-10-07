@@ -112,6 +112,7 @@ namespace ClubScansub.Models
 
         [NotMapped]
         public bool IsActive => (LockoutEnd <= DateTime.Now || LockoutEnd == null);
+
         [NotMapped]
         public string[] Roles { get; set; }
 

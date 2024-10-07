@@ -1,0 +1,107 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="5px">
+
+    <RadzenToggleButton Value="getRoleFilter(Userroles.Owner)" Change="@((args) => setRoleFilter(Userroles.Owner))" Visible="@(isActive(Userroles.Owner))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="supervisor_account" title="Owners"/>
+    <RadzenToggleButton Value="getRoleFilter(Userroles.Administrator)" Change="@((args) => setRoleFilter(Userroles.Administrator))" Visible="@(isActive(Userroles.Administrator))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="support_agent" title="Adminstrators" />
+    <RadzenToggleButton Value="getRoleFilter(Userroles.Divepro)" Change="@((args) => setRoleFilter(Userroles.Divepro))" Visible="@(isActive(Userroles.Divepro))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="shield_person" title="Divepro's'" />
+    <RadzenToggleButton Value="getRoleFilter(Userroles.Member)" Change="@((args) => setRoleFilter(Userroles.Member))" Visible="@(isActive(Userroles.Member))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="person_3" title="Premium members" />
+    <RadzenToggleButton Value="getRoleFilter(Userroles.User)" Change="@((args) => setRoleFilter(Userroles.User))" Visible="@(isActive(Userroles.User))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="person" title="Basic members" />
+    <RadzenToggleButton Value="getRoleFilter(Userroles.Student)" Change="@((args) => setRoleFilter(Userroles.Student))" Visible="@(isActive(Userroles.Student))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" Shade="Shade.Default" ToggleShade="Shade.Dark" Icon="school" title="Students" />
+@*     
+    <RadzenToggleButton @bind-Value="showDeactivated" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Danger" Shade="Shade.Default" ToggleShade="Shade.Default" Icon="person_alert" class="rz-ml-5" />
+ *@
+</RadzenStack>
+@code {
+    // [Parameter]
+    // public string LabelText { get; set; } = "Role filter";
+
+    // [Parameter]
+    // public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+    // [Parameter]
+    // public AlignItems Alignment { get; set; } = AlignItems.Stretch;
+
+    // [Parameter]
+    // public JustifyContent Justify { get; set; } = JustifyContent.Normal;
+
+    // [Parameter]
+    // public bool ShowLabel { get; set; } = true;
+
+    // [Parameter]
+    // public bool IsLoading { get; set; } = false;
+
+    [Parameter]
+    public bool SingleSelect { get; set; } = false;
+
+    [Parameter]
+    public Dictionary<string, Boolean> InitialFilters { get; set; } = new Dictionary<string, bool>()
+        {
+            { Userroles.Owner, true } ,
+            { Userroles.Administrator, true } ,
+            { Userroles.Divepro, true} ,
+            { Userroles.Member,true} ,
+            { Userroles.User,true} ,
+            { Userroles.Student ,true}
+        };
+
+    [Parameter]
+    public EventCallback<Dictionary<string, Boolean>> MemberRolesChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> MemberStatusFilterChanged { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+    }
+
+
+    private bool showDeactivated = false;
+
+    private void onMemberRolesChanged()
+    {
+        MemberRolesChanged.InvokeAsync(InitialFilters);
+    }
+
+    private void onMemberStatusFilterChanged()
+    {
+        MemberStatusFilterChanged.InvokeAsync(showDeactivated);
+    }
+
+    private bool getRoleFilter(string type)
+    {
+        bool value = true;
+        InitialFilters.TryGetValue(type, out value);
+        return value;
+    }
+
+    private void setRoleFilter(string type)
+    {
+        if (SingleSelect)
+        {
+            foreach (var item in InitialFilters)
+            {
+                if (item.Key != type)
+                    InitialFilters[item.Key] = false;
+            }
+            InitialFilters[type] = true;
+        }
+        else
+        {
+            InitialFilters[type] = !InitialFilters[type];
+
+        }
+        MemberRolesChanged.InvokeAsync(InitialFilters);
+    }
+
+    private bool isActive(string type)
+    {
+        return InitialFilters.Any(x => x.Key == type);
+    }
+}

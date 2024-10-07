@@ -8,7 +8,7 @@
 <RadzenDataGrid TItem="Event" Data="@filteredEvents" AllowPaging PageSize="15" AllowSorting AllowAlternatingRows="false">
     <Template Context="e">
         <EventUserActionsComponent ShowAddNewUser="false" Visible="@(e.EndDateAndTime > DateTime.Now && e.FreeSpots > 0 && !e.IsCancelled)" AddExistingUser="@((args) => enrollUser(e,args))"  />
-        <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" ReadOnly="@(e.EndDateAndTime < DateTime.Now || e.IsCancelled)" OnRemoveUser="@((args) => removeUser(e,args))" OnReleaseSpot="@(() => releaseSpot(e))" />
+        <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" OnRemoveUser="@((args) => removeUser(e,args))" OnReleaseSpot="@(() => releaseSpot(e))" />
     </Template>
     <Columns>
         <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable MinWidth="80px" Width="120px"/>

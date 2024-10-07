@@ -3,6 +3,7 @@ using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Exceptions;
 using ClubScansub.Service.Interfaces;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -49,6 +50,12 @@ namespace ClubScansub.Service
         public async Task<IList<ApplicationUser>> GetAllAsync()
         {
             var members = await context.ApplicationUsers.Include(x=>x.AccountTransactions).AsNoTracking().ToListAsync();
+
+            foreach (var item in members)
+            {
+                item.Roles = (await userManager.GetRolesAsync(item)).ToArray();
+            }
+
             return members;
         }
 

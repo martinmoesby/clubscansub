@@ -123,7 +123,7 @@ else
                             <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
                         </AuthorizeView>
 
-                        <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" ReadOnly=Event.IsCancelled OnReleaseSpot="releaseReservedSpot" Event="Event"/>
+                        <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent"  OnReleaseSpot="releaseReservedSpot" Event="Event"/>
 
                     </RadzenTabsItem>
                 </AuthorizeView>
