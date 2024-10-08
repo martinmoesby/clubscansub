@@ -8,7 +8,7 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width:100%;" class="rz-p-4">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-            <RadzenButton Click="prevMonth" Icon="chevron_backward" Disabled="@(Start < DateTime.Now)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" />
+            <RadzenButton Click="prevMonth" Icon="chevron_backward" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" />
             <RadzenButton Click="nextMonth" Icon="chevron_forward" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" />
         </RadzenStack>
         <RadzenText Text="@Start.ToString("MMMM yyyy")" TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" />
