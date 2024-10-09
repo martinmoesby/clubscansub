@@ -181,5 +181,12 @@ namespace ClubScansub.Service
             var data = context.CourseTemplates.Include(x => x.Sessions);
             return await data.ToListAsync();   
         }
+
+        public async Task<CourseTemplate> UpdateCourseTemplateAsync(CourseTemplate template)
+        {
+            context.Update(template);
+            await context.SaveChangesAsync();
+            return template;
+        }
     }
 }

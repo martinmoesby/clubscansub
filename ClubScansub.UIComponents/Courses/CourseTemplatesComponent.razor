@@ -6,7 +6,7 @@
 
 </RadzenStack>
 
-<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false">
+<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false" RowDoubleClick="onEdit">
     <Template Context="sessiondetails">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText Text="Course sessions" TextStyle="TextStyle.Subtitle1"></RadzenText>
@@ -87,10 +87,14 @@
     [Inject]
     CourseService courseService { get; set; }
 
+    [Inject]
+    DialogService dialogService { get; set; }
+
 
     private IList<CourseTemplate> templates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTypeEnum selectedCourseType = CourseTypeEnum.BaseCourse;
+
     private Dictionary<CourseTypeEnum, bool> initialFilters = new Dictionary<CourseTypeEnum, bool>()
     {
         {CourseTypeEnum.BaseCourse, true},
@@ -114,6 +118,30 @@
         var selectedCouorseTypes = filter.Where(x => x.Value == true).Select(x => x.Key).ToList();
         filteredTemplates = templates.Where(x => selectedCouorseTypes.Contains(x.CourseType)).ToList();
         StateHasChanged();
+    }
+
+    private async void onEdit(DataGridRowMouseEventArgs<CourseTemplate> args)
+    {
+        await dialogService.OpenAsync<CourseTemplateDetailsComponent>("Edit course template",
+        new Dictionary<string, object>()
+            {
+            {"Template",args.Data },
+            {"OnSave", EventCallback.Factory.Create<CourseTemplate>(this,Save)}
+            },
+        new DialogOptions()
+            {
+                Width = "85%",
+                Height = "75%"
+            }
+        );
+
+    }
+
+    private async void Save(CourseTemplate template)
+    {
+        Console.WriteLine(template.TemplateName);
+        await courseService.UpdateCourseTemplateAsync(template);
+        dialogService.Close();
     }
 
 }

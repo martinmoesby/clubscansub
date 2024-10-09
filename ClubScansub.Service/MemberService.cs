@@ -183,6 +183,7 @@ namespace ClubScansub.Service
             if (inclProCertificates)
                 return await data.ToListAsync();
 
-            return await data.Where(x => x.IsDiveproCertificate == false).ToListAsync();        }
+            return await data.Where(x => x.IsDiveproCertificate == false).ToListAsync();        
+        }
     }
 }
