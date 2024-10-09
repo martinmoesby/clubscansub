@@ -139,13 +139,19 @@
 
         var currentDate = course.StartDateAndTime;
         var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+        // var previousDateTime = course.StartDateAndTime;
+        // var prevoiusWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+
         if (selectedTemplate.Sessions.Count > 0)
         {
             course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
             var courseSessions = new List<CourseSession>();
 
+
             foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
             {
+
+
                 if (item.UseDefaultWeekDay)
                 {
                     while (currentWeekDay != item.DefaultWeekday)
@@ -166,9 +172,14 @@
                         SessionDescription = item.Description,
                         Course = course
                     });
+                if (!item.UseDefaultWeekDay)
+                {    
+                    currentDate.AddDays(1);
+                    currentWeekDay = currentDate.DayOfWeek;
+                }
 
-                currentDate = currentDate.AddDays(1);
-                currentWeekDay = currentDate.DayOfWeek;
+                // prevoiusWeekDay = currentWeekDay;
+                // previousDateTime = currentDate;
 
             }
             course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);

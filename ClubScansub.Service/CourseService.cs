@@ -42,7 +42,7 @@ namespace ClubScansub.Service
 
         public Task<IList<Course>> AddAsync(params Course[] Items)
         {
-            throw new NotImplementedException();
+            return AddAsync(Items.ToList());
         }
 
         public async Task DeleteAsync(Course Item)
