@@ -2,6 +2,8 @@
 using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
+using ClubScansub.Utility;
+using Mailjet.Client.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyModel;
@@ -118,6 +120,84 @@ namespace ClubScansub.Service
             return await UpdateAsync(Items.ToList());
         }
 
+        // Create but do not commit to database
+
+        public Course? CreateNewCourseFromTemplate(CourseTemplate courseTemplate, DateTime selectedStartDate)
+        {
+            if (selectedStartDate < DateTime.Now.Date || courseTemplate == null)
+                return null;
+
+            var firstSession = courseTemplate.Sessions.First();
+            if (firstSession == null)
+                return null;
+
+            var course = new Course()
+            {
+                CourseName = courseTemplate.TemplateName,
+                CourseTemplate = courseTemplate,
+                CourseType = courseTemplate.CourseType,
+                MinParticipants = courseTemplate.MinStudents,
+                MaxParticipants = courseTemplate.MaxStudents,
+                FixedParticipants = 0,
+                Title = $"{courseTemplate.TemplateName} - {selectedStartDate.ToString("MMM")}",
+                StartDateAndTime = selectedStartDate,
+                Price = courseTemplate.DefaultPrice,
+                PremiumPrice = courseTemplate.DefaultPrice,
+                EventType = EventTypeEnum.NotAnEvent
+            };
+
+            var currentDate = course.StartDateAndTime;
+            var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+            // var previousDateTime = course.StartDateAndTime;
+            // var prevoiusWeekDay = course.StartDateAndTime.Date.DayOfWeek;
+
+            if (courseTemplate.Sessions.Count > 0)
+            {
+                course.StartDateAndTime += courseTemplate.Sessions.FirstOrDefault().DefaultStartTime;
+                var courseSessions = new List<CourseSession>();
+
+
+                foreach (var item in courseTemplate.Sessions.OrderBy(x => x.SessionNumber))
+                {
+
+
+                    if (item.UseDefaultWeekDay)
+                    {
+                        while (currentWeekDay != item.DefaultWeekday)
+                        {
+                            currentDate = currentDate.AddDays(1);
+                            currentWeekDay = currentDate.DayOfWeek;
+                        }
+                    }
+
+                    courseSessions.Add(new CourseSession()
+                    {
+                        CourseSessionTemplate = item,
+                        DateTime = currentDate.Add(item.DefaultStartTime),
+                        Sessiontype = item.SessionType,
+                        Duration = item.DefaultDuration,
+                        Address = item.Address,
+                        SessionName = item.Name,
+                        SessionDescription = item.Description,
+                        Course = course
+                    });
+                    if (!item.UseDefaultWeekDay)
+                    {
+                        currentDate.AddDays(1);
+                        currentWeekDay = currentDate.DayOfWeek;
+                    }
+
+                    // prevoiusWeekDay = currentWeekDay;
+                    // previousDateTime = currentDate;
+
+                }
+                course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);
+                course.CourseSessions = courseSessions;
+            }
+
+            return course;
+        }
+
         // Session functions
 
         public async Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date)
@@ -180,6 +260,30 @@ namespace ClubScansub.Service
         {
             var data = context.CourseTemplates.Include(x => x.Sessions);
             return await data.ToListAsync();   
+        }
+
+        public async Task<CourseTemplate> AddTemplateAsync(CourseTemplate template)
+        {
+            context.Entry(template).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+
+            if (template.InstructorCertificate != null)
+                context.Entry(template.InstructorCertificate).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+
+            foreach (var item in template.Sessions)
+            {
+                context.Entry(item).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                if (item.Address != null)
+                    context.Entry(item.Address).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+            }
+            //context.Add<CourseTemplate>(template);
+            await context.SaveChangesAsync();
+            return template;
+        }
+
+        public async Task DeleteTemplateAsync(CourseTemplate template)
+        {
+            context.Remove(template);
+            await context.SaveChangesAsync();
         }
 
         public async Task<CourseTemplate> UpdateCourseTemplateAsync(CourseTemplate template)

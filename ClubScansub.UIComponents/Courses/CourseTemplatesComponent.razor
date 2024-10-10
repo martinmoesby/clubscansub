@@ -2,11 +2,13 @@
 @using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-5">
 
-    <CourseTypeToggleButtonsComponent OnFilter="applyTemplateFilter" SingleSelect="true" InitialFilters="initialFilters" />
-
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <CourseTypeToggleButtonsComponent OnFilter="applyTemplateFilter" SingleSelect="true" InitialFilters="initialFilters" />
+    </RadzenStack>
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add" Text="New template..." Variant="Variant.Text" Click="addTemplate" Size="ButtonSize.Small"/>
 </RadzenStack>
 
-<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false" RowDoubleClick="onEdit">
+<RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false" RowDoubleClick="onEdit" @ref=grid>
     <Template Context="sessiondetails">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText Text="Course sessions" TextStyle="TextStyle.Subtitle1"></RadzenText>
@@ -21,7 +23,13 @@
                     <RadzenDataGridColumn Property="@nameof(CourseSessionTemplate.Description)" Title="Description">
                         <Template Context="sessionItem">
                             <RadzenText Text="@sessionItem.Name" TextStyle="TextStyle.Subtitle2" />
-                            <RadzenText Text="@sessionItem.Description" Style="white-space:normal" TextStyle="TextStyle.Body2" />
+                            <RadzenText Text="@sessionItem.Description" class="rz-text-truncate" TextStyle="TextStyle.Body2" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(CourseSessionTemplate.Address)" Title="Location" MinWidth="100px" Width="180px">
+                        <Template Context="sessionItem">
+                            <RadzenText Text="@sessionItem.Address?.Name" TextStyle="TextStyle.Subtitle2" class="rz-text-truncate" />
+                            <RadzenText Text="@($"{sessionItem.Address?.Streetname}, {sessionItem.Address?.Zipcode}  {sessionItem.Address?.City}")" class="rz-text-truncate"  TextStyle="TextStyle.Caption" />
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(CourseSessionTemplate.DefaultWeekday)" Title="Default weekday and time" Width="180px;">
@@ -44,6 +52,7 @@
                             </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
+
                 </Columns>
             </RadzenDataGrid>
 
@@ -73,10 +82,15 @@
                 </RadzenStack>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(CourseTemplate.DefaultPrice)" Title="Price" Width="80px" TextAlign="TextAlign.Right">
+        <RadzenDataGridColumn Property="@nameof(CourseTemplate.DefaultPrice)" Title="Price" Width="80px" TextAlign="TextAlign.Right" HeaderCssClass="rz-text-align-left">
             <Template Context="item">
                 <RadzenText TextStyle="TextStyle.Body2" Text="@item.DefaultPrice.ToString("C0")" />
 
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Width="40px" TextAlign="TextAlign.Center">
+            <Template>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Icon="delete" Click="@(() => deleteTemplate(context))" Size="ButtonSize.Small" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -90,7 +104,7 @@
     [Inject]
     DialogService dialogService { get; set; }
 
-
+    private RadzenDataGrid<CourseTemplate> grid;
     private IList<CourseTemplate> templates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTypeEnum selectedCourseType = CourseTypeEnum.BaseCourse;
@@ -122,11 +136,11 @@
 
     private async void onEdit(DataGridRowMouseEventArgs<CourseTemplate> args)
     {
-        await dialogService.OpenAsync<CourseTemplateDetailsComponent>("Edit course template",
+        await dialogService.OpenAsync<CourseTemplateDetailsComponent>("Edit Template",
         new Dictionary<string, object>()
             {
             {"Template",args.Data },
-            {"OnSave", EventCallback.Factory.Create<CourseTemplate>(this,Save)}
+            {"OnSave", EventCallback.Factory.Create<CourseTemplate>(this,saveEditedTemplate)}
             },
         new DialogOptions()
             {
@@ -136,8 +150,53 @@
         );
 
     }
+    private async void deleteTemplate(CourseTemplate template)
+    {
+        var confirmAnswer = await dialogService.Confirm($"Do you want to delete '{template.TemplateName}'?", "Delete template", new ConfirmOptions()
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            });
 
-    private async void Save(CourseTemplate template)
+        if (confirmAnswer.GetValueOrDefault()) 
+        {
+            await courseService.DeleteTemplateAsync(template);
+            templates.Remove(template);
+            applyTemplateFilter(initialFilters);
+        }
+
+    }
+
+    private async void addTemplate()
+    {
+        var newTemplate = new CourseTemplate()
+            {
+                Sessions = new List<CourseSessionTemplate>()
+            };
+
+        await dialogService.OpenAsync<CourseTemplateDetailsComponent>("New Template",
+        new Dictionary<string, object>()
+                {
+            {"Template",newTemplate },
+            {"OnSave", EventCallback.Factory.Create<CourseTemplate>(this,saveNewTemplate)}
+                },
+        new DialogOptions()
+            {
+                Width = "85%",
+                Height = "75%"
+            }
+        );
+    }
+
+    private async void saveNewTemplate(CourseTemplate template)
+    {
+        var createdTemplate = await courseService.AddTemplateAsync(template);
+        templates.Add(createdTemplate);
+        applyTemplateFilter(initialFilters);
+        dialogService.Close();
+    }
+
+    private async void saveEditedTemplate(CourseTemplate template)
     {
         Console.WriteLine(template.TemplateName);
         await courseService.UpdateCourseTemplateAsync(template);

@@ -1,132 +1,155 @@
 ﻿@using Microsoft.JSInterop
 @using ClubScansub.Service
-<RadzenTemplateForm TItem="CourseTemplate">
-        <RadzenRow>
-            <RadzenColumn Size="3">
-                <RadzenFormField Text="Type" Variant="Variant.Outlined">
-                    <RadzenDropDown @bind-Value="@Template.CourseType" Data="Enum.GetValues(typeof(CourseTypeEnum)).Cast<CourseTypeEnum>()" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenFormField Text="Name" Variant="Variant.Outlined">
-                    <RadzenTextBox @bind-Value="@Template.TemplateName" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="3">
-                <RadzenFormField Text="Price" Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.DefaultPrice" Format="C2" ShowUpDown="false" />
-                </RadzenFormField>
-            </RadzenColumn>
 
-        </RadzenRow>
+<RadzenTemplateForm TItem="CourseTemplate" Style="flex:1">
+    <RadzenRow>
+        <RadzenColumn Size="3">
+            <RadzenFormField Text="Type" Variant="Variant.Outlined">
+                <RadzenDropDown @bind-Value="@Template.CourseType" Data="Enum.GetValues(typeof(CourseTypeEnum)).Cast<CourseTypeEnum>()" />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="6">
+            <RadzenFormField Text="Name" Variant="Variant.Outlined">
+                <RadzenTextBox @bind-Value="@Template.TemplateName" />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+            <RadzenFormField Text="Price" Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.DefaultPrice" Format="C2" ShowUpDown="false" />
+            </RadzenFormField>
+        </RadzenColumn>
 
-        <RadzenRow>
-            <RadzenColumn Size="2">
-                <RadzenFormField Text="Duration in Weeks" Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.TemplateDurationInWeeks" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Required Instructor level" Variant="Variant.Outlined">
-                    <RadzenDropDown @bind-Value="@Template.InstructorCertificate" Data="@instructorCertificates" TextProperty="@nameof(Certificate.Name)" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="3">
-                <RadzenFormField Text="Min." Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.MinStudents" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="3">
-                <RadzenFormField Text="Max." Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.MaxStudents" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Academig Sessions" Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.AcademicSessions" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="2">
+            <RadzenFormField Text="Duration in Weeks" Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.TemplateDurationInWeeks" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Text="Required Instructor level" Variant="Variant.Outlined">
+                <RadzenDropDown @bind-Value="@Template.InstructorCertificate" Data="@instructorCertificates" TextProperty="@nameof(Certificate.Name)" />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+            <RadzenFormField Text="Min." Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.MinStudents" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+            <RadzenFormField Text="Max." Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.MaxStudents" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="4">
+            <RadzenFormField Text="Academig Sessions" Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.AcademicSessions" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
 
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Pool sessions" Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.PoolSessions" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Text="Pool sessions" Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.PoolSessions" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
 
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Open water Sessions" Variant="Variant.Outlined">
-                    <RadzenNumeric @bind-Value="@Template.OpenWaterSessions" Format="N0" ShowUpDown="false" />
-                </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenFormField Text="Open water Sessions" Variant="Variant.Outlined">
+                <RadzenNumeric @bind-Value="@Template.OpenWaterSessions" Format="N0" ShowUpDown="false" />
+            </RadzenFormField>
 
-            </RadzenColumn>
-        </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
 
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%" AlignItems="AlignItems.Center">
-            <RadzenText Text="Course sessions:" TextStyle="TextStyle.Subtitle1" class="rz-my-4"/>
-            <RadzenButton ButtonStyle="ButtonStyle.Success" Variant="Variant.Text" Text="Add" Icon="add" Size="ButtonSize.Small" Click="onAddSession"/>
-        </RadzenStack>
-        @foreach (var item in Template.Sessions.OrderBy(x=>x.SessionNumber))
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+        <RadzenText Text="Course sessions:" TextStyle="TextStyle.Subtitle1" class="rz-my-4" />
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Variant="Variant.Text" Text="Add" Icon="add" Size="ButtonSize.Small" Click="onAddSession" />
+    </RadzenStack>
+    @foreach (var item in Template.Sessions?.OrderBy(x => x.SessionNumber))
     {
         <RadzenPanel Expand="@(() => onSessionCollapse(item))" Text="@($"Session# {item.SessionNumber.ToString()} - {item.Name}")" ExpandTitle="@($"Edit # {item.SessionNumber.ToString()}")" CollapseTitle="@($"Save # {item.SessionNumber.ToString()}")" Collapsed="@(selectedSessionNumber != item.SessionNumber)" AllowCollapse
-        class="rz-border rz-border-radius-2 rz-border-color-base-400 rz-mb-4 rz-p-5" Style="width:100%">
+                     class="rz-border rz-border-radius-2 rz-border-color-base-700 rz-mb-4 rz-p-5" Style="width:100%">
             <RadzenRow>
-                <RadzenColumn Size="11">
-                    <RadzenRow>
 
+                <RadzenColumn Size="11">
+                    @* // Row 1 *@
+                    <RadzenRow>
+                        @* // Session NUmber *@
                         <RadzenColumn SizeLG="1" SizeMD="2" SizeXS="2">
-                            <RadzenFormField Text="#" Variant="Variant.Outlined">
+                            <RadzenFormField Text="Session #" Variant="Variant.Outlined">
                                 <RadzenTextBox @bind-Value="item.SessionNumber" ReadOnly Disabled />
                             </RadzenFormField>
                         </RadzenColumn>
-                        
+                        @* // Session Type *@
                         <RadzenColumn SizeLG="2" SizeMD="3" SizeXS="4">
                             <RadzenFormField Text="Type" Variant="Variant.Outlined">
-                                <RadzenDropDown @bind-Value="item.SessionType" Data="Enum.GetValues(typeof(CourseSessionTypeEnum)).Cast<CourseSessionTypeEnum>()" />
+                                <RadzenDropDown @bind-Value="item.SessionType" Data="Enum.GetValues(typeof(CourseSessionTypeEnum)).Cast<CourseSessionTypeEnum>()" Change="setSessionTypeCounts" />
                             </RadzenFormField>
                         </RadzenColumn>
-
-                        <RadzenColumn  SizeLG="3" SizeMD="3" SizeXS="6">
+                        @* // Session Name *@
+                        <RadzenColumn SizeLG="3" SizeMD="3" SizeXS="6">
                             <RadzenFormField Text="Name" Variant="Variant.Outlined">
                                 <RadzenTextBox @bind-Value="item.Name" id="@(item.SessionNumber)" />
                             </RadzenFormField>
                         </RadzenColumn>
-
+                        @* // Session Description *@
                         <RadzenColumn SizeLG="6" SizeMD="4" SizeXS="12">
                             <RadzenFormField Text="Description" Variant="Variant.Outlined">
                                 <RadzenTextBox @bind-Value="item.Description" />
                             </RadzenFormField>
                         </RadzenColumn>
+
                     </RadzenRow>
+                    @* //Row 2 *@
                     <RadzenRow>
+                        @* // Session Meeting Location *@
                         <RadzenColumn Size="3">
-                            <RadzenFormField Text="Default WeekDay" Variant="Variant.Outlined">
-                                <RadzenDropDown @bind-Value="item.DefaultWeekday" Data="Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>()" />
+                            <RadzenFormField Text="Session Address" Variant="Variant.Outlined">
+                                <RadzenDropDown @bind-Value="item.Address" Data="addresses" TextProperty="@nameof(Address.Name)" />
                             </RadzenFormField>
                         </RadzenColumn>
-
-                        <RadzenColumn Size="3">
-                            <RadzenFormField Text="Default Start time" Variant="Variant.Outlined">
-                                <RadzenTimePicker @bind-TimeValue="item.DefaultStartTime" />
-                            </RadzenFormField>
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3">
-                            <RadzenFormField Text="Default duration" Variant="Variant.Outlined">
-                                <RadzenTimePicker @bind-TimeValue="item.DefaultDuration" />
-                            </RadzenFormField>
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3">
+                        @* // Session Instructor Ratio *@
+                        <RadzenColumn Size="2">
                             <RadzenFormField Text="Instructor Ratio 1:X" Variant="Variant.Outlined">
                                 <RadzenNumeric @bind-Value="item.InstructorRatio" Format="N0" />
                             </RadzenFormField>
                         </RadzenColumn>
+                        @* // Session USe Default *@
+                        <RadzenColumn Size="1">
+                            @* class="rz-mt-3 rz-p-1 rz-border rz-border-radius rz-border-color-base-700 rz-background-color-base-900" Style="white-space:nowrap ;overflow:hidden;text-overflow:ellipsis;" *@
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Style="height:100%" class="rz-pt-3 rz-pl-2">
+                                <RadzenText Text="Use defaults" TextStyle="TextStyle.Caption" class="rz-text-truncate rz-color-base-400 rz-mt-2" />
+                                <RadzenCheckBox @bind-Value="item.UseDefaultWeekDay" TValue="bool" Placeholder="Use default weekdays" />
+                            </RadzenStack>
+
+                        </RadzenColumn>
+                        @* // Session Default Weekday *@
+                        <RadzenColumn Size="2">
+                            <RadzenFormField Text="Default WeekDay" Variant="Variant.Outlined" Visible="item.UseDefaultWeekDay">
+                                <RadzenDropDown @bind-Value="item.DefaultWeekday" Data="Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>()" Disabled="!item.UseDefaultWeekDay" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        @* // Session Default Starttime *@
+                        <RadzenColumn Size="2">
+                            <RadzenFormField Text="Default Start time" Variant="Variant.Outlined" Visible="item.UseDefaultWeekDay">
+                                <RadzenTimePicker @bind-TimeValue="item.DefaultStartTime" Disabled="!item.UseDefaultWeekDay" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        @* // Session Default duration *@
+                        <RadzenColumn Size="2">
+                            <RadzenFormField Text="Default duration" Variant="Variant.Outlined" Visible="item.UseDefaultWeekDay">
+                                <RadzenTimePicker @bind-TimeValue="item.DefaultDuration" Disabled="!item.UseDefaultWeekDay" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+
 
                     </RadzenRow>
                 </RadzenColumn>
-                <RadzenColumn Size="1" >
+
+                @* // Session Action BUttons *@
+                <RadzenColumn Size="1">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-pt-3">
                         <RadzenStack>
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="keyboard_arrow_up" Click="@(() => moveSession(-1,item))" Disabled="@(item.SessionNumber == "1")" Variant="Variant.Text" />
@@ -135,14 +158,18 @@
                         <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => removeSession(item))" Variant="Variant.Text" />
                     </RadzenStack>
                 </RadzenColumn>
+
             </RadzenRow>
         </RadzenPanel>
     }
+
 </RadzenTemplateForm>
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="10" class="rz-my-8">
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="10" class="rz-pb-2">
     <RadzenButton Click="onSave" ButtonStyle="ButtonStyle.Success" Text="Save" Icon="save" />
     <RadzenButton Click="onCancel" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Text="Cancel" Icon="cancel" />
 </RadzenStack>
+
 <style>
     .rz-form-field {
     width: 100%
@@ -158,6 +185,9 @@
     [Inject]
     MemberService service { get; set; }
 
+    [Inject]
+    SiteService siteService { get; set; }
+
     [Parameter]
     public CourseTemplate Template { get; set; }
 
@@ -167,6 +197,10 @@
     private RadzenDropDown<CourseTypeEnum> courseTypeDropdown;
 
     private IList<Certificate> instructorCertificates = new List<Certificate>();
+    private IList<Address> addresses = new List<Address>();
+
+    private CourseTemplate originialTemplate;
+    private IList<CourseSessionTemplate> originalSessions;
 
     private string selectedSessionNumber = "1";
 
@@ -176,6 +210,20 @@
 
         var certificates = await service.GetAvailableCertificatesAsync(true);
         instructorCertificates = certificates.Where(x => x.IsDiveproCertificate == true).ToList();
+
+        addresses = await siteService.GetMeetingLocations();
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Template != null)
+        {
+            originalSessions = Template.Sessions.ToList();
+            originialTemplate = Template;
+            setSessionTypeCounts();    
+        }
     }
 
     private void onSessionCollapse(CourseSessionTemplate item)
@@ -194,6 +242,9 @@
 
     private void onCancel()
     {
+        Template = originialTemplate;
+        Template.Sessions = originalSessions;
+
         dialogService.Close();
     }
 
@@ -215,6 +266,7 @@
         };
 
         Template.Sessions.Add(newSession);
+        setSessionTypeCounts();
         selectedSessionNumber = newSession.SessionNumber;
         setFocus(selectedSessionNumber);
 
@@ -223,7 +275,15 @@
 
     private async void setFocus(string documentElementId)
     {
-        await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById('{documentElementId}').focus()");
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById('{documentElementId}').focus()");
+        }
+        catch (Exception)
+        {
+            
+            // throw;
+        }
     }
 
     private void moveSession(int direction, CourseSessionTemplate item)
@@ -249,6 +309,7 @@
     private void removeSession(CourseSessionTemplate sessionTemplate)
     {
         Template.Sessions.Remove(sessionTemplate);
+        setSessionTypeCounts();
         renumberSessions();
     }
 
@@ -259,7 +320,14 @@
         {
             item.SessionNumber = (++sessionNumber).ToString();
         }
-        
+
+    }
+
+    private void setSessionTypeCounts()
+    {
+        Template.AcademicSessions = Template.Sessions.Count(x => x.SessionType == CourseSessionTypeEnum.AcademicSession);
+        Template.PoolSessions = Template.Sessions.Count(x => x.SessionType == CourseSessionTypeEnum.PoolSession);
+        Template.OpenWaterSessions = Template.Sessions.Count(x => x.SessionType == CourseSessionTypeEnum.OpenWaterSession);
     }
 
 }

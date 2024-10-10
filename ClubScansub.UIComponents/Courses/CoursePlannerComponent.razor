@@ -72,13 +72,14 @@
 
     private IList<CourseTemplate> courseTemplates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
-    private CourseTemplate selectedTemplate;
+    private CourseTemplate? selectedTemplate;
 
     private IList<Course> newCourses = new List<Course>();
 
     private IList<CourseSession> activeCourseSessions = new List<CourseSession>();
 
     private IList<ICalendarEvent> activeItems = new List<ICalendarEvent>();
+
     private Dictionary<CourseTypeEnum, bool> initialCoursetypeFilter = new Dictionary<CourseTypeEnum, bool>()
     {
         { CourseTypeEnum.BaseCourse, true},
@@ -97,6 +98,7 @@
             filterCourseTemplates(initialCoursetypeFilter);
         }
     }
+   
     private void setSelectedTemplate(CourseTemplate template) 
     {
         selectedTemplate = template;
@@ -115,76 +117,9 @@
         args.PreventDefault();
         shouldDataReload = false;
 
-        if (args.Start.Date < DateTime.Now.Date || selectedTemplate == null)
+        var course = courseService.CreateNewCourseFromTemplate(selectedTemplate, args.Start);
+        if (course is null)
             return;
-
-        var firstSession = selectedTemplate.Sessions.First();
-        if (firstSession == null)
-            return;
-
-        var course = new Course()
-            {
-                CourseName = selectedTemplate.TemplateName,
-                CourseTemplate = selectedTemplate,
-                CourseType = selectedTemplate.CourseType,
-                MinParticipants = selectedTemplate.MinStudents,
-                MaxParticipants = selectedTemplate.MaxStudents,
-                FixedParticipants = 0,
-                Title = $"{selectedTemplate.TemplateName} - {args.Start.ToString("MMM")}",
-                StartDateAndTime = args.Start,
-                Price = selectedTemplate.DefaultPrice,
-                PremiumPrice = selectedTemplate.DefaultPrice,
-                EventType = EventTypeEnum.NotAnEvent
-            };
-
-        var currentDate = course.StartDateAndTime;
-        var currentWeekDay = course.StartDateAndTime.Date.DayOfWeek;
-        // var previousDateTime = course.StartDateAndTime;
-        // var prevoiusWeekDay = course.StartDateAndTime.Date.DayOfWeek;
-
-        if (selectedTemplate.Sessions.Count > 0)
-        {
-            course.StartDateAndTime += selectedTemplate.Sessions.FirstOrDefault().DefaultStartTime;
-            var courseSessions = new List<CourseSession>();
-
-
-            foreach (var item in selectedTemplate.Sessions.OrderBy(x => x.SessionNumber))
-            {
-
-
-                if (item.UseDefaultWeekDay)
-                {
-                    while (currentWeekDay != item.DefaultWeekday)
-                    {
-                        currentDate = currentDate.AddDays(1);
-                        currentWeekDay = currentDate.DayOfWeek;
-                    }
-                }
-
-                courseSessions.Add(new CourseSession()
-                    {
-                        CourseSessionTemplate = item,
-                        DateTime = currentDate.Add(item.DefaultStartTime),
-                        Sessiontype = item.SessionType,
-                        Duration = item.DefaultDuration,
-                        Address = item.Address,
-                        SessionName = item.Name,
-                        SessionDescription = item.Description,
-                        Course = course
-                    });
-                if (!item.UseDefaultWeekDay)
-                {    
-                    currentDate.AddDays(1);
-                    currentWeekDay = currentDate.DayOfWeek;
-                }
-
-                // prevoiusWeekDay = currentWeekDay;
-                // previousDateTime = currentDate;
-
-            }
-            course.EndDateAndTime = courseSessions.Max(x => x.EndDateAndTime);
-            course.CourseSessions = courseSessions;
-        }
 
         newCourses.Add(course);
 
@@ -203,6 +138,7 @@
 
 
     }
+    
     private void resetCourses()
     {
         newCourses = new List<Course>();
