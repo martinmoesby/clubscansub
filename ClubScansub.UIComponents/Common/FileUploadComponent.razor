@@ -1,0 +1,81 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal">
+    <RadzenUpload
+        Multiple=false
+                  Accept="image/*"
+        Complete="CompleteUpload"
+        Change="@(args => OnChange(args,"Completed file uplad"))"
+        Progress=@(args => OnProgress(args, "Single file upload")) 
+        Style="width: 100%" 
+        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+        Icon="image"
+        
+        >
+    </RadzenUpload>
+</RadzenStack>
+
+@code {
+    [Inject]
+    DialogService dialogService { get; set; }
+
+    [Parameter]
+    public double MaxFileSIzeInMegabytes { get; set; } = 0.4;
+
+    [Parameter]
+    public EventCallback<byte[]> OnFileUploaded { get; set; }
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        Console.WriteLine($"{args.Progress}% '{name}' / {args.Loaded} of {args.Total} bytes.");
+
+        long maxFileSize = (long)(MaxFileSIzeInMegabytes * 1024.0 * 1024.0);
+
+        if (args.Progress == 100)
+        {
+            foreach (FileInfo file in args.Files)
+            {
+                Console.WriteLine($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+
+    void CompleteUpload(UploadCompleteEventArgs args)
+    {
+
+        // if (!args.Cancelled)
+        //     completionMessage = "Upload Complete!";
+        // else
+        //     completionMessage = "Upload Cancelled!";
+
+        // showProgress = false;
+        // showComplete = true;
+    }
+
+    async void OnChange(UploadChangeEventArgs args, string name)
+    {
+        long maxFileSize = (long)(MaxFileSIzeInMegabytes * 1024.0 * 1024.0);
+
+        foreach (var file in args.Files)
+        {
+            try
+            {
+
+                MemoryStream memoryStream = new MemoryStream();
+                var stream = file.OpenReadStream(maxFileSize);
+                await stream.CopyToAsync(memoryStream);
+                stream.Close();
+
+                await OnFileUploaded.InvokeAsync(memoryStream.ToArray());
+                Console.WriteLine($"Uploaded: {file.Name} / {file.Size} bytes");
+                dialogService.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CLient Side upload error: {ex.Message} ");
+            }
+        }
+
+        Console.WriteLine($"{name} changed");
+    }
+
+}
