@@ -1,8 +1,9 @@
 ﻿@using ClubScansub.Extensions
 @using ClubScansub.Service
 @using ClubScansub.Utility
+@* <RadzenStack class="rz-border-base-900 rz-background-color-base-700 rz-border-radius-2 rz-mb-1 rz-mx-1 rz-p-2" JustifyContent="JustifyContent.Center"> *@
 
-<RadzenStack class="rz-border-base-900 rz-background-color-base-700 rz-border-radius-2 rz-mb-1 rz-mx-1 rz-p-2" JustifyContent="JustifyContent.Center">
+<RadzenStack class="rz-background-color-base-400 rz-border-base-300 rz-border-radius-2 rz-mb-1 rz-mx-1 rz-p-2" JustifyContent="JustifyContent.Center">
     <RadzenStack Orientation="Orientation.Horizontal">
 
         <RadzenStack Style="flex:3">
@@ -56,7 +57,7 @@
     </RadzenStack>
     
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
-        <RadzenPanel AllowCollapse="true" Collapsed Style="flex:1" Text="Instructors..." class="rz-border-radius-2" >
+        <RadzenPanel AllowCollapse="true" Collapsed Style="flex:1" Text="Instructors..." class="rz-border-radius-2 rz-border-color-base-700" >
             <RadzenStack Style="flex:1" Gap="2" class="rz-mt-1">
                 <AuthorizeView Roles="Administrator,Owner">
                         @foreach (var item in Session.SessionInstructors)

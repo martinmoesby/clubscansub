@@ -1,16 +1,24 @@
-﻿
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+
     <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="newCertificate" Text="Create new certificate" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" class="rz-mb-4"/>
 <RadzenRow Gap="10">
     @if (!IsLoading && Certificates != null)
     {
         foreach (var item in Certificates)
         {
-            <ProfileCertificateDetailsComponent Certificate="@item" />
+            <ProfileCertificateDetailsComponent Certificate="@item" OnEdit="editCertificate" />
         }
     }
 </RadzenRow>
 
 @code {
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
     [Inject]
     DialogService dialogService { get; set; }
 
@@ -30,32 +38,44 @@
             StateHasChanged();
         }
     }
-    private void onSave(UserCertificat newUserCertificate)
-    {
 
+    private async void onSave(UserCertificat newUserCertificate)
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            var currentUser = await memberService.GetAsync(authState?.User?.GetIdentityId());
+            if (currentUser != null)
+            {
+                newUserCertificate.User = currentUser;
+                await memberService.CreateUpdateUserCertificate(newUserCertificate);
+                dialogService.Close();
+            }
+        }
     }
-
-    private async void newCertificate()
+    private async Task editCertificate(UserCertificat editedCertificate)
     {
-
-        var certificate = new UserCertificat();
-
         var dialogOptions = new DialogOptions()
             {
                 Width = "800px",
-                Height="600px",
+                Height = "600px",
                 ShowClose = true
             };
 
         var dialogParameters = new Dictionary<string, object>()
                 {
                     { "OnSave", EventCallback.Factory.Create<UserCertificat>(this, onSave)},
-                    { "UserCertificate", certificate }
+                    { "UserCertificate", editedCertificate }
                 };
 
         await dialogService.OpenAsync<ProfileCertificateAddEditComponent>("Add new Certificate", dialogParameters, dialogOptions);
 
+    }
 
+    private async void newCertificate()
+    {
+        var certificate = new UserCertificat();
+        await editCertificate(certificate);
     }
 
 }

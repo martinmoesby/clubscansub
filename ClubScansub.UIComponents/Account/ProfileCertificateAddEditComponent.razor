@@ -25,12 +25,12 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="Front">
                 <RadzenStack JustifyContent="JustifyContent.Center" Style="width:100%">
-                    <img src="@ImageUtils.GetImageSrc(UserCertificate?.FrontSideImage)" style="width:80%;" class="rz-border-radius-4" />
+                    <img src="@ImageUtils.GetImageSrc(UserCertificate?.FrontSideImage)" style="width:80%;" class="rz-border-radius-4" @onclick="uploadFrontSide" />
                 </RadzenStack>
 
             </RadzenTabsItem>
             <RadzenTabsItem Text="Backside">
-                <img src="@ImageUtils.GetImageSrc(UserCertificate?.BackSideImage)" style="width:80%;" class="rz-border-radius-4" />
+                <img src="@ImageUtils.GetImageSrc(UserCertificate?.BackSideImage)" style="width:80%;" class="rz-border-radius-4" @onclick="uploadBackSide"/>
 
             </RadzenTabsItem>
             <RadzenTabsItem Text="Verification">
@@ -49,10 +49,14 @@
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
+    <RadzenButton Click="saveCertificate" Icon="save" Text="Save certificate" ButtonStyle="ButtonStyle.Success" />
 }
 
 
 @code {
+    [Inject]
+    DialogService dialogService { get; set; }
+
     [Inject]
     AuthenticationStateProvider authStateProvider { get; set; }
 
@@ -68,6 +72,7 @@
     private IList<Certificate> availableCertificates = new List<Certificate>();
     private Certificate selectedCertificateType = new();
     private bool isLoading = true;
+    private string imageSide = "Front";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -75,12 +80,53 @@
         if (firstRender)
         {
             var authUser = await authStateProvider.GetAuthenticationStateAsync();
-            
+
             bool includeProCertificates = authUser.User.IsInRole(Userroles.Divepro);
             availableCertificates = await memberService.GetAvailableCertificatesAsync(includeProCertificates);
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private void setCertificateImagesData(byte[] imageData)
+    {
+        if (imageSide == "Front")
+            UserCertificate.FrontSideImage = imageData;
+
+        if (imageSide == "Back")
+            UserCertificate.BackSideImage = imageData;
+
+        StateHasChanged();
+    }
+
+
+    private async void uploadImage(string side)
+    {
+        imageSide = side;
+        await dialogService.OpenAsync<FileUploadComponent>($"Upload new {side}", new Dictionary<string, object>()
+        { 
+            {
+                "OnFileUploaded", EventCallback.Factory.Create<byte[]>(this, setCertificateImagesData)
+            },
+           {
+               "MaxFileSIzeInMegabytes",0.4
+           }
+        }, new DialogOptions()
+            {
+                Width = "600px",
+                Height = "480px"
+            });
+
+
+
+
+    }
+    private void uploadFrontSide() => uploadImage("Front");
+    private void uploadBackSide() => uploadImage("Back");
+
+    private async void saveCertificate()
+    {
+        await OnSave.InvokeAsync(UserCertificate);
     }
 
 }

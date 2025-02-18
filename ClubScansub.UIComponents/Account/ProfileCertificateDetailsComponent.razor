@@ -1,7 +1,10 @@
 ﻿
 <RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3" SizeXL="2">
     <RadzenCard>
-        <RadzenText TextStyle="TextStyle.Subtitle1" Text="@Certificate.Certificate.Name" Style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+            <RadzenText TextStyle="TextStyle.Subtitle1" Text="@Certificate.Certificate.Name" Style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"/>
+            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" Click="@(() => OnEdit.InvokeAsync(Certificate))" Variant="Variant.Text" />
+        </RadzenStack>
         <RadzenStack @onmousedown="setShowBack" @onmouseup="setShowFront">
             @if (showBack)
             {
@@ -33,8 +36,8 @@
 </RadzenColumn>
 
 @code {
-
-
+    [Parameter]
+    public EventCallback<UserCertificat> OnEdit { get; set; }
 
     [Parameter]
     public UserCertificat Certificate { get; set; }

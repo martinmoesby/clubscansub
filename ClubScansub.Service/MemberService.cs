@@ -7,6 +7,7 @@ using ClubScansub.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.Design;
 
 namespace ClubScansub.Service
 {
@@ -184,6 +185,29 @@ namespace ClubScansub.Service
                 return await data.ToListAsync();
 
             return await data.Where(x => x.IsDiveproCertificate == false).ToListAsync();        
+        }
+
+        public async Task CreateUpdateUserCertificate(UserCertificat uc)
+        {
+            if (uc.Id != 0)
+            {
+                context.Attach(uc);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                var user = await context.ApplicationUsers.FindAsync(uc.User.Id);
+                if (user != null)
+                {
+                    user.Certificates.Add(uc);
+                }
+                
+                await context.SaveChangesAsync();
+
+            }
+                    
+
+
         }
     }
 }
