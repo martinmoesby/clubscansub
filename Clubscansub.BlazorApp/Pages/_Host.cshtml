@@ -16,11 +16,12 @@
     <link rel="icon" href="images/scuba_icon.png" type="image/png" sizes="16x16">
     @* <link rel="icon" href="favicon.ico" /> *@
     <link href="css/site.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <component type="typeof(RadzenTheme)" render-mode="ServerPrerendered" param-Theme="@("software")" />
+    <component type="typeof(HeadOutlet)" render-mode="Server" />
+    <component type="typeof(RadzenTheme)" render-mode="Server" param-Theme="@("software")" />
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <component type="typeof(App)" render-mode="Server" />
 
     <div id="blazor-error-ui" style="display:none">
         <environment include="Staging,Production">

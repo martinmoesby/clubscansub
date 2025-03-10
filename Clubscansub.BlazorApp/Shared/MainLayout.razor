@@ -17,7 +17,7 @@
                     <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-4" Orientation="Orientation.Horizontal">
                         <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu"></RadzenSidebarToggle>
                         @* <RadzenAppearanceToggle /> *@
-                        <RadzenImage Path="images/logo_neg.png" Style="height:55px;margin-bottom:10px"></RadzenImage>
+                        <RadzenImage Path="images/logo.png" Style="height:55px;margin-bottom:10px"></RadzenImage>
                     </RadzenStack>
 
                     <RadzenStack JustifyContent="JustifyContent.End" class="rz-pr-4" Orientation="Orientation.Horizontal">
@@ -37,11 +37,7 @@
 
     </RadzenBody>
 
-    <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2; display: flex; flex-direction:column" >
-
-@*         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
-            <RadzenText Text="Clubscansub.BlazorApp" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" class="rz-mb-0" style="color: var(--rz-sidebar-color);" />
-        </RadzenStack> *@
+    <RadzenSidebar Expanded=@sidebarExpanded style="z-index: 2; display: flex; flex-direction:column">
 
         <RadzenPanelMenu Style="text-align: left; flex-grow:1">
             <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
@@ -80,12 +76,7 @@
                 <RadzenText Text="©2023 Martin Moesby" TextStyle="Radzen.Blazor.TextStyle.Caption" class="rz-mb-0" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
             </RadzenColumn>
         </RadzenRow>
-        @*         <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding);">
-        </RadzenStack>
-        *@
-    </RadzenFooter>
-</RadzenLayout>
 
-@code {
-    string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
-}
+    </RadzenFooter>
+
+</RadzenLayout>

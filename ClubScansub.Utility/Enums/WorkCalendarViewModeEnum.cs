@@ -8,6 +8,6 @@ namespace ClubScansub.Utility.Enums
 {
     public enum WorkCalendarViewModeEnum
     {
-        List, Calendar
+        List, Calendar, Completed
     }
 }

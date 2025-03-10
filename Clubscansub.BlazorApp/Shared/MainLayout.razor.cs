@@ -2,6 +2,7 @@ using System.Net.Http;
 using ClubScansub.Extensions;
 using ClubScansub.Models;
 using ClubScansub.Service;
+using ClubScansub.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -36,11 +37,19 @@ namespace ClubScansub.BlazorApp.Shared
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
+        string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
+
         private bool sidebarExpanded = false;
 
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+                
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
         }
 
         void SidebarToggleClick()

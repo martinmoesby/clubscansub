@@ -39,7 +39,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+    <!--<PackageReference Include="System.Drawing.Common" Version="8.0.8" />-->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClubScansub.DataAccess\ClubScansub.DataAccess.csproj" />

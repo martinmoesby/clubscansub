@@ -85,6 +85,24 @@ namespace ClubScansub.Service
             return result;
         }
 
+        public async Task<IList<CourseSessionInstructor>> GetInstructorCompletedWorkAsync(ApplicationUser user)
+        {
+            var data = await context.CourseSessionInstructors
+                .Include(x => x.CourseSession)
+                .ThenInclude(x => x.Course).ThenInclude(x => x.Participants)
+                .Include(x => x.Instructor)
+                //.OrderBy(x => x.CourseSession.Course.StartDateAndTime).ThenBy(x => x.CourseSession.DateTime).ThenBy(x => x.Instructor.UserName)
+                .ToListAsync();
+
+            var result = data.Where(x => x.CourseSession.DateTime < DateTime.UtcNow 
+                && x.InstructorApproved == true 
+                && (x.CourseSession.Course.Participants != null 
+                    || x.CourseSession.Course.FixedParticipants > 0)
+                && x.Instructor.Id == user.Id
+                ).ToList();
+            return result;
+        }
+
         public async Task<Course> GetAsync(string Id)
         {
             var id = int.Parse(Id);

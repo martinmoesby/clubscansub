@@ -1,17 +1,17 @@
 ﻿@using ClubScansub.Service
 
 <RadzenDataGrid 
-    AllowGrouping 
-    AllowSorting
-    Data="@instructorWork" 
-    TItem="InstructorWork" 
-    AllowFiltering 
-    AllowAlternatingRows="false"
-    Render="OnRender" 
-    FilterMode="FilterMode.CheckBoxList" 
-    HideGroupedColumn="false" 
-    AllGroupsExpanded="false" 
-    Style="flex:1" 
+AllowGrouping 
+AllowSorting
+Data="@instructorWork" 
+TItem="InstructorWork" 
+AllowFiltering 
+AllowAlternatingRows="false"
+Render="OnRender" 
+FilterMode="FilterMode.CheckBoxList" 
+HideGroupedColumn="true" 
+AllGroupsExpanded="false" 
+Style="flex:1" 
 >
 
     <GroupHeaderTemplate>
@@ -24,16 +24,18 @@
     </GroupHeaderTemplate>
 
     <Columns>
+        @if (!SingleUserResult)
+        {
+            <RadzenDataGridColumn Title="Instructor name" GroupProperty="@nameof(InstructorWork.InstructorName)" Width="200px" Filterable FilterProperty="@nameof(InstructorWork.InstructorName)" Property="@nameof(InstructorWork.InstructorName)">
+                <Template Context="item">
+                    <RadzenText Text="@item.InstructorName" />
+                </Template>
+                <GroupFooterTemplate>
+                    @context.Data.Key - total:<b>@(String.Format("{0:n2}", context.Data.Items.Cast<InstructorWork>().Sum(x => x.Hours)))</b>
+                </GroupFooterTemplate>
 
-        <RadzenDataGridColumn Title="Instructor name" GroupProperty="@nameof(InstructorWork.InstructorName)" Width="200px" Filterable FilterProperty="@nameof(InstructorWork.InstructorName)" Property="@nameof(InstructorWork.InstructorName)">
-            <Template Context="item">
-                <RadzenText Text="@item.InstructorName" />
-            </Template>
-            <GroupFooterTemplate>
-                @context.Data.Key - total:<b>@(String.Format("{0:n2}", context.Data.Items.Cast<InstructorWork>().Sum(x => x.Hours)))</b>
-            </GroupFooterTemplate>
-
-        </RadzenDataGridColumn>
+            </RadzenDataGridColumn>
+        }
 
         <RadzenDataGridColumn Title="Year" GroupProperty="@nameof(InstructorWork.Year)" Width="100px" Filterable FilterProperty="@nameof(InstructorWork.Year)" Property="@nameof(InstructorWork.Year)">
             <Template Context="item">
@@ -81,6 +83,12 @@
     [Inject]
     public CourseService courseService { get; set; }
 
+    [Parameter]
+    public bool SingleUserResult { get; set; } = false;
+
+    [Parameter]
+    public ApplicationUser? User { get; set; } = null;
+
     private IEnumerable<InstructorWork> instructorWork;
 
     private bool isLoading = true;
@@ -111,6 +119,10 @@
         if (firstRender)
         {
             var data = await courseService.GetCourseSessionInstructorAsync();
+            if (SingleUserResult && User != null)
+            {
+                data = await courseService.GetInstructorCompletedWorkAsync(User);
+            }
             instructorWork = data.Where(x=>x.InstructorApproved == true).Select(x => new InstructorWork()
                 {
                     CourseId = x.CourseSession.Course.Id,
@@ -134,14 +146,20 @@
     {
         if (args.FirstRender)
         {
-            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.InstructorName), SortOrder = SortOrder.Descending, Title = "Instructor" });
+            if (!SingleUserResult)
+            {
+                args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.InstructorName), SortOrder = SortOrder.Descending, Title = "Instructor" });
+                args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.InstructorName), SortOrder = SortOrder.Ascending });
+                
+            }
             args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.Year), SortOrder = SortOrder.Descending, Title = "Year" });
-            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.Month), Title = "Month" });
+            args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.Year), SortOrder = SortOrder.Ascending });
+
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = nameof(InstructorWork.Month), Title = "Month", SortOrder = SortOrder.Ascending, });
+            args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.MonthNumber), SortOrder = SortOrder.Ascending });
+
             args.Grid.CollapseAll();
 
-            args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.InstructorName), SortOrder = SortOrder.Ascending });
-            args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.Year), SortOrder = SortOrder.Ascending });
-            args.Grid.Sorts.Add(new SortDescriptor() { Property = nameof(InstructorWork.MonthNumber), SortOrder = SortOrder.Ascending });
 
             StateHasChanged();
         }

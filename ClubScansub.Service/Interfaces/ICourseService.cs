@@ -10,6 +10,7 @@ namespace ClubScansub.Service.Interfaces
     internal interface ICourseService : IGenericService<Course>
     {
         Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date);
+        Task<IList<CourseSessionInstructor>> GetInstructorCompletedWorkAsync(ApplicationUser user);
         Task<IList<CourseTemplate>> GetTemplatesAsync();
     }
 }

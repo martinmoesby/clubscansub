@@ -39,6 +39,13 @@ namespace ClubScansub.Data
         //public DbSet<kursistdata> kursistdata { get; private set; }
         //public DbSet<saldooplysning> saldooplysning { get; private set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlServer(o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

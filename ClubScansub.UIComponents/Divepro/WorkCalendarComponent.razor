@@ -16,39 +16,46 @@
         @if (AllowViews)
         {
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenToggleButton Change="@(() => setViewMode(WorkCalendarViewModeEnum.Completed))" Value="@(ViewMode == WorkCalendarViewModeEnum.Completed)" Icon="history" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" />
                 <RadzenToggleButton Change="@(() => setViewMode(WorkCalendarViewModeEnum.List))" Value="@(ViewMode == WorkCalendarViewModeEnum.List)" Icon="list" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
                 <RadzenToggleButton Change="@(() => setViewMode(WorkCalendarViewModeEnum.Calendar))" Value="@(ViewMode == WorkCalendarViewModeEnum.Calendar)" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Icon="calendar_month" />
             </RadzenStack>
         }
     </RadzenStack>
 
-        @switch (ViewMode)
-        {
-            case WorkCalendarViewModeEnum.List:
-                <WorkCalendarListViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
-                                               OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
-                                               OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
-                                               OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
-                Sessions="sessions" />
+    @switch (ViewMode)
+    {
+        case WorkCalendarViewModeEnum.List:
+            <WorkCalendarListViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+            OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+            OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+            OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+            Sessions="sessions" />
 
-                break;
-            case WorkCalendarViewModeEnum.Calendar:
-                <WorkCalendarMonthViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
-                                                OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
-                                                OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
-                                                OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
-                                                Start="Start" End="End"
-                                                Sessions="sessions"  />
+            break;
+        case WorkCalendarViewModeEnum.Calendar:
+            <WorkCalendarMonthViewComponent OnRetractInstructor="(args)=>retractInstructor(args.Item1, args.Item2) "
+            OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
+            OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
+            OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
+            Start="Start" End="End"
+            Sessions="sessions" />
 
-                break;
-            default:
-                break;
-        }
+            break;
+        case WorkCalendarViewModeEnum.Completed:
+            <WorkCompletedComponent SingleUserResult=true User="@CurrentUser" />
+            break;
+        default:
+            break;
+    }
 
 </RadzenStack>
 @code {
     [Inject]
     CourseService courseService { get; set; }
+
+    [CascadingParameter(Name ="CurrentUser")]
+    public ApplicationUser? CurrentUser { get; set; }
 
     [Parameter]
     public WorkCalendarViewModeEnum ViewMode { get; set; } = WorkCalendarViewModeEnum.List;
@@ -104,7 +111,8 @@
         StateHasChanged();
     }
 
-    private void setViewMode(WorkCalendarViewModeEnum mode) {
+    private void setViewMode(WorkCalendarViewModeEnum mode)
+    {
         ViewMode = mode;
     }
 
