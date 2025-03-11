@@ -28,7 +28,7 @@
             </RadzenColumn>
         </RadzenRow>
     </RadzenHeader>
-    <RadzenBody Expanded="@sidebarExpanded">
+    <RadzenBody>
         <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;height:100%">
             <RadzenColumn Size="12">
                 @Body
@@ -37,9 +37,9 @@
 
     </RadzenBody>
 
-    <RadzenSidebar Expanded=@sidebarExpanded style="z-index: 2; display: flex; flex-direction:column">
+    <RadzenSidebar @bind-Expanded=@sidebarExpanded Responsive=false style="z-index: 2; display: flex; flex-direction:column">
 
-        <RadzenPanelMenu Style="text-align: left; flex-grow:1">
+        <RadzenPanelMenu DisplayStyle="MenuItemDisplayStyle.Text">
             <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
 
             <AuthorizeView Roles="@Userroles.Member">

@@ -43,8 +43,8 @@ namespace ClubScansub.BlazorApp.Shared
 
         protected override async Task OnInitializedAsync()
         {
-            await base.OnInitializedAsync();
-                
+            sidebarExpanded = false;
+
         }
 
         protected override void OnAfterRender(bool firstRender)

@@ -15,9 +15,12 @@ namespace ClubScansub.Service
     {
         private readonly ApplicationDbContext context;
 
-        public CourseService(IOptions<ServiceOptions> options, IEmailSender emailSender) : base(options, emailSender)
+        private ISmsSender smsSender;
+
+        public CourseService(IOptions<ServiceOptions> options, IEmailSender emailSender, ISmsSender smsSender) : base(options, emailSender)
         {
             context = new ApplicationDbContext(dbContextOptions);
+            this.smsSender = smsSender;
         }
 
         public Task<Course> AddAsync(Course Item)
@@ -254,6 +257,34 @@ namespace ClubScansub.Service
                 sessionInstructor.InstructorApproved = approved;
                 sessionInstructor.InstructorRetracted = false;
                 context.CourseSessionInstructors.Update(sessionInstructor);
+
+                if (approved)
+                {
+                    if (!string.IsNullOrEmpty(instructor.Email))
+                    {
+                        await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} approved", $"You have been assigned as instructor on the {session.SessionName} on {session.DateTime}");
+                    }
+
+                    if(instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                    {
+                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been assigned as instructor on {session.StartDateAndTime} - {session.SessionName}");
+                    }
+
+                } else
+                {
+                    if (!string.IsNullOrEmpty(instructor.Email))
+                    {
+                        await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} removed", $"You have been removed as instructor on the {session.SessionName} on {session.DateTime}");
+                    }
+
+                    if (instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                    {
+                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been removed as instructor on {session.StartDateAndTime} - {session.SessionName}");
+                    }
+
+                }
+
+
                 await context.SaveChangesAsync();
             }
         }
@@ -266,6 +297,17 @@ namespace ClubScansub.Service
                 sessionInstructor.InstructorApproved = false;
                 sessionInstructor.InstructorRetracted = !sessionInstructor.InstructorRetracted;
                 context.CourseSessionInstructors.Update(sessionInstructor);
+
+                if (!string.IsNullOrEmpty(instructor.Email))
+                {
+                    await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} retracted", $"You have been removed as instructor on the {session.SessionName} on {session.DateTime}");
+                }
+
+                if (instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                {
+                    await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been retracted as instructor on {session.StartDateAndTime} - {session.SessionName}");
+                }
+
                 await context.SaveChangesAsync();
             }
 

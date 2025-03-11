@@ -10,8 +10,8 @@ namespace ClubScansub.Service.Communication
 {
     public interface ISmsSender
     {
-        Task<MailjetResponse> SendSmsAsync(string phonenumber, string message);
-        Task<IEnumerable<MailjetResponse>> SendMultipleSmsAsync(IEnumerable<IdentityUser> users, string message);
+        Task<SmsResponse> SendSmsAsync(string phonenumber, string message);
+        Task<IEnumerable<SmsResponse>> SendMultipleSmsAsync(IEnumerable<IdentityUser> users, string message);
 
     }
 }
