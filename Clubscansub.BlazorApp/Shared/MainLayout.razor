@@ -16,12 +16,14 @@
 
                     <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-4" Orientation="Orientation.Horizontal">
                         <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu"></RadzenSidebarToggle>
-                        @* <RadzenAppearanceToggle /> *@
-                        <RadzenImage Path="images/logo.png" Style="height:55px;margin-bottom:10px"></RadzenImage>
+                        <RadzenLink Path="/">
+                            <RadzenImage Path="@logoFilename" Style="height:55px;margin-bottom:10px"></RadzenImage>
+                        </RadzenLink>
                     </RadzenStack>
 
-                    <RadzenStack JustifyContent="JustifyContent.End" class="rz-pr-4" Orientation="Orientation.Horizontal">
+                    <RadzenStack JustifyContent="JustifyContent.End" class="rz-pr-4" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                         <LoginDisplay />
+                        <RadzenAppearanceToggle ButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Info" />
                     </RadzenStack>
 
                 </RadzenStack>
@@ -31,7 +33,9 @@
     <RadzenBody>
         <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;height:100%">
             <RadzenColumn Size="12">
-                @Body
+                <CascadingValue TValue="bool" Name="IsDarkTheme" Value="@isDarkTheme">
+                    @Body
+                </CascadingValue>
             </RadzenColumn>
         </RadzenRow>
 
@@ -45,7 +49,7 @@
             <AuthorizeView Roles="@Userroles.Member">
                 <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person" />
             </AuthorizeView>
-            
+
             <AuthorizeView Roles="@Userroles.Divepro">
                 <RadzenPanelMenuItem Text="Workcalender" Path="/divepro/workcalendar" Icon="engineering" />
             </AuthorizeView>
@@ -80,3 +84,45 @@
     </RadzenFooter>
 
 </RadzenLayout>
+
+@code {
+    [Inject]
+    private IServiceProvider serviceProvider { get; set; }
+
+    private ThemeService themeService;
+
+    private string logoFilename = "";
+    private bool isDarkTheme = false;
+
+    protected override void OnInitialized()
+    {
+        themeService = serviceProvider.GetService<ThemeService>();
+        if (themeService != null )
+        {
+            themeService.ThemeChanged += OnThemeChanged;
+            setLogoFileName();
+        }
+    }
+
+    private void OnThemeChanged()
+    {
+        setLogoFileName();
+        StateHasChanged();
+    }
+
+    private void setLogoFileName()
+    {
+
+        if (themeService.Theme.Contains("dark"))
+        {
+            isDarkTheme = true;
+            logoFilename = "images/logo_neg.png";
+        }
+        else
+        {
+            isDarkTheme = false;
+            logoFilename = "images/logo.png";
+        }
+    }
+
+}

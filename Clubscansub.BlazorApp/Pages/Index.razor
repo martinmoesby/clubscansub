@@ -65,9 +65,11 @@
 
             <RadzenWeekView Text="@IconsTextsAndColors.Texts.SCHEDULER_WEEK" TimeFormat="HH:mm" MinutesPerSlot="15" />
             <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
-            <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
-            <RadzenYearPlannerView Text="@IconsTextsAndColors.Texts.SCHEDULER_PLANNER" />
-            <RadzenYearTimelineView Text="@IconsTextsAndColors.Texts.SCHEDULER_TIMELINE" />
+            <AuthorizeView roles="Administrator, Owner">
+                <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
+                <RadzenYearPlannerView Text="@IconsTextsAndColors.Texts.SCHEDULER_PLANNER" />
+                <RadzenYearTimelineView Text="@IconsTextsAndColors.Texts.SCHEDULER_TIMELINE" />
+            </AuthorizeView>
 
         </ChildContent>
 

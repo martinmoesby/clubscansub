@@ -1,75 +1,75 @@
 ﻿@using ClubScansub.Extensions
 @using ClubScansub.Service
 @using Nager.Date
-    @* <RadzenStack Style="width:100%;flex:1; background-color:var(--rz-base-900)" class="rz-border-color-base-700 rz-color-info rz-border rz-border-radius-3" Gap="0"> *@
+@* <RadzenStack Style="width:100%;flex:1; background-color:var(--rz-base-900)" class="rz-border-color-base-700 rz-color-info rz-border rz-border-radius-3" Gap="0"> *@
 
-    <RadzenStack Style="width:100%;flex:1;" class="rz-border-color-base-400 rz-border rz-border-radius-3" Gap="0">
-            <RadzenRow AlignItems="AlignItems.Center" Gap="0" class="rz-py-2">
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Monday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Tuesday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Wednesday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Thursday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Friday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Saturday</RadzenColumn>
-                <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Sunday</RadzenColumn>
-            </RadzenRow>
+<RadzenStack Style="width:100%;flex:1;" class=@($"{rowBorderColorClass} rz-border rz-border-radius-1") Gap="0">
+    <RadzenRow AlignItems="AlignItems.Center" Gap="0" class="rz-py-2">
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Monday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Tuesday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Wednesday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Thursday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Friday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Saturday</RadzenColumn>
+        <RadzenColumn Style="height:100%;flex:1;text-align:center">@DayOfWeek.Sunday</RadzenColumn>
+    </RadzenRow>
 
-                @foreach (var item in weeks)
+    @foreach (var item in weeks)
+    {
+        <RadzenRow style="flex:1" class=@($"{rowBorderColorClass} rz-border-top") Gap="0">
+            @foreach (var day in EachDay(item.Start, item.End))
+            {
+                string bgClass = $"{bgColorClass} {cellBorderColorClass}";
+                string borderStyle = "border-right:1px solid";
+                if (Nager.Date.DateSystem.IsWeekend(day, CountryCode.DK))
                 {
-                    @* <RadzenRow style="flex:1" class="rz-border-color-base-700 rz-border-top" Gap="0"> *@
-
-                    <RadzenRow style="flex:1" class="rz-border-color-base-400 rz-border-top" Gap="0">
-                        @foreach (var day in EachDay(item.Start, item.End))
-                        {
-                            @* string bgClass = "rz-background-color-base-800 rz-border-color-base-700"; *@
-
-                            string bgClass = "rz-background-color-base-200 rz-border-color-base-400";
-                            string borderStyle = "border-right:1px solid";
-                            if (Nager.Date.DateSystem.IsWeekend(day, CountryCode.DK))
-                            {
-                                @* bgClass = "rz-background-color-base-900 rz-border-color-base-900"; *@
-
-                                bgClass = "rz-background-color-base-300 rz-border-color-base-400";
-                            }
-                            if (day.DayOfWeek == DayOfWeek.Sunday)
-                            {
-                                borderStyle = "border-right:none;";
-                            }
-
-                            string columnCLass = $"{bgClass} {borderStyle}";
-
-                            if (day.Month == Start.Month)
-                            {
-                                
-                                <RadzenColumn Style=@($"flex:1;height:100%;display:flex;flex-direction:column;") class="@columnCLass">
-                                    <RadzenText TextStyle="TextStyle.Caption" Text="@day.Day.ToString()" class="rz-ml-1 rz-mt-1" />
-                                    <RadzenStack Style="flex:1">
-                                        @foreach (var session in GetSessionsForDay(day).OrderBy(x => x.StartDateAndTime))
-                                        {
-                                            <WorkCalendarSessionComponent Session="session"
-                                                              OnRetractInstructor="@(async (args)=>await OnRetractInstructor.InvokeAsync((args.Item1, args.Item2)))"
-                                                              OnApproveInstructor="@(async (args)=> await OnApproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
-                                                              OnUnaproveInstructor="@(async (args)=>await OnUnaproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
-                                                              OnSignUpInstructor="@(async (args) => await OnSignUpInstructor.InvokeAsync((args.Item1, args.Item2)))"
-                                                                          ReadOnly="(day < DateTime.Now)" />
-                                        }
-                                    </RadzenStack>
-
-                                </RadzenColumn>
-                            }
-                            else
-                            {
-                                <RadzenColumn Style="height:100%;flex:1;" class="rz-background-color-transparent" />
-                            }
-                        }
-                    </RadzenRow>
+                    bgClass = $"{weekendBgColorClass} {weekendBorderColorClass}";
                 }
-                <RadzenRow AlignItems="AlignItems.Center" Gap="0" class="rz-py-2"></RadzenRow>
+                if (day.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    borderStyle = "border-right:none;";
+                }
 
-        </RadzenStack>
-    
+                string columnCLass = $"{bgClass}";
+
+                if (day.Month == Start.Month)
+                {
+
+                    <RadzenColumn Style=@($"flex:1;height:100%;display:flex;flex-direction:column;{borderStyle}") class="@columnCLass">
+                        <RadzenText TextStyle="TextStyle.Caption" Text="@day.Day.ToString()" class="rz-ml-1 rz-mt-1" />
+                        <RadzenStack Style="flex:1">
+                            @foreach (var session in GetSessionsForDay(day).OrderBy(x => x.StartDateAndTime))
+                            {
+                                <WorkCalendarSessionComponent Session="session"
+                                OnRetractInstructor="@(async (args)=>await OnRetractInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                OnApproveInstructor="@(async (args)=> await OnApproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                OnUnaproveInstructor="@(async (args)=>await OnUnaproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                OnSignUpInstructor="@(async (args) => await OnSignUpInstructor.InvokeAsync((args.Item1, args.Item2)))"
+                                ReadOnly="(day < DateTime.Now)" />
+                            }
+                        </RadzenStack>
+
+                    </RadzenColumn>
+                }
+                else
+                {
+                    <RadzenColumn Style="height:100%;flex:1;" class="rz-background-color-transparent" />
+                }
+            }
+        </RadzenRow>
+    }
+    <RadzenRow AlignItems="AlignItems.Center" Gap="0" class="rz-py-2"></RadzenRow>
+
+</RadzenStack>
+
 
 @code {
+    // [Inject]
+    // private IServiceProvider serviceProvider { get; set; }
+
+
+    [CascadingParameter(Name = "IsDarkTheme")]
+    public bool isDarkTheme { get; set; } 
 
     [Parameter]
     public IList<CourseSession> Sessions { get; set; } = new List<CourseSession>();
@@ -98,13 +98,32 @@
     private double weeksInCalendarView;
     private IList<Week> weeks = new List<Week>();
 
+    private string weekendBgColorClass = "rz-background-color-base-300";
+    private string weekendBorderColorClass = "rz-border-color-base-400";
+
+    private string bgColorClass = "rz-background-color-base-200"; // "rz-background-color-base-800";
+
+    private string rowBorderColorClass = "rz-border-color-base-700"; // "rz-border-color-base-400";
+    private string cellBorderColorClass = "rz-border-color-base-400"; // "rz-border-color-base-700" ;
+
+    protected override void OnInitialized()
+    {
+
+        base.OnInitialized();
+
+    }
+
     protected override void OnParametersSet()
     {
-        base.OnParametersSet();
-        if (Start != null && End != null) {
-        calculateInternalVariables();
-            
-        }
+        if (Start != null && End != null) 
+            calculateInternalVariables();
+
+        weekendBgColorClass = isDarkTheme ? "rz-background-color-base-900" : "rz-background-color-base-300";
+        weekendBorderColorClass = isDarkTheme ? "rz-border-color-base-800" : "rz-border-color-base-400";
+        bgColorClass = isDarkTheme ? "rz-background-color-base-800" : "rz-background-color-base-200";
+        rowBorderColorClass = isDarkTheme ? "rz-border-color-base-700" : "rz-border-color-base-400";
+        cellBorderColorClass = isDarkTheme ? "rz-border-color-base-700" : "rz-border-color-base-400";
+        StateHasChanged();
     }
 
     protected override Task OnParametersSetAsync()
