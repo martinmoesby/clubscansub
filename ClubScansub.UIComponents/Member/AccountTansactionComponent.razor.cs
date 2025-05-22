@@ -11,7 +11,7 @@ namespace ClubScansub.Blazor.UIComponents.Member
         DialogService dialogService { get; set; }
 
         [Parameter]
-        public IList<ApplicationUserAccountEntry> Transactions { get; set; }
+        public IList<ApplicationUserAccountEntry> Transactions { get; set; } = [];
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {

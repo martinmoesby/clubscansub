@@ -315,11 +315,16 @@ namespace ClubScansub.BlazorApp.Pages.Admin
         {
             if (member == null) return;
 
-            dialogService.Open<AccountTansactionComponent>("Transactions",
-                new Dictionary<string, object>
+            var transactions = member.AccountTransactions.ToList();
+
+            var parms = new Dictionary<string, object>
                 {
-                     { "Transactions", member.AccountTransactions }
-                }
+                     { "Transactions", transactions }
+                };
+
+
+            dialogService.Open<AccountTansactionComponent>("Transactions",
+                parms
                 , editDialogOptions);
         }
 

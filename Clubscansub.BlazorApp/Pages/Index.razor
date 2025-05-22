@@ -33,19 +33,19 @@
 
     </RadzenStack>
     <RadzenScheduler @ref="@scheduler"
-        TItem="ICalendarEvent"
-                     Data="@filteredData"
-                     StartProperty="StartDateAndTime"
-                     EndProperty="EndDateAndTime"
-                     TextProperty="Title"
-                     AppointmentRender="OnAppointmentRender"
-                     AppointmentSelect="OnAppointmentClick"
-                     AppointmentMouseEnter="OnMouseOverAppointment"
-                     AppointmentMouseLeave="OnMouseLeaveAppointment"
-                     SlotRender="OnSlotRender"
-                     SelectedIndex="1"
-                     LoadData="OnLoadData"
-                     style="height: 100%">
+    TItem="ICalendarEvent"
+    Data="@filteredData"
+    StartProperty="StartDateAndTime"
+    EndProperty="EndDateAndTime"
+    TextProperty="Title"
+    AppointmentRender="OnAppointmentRender"
+    AppointmentSelect="OnAppointmentClick"
+    AppointmentMouseEnter="OnMouseOverAppointment"
+    AppointmentMouseLeave="OnMouseLeaveAppointment"
+    SlotRender="OnSlotRender"
+    SelectedIndex="1"
+    LoadData="OnLoadData"
+    style="height: 100%">
 
         <Template Context="context" >
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap">

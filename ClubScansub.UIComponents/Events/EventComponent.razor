@@ -83,9 +83,15 @@ else
 
                         if (currentUser != null)
                         {
-                            if (currentUser.Balance > Event.Price)
+                            if (isUserSignedUp)
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.ENROLLED" Text="Already signed up" Size="ButtonSize.Small" Disabled />
+
+                            }
+                            
+                            else if (currentUser.Balance > Event.Price)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Click=@(() => enrollExistingUser(currentUser.Id)) Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
                             }
                             else
                             {
@@ -95,7 +101,7 @@ else
                         }
                         else
                         {
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="@IconsTextsAndColors.Icons.LOGIN" Shade="Shade.Lighter" Text="Please login first" Size="ButtonSize.Small" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info"  Icon="@IconsTextsAndColors.Icons.LOGIN" Shade="Shade.Lighter" Text="Please login first" Size="ButtonSize.Small" />
                         }
                     }
                 }

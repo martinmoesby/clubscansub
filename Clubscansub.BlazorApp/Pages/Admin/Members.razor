@@ -61,7 +61,11 @@
                         <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"/>
 
                     </Columns>
-
+                   <FooterTemplate>
+                       <RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Text="Right-click for context sensitive menu" class="rz-my-3" />
+                       </RadzenStack>
+                   </FooterTemplate>
                 </RadzenDataGrid>
 
             }

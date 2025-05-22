@@ -2,6 +2,7 @@
 using ClubScansub.Models;
 using ClubScansub.Models.Interface;
 using ClubScansub.Service;
+using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -36,7 +37,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         private ApplicationUser currentUser { get; set; } = new();
         Event Event { get; set; } = new Event();
         IList<EventUser> enrolledUsers = new List<EventUser>();
-
+        private bool isUserSignedUp = false;
         private bool isLoading = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,6 +58,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                     Event = item;
                 }
                 enrolledUsers = await eventUserService.GetUsersByEvent(EventId);
+                isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser.Id);
                 isLoading = false;
                 StateHasChanged();
             }
@@ -65,6 +67,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         private async Task OnLoadEnrolledUsers()
         {
             enrolledUsers = await eventUserService.GetUsersByEvent(EventId);
+            isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser.Id);
             Event.Participants = enrolledUsers;
             StateHasChanged();
         }
@@ -91,9 +94,19 @@ namespace ClubScansub.Blazor.UIComponents.Events
             }
             else
             {
-                await eventUserService.AddUserToEvent(selectedUser, EventId);
+                bool doPayForTrip = true;
+                string notificationMessage = "You have joined this event";
+                if (selectedUser != currentUser.Id)
+                {
+
+                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?"));
+                    doPayForTrip = confirm.Value;
+                    notificationMessage = $"User added to this for the event";
+                }
+
+                await eventUserService.AddUserToEvent(selectedUser, EventId, doPayForTrip);
                 await OnLoadEnrolledUsers();
-                notificationService.Notify(NotificationSeverity.Success, $"User added to this for the event");
+                notificationService.Notify(NotificationSeverity.Success, notificationMessage);
             }
         }
 

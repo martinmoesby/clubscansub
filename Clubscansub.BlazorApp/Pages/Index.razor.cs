@@ -194,10 +194,15 @@ namespace ClubScansub.BlazorApp.Pages
                 dialogOptions);
             }
         }
+
         private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
         {
 
-            Tooltipservice.Open(args.Element, getToolTipText(args.Data), new TooltipOptions() { Delay=500, Duration=5000 });
+            Tooltipservice.Open(
+                args.Element,
+                getToolTipText(args.Data),
+                new TooltipOptions { Delay = 500, Duration = 5000 }
+            );
 
         }
         private void OnMouseLeaveAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
@@ -335,36 +340,70 @@ namespace ClubScansub.BlazorApp.Pages
 
         }
 
-        private string getToolTipText(ICalendarEvent item)
+        private RenderFragment<TooltipService> getToolTipText(ICalendarEvent item)
         {
-
-            if (item is Course)
+            RenderFragment<TooltipService> fragment = (context) => builder =>
             {
-                return "This is a course";
-            }
+                builder.OpenElement(0, "div");
+                if (item is Course)
+                {
+                    builder.AddContent(1, "This is a course");
+                }
+                else
+                {
+                    builder.AddMarkupContent(1, $@"
+                        <div style='min-width:100px;max-width:250px;display:flex;flex-direction:column' >
+                            <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
+                            <div style='white-space: wrap;'>{item.Divelocation?.Description}</div>
+                            <div style='display:flex;justify-content:space-between'>
+                                <div>
+                                    Start: {item.StartDateAndTime.ToShortTimeString()}
+                                </div>
+                                <div>
+                                    End: {item.EndDateAndTime.ToShortTimeString()}
+                                </div>
+                            </div>
+                            <div style='display:flex;justify-content:space-between'>
+                                <div>
+                                    Price: {item.Price:C2}
+                                </div>
+                                <div>
+                                    Free seats: {item.FreeSpots:N0}
+                                </div>
+                            </div>
+                        </div>
+                        ");
+                }
+                builder.CloseElement();
+            };
+            return fragment;
+            //if (item is Course)
+            //{
+            //    return new RenderFragment<TooltipService>("This is a course");
+            //}
 
-            return $@"
-            <div style='min-width:250px;max-width:400px;display:flex;flex-direction:column' >
-                <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
-                <div style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Divelocation?.Description}</div>
-                <div style='display:flex;justify-content:space-between'>
-                    <div>
-                        Start: {item.StartDateAndTime.ToShortTimeString()}
-                    </div>
-                    <div>
-                        End: {item.EndDateAndTime.ToShortTimeString()}
-                    </div>
-                </div>
-                <div style='display:flex;justify-content:space-between'>
-                    <div>
-                        Price: {item.Price:C2}
-                    </div>
-                    <div>
-                        Free seats: {item.FreeSpots:N0}
-                    </div>
-                </div>
-            </div>
-            ";
+            //return $@"
+            //<div style='min-width:250px;max-width:400px;display:flex;flex-direction:column' >
+            //    <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
+            //    <div style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Divelocation?.Description}</div>
+            //    <div style='display:flex;justify-content:space-between'>
+            //        <div>
+            //            Start: {item.StartDateAndTime.ToShortTimeString()}
+            //        </div>
+            //        <div>
+            //            End: {item.EndDateAndTime.ToShortTimeString()}
+            //        </div>
+            //    </div>
+            //    <div style='display:flex;justify-content:space-between'>
+            //        <div>
+            //            Price: {item.Price:C2}
+            //        </div>
+            //        <div>
+            //            Free seats: {item.FreeSpots:N0}
+            //        </div>
+            //    </div>
+            //</div>
+            //";
 
         }
 
