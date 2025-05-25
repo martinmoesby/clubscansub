@@ -4,49 +4,45 @@
 @using Nager.Date
 @using Nager.Date.Model
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:1;width:100%">
-        
+
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceEvenly" Style="width:100%" class="rz-border rz-border-radius-4 rz-p-2">
 
-            <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="setActiveItemsList" />
-                <RadzenLabel Text="Show planned courses" Component="existingCourses" />
-            </RadzenStack>
-
-            
-
-            <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenCheckBox @bind-Value="showExistingEvents" Name="existingEvents" @onclick="setActiveItemsList" />
-                <RadzenLabel Text="Show planned events" Component="existingEvents" />
-            </RadzenStack>
-
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenCheckBox @bind-Value="showExistingCourses" Name="existingCourses" @onclick="setActiveItemsList" />
+            <RadzenLabel Text="Show planned courses" Component="existingCourses" />
         </RadzenStack>
 
-        <RadzenScheduler @ref="scheduler" TItem="ICalendarEvent"
-                         AppointmentMove="onAppointmentMove"
-                         AppointmentRender="onAppointmentRender"
-                         SlotSelect="onSlotClicked"
-                         SlotRender="onSlotRender"
+
+
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenCheckBox @bind-Value="showExistingEvents" Name="existingEvents" @onclick="setActiveItemsList" />
+            <RadzenLabel Text="Show planned events" Component="existingEvents" />
+        </RadzenStack>
+
+    </RadzenStack>
+
+    <RadzenScheduler @ref="scheduler" TItem="ICalendarEvent"
+                     AppointmentMove="onAppointmentMove"
+                     AppointmentRender="onAppointmentRender"
+                     SlotSelect="onSlotClicked"
+                     SlotRender="onSlotRender"
                      StartProperty="@nameof(ICalendarEvent.StartDateAndTime)"
                      EndProperty="@nameof(ICalendarEvent.EndDateAndTime)"
                      TextProperty="@nameof(ICalendarEvent.Title)"
-                         SelectedIndex="0"
-                         Data="@activeItems"
-                         Style="width:100%;height:100%"
-                         >
-            <ChildContent>
+                     SelectedIndex="0"
+                     Data="@activeItems"
+                     Style="width:100%;height:100%">
+        <ChildContent>
 
-                <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
-                <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
+            <RadzenMonthView MaxAppointmentsInSlot="4" Text="@IconsTextsAndColors.Texts.SCHEDULER_MONTH" MoreText="More..." />
+            <RadzenYearView Text="@IconsTextsAndColors.Texts.SCHEDULER_YEAR" />
 
-            </ChildContent>
-            <Template Context="item">
+        </ChildContent>
+        <Template Context="item">
             @if (item is CourseSession)
             {
 
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
-@*                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1" AlignItems="AlignItems.Center">
-                        <RadzenIcon Icon="@IconsTextsAndColors.GetCourseIcon((item as CourseSession).Course.CourseType)" Style="font-size:0.8rem;" />
-                    </RadzenStack> *@
                     <RadzenIcon Icon="@IconsTextsAndColors.GetCourseSessionIcon((item as CourseSession).Sessiontype)" Style="font-size:0.8rem;" />
                     <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
                 </RadzenStack>
@@ -59,10 +55,11 @@
                     <span style="white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; font-size:0.8rem;">@(item.Title)</span>
                 </RadzenStack>
             }
-            </Template>
+        </Template>
 
-        </RadzenScheduler>
-    </RadzenStack>
+    </RadzenScheduler>
+
+</RadzenStack>
 
 
 @code {

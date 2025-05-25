@@ -120,7 +120,7 @@ namespace ClubScansub.BlazorApp.Pages
                 if ((args.Data as Event).IsCancelled)
                 {
                     bgClass = "rz-background-color-secondary-lighter";
-                    fgClass = "rz-border rz-border-color-secondary rz-color-base-300";
+                    fgClass = "rz-color-base-500";
                     args.Attributes["style"] = "text-decoration:line-through;";
                 }
             }

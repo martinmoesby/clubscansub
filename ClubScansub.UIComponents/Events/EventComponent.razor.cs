@@ -34,7 +34,8 @@ namespace ClubScansub.Blazor.UIComponents.Events
         [Parameter]
         public EventCallback<Event> EventStatusChanged { get; set; }
 
-        private ApplicationUser currentUser { get; set; } = new();
+        private ApplicationUser currentUser;
+
         Event Event { get; set; } = new Event();
         IList<EventUser> enrolledUsers = new List<EventUser>();
         private bool isUserSignedUp = false;

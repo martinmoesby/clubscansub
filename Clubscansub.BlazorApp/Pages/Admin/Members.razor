@@ -5,6 +5,8 @@
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Members">
+
+
             <RadzenStack Orientation="Orientation.Horizontal" Style="width:100%" Gap="5" AlignItems="AlignItems.Center" class="rz-mb-4">
                 <RadzenStack>
                     <MemberRolesFilterComponent MemberRolesChanged="setRoleFilter" MemberStatusFilterChanged="setStatusFilter" SingleSelect="false" InitialFilters="@InitialFilters" />
@@ -50,27 +52,29 @@
                                 <ProfileStatusComponent Profile="@member" />
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px"/>
-                        <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Name" Property="Name" Width="200px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Address" Property="Streetaddress" Filterable=false MinWidth="240px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Postcode" Property="PostalCode" Filterable=false Width="120px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="City" Property="City" Filterable=false Width="180px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Phone" Property="PhoneNumber" Filterable=false Width="120px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Mail" Property="Email" Filterable=false MinWidth="120px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px"/>
-                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px"/>
+                        <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Acc. number" Property="AccountNumber" Width="100px" MinWidth="100px" />
+                        <RadzenDataGridColumn Pickable="false" TItem="ApplicationUser" Title="Name" Property="Name" Width="200px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Address" Property="Streetaddress" Filterable=false MinWidth="240px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Postcode" Property="PostalCode" Filterable=false Width="120px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="City" Property="City" Filterable=false Width="180px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Phone" Property="PhoneNumber" Filterable=false Width="120px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Mail" Property="Email" Filterable=false MinWidth="120px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Birthday" Property="DayOfbirth" Filterable=false FormatString="{0:d}" Width="120px" MinWidth="120px" />
+                        <RadzenDataGridColumn Visible="true" TItem="ApplicationUser" Title="Balance" Property="Balance" Filterable=false FormatString="{0:c2}" TextAlign="TextAlign.Right" Width="120px" />
 
                     </Columns>
-                   <FooterTemplate>
-                       <RadzenStack>
+                    <FooterTemplate>
+                        <RadzenStack>
                             <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Text="Right-click for context sensitive menu" class="rz-my-3" />
-                       </RadzenStack>
-                   </FooterTemplate>
+                        </RadzenStack>
+                    </FooterTemplate>
                 </RadzenDataGrid>
 
             }
         </RadzenTabsItem>
-        <RadzenTabsItem Text="Member actions"></RadzenTabsItem>
+@*         <RadzenTabsItem Text="Member actions">
+
+        </RadzenTabsItem> *@
     </Tabs>
 </RadzenTabs>
 

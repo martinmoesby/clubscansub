@@ -11,6 +11,12 @@ using Microsoft.Extensions.Options;
 
 namespace ClubScansub.Service
 {
+    /// <summary>
+    /// Provides functionality for managing events, including creation, retrieval, updating, and deletion of events.
+    /// </summary>
+    /// <remarks>This service supports operations for handling events, such as retrieving events by date or
+    /// location,  managing participants, and activating or canceling events. It also includes methods for working with 
+    /// course sessions and creating events based on predefined configurations.</remarks>
     public class EventService : ServiceBase, IEventService
     {
         private readonly ApplicationDbContext context;
@@ -108,6 +114,19 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Creates and saves new events asynchronously based on the provided list of event templates.
+        /// </summary>
+        /// <remarks>This method processes each event in the provided list by retrieving the associated
+        /// dive location and its related data (e.g., certificate, meeting location). It then creates a new event with
+        /// properties derived from the template and the dive location's defaults. The new events are added to the
+        /// database and saved asynchronously.  If the event's price is not specified (i.e., zero), the dive location's
+        /// default price is used. Titles for the events are generated based on the event type and dive location if not
+        /// explicitly provided.</remarks>
+        /// <param name="events">A list of <see cref="Event"/> objects representing the event templates to be processed and created. Each
+        /// event in the list must have a valid associated dive location.</param>
+        /// <returns>A task that represents the asynchronous operation. The task completes when all events have been created and
+        /// saved to the database.</returns>
         public async Task CreateEventsAsync(IList<Event> events)
         {
             foreach (var @event in events)
