@@ -4,11 +4,14 @@
         <RadzenText Text="No divers joined" TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" />
     </EmptyTemplate>
     <Columns>
-        <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
-            <Template Context="item">
-                <RadzenText Text="@item.ApplicationUser?.AccountNumber" TextStyle="TextStyle.Body1" />
-            </Template>
-        </RadzenDataGridColumn>
+
+        <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
+            <RadzenDataGridColumn Title="Medlemsnummer" Width="120px">
+                <Template Context="item">
+                    <RadzenText Text="@item.ApplicationUser?.AccountNumber" TextStyle="TextStyle.Body1" />
+                </Template>
+            </RadzenDataGridColumn>
+        </AuthorizeView>
 
         <RadzenDataGridColumn Title="Navn">
             <Template Context="item">
@@ -18,17 +21,20 @@
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Title="Alder" TextAlign="TextAlign.Center" Width="60px">
-            <Template Context="item">
-                <RadzenText Text="@((new DateTime((DateTime.Now - item.ApplicationUser.DayOfbirth).Ticks).Year-1).ToString())" TextStyle="TextStyle.Body1" />
-            </Template>
-        </RadzenDataGridColumn>
+        <AuthorizeView Roles="Owner, Administrator, Divepro">
+            <RadzenDataGridColumn Title="Alder" TextAlign="TextAlign.Center" Width="60px">
+                <Template Context="item">
+                    <RadzenText Text="@((new DateTime((DateTime.Now - item.ApplicationUser.DayOfbirth).Ticks).Year-1).ToString())" TextStyle="TextStyle.Body1" />
+                </Template>
+            </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Title="Telefon" TextAlign="TextAlign.Center" Width="120px">
-            <Template Context="item">
-                <RadzenText Text="@item.ApplicationUser?.PhoneNumber" TextStyle="TextStyle.Body1" />
-            </Template>
-        </RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="Telefon" TextAlign="TextAlign.Center" Width="120px">
+                <Template Context="item">
+                    <RadzenText Text="@item.ApplicationUser?.PhoneNumber" TextStyle="TextStyle.Body1" />
+                </Template>
+            </RadzenDataGridColumn>
+        </AuthorizeView>
+
         <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
             <RadzenDataGridColumn Width="40px" Visible="!readOnly">
                 <Template Context="item">

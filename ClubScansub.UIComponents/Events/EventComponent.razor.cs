@@ -59,7 +59,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                     Event = item;
                 }
                 enrolledUsers = await eventUserService.GetUsersByEvent(EventId);
-                isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser.Id);
+                isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser?.Id);
                 isLoading = false;
                 StateHasChanged();
             }
@@ -68,7 +68,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         private async Task OnLoadEnrolledUsers()
         {
             enrolledUsers = await eventUserService.GetUsersByEvent(EventId);
-            isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser.Id);
+            isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser?.Id);
             Event.Participants = enrolledUsers;
             StateHasChanged();
         }
