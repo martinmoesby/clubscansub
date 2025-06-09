@@ -1,0 +1,11 @@
+﻿
+@code {
+    [Inject]
+    private NavigationManager navigationManager { get; set; }
+
+    protected override void OnInitialized()
+    {
+        navigationManager.NavigateTo("/",true);
+    }
+
+}

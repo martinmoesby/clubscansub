@@ -121,34 +121,35 @@ namespace ClubScansub.BlazorApp.Pages
                 {
                     bgClass = "rz-background-color-secondary-lighter";
                     fgClass = "rz-color-base-500";
-                    args.Attributes["style"] = "text-decoration:line-through;";
+                    args.Attributes["style"] = "text-decoration:line-through;cursor:not-allowed;";
                 }
             }
 
             if (args.Data is CourseSession)
             {
-                switch ((args.Data as CourseSession).Course?.CourseType)
-                {
-                    case CourseTypeEnum.BaseCourse:
-                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
-                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
-                        break;
-                    case CourseTypeEnum.SpecialtyCourse:
-                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
-                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
-                        break;
-                    case CourseTypeEnum.TechCourse:
-                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
-                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
-                        break;
-                    case CourseTypeEnum.ProCourse:
-                        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
-                        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
-                        break;
-                    default:
-                        break;
+                (bgClass, fgClass) = IconsTextsAndColors.GetCourseClasses((args.Data as CourseSession).Course?.CourseType);
+                //switch ((args.Data as CourseSession).Course?.CourseType)
+                //{
+                //    case CourseTypeEnum.BaseCourse:
+                //        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_BASE;
+                //        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_BASE;
+                //        break;
+                //    case CourseTypeEnum.SpecialtyCourse:
+                //        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC;
+                //        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC;
+                //        break;
+                //    case CourseTypeEnum.TechCourse:
+                //        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_TECH;
+                //        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_TECH;
+                //        break;
+                //    case CourseTypeEnum.ProCourse:
+                //        bgClass = IconsTextsAndColors.ColorClasses.BG_COURSE_PRO;
+                //        fgClass = IconsTextsAndColors.ColorClasses.FG_COURSE_PRO;
+                //        break;
+                //    default:
+                //        break;
 
-                }
+                //}
             }
             args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
         }
@@ -197,11 +198,13 @@ namespace ClubScansub.BlazorApp.Pages
 
         private void OnMouseOverAppointment(SchedulerAppointmentMouseEventArgs<ICalendarEvent> args)
         {
+            if ((args.Data is Event && (args.Data as Event).IsCancelled) || (args.Data is CourseSession && (args.Data as CourseSession).Course.IsCancelled))
+                return;
 
             Tooltipservice.Open(
                 args.Element,
                 getToolTipText(args.Data),
-                new TooltipOptions { Delay = 500, Duration = 5000 }
+                new TooltipOptions { Delay = 500, Duration = 5000, Position = TooltipPosition.Top }
             );
 
         }
@@ -342,10 +345,10 @@ namespace ClubScansub.BlazorApp.Pages
 
         private RenderFragment<TooltipService> getToolTipText(ICalendarEvent item)
         {
-            RenderFragment<TooltipService> fragment = (context) => builder =>
+            RenderFragment fragment(TooltipService context) => builder =>
             {
                 builder.OpenElement(0, "div");
-                if (item is Course)
+                if (item is CourseSession)
                 {
                     builder.AddContent(1, "This is a course");
                 }
@@ -377,33 +380,6 @@ namespace ClubScansub.BlazorApp.Pages
                 builder.CloseElement();
             };
             return fragment;
-            //if (item is Course)
-            //{
-            //    return new RenderFragment<TooltipService>("This is a course");
-            //}
-
-            //return $@"
-            //<div style='min-width:250px;max-width:400px;display:flex;flex-direction:column' >
-            //    <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
-            //    <div style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Divelocation?.Description}</div>
-            //    <div style='display:flex;justify-content:space-between'>
-            //        <div>
-            //            Start: {item.StartDateAndTime.ToShortTimeString()}
-            //        </div>
-            //        <div>
-            //            End: {item.EndDateAndTime.ToShortTimeString()}
-            //        </div>
-            //    </div>
-            //    <div style='display:flex;justify-content:space-between'>
-            //        <div>
-            //            Price: {item.Price:C2}
-            //        </div>
-            //        <div>
-            //            Free seats: {item.FreeSpots:N0}
-            //        </div>
-            //    </div>
-            //</div>
-            //";
 
         }
 

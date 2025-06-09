@@ -2,10 +2,17 @@
 @using ClubScansub.Service
 @using ClubScansub.Extensions
 
+<AuthorizeView Roles="Divepro">
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
+
 <PageTitle>Club Scansub Work calendar</PageTitle>
 <CascadingValue Name="CurrentUser" TValue="ApplicationUser" Value="applicationUser">
     <WorkCalendarComponent AllowViews="true"  />
 </CascadingValue>
+
 
 @code {
     [Inject]

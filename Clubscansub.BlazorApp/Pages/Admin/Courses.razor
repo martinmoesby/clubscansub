@@ -1,4 +1,9 @@
 ﻿@page "/admin/courses"
+<AuthorizeView Roles="Administrator">
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
 
 <PageTitle>Club Scansub Course Management</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">

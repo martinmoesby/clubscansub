@@ -22,8 +22,20 @@
                     </RadzenStack>
 
                     <RadzenStack JustifyContent="JustifyContent.End" class="rz-pr-4" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10">
+                        <AuthorizeView>
+                            <RadzenStack JustifyContent=JustifyContent.Start Orientation="Orientation.Horizontal" AlignItems="AlignItems.End">
+                                <RadzenLabel Text="Select your preferred design" class="rz-mb-2" />
+                            <RadzenDropDown 
+                                Name="themeSelector" 
+                                TValue="string" 
+                                Value="@themeService.Theme" 
+                                ValueChanged="changeTheme" 
+                                Data="@Themes.Free"
+                                            TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value) />
+                            <RadzenAppearanceToggle ButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Info" />
+                            </RadzenStack>
+                        </AuthorizeView>
                         <LoginDisplay />
-                        <RadzenAppearanceToggle ButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Lighter" ToggleButtonStyle="ButtonStyle.Info" />
                     </RadzenStack>
 
                 </RadzenStack>
@@ -86,43 +98,7 @@
 </RadzenLayout>
 
 @code {
-    [Inject]
-    private IServiceProvider serviceProvider { get; set; }
 
-    private ThemeService themeService;
 
-    private string logoFilename = "";
-    private bool isDarkTheme = false;
-
-    protected override void OnInitialized()
-    {
-        themeService = serviceProvider.GetService<ThemeService>();
-        if (themeService != null )
-        {
-            themeService.ThemeChanged += OnThemeChanged;
-            setLogoFileName();
-        }
-    }
-
-    private void OnThemeChanged()
-    {
-        setLogoFileName();
-        StateHasChanged();
-    }
-
-    private void setLogoFileName()
-    {
-
-        if (themeService.Theme.Contains("dark"))
-        {
-            isDarkTheme = true;
-            logoFilename = "images/logo_neg.png";
-        }
-        else
-        {
-            isDarkTheme = false;
-            logoFilename = "images/logo.png";
-        }
-    }
 
 }

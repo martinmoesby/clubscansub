@@ -78,6 +78,12 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 //builder.Services.AddScoped<TooltipService>();
 //builder.Services.AddScoped<ContextMenuService>();
 
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = "ClubScansubTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddSingleton<ISmsSender, SmsSender>();
 

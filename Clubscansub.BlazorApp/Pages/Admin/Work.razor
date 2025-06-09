@@ -1,5 +1,11 @@
 ﻿@page "/admin/work"
 
+<AuthorizeView Roles="Administrator">
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
+
 <PageTitle>Club Scansub Work management</PageTitle>
 
 <RadzenTabs>

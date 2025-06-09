@@ -1,4 +1,11 @@
 ﻿@page "/admin/events"
+
+<AuthorizeView Roles="Administrator">
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
+
 <PageTitle>Club Scansub Event management</PageTitle>
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
 

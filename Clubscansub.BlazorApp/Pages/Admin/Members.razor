@@ -1,4 +1,11 @@
 ﻿@page "/admin/members"
+
+<AuthorizeView Roles="Administrator">
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
+
 <PageTitle>Club Scansub Member management</PageTitle>
 
 <RadzenText TextStyle="TextStyle.DisplayH6" Text="Member management" />

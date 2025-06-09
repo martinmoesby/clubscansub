@@ -81,6 +81,11 @@ namespace ClubScansub.Service
 
         public async Task<SignInResult> LoginUserAsync(LoginUserDTO<ApplicationUser> model)
         {
+            if (!model.Username.EndsWith("@scansub.dk"))
+            {
+                model.Username = $"{model.Username}@scansub.dk";
+            }
+
             var user = await userManager.FindByNameAsync(model.Username);
             if (user == null)
             {

@@ -1,4 +1,6 @@
-﻿namespace ClubScansub.Utility
+﻿using System.Formats.Asn1;
+
+namespace ClubScansub.Utility
 {
     public static class IconsTextsAndColors
     {
@@ -263,6 +265,18 @@
                     return Icons.EVENTTYPE_NOT_EVENT;
             }
 
+        }
+
+        public static (string bgClass, string fgClass) GetCourseClasses(CourseTypeEnum? courseType)
+        {
+            return courseType switch
+            {
+                CourseTypeEnum.BaseCourse => (IconsTextsAndColors.ColorClasses.BG_COURSE_BASE, IconsTextsAndColors.ColorClasses.FG_COURSE_BASE),
+                CourseTypeEnum.SpecialtyCourse => (IconsTextsAndColors.ColorClasses.BG_COURSE_SPEC, IconsTextsAndColors.ColorClasses.FG_COURSE_SPEC),
+                CourseTypeEnum.TechCourse => (IconsTextsAndColors.ColorClasses.BG_COURSE_TECH, IconsTextsAndColors.ColorClasses.FG_COURSE_TECH),
+                CourseTypeEnum.ProCourse => (IconsTextsAndColors.ColorClasses.BG_COURSE_PRO, IconsTextsAndColors.ColorClasses.FG_COURSE_PRO),
+                _ => (IconsTextsAndColors.ColorClasses.BG_DEFAULT, IconsTextsAndColors.ColorClasses.FG_DEFAULT),
+            };
         }
     }
 }

@@ -11,13 +11,14 @@
         <RadzenStack Style="flex:1">
 
             <RadzenStack Orientation="Orientation.Vertical" Style="flex:1;width:100%;" JustifyContent="JustifyContent.SpaceBetween">
-                <EventTypeToggleButtonsComponent InitialFilters="initialEventTypeFilter" OnFilter="filterSitesList" SingleSelect="true">
+                <EventTypeToggleButtonsComponent InitialFilters="initialEventTypeFilter" OnFilter="filterSitesList" SingleSelect="false">
                     <End>
 @*                         <RadzenText Text="Divetype filter:" TextStyle="TextStyle.Caption" /> *@
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Style="flex:1" AlignItems="AlignItems.Center" Gap="5">
-                            <RadzenToggleButton Size="ButtonSize.Small" title="Show wreck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
-                            <RadzenToggleButton Size="ButtonSize.Small" title="Show nature/muck dive locations in the list" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
-                            <RadzenToggleButton Size="ButtonSize.Small" title="Show Technical dive locations in the list"  Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show pool/confined water locations" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.PoolDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.PoolDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show nature/muck dive locations " Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show wreck dive locations" Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
+                            <RadzenToggleButton Size="ButtonSize.Small" title="Show Technical dive locations"  Change="changeDiveTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
                         </RadzenStack>
                     </End>
                 </EventTypeToggleButtonsComponent>
@@ -87,15 +88,16 @@
 
     private Dictionary<DiveTypeEnum, bool> diveTypeFilter = new Dictionary<DiveTypeEnum, bool>
     {
-        { DiveTypeEnum.NatureDive, false },
+        { DiveTypeEnum.PoolDive, true },
+        { DiveTypeEnum.NatureDive, true },
         { DiveTypeEnum.WreckDive, true },
         { DiveTypeEnum.TechDive, false },
     };
     private Dictionary<EventTypeEnum, bool> initialEventTypeFilter = new Dictionary<EventTypeEnum, bool>()
     {
         { EventTypeEnum.Bådtur, true},
-        { EventTypeEnum.Stranddyk, false},
-        { EventTypeEnum.Klubture, false},
+        { EventTypeEnum.Stranddyk, true},
+        { EventTypeEnum.Klubture, true},
         { EventTypeEnum.Other, false}
     };
 

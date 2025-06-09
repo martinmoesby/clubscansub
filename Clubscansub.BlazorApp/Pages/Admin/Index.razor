@@ -1,3 +1,12 @@
 ﻿@page "/admin/"
-<PageTitle>Club Scansub Managemant</PageTitle>
-<h3>Site administration</h3>
+<AuthorizeView Roles="Administrator, Owner">
+    <Authorized>
+        <PageTitle>Club Scansub Management</PageTitle>
+        <h3>Site administration</h3>
+
+    </Authorized>
+    <NotAuthorized>
+        <Redirect />
+    </NotAuthorized>
+</AuthorizeView>
+
