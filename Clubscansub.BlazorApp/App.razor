@@ -9,8 +9,8 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <Redirect />
-@*             <PageTitle>OOPS - 404 Not found</PageTitle>
+            @*<Redirect />*@
+            <PageTitle>OOPS - 404 Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
                 <RadzenRow>
                     <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
@@ -18,7 +18,7 @@
                         <RadzenText Text="Sorry, but there's nothing here!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
                     </RadzenColumn>
                 </RadzenRow>
-            </LayoutView> *@
+            </LayoutView> 
         </NotFound>
     </Router>
 

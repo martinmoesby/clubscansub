@@ -1,9 +1,14 @@
 ﻿@page "/profile"
 @using ClubScansub.Extensions
 @using ClubScansub.Service
+<AuthorizeView>
+    <NotAuthorized>
+        <Redirect ToPage="account/login" />
+    </NotAuthorized>
+</AuthorizeView>
+
 <PageTitle>Club Scansuib My Profile</PageTitle>
 <RadzenText TextStyle="TextStyle.DisplayH6" Text="Profile management" />
-
 @if (IsLoading)
 {
     <RadzenStack Style="height:100%;width:100%" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
@@ -31,6 +36,28 @@ else
                 <ProfileCertificatesComponent Certificates="@currentUser.Certificates" />
             </RadzenTabsItem>
             <RadzenTabsItem Text="Eksterne konti" Visible="false" />
+            <RadzenTabsItem Text="Password" Icon="@IconsTextsAndColors.Icons.USER_CHECK">
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start">
+                    <RadzenTemplateForm TItem="ChangePasswordModel" Data=@changePassword Submit=@onChangePasswordSubmitAsync InvalidSubmit=@onInvalidSubmit>
+
+                    <RadzenFormField Variant="Variant.Outlined" Text="Current Password" Style="width:100%">
+                            <RadzenPassword @bind-Value="@changePassword.CurrentPassword" />
+                    </RadzenFormField>
+
+                    <RadzenFormField Variant="Variant.Outlined" Text="New Password" Style="width:100%">
+                            <RadzenPassword @bind-Value="@changePassword.NewPassword" Name="newPasswordComponent" />
+                    </RadzenFormField>
+
+                    <RadzenFormField Variant="Variant.Outlined" Text="Repeat new password" Style="width:100%">
+                            <RadzenPassword @bind-Value="@changePassword.RepeatPassword" Name="repeatPasswordComponent" />
+                            <RadzenCompareValidator Visible="true" Component="repeatPasswordComponent" Value="@changePassword.NewPassword" Text="New Password does not match" ValidateOnComponentValueChange="true" />
+                    </RadzenFormField>
+                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Variant="Variant.Text" Text="Change Password" class="rz-mt-3" />
+                    </RadzenTemplateForm>
+
+                </RadzenStack>
+                @* <ProfileResetPasswordComponent /> *@
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Slet konto" Icon="delete" Style="color:var(--rz-color-danger)" />
         </Tabs>
     </RadzenTabs>
@@ -56,6 +83,7 @@ else
 
     bool IsLoading = true;
 
+    private ChangePasswordModel changePassword = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -102,5 +130,40 @@ else
         }
     }
 
+    private async Task onChangePasswordSubmitAsync(ChangePasswordModel model)
+    {
+        var result = await userService.ChangePassordAsync(currentUser, model.CurrentPassword, model.NewPassword);
+        if (result.Succeeded)
+        {
+            notificationService.Notify(new NotificationMessage()
+                { 
+                    Severity = NotificationSeverity.Success,
+                    Detail = "Your password has succesfully been changed",
+                    Summary = "Password Changed"
+                });
+            return;
+        }
+        NotificationMessage errorMessage = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Password not changed"
+            };
+        foreach (var item in result.Errors)
+        {
+            errorMessage.Detail += item.Description + "\n";
+        }
+        notificationService.Notify(errorMessage);
+    }
 
+    private void onInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        
+    }
+    private class ChangePasswordModel
+    {
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
+        public string RepeatPassword { get; set; }
+
+    }
 }

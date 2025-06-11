@@ -46,9 +46,13 @@ namespace ClubScansub.Service
             emailStore = getEmailStore();
             appDbContext = new Data.ApplicationDbContext(dbContextOptions);
         }
-        public Task<IdentityResult> ChangePassordAsync(ApplicationUser user, string oldPassword, string newPassword)
+        public async Task<IdentityResult> ChangePassordAsync(ApplicationUser user, string oldPassword, string newPassword)
         {
-            throw new NotImplementedException();
+
+            var result = await userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+            return result;
+
         }
 
         public async Task<IdentityResult> EmailConfirmAsync(Guid userid, string code)
