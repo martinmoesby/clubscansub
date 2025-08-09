@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Radzen;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
+using System.Text.RegularExpressions;
 
 namespace ClubScansub.BlazorApp.Pages.Account
 {
@@ -30,13 +31,6 @@ namespace ClubScansub.BlazorApp.Pages.Account
         [Parameter]
         public EventCallback<ApplicationUser> OnLoginSuccessFull { get; set; }
 
-        protected override async Task OnParametersSetAsync()
-        {
-
-            await base.OnParametersSetAsync();
-            Console.WriteLine($"Return url: {returnUrl}");
-        }
-
         private async Task onLogin(LoginArgs args)
         {
             model.Error = string.Empty;
@@ -46,6 +40,7 @@ namespace ClubScansub.BlazorApp.Pages.Account
                 var returnString = string.IsNullOrEmpty(returnUrl) ? "" : $"&returnUrl= {returnUrl}";
                 model.Username = args.Username;
                 model.Password = args.Password;
+
                 var loginResult = await userService.LoginUserAsync(model);
                 if (loginResult == SignInResult.Success)
                 {
@@ -95,8 +90,7 @@ namespace ClubScansub.BlazorApp.Pages.Account
             await dialogService.Alert($"User: '{result.User.UserName}' has been created", "Congrats", new AlertOptions() { OkButtonText = "ok"});
 
         }
-        private string userName { get; set; } = "";
-        private string password { get; set; } = "";
+
         protected LoginUserDTO<ApplicationUser> model = new LoginUserDTO<ApplicationUser>();
 
 

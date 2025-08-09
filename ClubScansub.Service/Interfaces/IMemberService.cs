@@ -13,5 +13,7 @@ namespace ClubScansub.Service.Interfaces
         Task<IList<Certificate>> GetAvailableCertificatesAsync(bool inclProCertificates);
         Task<IList<ApplicationUser>> GetByRolesAsync(params string[] userroles);
 
+        Task<bool> IsUserInRole(ApplicationUser user, string role);
+
     }
 }

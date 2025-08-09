@@ -209,5 +209,11 @@ namespace ClubScansub.Service
 
 
         }
+
+        public async Task<bool> IsUserInRole(ApplicationUser user, string role)
+        {
+            var membersInRole = await userManager.GetUsersInRoleAsync(role);
+            return membersInRole.Any(x => x.Id == user.Id);
+        }
     }
 }

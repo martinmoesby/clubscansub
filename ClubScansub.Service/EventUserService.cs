@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ClubScansub.Service
 {
-    public class EventUserService :ServiceBase
+    public class EventUserService : ServiceBase
     {
         private readonly ApplicationDbContext context;
 
@@ -63,41 +63,67 @@ namespace ClubScansub.Service
             return await GetUsersByEvent(EventId);
         }
 
-        public async Task<IList<EventUser>> RemoveUserFromEvent(string userId, int courseId)
+        public async Task<IList<EventUser>> RemoveUserFromEvent(string userId, int eventId)
         {
-            var eventUser = await context.EventUsers.FindAsync(userId, courseId);
-            var currentEvent = await context.Events.FindAsync(courseId);
+            var eventUser = await context.EventUsers.FindAsync(userId, eventId);
+            var currentEvent = await context.Events.FindAsync(eventId);
             var currentUser = await context.ApplicationUsers.FindAsync(userId); 
 
             if (eventUser != null && currentEvent != null && currentUser != null)
             {
                 context.EventUsers.Remove(eventUser);
-                //TODO: Refund any payments for this course made to users account...
+                await context.SaveChangesAsync();
+                await RefundForEvent(eventUser);
+            }
+            return await GetUsersByEvent(eventId);
+        }
 
-                var accountEntry = await context.ApplicationUserAccountEntry.Where(x=>x.ApplicationUser == eventUser.ApplicationUser && x.Event.Id == courseId).FirstAsync();
-                if (accountEntry != null)
+        public async Task RefundForEvent(EventUser eventUser, bool refundFullAmount = false)
+        {
+            var currentEvent = await context.Events.FindAsync(eventUser.EventId);
+
+            var accountEntry = await context.ApplicationUserAccountEntry.Where(x => x.ApplicationUser == eventUser.ApplicationUser && x.Event.Id == eventUser.EventId).FirstOrDefaultAsync();
+
+            if (accountEntry != null && currentEvent != null)
+            {
+                if (accountEntry.Amount != 0)
                 {
-                    if (accountEntry.Amount != 0) {
+                    decimal refundFactor = 1m;
+                    if (!refundFullAmount)
+                    {
+
+                        if ((currentEvent.StartDateAndTime - DateTime.Now).Days > 0 && (currentEvent.StartDateAndTime - DateTime.Now).Days < 8)
+                            refundFactor = 0.5m;
+
+                        if ((currentEvent.StartDateAndTime - DateTime.Now).Days < 1)
+                            refundFactor = 0;
+                    }
 
                     var newAccountEntry = new ApplicationUserAccountEntry()
                     {
                         AccountType = Utility.AccountTypeEnum.EventAccountType,
-                        Amount = -accountEntry.Amount,
-                        ApplicationUser = currentUser,
+                        Amount = -accountEntry.Amount*refundFactor,
+                        ApplicationUser = eventUser.ApplicationUser,
                         PostingDate = DateTime.UtcNow,
                         Description = $"Refundering af {currentEvent.Title} d. {currentEvent.StartDateAndTime.ToShortDateString()}",
                         Event = eventUser.Event
                     };
 
                     await context.AddRangeAsync(newAccountEntry);
-                    }
                 }
-
-
-                await context.SaveChangesAsync();
             }
-            return await GetUsersByEvent(courseId);
         }
 
+        public async Task RefundForCancelledEvent(Event @event)
+        {
+            var eventUsers = await context.EventUsers.Where(x => x.EventId == @event.Id).ToListAsync();
+            if (eventUsers != null)
+            {
+                foreach (var item in eventUsers)
+                {
+                    await RefundForEvent(item, true);
+                }
+            }
+        }
     }
 }

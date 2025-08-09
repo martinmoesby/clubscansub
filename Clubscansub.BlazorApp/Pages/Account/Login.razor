@@ -11,6 +11,8 @@
             <RadzenLogin  
                 FormFieldVariant="Variant.Outlined" 
                 Login="@(args => onLogin(args))" 
+
+
                 Register="@onRegister" 
                 
                 AllowResetPassword="false" 
@@ -25,8 +27,11 @@
                 AllowRegister="false" 
                 RegisterText="Create account"
                 RegisterMessageText="No Account yet - create one here?"
+                AutoComplete = "false"
+                >
                 
-                />
+            </RadzenLogin>
+                
         </RadzenTemplateForm>
 
     </RadzenCard>

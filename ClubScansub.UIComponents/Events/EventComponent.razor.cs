@@ -2,6 +2,7 @@
 using ClubScansub.Models;
 using ClubScansub.Models.Interface;
 using ClubScansub.Service;
+using ClubScansub.Utility;
 using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -39,6 +40,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         Event Event { get; set; } = new Event();
         IList<EventUser> enrolledUsers = new List<EventUser>();
         private bool isUserSignedUp = false;
+        private bool isUserPremium = false;
         private bool isLoading = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -52,6 +54,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                     {
                         var user = await memberService.GetAsync(authState.User.GetIdentityId());
                         currentUser = user;
+                        isUserPremium = await memberService.IsUserInRole(user, Userroles.Member);
                     }
                 }
                 var item = await eventService.GetAsync(EventId.ToString());
@@ -95,7 +98,8 @@ namespace ClubScansub.Blazor.UIComponents.Events
             }
             else
             {
-                bool doPayForTrip = true;
+                bool doPayForTrip = Event.EventType == EventTypeEnum.Klubture && isUserPremium ? false: true;
+
                 string notificationMessage = "You have joined this event";
                 if (selectedUser != currentUser.Id)
                 {

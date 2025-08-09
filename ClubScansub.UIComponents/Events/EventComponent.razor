@@ -8,7 +8,6 @@
 else
 {
     <RadzenText TextStyle="TextStyle.Body1">@(Event?.Details)</RadzenText>
-
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
         <RadzenStack Style="max-width:50%">
             @if (Event.Divelocation?.Image != null)
@@ -49,7 +48,15 @@ else
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
                         <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT"></RadzenIcon>
+                        @if(isUserPremium)
+                        {
+                            <RadzenText TextStyle="TextStyle.Subtitle2" Style="color:lawngreen">@Event.PremiumPrice?.ToString("C2")</RadzenText>
+                        } 
+                        else
+                        {
+                            
                         <RadzenText TextStyle="TextStyle.Subtitle2">@Event.Price?.ToString("C2")</RadzenText>
+                        }
                     </RadzenStack>
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
@@ -88,8 +95,7 @@ else
                                 <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.ENROLLED" Text="Already signed up" Size="ButtonSize.Small" Disabled />
 
                             }
-                            
-                            else if (currentUser.Balance > Event.Price)
+                            else if (currentUser.Balance >= Event.Price || (isUserPremium && currentUser.Balance >= Event.PremiumPrice) || Event.EventType == EventTypeEnum.Klubture && isUserPremium)
                             {
                                 <RadzenButton ButtonStyle="ButtonStyle.Success" Click=@(() => enrollExistingUser(currentUser.Id)) Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
                             }

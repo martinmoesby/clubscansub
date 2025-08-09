@@ -120,7 +120,9 @@
                 };
 
             e.Participants.Add(eu);
-            await eventService.UpdateAsync(e);
+
+            await eventService.AddedUserToEvent(userId, e);
+
         }
     }
 

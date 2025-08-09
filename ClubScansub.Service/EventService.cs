@@ -1,4 +1,5 @@
 ﻿using ClubScansub.Data;
+using ClubScansub.Data.Migrations;
 using ClubScansub.Models;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
@@ -20,10 +21,11 @@ namespace ClubScansub.Service
     public class EventService : ServiceBase, IEventService
     {
         private readonly ApplicationDbContext context;
-
-        public EventService(IOptions<ServiceOptions> options, IEmailSender emailSender) : base(options, emailSender)
+        private readonly EventUserService userService;
+        public EventService(EventUserService userService, IOptions<ServiceOptions> options, IEmailSender emailSender) : base(options, emailSender)
         {
             context = new ApplicationDbContext(dbContextOptions);
+            this.userService = userService;
         }
 
         public Task<Event> AddAsync(Event Item)
@@ -94,6 +96,11 @@ namespace ClubScansub.Service
         {
             var data = context.Events.Include(x => x.Participants).Where(x => x.StartDateAndTime < DateTime.UtcNow && x.Divelocation.Id == divesiteId);
             return await data.ToListAsync();
+        }
+
+        public async Task AddedUserToEvent(string userId, Event @event )
+        {
+            await userService.AddUserToEvent(userId, @event.Id);
         }
 
         public async Task<Event> UpdateAsync(Event item)
@@ -197,6 +204,7 @@ namespace ClubScansub.Service
             // TODO: Refund users
             context.Update(item);
             await context.SaveChangesAsync();
+            await userService.RefundForCancelledEvent(item);
         }
         public async Task ActivateEventAsync(Event item)
         {
