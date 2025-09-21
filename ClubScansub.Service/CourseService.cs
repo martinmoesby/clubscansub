@@ -230,6 +230,8 @@ namespace ClubScansub.Service
                 .Include(x => x.SessionInstructors)
                     .ThenInclude(x => x.Instructor)
                 .Include(x => x.Course)
+                    .ThenInclude(x=>x.Participants)
+                        .ThenInclude(x=>x.ApplicationUser)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -251,41 +253,60 @@ namespace ClubScansub.Service
         }
         public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor, bool approved = true)
         {
-            var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();  //new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = true, InstructorRetracted = false };
+            var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();
+
             if (sessionInstructor != null)
             {
                 sessionInstructor.InstructorApproved = approved;
                 sessionInstructor.InstructorRetracted = false;
                 context.CourseSessionInstructors.Update(sessionInstructor);
-
-                if (approved)
+                try
                 {
-                    if (!string.IsNullOrEmpty(instructor.Email))
-                    {
-                        await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} approved", $"You have been assigned as instructor on the {session.SessionName} on {session.DateTime}");
-                    }
 
-                    if(instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                    if (approved)
                     {
-                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been assigned as instructor on {session.StartDateAndTime} - {session.SessionName}");
-                    }
+                        if (!string.IsNullOrEmpty(instructor.Email))
+                        {
+                            await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} approved", $"You have been assigned as instructor on the {session.SessionName} on {session.DateTime}");
+                        }
 
-                } else
-                {
-                    if (!string.IsNullOrEmpty(instructor.Email))
+                        if (instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                        {
+                            await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been assigned as instructor on {session.StartDateAndTime} - {session.SessionName}");
+                        }
+
+                    }
+                    else
                     {
-                        await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} removed", $"You have been removed as instructor on the {session.SessionName} on {session.DateTime}");
-                    }
+                        if (!string.IsNullOrEmpty(instructor.Email))
+                        {
+                            await emailSender.SendEmailAsync(instructor.Email, $"Instruction for {session.SessionName} removed", $"You have been removed as instructor on the {session.SessionName} on {session.DateTime}");
+                        }
 
-                    if (instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
-                    {
-                        await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been removed as instructor on {session.StartDateAndTime} - {session.SessionName}");
-                    }
+                        if (instructor.PhoneNumberConfirmed && !string.IsNullOrEmpty(instructor.PhoneNumber))
+                        {
+                            await smsSender.SendSmsAsync(instructor.PhoneNumber, $"You have been removed as instructor on {session.StartDateAndTime} - {session.SessionName}");
+                        }
 
+                    }
                 }
-
-
-                await context.SaveChangesAsync();
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to notify Instructor due to: {ex.Message}");
+                }
+                finally
+                {
+                    await context.SaveChangesAsync();
+                }
+            } 
+            else
+            {
+                if (sessionInstructor == null || approved == true)
+                {
+                    sessionInstructor = new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = true, InstructorRetracted = false };
+                    await context.CourseSessionInstructors.AddAsync(sessionInstructor);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 

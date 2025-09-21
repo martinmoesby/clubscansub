@@ -57,10 +57,12 @@
         </RadzenStack>
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
-        <RadzenPanel AllowCollapse="true" Collapsed Style="flex:1" Text="Instructors..." class="rz-border-radius-2 rz-border-color-base-700" >
-            <RadzenStack Style="flex:1" Gap="2" class="rz-mt-1">
-                <AuthorizeView Roles="Administrator,Owner">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch" Gap="2">
+
+        <AuthorizeView Roles="Administrator,Owner">
+            <RadzenPanel AllowCollapse="true" Collapsed Style="flex:1" Text="Instructors..." class="rz-border-radius-2 rz-border-color-base-700">
+                <RadzenStack Style="flex:1" Gap="2" class="rz-mt-1">
+
                     @foreach (var item in Session.SessionInstructors)
                     {
                         switch (item.InstructorStatus)
@@ -108,8 +110,22 @@
                                 break;
                         }
                     }
-                </AuthorizeView>
-                <AuthorizeView Roles="Divepro">
+                    <RadzenSplitButton Click="@(args => addAndApproveInstructorCallback(args?.Value))" Text="Add.." Icon="@IconsTextsAndColors.Icons.USER_ADD" Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.ExtraSmall">
+                        <ChildContent>
+                            @foreach (var item in availableInstructors)
+                            {
+                                <RadzenSplitButtonItem Text="@item.Name" Value="@item.Id"  />
+                            }
+                        </ChildContent>
+                    </RadzenSplitButton>
+                             
+                </RadzenStack>
+            </RadzenPanel>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Divepro">
+            <RadzenPanel AllowCollapse="true" Collapsed Style="flex:1" Text="Instructors..." class="rz-border-radius-2 rz-border-color-base-700">
+                <RadzenStack Style="flex:1" Gap="2" class="rz-mt-1">
                     @if (!Session.SessionInstructors.Any(x => x.InstructorId == CurrentUser?.Id) && !ReadOnly)
                     {
                         <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Variant="Variant.Flat" IsPill>
@@ -156,9 +172,18 @@
                                 break;
                         }
                     }
-                </AuthorizeView>
-            </RadzenStack>
-        </RadzenPanel>
+
+                </RadzenStack>
+            </RadzenPanel>
+            <RadzenPanel AllowCollapse="true" Collapsed Text="Students..." class="rz-border-radius-2 rz-border-color-base-700">
+                <RadzenStack Style="flex:1" Gap="2" class="rz-mt-1">
+                    @foreach (var item in Session.Course.Participants)
+                    {
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="@item.ApplicationUser.Name" />
+                    }
+                </RadzenStack>
+            </RadzenPanel>
+        </AuthorizeView>
 
     </RadzenStack>
 </RadzenStack>
@@ -166,11 +191,18 @@
 
 @code {
 
+
+    [Inject]
+    DialogService dialogService { get; set; }
+
     [Parameter]
     public bool ReadOnly { get; set; } = true;
 
     [Parameter]
     public CourseSession Session { get; set; }
+
+    [Parameter]
+    public IList<ApplicationUser> Instructors { get; set; } = [];
 
     [CascadingParameter(Name = "CurrentUser")]
     public ApplicationUser CurrentUser { get; set; }
@@ -190,6 +222,9 @@
     [Parameter]
     public EventCallback<(CourseSession, ApplicationUser)> OnUnaproveInstructor { get; set; }
 
+    private IList<ApplicationUser> availableInstructors { get; set; } = [];
+
+
     private string themeClasses = "rz-background-color-base-400 rz-border-base-300";
 
     protected override void OnInitialized()
@@ -205,10 +240,11 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            
+            var sessionInstructors = Session.SessionInstructors.Select(x => x.Instructor.Id).ToList();
+            availableInstructors = Instructors.Where(x=>!sessionInstructors.Contains(x.Id)).ToList();
+            StateHasChanged();
         }
     }
 
@@ -242,24 +278,37 @@
         return false;
     }
 
-    private void onApproveInstructor(ApplicationUser instructor)
+    private async void addAndApproveInstructorCallback(string? instructorId)
     {
-        OnApproveInstructor.InvokeAsync((Session, instructor));
+        if (string.IsNullOrEmpty(instructorId))
+            return;
+
+        var instructor = Instructors.First(x=>x.Id == instructorId);
+
+        if (instructor != null) {
+            await OnApproveInstructor.InvokeAsync((Session, instructor));
+        }
+
     }
 
-    private void onUnapproveInstructor(ApplicationUser instructor)
+    private async void onApproveInstructor(ApplicationUser instructor)
     {
-        OnUnaproveInstructor.InvokeAsync((Session, instructor));
+        await OnApproveInstructor.InvokeAsync((Session, instructor));
     }
 
-    private void onRetractSubmission()
+    private async void onUnapproveInstructor(ApplicationUser instructor)
     {
-        OnRetractInstructor.InvokeAsync((Session, CurrentUser));
+        await OnUnaproveInstructor.InvokeAsync((Session, instructor));
     }
 
-    private void onSignupInstructor()
+    private async void onRetractSubmission()
     {
-        OnSignUpInstructor.InvokeAsync((Session, CurrentUser));
+        await OnRetractInstructor.InvokeAsync((Session, CurrentUser));
+    }
+
+    private async void onSignupInstructor()
+    {
+        await OnSignUpInstructor.InvokeAsync((Session, CurrentUser));
     }
 
 }

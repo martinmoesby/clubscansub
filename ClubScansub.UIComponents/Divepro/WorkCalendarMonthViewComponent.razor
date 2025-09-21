@@ -41,6 +41,7 @@
                             @foreach (var session in GetSessionsForDay(day).OrderBy(x => x.StartDateAndTime))
                             {
                                 <WorkCalendarSessionComponent Session="session"
+                                    Instructors="@Instructors"
                                 OnRetractInstructor="@(async (args)=>await OnRetractInstructor.InvokeAsync((args.Item1, args.Item2)))"
                                 OnApproveInstructor="@(async (args)=> await OnApproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
                                 OnUnaproveInstructor="@(async (args)=>await OnUnaproveInstructor.InvokeAsync((args.Item1, args.Item2)))"
@@ -73,6 +74,9 @@
 
     [Parameter]
     public IList<CourseSession> Sessions { get; set; } = new List<CourseSession>();
+
+    [Parameter]
+    public IList<ApplicationUser> Instructors { get; set; } = [];
 
     [Parameter]
     public EventCallback<(CourseSession, ApplicationUser)> OnApproveInstructor { get; set; }

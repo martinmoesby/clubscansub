@@ -30,7 +30,7 @@
             OnApproveInstructor="(args)=>approveInstructor(args.Item1, args.Item2) "
             OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
             OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
-            Sessions="sessions" />
+                                           Sessions="sessions" />
 
             break;
         case WorkCalendarViewModeEnum.Calendar:
@@ -39,7 +39,7 @@
             OnUnaproveInstructor="(args)=>unApproveInstructor(args.Item1, args.Item2) "
             OnSignUpInstructor="(args) => signupInstructor(args.Item1, args.Item2)"
             Start="Start" End="End"
-            Sessions="sessions" />
+            Sessions="sessions" Instructors="instructors" />
 
             break;
         case WorkCalendarViewModeEnum.Completed:
@@ -54,6 +54,9 @@
     [Inject]
     CourseService courseService { get; set; }
 
+    [Inject]
+    UserService userService { get; set; }
+
     [CascadingParameter(Name ="CurrentUser")]
     public ApplicationUser? CurrentUser { get; set; }
 
@@ -64,6 +67,7 @@
     public bool AllowViews { get; set; } = true;
 
     private IList<CourseSession> sessions = new List<CourseSession>();
+    private IList<ApplicationUser> instructors = [];
 
     private DateTime Start;
     private DateTime End;
@@ -83,6 +87,7 @@
         await base.OnParametersSetAsync();
         if (firstrender)
         {
+            instructors =(await userService.GetUsersByRolesAsync(Userroles.Divepro)).ToList();
             await refreshSessions();
         }
     }

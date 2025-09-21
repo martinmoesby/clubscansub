@@ -251,7 +251,7 @@ namespace ClubScansub.Service
             {
                 var roleUsers = await userManager.GetUsersInRoleAsync(item);
                 users.AddRange(roleUsers);
-                users = users.Distinct().ToList(); ;
+                users = users.Distinct().ToList();
             }
 
             return users;
