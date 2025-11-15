@@ -39,9 +39,9 @@ namespace ClubScansub.BlazorApp.Pages
         private Dictionary<EventTypeEnum, bool> eventTypeFilters = new Dictionary<EventTypeEnum, bool>() 
         {
             { EventTypeEnum.Bådtur, true },
-            { EventTypeEnum.Stranddyk, false },
+            { EventTypeEnum.Stranddyk, true },
             { EventTypeEnum.Klubture, true },
-            { EventTypeEnum.Other, true },
+            { EventTypeEnum.Other, false },
             { EventTypeEnum.Liveaboard, false },
             { EventTypeEnum.Rejse, false },
             //{ EventTypeEnum.NotAnEvent, false }

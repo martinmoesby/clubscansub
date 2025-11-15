@@ -1,15 +1,15 @@
 ﻿@using ClubScansub.Utility
 @if (ShowText)
 {
-    <RadzenText Text="@Text" TextStyle="TextStyle.Caption" />
+    <RadzenText Text="@Text" TextStyle="TextStyle.Caption" Style="@sizeStyle" />
 }
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" >
-    <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Info" Variant="Variant.Filled" Shade="Shade.Lighter" Style="width:100%; text-align:start">
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="5" >
+    <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Info" Variant="Variant.Filled" Shade="Shade.Lighter" Style="text-align:start;padding-top:7px;">
 
 
         @for (int i = 0; i < Event.FixedParticipants; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Info" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Info" Style="@sizeStyle" />
 
         }
 
@@ -17,37 +17,37 @@
         {
             @if (user.ApplicationUser != null)
             {
-                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="@user.ApplicationUser?.Firstname" />
+                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="@user.ApplicationUser?.Firstname" Style="@sizeStyle" />
             }
             else
             {
-                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="Plads optaget" />
+                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_CHECK" IconStyle="IconStyle.Success" title="Plads optaget" Style="@sizeStyle" />
             }
         }
 
 
         @for (int i = 0; i < Event.RequiredSpots % 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Warning" title="1 påkrævet plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Warning" title="1 påkrævet plads" Style="@sizeStyle" />
 
         }
 
 
         @for (int i = 0; i < Event.RequiredSpots / 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Warning" title="10 påkrævede plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Warning" title="10 påkrævede plads" Style="@sizeStyle" />
 
         }
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) % 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Secondary" title="Ledig plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" IconStyle="IconStyle.Secondary" title="Ledig plads" Style="@sizeStyle" />
 
         }
 
         @for (int i = 0; i < (Event.FreeSpots - Event.RequiredSpots) / 10; i++)
         {
-            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Secondary" title="10 ledige plads" />
+            <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_10" IconStyle="IconStyle.Secondary" title="10 ledige plads" Style="@sizeStyle" />
 
         }
     </RadzenBadge>

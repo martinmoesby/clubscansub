@@ -59,11 +59,15 @@ namespace ClubScansub.Models
         public Certificate Certificate { get; set; }
 
         [Display(Name = "Normal start tidspunkt")]
-        public TimeSpan DefaultStartTime { get; set; }
+        public TimeSpan DefaultStartTime { get; set; } = new TimeSpan(8, 30, 0);
 
 
         [Display(Name = "Normal varighed")]
-        public TimeSpan DefaultDuration { get; set; }
+        public TimeSpan DefaultDuration { get; set; } = new TimeSpan(4, 0, 0);
+
+        [Display(Name = "Antal Dage")]
+        public int DefaultDays { get; set; } = 1;
+
 
         [Display(Name = "Tur type")] 
         public EventTypeEnum DefaultEventType { get; set; }

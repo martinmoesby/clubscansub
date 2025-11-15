@@ -90,7 +90,7 @@
                             </RadzenRow>
 
                             <RadzenRow>
-                                <RadzenColumn Size="6">
+                                <RadzenColumn Size="4">
                                     <RadzenFormField Text="Min. participants" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
                                             <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MIN"></RadzenIcon>
@@ -101,7 +101,7 @@
                                     </RadzenFormField>
                                 </RadzenColumn>
 
-                                <RadzenColumn Size="6">
+                                <RadzenColumn Size="4">
                                     <RadzenFormField Text="Max. participants" Variant="Variant.Outlined" Style="width:100%">
                                         <End>
                                             <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MAX"></RadzenIcon>
@@ -112,6 +112,14 @@
                                     </RadzenFormField>
                                 </RadzenColumn>
 
+                                <RadzenColumn Size="4">
+                                    <RadzenFormField Text="Price" Variant="Variant.Outlined" Style="width:100%">
+                                        <End><RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" /></End>
+                                        <ChildContent>
+                                            <RadzenNumeric @bind-Value="Divesite.Price"></RadzenNumeric>
+                                        </ChildContent>
+                                    </RadzenFormField>
+                                </RadzenColumn>
 
                             </RadzenRow>
 
@@ -127,16 +135,13 @@
 
                                 <RadzenColumn Size="4">
                                     <RadzenFormField Text="Default End time" Variant="Variant.Outlined" Style="width:100%">
-                                        <RadzenDatePicker ShowTime="true" TimeOnly="true" DateFormat="HH:mm" @bind-Value="@endTime" />
+                                        <RadzenDatePicker ShowTime="true" TimeOnly="true" DateFormat="HH:mm" @bind-Value="@endTime" onchange=""/>
                                     </RadzenFormField>
                                 </RadzenColumn>
 
                                 <RadzenColumn Size="4">
-                                    <RadzenFormField Text="Price" Variant="Variant.Outlined" Style="width:100%">
-                                        <End><RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" /></End>
-                                        <ChildContent>
-                                            <RadzenNumeric @bind-Value="Divesite.Price"></RadzenNumeric>
-                                        </ChildContent>
+                                    <RadzenFormField Text="Default Days" Variant="Variant.Outlined" Style="width:100%">
+                                        <RadzenNumeric @bind-Value="@Divesite.DefaultDays" />
                                     </RadzenFormField>
                                 </RadzenColumn>
 

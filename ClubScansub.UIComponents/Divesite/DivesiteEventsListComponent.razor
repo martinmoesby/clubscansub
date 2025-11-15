@@ -1,36 +1,77 @@
 ﻿@using ClubScansub.Service
+@using System.Threading.Tasks
 
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
     <EventTypeToggleButtonsComponent OnFilter="setFilter" InitialFilters="InitialFilters" SingleSelect="!ActiveEventsOnly" />
-    <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Eventsplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" Visible="ActiveEventsOnly" Click="addNewEvents"/>
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Eventsplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" Visible="ActiveEventsOnly" Click="addNewEvents" />
 </RadzenStack>
 
-<RadzenDataGrid TItem="Event" Data="@filteredEvents" AllowPaging PageSize="15" AllowSorting AllowAlternatingRows="false">
+<RadzenDataGrid 
+    TItem="Event" 
+    Data="@filteredEvents" 
+    AllowPaging PageSize="15" 
+    AllowSorting 
+    AllowAlternatingRows="true" 
+    AllowRowSelectOnRowClick="true" 
+    RowDoubleClick="editEvent">
     <Template Context="e">
-        <EventUserActionsComponent ShowAddNewUser="false" Visible="@(e.EndDateAndTime > DateTime.Now && e.FreeSpots > 0 && !e.IsCancelled)" AddExistingUser="@((args) => enrollUser(e,args))"  />
-        <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" OnRemoveUser="@((args) => removeUser(e,args))" OnReleaseSpot="@(() => releaseSpot(e))" />
+        <EventUserActionsComponent ShowAddNewUser="false" Visible="@(e.EndDateAndTime > DateTime.Now && e.FreeSpots > 0 && !e.IsCancelled)" AddExistingUser="@((args) => enrollUser(e, args))" />
+        <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" OnRemoveUser="@((args) => removeUser(e, args))" OnReleaseSpot="@(() => releaseSpot(e))" />
     </Template>
     <Columns>
-        <RadzenDataGridColumn Property="StartDateAndTime" Title="Date" Sortable MinWidth="80px" Width="120px"/>
-
-        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable>
+        <RadzenDataGridColumn Title="Date and Time" Width="200px">
             <Template>
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="5">
-                    <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(context.EventType)" Style="font-size:1rem" />
-                    <RadzenText Text="@context.Title" TextStyle="TextStyle.Subtitle2" />
+                <RadzenStack Orientation="Orientation.Vertical" Gap="3">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" IconColor="@Colors.Success"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@context.StartDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" IconColor="@Colors.Danger"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@context.EndDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                    </RadzenStack>
                 </RadzenStack>
-                <SeatComponent Event="context" ShowText="false" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@(nameof(Event.PremiumPrice))" Title="Price" Width="80px" TextAlign="TextAlign.Right" FormatString="{0:c2}" />
-
-        <RadzenDataGridColumn MinWidth="40px" Width="60px" TextAlign="TextAlign.Center" Visible="@ActiveEventsOnly" >
+        <RadzenDataGridColumn Property="Title" Title="Event name" Sortable MinWidth="180px">
             <Template>
-                @if(context.IsCancelled)
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="3">
+
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="10">
+                    <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(context.EventType)" />
+                    <RadzenText Text="@context.Title" TextStyle="TextStyle.Body1" />
+                </RadzenStack>
+                    <SeatComponent Event="context" ShowText="false" Text="Occupancy" Size="Utility.Enums.IconSizeEnum.Small" />
+                </RadzenStack>
+            </Template>
+
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Pricing" Width="120px">
+            <Template>
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal" Gap="3">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessDarker" title="Premium membership price"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2">@context.PremiumPrice?.ToString("C2")</RadzenText>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessLighter" title="Basic membership price"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" >@context.Price?.ToString("C2")</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </Template>
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn MinWidth="40px" Width="60px" TextAlign="TextAlign.Center" Visible="@ActiveEventsOnly">
+            <Template>
+                @if (context.IsCancelled)
                 {
                     <RadzenButton Click="@(() => reactivateEvent(context))" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Icon="refresh" Variant="Variant.Text" />
                     <RadzenButton Click="@(() => removeEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="delete" />
-                } else
+                }
+                else
                 {
                     <RadzenButton Click="@(() => cancelEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="cancel" />
                 }
@@ -114,10 +155,10 @@
         else
         {
             var eu = new EventUser()
-                {
-                    EventId = e.Id,
-                    ApplicationUserId = userId
-                };
+            {
+                EventId = e.Id,
+                ApplicationUserId = userId
+            };
 
             e.Participants.Add(eu);
 
@@ -137,11 +178,11 @@
     private async void addNewEvents()
     {
         await dialogService.OpenAsync<EventsPlannerComponent>("Events planner", null, new DialogOptions()
-            {
-                Width = "95%",
-                Height = "95%",
-                ContentCssClass = "fullHeight"
-            });
+        {
+            Width = "95%",
+            Height = "95%",
+            ContentCssClass = "fullHeight"
+        });
         allEvents = await eventService.GetAllAsync();
         setFilter(InitialFilters);
         StateHasChanged();
@@ -157,10 +198,10 @@
         }
 
         var doCancel = await dialogService.Confirm(questionText, "Cancel event", new ConfirmOptions()
-            {
-                OkButtonText = "Yes",
-                CancelButtonText = "No"
-            });
+        {
+            OkButtonText = "Yes",
+            CancelButtonText = "No"
+        });
         if (doCancel.GetValueOrDefault())
         {
 
@@ -177,10 +218,10 @@
         var questionText = $"Do you want to remove '{item.Title}' from the calendar?";
 
         var doCancel = await dialogService.Confirm(questionText, "Delete event", new ConfirmOptions()
-            {
-                OkButtonText = "Yes",
-                CancelButtonText = "No"
-            });
+        {
+            OkButtonText = "Yes",
+            CancelButtonText = "No"
+        });
         if (doCancel.GetValueOrDefault())
         {
 
@@ -197,10 +238,10 @@
         var questionText = $"Do you want to reactivate '{item.Title}'?";
 
         var doCancel = await dialogService.Confirm(questionText, "Activate event", new ConfirmOptions()
-            {
-                OkButtonText = "Yes",
-                CancelButtonText = "No"
-            });
+        {
+            OkButtonText = "Yes",
+            CancelButtonText = "No"
+        });
         if (doCancel.GetValueOrDefault())
         {
 
@@ -212,10 +253,41 @@
         }
     }
 
+    private async void editEvent(DataGridRowMouseEventArgs<Event> item)
+    {
+        var dialogOptions = new DialogOptions()
+        {
+            Width = "800px",
+            Height = "600px",
+            ShowClose = true
+        };
+        var dialogParameters = new Dictionary<string, object>()
+        {
+            {"Event",item.Data },
+            { "EventChanged", EventCallback.Factory.Create<Event>(this, updateEvent) }
+        };
+        if (ActiveEventsOnly) {
+
+            await dialogService.OpenAsync<EditEventComponent>("Edit Event", dialogParameters, dialogOptions );
+            allEvents = await eventService.GetAllAsync();
+            setFilter(InitialFilters);
+            StateHasChanged();
+        } 
+    }
+
+    private async Task updateEvent(Event item)
+    {
+        await eventService.UpdateAsync(item);
+        allEvents = await eventService.GetAllAsync();
+        setFilter(InitialFilters);
+        StateHasChanged();
+
+    }
+
     private async void removeUser(Event e, ApplicationUser user)
     {
         var eu = e.Participants.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
-        if (eu!= null)
+        if (eu != null)
         {
             e.Participants.Remove(eu);
             await eventService.UpdateAsync(e);

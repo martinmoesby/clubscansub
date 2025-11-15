@@ -24,6 +24,7 @@
     <RadzenScheduler @ref="scheduler" TItem="ICalendarEvent"
                      AppointmentMove="onAppointmentMove"
                      AppointmentRender="onAppointmentRender"
+                     AppointmentSelect="onAppointmentClick"
                      SlotSelect="onSlotClicked"
                      SlotRender="onSlotRender"
                      StartProperty="@nameof(ICalendarEvent.StartDateAndTime)"
@@ -72,6 +73,12 @@
 
     [Parameter]
     public EventCallback<SchedulerSlotSelectEventArgs> OnSlotClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<SchedulerAppointmentSelectEventArgs<ICalendarEvent>> OnAppointmentDblClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnAppointmentMoved { get; set; }
 
     [Parameter]
     public IList<ICalendarEvent> NewItems { get; set; } = new List<ICalendarEvent>();
@@ -232,7 +239,7 @@
         args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
     }
 
-    private void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    private async void onAppointmentMove(SchedulerAppointmentMoveEventArgs args)
     {
 
         if (args.Appointment.Data is CourseSession)
@@ -243,8 +250,9 @@
                 var draggedAppointment = activeItems.FirstOrDefault(x => x == session) as CourseSession;
                 if (draggedAppointment != null)
                 {
-                    draggedAppointment.DateTime = draggedAppointment.DateTime + args.TimeSpan;
-                    scheduler.Reload();
+                    draggedAppointment.DateTime = draggedAppointment.DateTime.AddDays(args.TimeSpan.Days);
+                    await courseService.UpdateSessionAsync(draggedAppointment);
+                    await scheduler.Reload();
                 }
             }
             return;
@@ -256,12 +264,19 @@
             var draggedAppointment = activeItems.FirstOrDefault(x => x == item) as Event;
             if (draggedAppointment != null)
             {
-                draggedAppointment.StartDateAndTime = draggedAppointment.StartDateAndTime + args.TimeSpan;
-                scheduler.Reload();
+                draggedAppointment.StartDateAndTime = draggedAppointment.StartDateAndTime.AddDays(args.TimeSpan.Days);
+                draggedAppointment.EndDateAndTime = draggedAppointment.EndDateAndTime.AddDays(args.TimeSpan.Days);
+                await eventService.UpdateAsync(draggedAppointment);
+                await scheduler.Reload();
             }
         }
 
 
+    }
+
+    private void onAppointmentClick(SchedulerAppointmentSelectEventArgs<ICalendarEvent> args)
+    {
+        Console.WriteLine(args.Data.Title);
     }
 
     private void onSlotClicked(SchedulerSlotSelectEventArgs args)

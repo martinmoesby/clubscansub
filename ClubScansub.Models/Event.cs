@@ -40,7 +40,7 @@ namespace ClubScansub.Models
 
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal")]
-        [Display(Name = "Prim (Prem. medlem)")]
+        [Display(Name = "Pris (Prem. medlem)")]
         public decimal? PremiumPrice { get; set; }
 
         [DataType(DataType.Currency)]

@@ -29,23 +29,43 @@ namespace ClubScansub.BlazorApp.Shared
         [Inject]
         private ThemeService themeService { get; set; }
 
+        private MenuItemDisplayStyle menuItemDisplayStyle;
+        private string[] menuWidths = ["0px;","80px", "160px"];
+        private string selectedMenuWidth = string.Empty;
+
         string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
+        private MenuState menuState;
 
         private bool sidebarExpanded = false;
+
+        protected override void OnInitialized()
+        {
+            setMenuState();
+        }
+
 
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);
         }
 
+
         void SidebarToggleClick()
         {
-            sidebarExpanded = !sidebarExpanded;
+            menuState++;
+            if ((int)menuState > 2)
+                menuState = 0;
+            setMenuState();
         }
 
         private string logoFilename = "";
         private bool isDarkTheme = false;
-
+        internal enum MenuState
+        {
+            Hidden,
+            IconAndText,
+            IconOnly
+        }
         protected override async Task OnInitializedAsync()
         {
 
@@ -83,5 +103,27 @@ namespace ClubScansub.BlazorApp.Shared
             }
         }
 
+        private void setMenuState()
+        {
+            switch (menuState)
+            {
+                case MenuState.Hidden:
+                    selectedMenuWidth = menuWidths[0];
+                    sidebarExpanded = false;
+                    break;
+                case MenuState.IconOnly:
+                    menuItemDisplayStyle = MenuItemDisplayStyle.Icon;
+                    selectedMenuWidth = menuWidths[1];
+                    sidebarExpanded = true;
+                    break;
+                case MenuState.IconAndText:
+                    selectedMenuWidth = menuWidths[2];
+                    menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
+                    sidebarExpanded = true;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

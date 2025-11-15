@@ -30,10 +30,27 @@
                 <RadzenText Text="New Events to be created" TextStyle="TextStyle.Subtitle2" />
                 <RadzenDataGrid Data="@newEvents" TItem="Event" @ref=eventsGrid AllowAlternatingRows="false">
                     <Columns>
-                        <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}"/>
+@*                         <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Start Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}"/>
+                        <RadzenDataGridColumn Property="@nameof(Event.EndDateAndTime)" Title="End Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}" />
+ *@                        <RadzenDataGridColumn Title="Date" MinWidth="120px" Width="160px">
+                            <Template context="item">
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" >
+                                        <RadzenIcon Icon="event_available" IconColor="@Colors.Success" Style="font-size:0.8rem" />
+                                        <RadzenText Text="@item.StartDateAndTime.ToString("dd-MM-yy HH:mm")" TextStyle="TextStyle.Caption" />
+                                    </RadzenStack>
+
+                                    <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                        <RadzenIcon Icon="event_busy" IconColor="@Colors.Danger" Style="font-size:0.8rem" />
+                                        <RadzenText Text="@item.EndDateAndTime.ToString("dd-MM-yy HH:mm")" TextStyle="TextStyle.Caption" />
+                                    </RadzenStack>
+
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
                         <RadzenDataGridColumn Title="Event" MinWidth="60px" TextAlign="TextAlign.Center">
                             <Template Context="item">
-                              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start">       
+                              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">       
                                     <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Danger" Click="@(() => removeNewEvent(item))" />
                                     <RadzenText Text="@item.Title" TextStyle="TextStyle.Body2" />
                                 </RadzenStack>
@@ -52,7 +69,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Style="flex:3;">
-        <PlannerComponent OnSlotClicked="addSelectedLocationAsEvent" DoReloadData="doReloadData" NewItems="eventsList"/>
+        <PlannerComponent OnSlotClicked="addSelectedLocationAsEvent" DoReloadData="doReloadData" NewItems="eventsList" />
     </RadzenStack>
 </RadzenStack>
 <style>
@@ -98,6 +115,7 @@
         { EventTypeEnum.Bådtur, true},
         { EventTypeEnum.Stranddyk, true},
         { EventTypeEnum.Klubture, true},
+        { EventTypeEnum.Rejse, false},
         { EventTypeEnum.Other, false}
     };
 
@@ -141,12 +159,16 @@
             return;
 
         args.PreventDefault();
+        DateTime start = args.Start.Date.Add(selectedLocation.DefaultStartTime);
+        int days = selectedLocation.DefaultDays > 0 ? selectedLocation.DefaultDays - 1 : 0;
+        DateTime end = start.Add(selectedLocation.DefaultDuration).AddDays(days);
+
         var newEvent = new Event()
             {
                 Title = selectedLocation.Name,
                 Divelocation = selectedLocation,
-                StartDateAndTime = args.Start.Date.Add(selectedLocation.DefaultStartTime),
-                EndDateAndTime = args.Start.Date.Add(selectedLocation.DefaultStartTime).Add(selectedLocation.DefaultDuration),
+                StartDateAndTime = start, //args.Start.Date.Add(selectedLocation.DefaultStartTime),
+                EndDateAndTime = end, // args.Start.Date.Add(selectedLocation.DefaultStartTime).Add(selectedLocation.DefaultDuration).AddDays(selectedLocation.DefaultDays-1),
                 EventType = selectedLocation.DefaultEventType,
                 Details = selectedLocation.Description,
                 MinParticipants = selectedLocation.MinParticipants,

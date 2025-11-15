@@ -25,27 +25,21 @@ else
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start">
 
-                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start">
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.CALENDAR"></RadzenIcon>
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMM yyyy")" />
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" IconColor="@Colors.Success"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
                     </RadzenStack>
 
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME"></RadzenIcon>
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToShortTimeString()" />
-                    </RadzenStack>
-
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME"></RadzenIcon>
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToShortTimeString()" />
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" IconColor="@Colors.Danger"></RadzenIcon>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
                     </RadzenStack>
 
                 </RadzenStack>
 
                 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
-
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
                         <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT"></RadzenIcon>
                         @if(isUserPremium)

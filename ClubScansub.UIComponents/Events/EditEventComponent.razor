@@ -1,0 +1,125 @@
+﻿@using ClubScansub.Utility
+
+@if (isLoading)
+{
+    <RadzenStack Style="height:580px;">
+        <WaitLoadingComponent />
+    </RadzenStack>
+}
+else
+{
+    <AuthorizeView Roles="@Userroles.Administrator">
+        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch" Gap="20">
+
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="10">
+
+                <RadzenStack Style="max-width:40%">
+                    @if (Event.Divelocation?.Image != null)
+                    {
+                        <img src="@ImageUtils.GetImageSrc(Event.Divelocation.Image.ImageData)" alt="@Event.Divelocation.Name" class="img rounded w-100" />
+
+                    }
+                    else
+                    {
+                        <RadzenImage Path="/images/no_location_image.png" class="img rounded w-100" />
+                    }
+                    <SeatComponent Event="@Event" ShowText="false" Size="Utility.Enums.IconSizeEnum.Medium" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" Style="width:60%" JustifyContent="JustifyContent.Stretch" AlignItems="AlignItems.Normal" Gap="10">
+                    <RadzenStack Gap="2">
+                        <RadzenLabel Component="EventTitle" Text="Title" />
+                        <RadzenTextBox @bind-Value="Event.Title" Name="EventTitle" />
+                    </RadzenStack>
+
+                    <RadzenStack Gap="2">
+                        <RadzenLabel Component="EventDetails" Text="Details" />
+                        <RadzenTextArea @bind-Value="Event.Details" Name="EventDetails" Rows="5"/>
+                    </RadzenStack>
+                </RadzenStack>
+
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start" Gap="10">
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start" Gap="5">
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" IconColor="@Colors.Success"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="2">
+                            <RadzenLabel Component="StartDateAndTime" Text="Start date and time"></RadzenLabel>
+                            <RadzenDatePicker @bind-Value="Event.StartDateAndTime" DateFormat="dd. MMMM yyyy kl. HH:mm" ShowTime="true" Style="width: 250px;" Name="StartDateAndTime" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" IconColor="@Colors.Danger"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="2">
+                            <RadzenLabel Component="EndDateAndTime" Text="End date and time"></RadzenLabel>
+                            <RadzenDatePicker @bind-Value="Event.EndDateAndTime" DateFormat="dd. MMMM yyyy kl. HH:mm" ShowTime="true" Style="width: 250px;" Name="EndDateAndTime" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start" Gap="5">
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MIN" IconColor="@Colors.WarningDark"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2">
+                            <RadzenLabel Text="Min participants" Component="MinParticipants"></RadzenLabel>
+                            <RadzenNumeric @bind-Value="@Event.MinParticipants" ShowUpDown="true" Format="n0" Name="MinParticipants" Min="2" Max="50" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER_MAX" IconColor="@Colors.SuccessDark"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2">
+                            <RadzenLabel Text="Max participants" Component="MaxParticipants"></RadzenLabel>
+                            <RadzenNumeric @bind-Value="@Event.MaxParticipants" ShowUpDown="true" Format="n0" Name="MaxParticipants" Max="50" Min="2" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start" Gap="5">
+
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon IconColor="@Colors.PrimaryLighter" Icon="@IconsTextsAndColors.Icons.AMOUNT"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="2">
+                            <RadzenLabel Component="BasicPrice" Text="Basic member Price"></RadzenLabel>
+                            <RadzenNumeric @bind-Value="Event.Price" Format="c2" Name="BasicPrice" ShowUpDown="false" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon IconColor="@Colors.SuccessDarker" Icon="@IconsTextsAndColors.Icons.AMOUNT"></RadzenIcon>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="2">
+                            <RadzenLabel Component="PremPrice" Text="Premium member Price"></RadzenLabel>
+                            <RadzenNumeric @bind-Value="Event.PremiumPrice" Format="c2" Name="PremPrice" ShowUpDown="false" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon IconColor="@Colors.WarningLight" Icon="@IconsTextsAndColors.Icons.USER_CHECK"></RadzenIcon>
+                        <RadzenCheckBox @bind-Value="Event.IsFreeForDivepros" Name="FreeForPro" />
+                        <RadzenLabel Component="FreeForPro" Text="Free for Divepros"></RadzenLabel>
+                    </RadzenStack>
+                </RadzenStack>
+
+            </RadzenStack>
+
+
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
+                <RadzenButton ButtonStyle="ButtonStyle.Success" Variant="Variant.Filled" Text="Save Changes" Icon="save" Click="saveChanges" />
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Variant="Variant.Filled" Text="Cancel Changes" Icon="undo"Click="cancelChanges" />
+@*                 <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
+                <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
+ *@            </RadzenStack>
+
+        </RadzenStack>
+    </AuthorizeView>
+
+}

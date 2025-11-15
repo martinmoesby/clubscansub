@@ -1,6 +1,9 @@
 ﻿using ClubScansub.Models;
 using ClubScansub.Models.Interface;
+using ClubScansub.Utility.Enums;
+using ClubScansub.Utility.Extensions;
 using Microsoft.AspNetCore.Components;
+using Radzen;
 
 namespace ClubScansub.Blazor.UIComponents.Common
 {
@@ -14,6 +17,11 @@ namespace ClubScansub.Blazor.UIComponents.Common
 
         [Parameter]
         public string Text { get; set; } = "Status";
+
+        [Parameter]
+        public IconSizeEnum Size { get; set; } = IconSizeEnum.Medium;
+
+        private string sizeStyle => Size.ToFontSizeStyle();
 
         protected override void OnAfterRender(bool firstRender)
         {

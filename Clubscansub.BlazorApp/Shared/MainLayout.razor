@@ -6,7 +6,7 @@
 <RadzenContextMenu /> *@
 <RadzenComponents />
 
-<RadzenLayout style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body' 'rz-sidebar rz-footer';">
+<RadzenLayout style="grid-template-areas: 'rz-header' 'rz-sidebar rz-body' 'rz-footer';">
 
     <RadzenHeader>
         <RadzenRow JustifyContent="JustifyContent.Start" Gap="0">
@@ -14,8 +14,8 @@
             <RadzenColumn Size="12">
                 <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
 
-                    <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-4" Orientation="Orientation.Horizontal">
-                        <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu"></RadzenSidebarToggle>
+                    <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-2" Orientation="Orientation.Horizontal">
+                        <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu" Style="@($"width:80px;")"></RadzenSidebarToggle>
                         <RadzenLink Path="/">
                             <RadzenImage Path="@logoFilename" Style="height:55px;margin-bottom:10px"></RadzenImage>
                         </RadzenLink>
@@ -53,11 +53,10 @@
 
     </RadzenBody>
 
-    <RadzenSidebar @bind-Expanded=@sidebarExpanded Responsive=false style="z-index: 2; display: flex; flex-direction:column">
+    <RadzenSidebar @bind-Expanded=@sidebarExpanded Responsive=true ResponsiveMaxWidth="1024px" style="@($"z-index: 2; display: flex; flex-direction:column;width:{selectedMenuWidth}")" Position="SidebarPosition.Start">
 
-        <RadzenPanelMenu DisplayStyle="MenuItemDisplayStyle.Text">
+        <RadzenPanelMenu DisplayStyle="@menuItemDisplayStyle" >
             <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
-
             <AuthorizeView Roles="@Userroles.Member">
                 <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person" />
             </AuthorizeView>
@@ -98,7 +97,6 @@
 </RadzenLayout>
 
 @code {
-
 
 
 }

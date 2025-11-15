@@ -32,6 +32,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
 
         [Parameter]
         public int EventId { get; set; }
+
         [Parameter]
         public EventCallback<Event> EventStatusChanged { get; set; }
 
