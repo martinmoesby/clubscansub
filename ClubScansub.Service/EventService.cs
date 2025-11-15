@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace ClubScansub.Service
 {
@@ -20,11 +21,11 @@ namespace ClubScansub.Service
     /// course sessions and creating events based on predefined configurations.</remarks>
     public class EventService : ServiceBase, IEventService
     {
-        private readonly ApplicationDbContext context;
+        //private readonly ApplicationDbContext context;
         private readonly EventUserService userService;
         public EventService(EventUserService userService, IOptions<ServiceOptions> options, IEmailSender emailSender) : base(options, emailSender)
         {
-            context = new ApplicationDbContext(dbContextOptions);
+            //context = new ApplicationDbContext(dbContextOptions);
             this.userService = userService;
         }
 
@@ -35,6 +36,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Event>> AddAsync(IList<Event> Items)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             await context.AddRangeAsync(Items);
             await context.SaveChangesAsync();
             return Items;
@@ -47,30 +49,36 @@ namespace ClubScansub.Service
 
         public async Task DeleteAsync(Event Item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             context.Events.Remove(Item);
             await context.SaveChangesAsync();
         }
 
         public async Task<IList<Event>> GetActiveEventsByDivesiteId(int divesiteId)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Events.Include(x=>x.Participants).Where(x => x.StartDateAndTime > DateTime.UtcNow && x.Divelocation.Id == divesiteId);
             return await data.ToListAsync();
         }
 
         public async Task<IList<Event>> GetAllAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Events.Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser).Where(x=>x.EventType != Utility.EventTypeEnum.NotAnEvent);
             return await data.ToListAsync();
         }
 
         public async Task<IList<Event>> GetAllByDateAsync(DateTime startDate, DateTime endDate)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.Events.Include(x=>x.Participants).Include(x=>x.ExternalClubMembers).Include(x=>x.Divelocation).Where(x => x.StartDateAndTime >= startDate && x.EndDateAndTime <= endDate && x.EventType != Utility.EventTypeEnum.NotAnEvent).ToListAsync<Event>();
             return data;
         }
 
         public async Task<IList<CourseSession>> GetAllCourseSessionsByDateAsync(DateTime startDate, DateTime endDate)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.CourseSessions.Include(x=>x.Course).ThenInclude(x=>x.Participants).Where(x=>x.DateTime >= startDate && x.DateTime <= endDate).ToListAsync();
             return data;
         }
@@ -79,6 +87,7 @@ namespace ClubScansub.Service
         {
             var id = int.Parse(Id);
 
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.Events.Include(x=>x.Participants).Include(x => x.Divelocation).ThenInclude(x=>x.Image).Where(x => x.Id == id).FirstOrDefaultAsync();
             if (data == null)
                 throw new Exception($"Event with Id '{Id}' could nor be retrieved.");
@@ -94,6 +103,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Event>> GetCompletedEventsByDivesiteId(int divesiteId)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Events.Include(x => x.Participants).Where(x => x.StartDateAndTime < DateTime.UtcNow && x.Divelocation.Id == divesiteId);
             return await data.ToListAsync();
         }
@@ -105,6 +115,7 @@ namespace ClubScansub.Service
 
         public async Task<Event> UpdateAsync(Event item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.Update(item);
             await context.SaveChangesAsync();
             return item;
@@ -136,9 +147,9 @@ namespace ClubScansub.Service
         /// saved to the database.</returns>
         public async Task CreateEventsAsync(IList<Event> events)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             foreach (var @event in events)
             {
-
                 var location = context.Divelocations.Include(x => x.Certificate).Include(x => x.MeetingLocation).FirstOrDefault(x => x.Id ==@event.Divelocation.Id);
                 if (location != null)
                 {
@@ -200,6 +211,7 @@ namespace ClubScansub.Service
 
         public async Task CancelEventAsync(Event item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             item.IsCancelled = true;
             // TODO: Refund users
             context.Update(item);
@@ -208,6 +220,7 @@ namespace ClubScansub.Service
         }
         public async Task ActivateEventAsync(Event item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             item.IsCancelled = false;
             // TODO: Refund users
             context.Update(item);

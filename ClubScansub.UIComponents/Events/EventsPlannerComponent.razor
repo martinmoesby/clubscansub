@@ -33,7 +33,7 @@
 @*                         <RadzenDataGridColumn Property="@nameof(Event.StartDateAndTime)" Title="Start Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}"/>
                         <RadzenDataGridColumn Property="@nameof(Event.EndDateAndTime)" Title="End Date" MinWidth="40px" Width="80px" FormatString="{0:dd-MM-yy}" />
  *@                        <RadzenDataGridColumn Title="Date" MinWidth="120px" Width="160px">
-                            <Template context="item">
+                            <Template Context="item">
                                 <RadzenStack Orientation="Orientation.Vertical">
                                     <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" >
                                         <RadzenIcon Icon="event_available" IconColor="@Colors.Success" Style="font-size:0.8rem" />
