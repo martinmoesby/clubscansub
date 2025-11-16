@@ -80,6 +80,13 @@ namespace ClubScansub.Service
             return AddAsync(Items.ToList());
         }
 
+        /// <summary>
+        /// Asynchronously deletes the specified course from the database context.
+        /// </summary>
+        /// <remarks>If the specified course is not found in the database, no changes are made. This
+        /// method does not validate whether the entity exists prior to deletion.</remarks>
+        /// <param name="Item">The course entity to be deleted. Must be attached to the context and represent an existing record.</param>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
         public async Task DeleteAsync(Course Item)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -106,6 +113,10 @@ namespace ClubScansub.Service
             return await data.ToListAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<IList<Course>> GetStartedOrCompletedAsync()
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -116,6 +127,14 @@ namespace ClubScansub.Service
             return await data.ToListAsync();
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a list of instructors who have been approved for past course sessions.
+        /// </summary>
+        /// <remarks>Only instructors associated with course sessions that have already taken place, are
+        /// approved, and have either registered participants or a positive fixed participant count are included in the
+        /// result.</remarks>
+        /// <returns>A list of <see cref="CourseSessionInstructor"/> objects representing instructors approved for course
+        /// sessions that have already occurred. The list will be empty if no matching instructors are found.</returns>
         public async Task<IList<CourseSessionInstructor>> GetCourseSessionInstructorAsync()
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -130,6 +149,18 @@ namespace ClubScansub.Service
             return result;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a list of completed course session instructor assignments for the specified
+        /// instructor.
+        /// </summary>
+        /// <remarks>A course session is considered completed if its scheduled date and time are in the
+        /// past, it has been approved by the instructor, and it has participants or a fixed participant count. The
+        /// method filters results to include only those assignments associated with the provided instructor.</remarks>
+        /// <param name="user">The instructor for whom to retrieve completed work. Must not be null. Only assignments associated with this
+        /// user's identifier are returned.</param>
+        /// <returns>A list of <see cref="CourseSessionInstructor"/> objects representing completed course sessions that have
+        /// been approved by the instructor. The list will be empty if no completed work is found for the specified
+        /// instructor.</returns>
         public async Task<IList<CourseSessionInstructor>> GetInstructorCompletedWorkAsync(ApplicationUser user)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -150,6 +181,15 @@ namespace ClubScansub.Service
             return result;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a course by its identifier, including its sessions and participants.
+        /// </summary>
+        /// <remarks>Throws an exception if the specified identifier does not correspond to an existing
+        /// course or if the identifier is not a valid integer.</remarks>
+        /// <param name="Id">The string representation of the course identifier. Must be convertible to an integer value corresponding to
+        /// an existing course.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the course matching the
+        /// specified identifier, including its sessions and participants.</returns>
         public async Task<Course> GetAsync(string Id)
         {
             var id = int.Parse(Id);
@@ -167,7 +207,14 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-
+        /// <summary>
+        /// Asynchronously updates the specified course in the data store.
+        /// </summary>
+        /// <remarks>The update is performed immediately in the underlying data store. If the specified
+        /// course does not exist, an exception may be thrown by the data context.</remarks>
+        /// <param name="item">The course entity to update. Must not be null. The entity should have a valid identifier corresponding to an
+        /// existing course.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the updated course entity.</returns>
         public async Task<Course> UpdateAsync(Course item)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -176,6 +223,15 @@ namespace ClubScansub.Service
             return item;
         }
 
+        /// <summary>
+        /// Asynchronously updates the specified collection of courses in the database.
+        /// </summary>
+        /// <remarks>All changes to the provided courses are persisted to the database upon successful
+        /// completion of the operation. The returned list contains the same course instances as provided in <paramref
+        /// name="Items"/>.</remarks>
+        /// <param name="Items">The list of <see cref="Course"/> entities to update. Each item must represent an existing course in the
+        /// database.</param>
+        /// <returns>A list containing the updated <see cref="Course"/> entities.</returns>
         public async Task<IList<Course>> UpdateAsync(IList<Course> Items)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -184,13 +240,30 @@ namespace ClubScansub.Service
             return Items;
         }
 
+        /// <summary>
+        /// Updates the specified courses asynchronously.
+        /// </summary>
+        /// <param name="Items">An array of <see cref="Course"/> objects to update. Cannot be null. Each item represents a course to be
+        /// updated.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Course"/>
+        /// objects reflecting the updated state of each course.</returns>
         public async Task<IList<Course>> UpdateAsync(params Course[] Items)
         {
             return await UpdateAsync(Items.ToList());
         }
 
         // Create but do not commit to database
-
+        /// <summary>
+        /// Creates a new course instance based on the specified course template and start date, without committing it
+        /// to the database.
+        /// </summary>
+        /// <remarks>The returned Course object includes sessions and properties derived from the
+        /// template, but is not persisted to the database. To save the course, use the appropriate data access method
+        /// after creation.</remarks>
+        /// <param name="courseTemplate">The template containing the course structure, sessions, and default settings. Cannot be null.</param>
+        /// <param name="selectedStartDate">The date on which the course is intended to start. Must not be earlier than the current date.</param>
+        /// <returns>A new Course object initialized from the template and start date, or null if the template is invalid or the
+        /// start date is in the past.</returns>
         public Course? CreateNewCourseFromTemplate(CourseTemplate courseTemplate, DateTime selectedStartDate)
         {
             if (selectedStartDate < DateTime.Now.Date || courseTemplate == null)
@@ -268,7 +341,15 @@ namespace ClubScansub.Service
         }
 
         // Session functions
-
+        /// <summary>
+        /// Retrieves all course sessions that occur within the specified month.
+        /// </summary>
+        /// <remarks>The returned sessions include related instructors, course details, and participants.
+        /// The query is executed with no tracking for improved read performance.</remarks>
+        /// <param name="date">A date representing the target month and year. Only the month and year components are used; the day
+        /// component is ignored.</param>
+        /// <returns>A list of <see cref="CourseSession"/> objects scheduled to start and end within the specified month. Returns
+        /// an empty list if no sessions are found.</returns>
         public async Task<IList<CourseSession>> GetCourseSessionsByMonth(DateTime date)
         {
             var start = new DateTime(date.Year, date.Month, 1);
@@ -287,6 +368,15 @@ namespace ClubScansub.Service
 
         }
 
+        /// <summary>
+        /// Updates the specified course session entities in the database asynchronously.
+        /// </summary>
+        /// <remarks>All changes are persisted to the database upon successful completion of the
+        /// operation. The method returns the same entities that were provided as input, reflecting their updated state.
+        /// This operation is not atomic; if an error occurs during saving, some updates may not be applied.</remarks>
+        /// <param name="items">An array of <see cref="CourseSession"/> objects to update. Each item must represent an existing session to
+        /// be updated.</param>
+        /// <returns>A list containing the updated <see cref="CourseSession"/> entities.</returns>
         public async Task<IList<CourseSession>> UpdateSessionAsync(params CourseSession[] items )
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -295,6 +385,12 @@ namespace ClubScansub.Service
             return items.ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="instructor"></param>
+        /// <returns></returns>
         public async Task SignupSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -302,6 +398,19 @@ namespace ClubScansub.Service
             await context.CourseSessionInstructors.AddAsync(new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = false, InstructorRetracted = false });
             await context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Approves or removes an instructor's assignment for a specified course session and notifies the instructor of
+        /// the change.
+        /// </summary>
+        /// <remarks>If the instructor is approved or removed, an email and/or SMS notification is sent to
+        /// the instructor if their contact information is available and confirmed. The method creates a new assignment
+        /// if none exists and approval is requested.</remarks>
+        /// <param name="session">The course session for which the instructor's assignment is being approved or removed.</param>
+        /// <param name="instructor">The instructor whose assignment to the session is being updated. Cannot be null.</param>
+        /// <param name="approved">Indicates whether the instructor is approved (<see langword="true"/>) or removed (<see langword="false"/>).
+        /// Defaults to <see langword="true"/>.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor, bool approved = true)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -363,6 +472,17 @@ namespace ClubScansub.Service
             }
         }
 
+        /// <summary>
+        /// Retracts the specified instructor from the given course session, updating their approval status and
+        /// notifying them via email and SMS if contact information is available.
+        /// </summary>
+        /// <remarks>If the instructor has a confirmed phone number or a valid email address, they will be
+        /// notified of the retraction. The instructor's approval status is set to false, and their retraction status is
+        /// toggled. No action is taken if the instructor is not associated with the session.</remarks>
+        /// <param name="session">The course session from which the instructor will be retracted. Must not be null.</param>
+        /// <param name="instructor">The instructor to retract from the session. Must not be null and should have valid contact information to
+        /// receive notifications.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task RetractSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -392,6 +512,15 @@ namespace ClubScansub.Service
         }
 
         // Template functions
+
+        /// <summary>
+        /// Asynchronously retrieves all course templates, including their associated sessions, from the database.
+        /// </summary>
+        /// <remarks>The returned templates include their related session data. This method executes a
+        /// database query and may incur network or I/O latency. The caller should await the result to ensure completion
+        /// before accessing the returned data.</remarks>
+        /// <returns>A list of <see cref="CourseTemplate"/> objects representing all course templates in the database. The list
+        /// will be empty if no templates are found.</returns>
         public async Task<IList<CourseTemplate>> GetTemplatesAsync()
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -400,6 +529,15 @@ namespace ClubScansub.Service
             return await data.ToListAsync();   
         }
 
+        /// <summary>
+        /// Asynchronously adds a new course template and its associated sessions to the database.
+        /// </summary>
+        /// <remarks>The method saves the provided template and its sessions in a single transaction. The
+        /// template's instructor certificate and session addresses are not tracked by the context after the operation.
+        /// The returned template reflects the state after saving to the database.</remarks>
+        /// <param name="template">The course template to add, including its sessions and optional instructor certificate. Cannot be null.</param>
+        /// <returns>A <see cref="CourseTemplate"/> instance representing the added template, including any changes made during
+        /// the save operation.</returns>
         public async Task<CourseTemplate> AddTemplateAsync(CourseTemplate template)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -420,6 +558,13 @@ namespace ClubScansub.Service
             return template;
         }
 
+        /// <summary>
+        /// Asynchronously deletes the specified course template from the database.
+        /// </summary>
+        /// <remarks>If the specified template is not tracked by the context, no changes will be made.
+        /// This method does not throw if the template does not exist in the database.</remarks>
+        /// <param name="template">The course template to delete. Must not be null and must exist in the current context.</param>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
         public async Task DeleteTemplateAsync(CourseTemplate template)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -428,6 +573,14 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Updates the specified course template in the database asynchronously.
+        /// </summary>
+        /// <remarks>If the specified template does not exist in the database, the update may fail or
+        /// result in an exception depending on the entity tracking configuration.</remarks>
+        /// <param name="template">The course template entity to update. Must not be null and should represent an existing template in the
+        /// database.</param>
+        /// <returns>The updated <see cref="CourseTemplate"/> entity after changes have been saved to the database.</returns>
         public async Task<CourseTemplate> UpdateCourseTemplateAsync(CourseTemplate template)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
