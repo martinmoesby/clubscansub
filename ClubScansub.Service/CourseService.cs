@@ -13,13 +13,11 @@ namespace ClubScansub.Service
 {
     public class CourseService : ServiceBase, ICourseService
     {
-        private readonly ApplicationDbContext context;
-
         private ISmsSender smsSender;
 
         public CourseService(IOptions<ServiceOptions> options, IEmailSender emailSender, ISmsSender smsSender) : base(options, emailSender)
         {
-            context = new ApplicationDbContext(dbContextOptions);
+
             this.smsSender = smsSender;
         }
 
@@ -30,6 +28,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Course>> AddAsync(IList<Course> Items)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             foreach (var item in Items)
             {
                 
@@ -52,6 +51,7 @@ namespace ClubScansub.Service
 
         public async Task DeleteAsync(Course Item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.Attach(Item).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await context.SaveChangesAsync();
 
@@ -59,6 +59,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Course>> GetAllAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Courses
                 .Include(x=>x.CourseSessions)
                 .Include(x=>x.Participants).ThenInclude(x=>x.ApplicationUser)
@@ -68,6 +69,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Course>> GetStartedOrCompletedAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Courses
                 .Include(x => x.CourseSessions)
                 .Include(x => x.Participants).ThenInclude(x => x.ApplicationUser)
@@ -77,6 +79,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<CourseSessionInstructor>> GetCourseSessionInstructorAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.CourseSessionInstructors
                 .Include(x => x.CourseSession)
                 .ThenInclude(x => x.Course).ThenInclude(x => x.Participants)
@@ -90,6 +93,8 @@ namespace ClubScansub.Service
 
         public async Task<IList<CourseSessionInstructor>> GetInstructorCompletedWorkAsync(ApplicationUser user)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             var data = await context.CourseSessionInstructors
                 .Include(x => x.CourseSession)
                 .ThenInclude(x => x.Course).ThenInclude(x => x.Participants)
@@ -109,6 +114,8 @@ namespace ClubScansub.Service
         public async Task<Course> GetAsync(string Id)
         {
             var id = int.Parse(Id);
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             var course = await context.Courses
                 .Include(x => x.CourseSessions)
                 .Include(x=>x.Participants)
@@ -124,6 +131,7 @@ namespace ClubScansub.Service
 
         public async Task<Course> UpdateAsync(Course item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.Update(item);
             await context.SaveChangesAsync();
             return item;
@@ -131,6 +139,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Course>> UpdateAsync(IList<Course> Items)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.UpdateRange(Items);
             await context.SaveChangesAsync();
             return Items;
@@ -225,7 +234,7 @@ namespace ClubScansub.Service
         {
             var start = new DateTime(date.Year, date.Month, 1);
             var end = start.AddMonths(1).AddSeconds(-1);
-
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.CourseSessions
                 .Include(x => x.SessionInstructors)
                     .ThenInclude(x => x.Instructor)
@@ -241,6 +250,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<CourseSession>> UpdateSessionAsync(params CourseSession[] items )
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.CourseSessions.UpdateRange(items);
             await context.SaveChangesAsync();
             return items.ToList();
@@ -248,11 +258,15 @@ namespace ClubScansub.Service
 
         public async Task SignupSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             await context.CourseSessionInstructors.AddAsync(new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = false, InstructorRetracted = false });
             await context.SaveChangesAsync();
         }
         public async Task ApproveSessionInstructor(CourseSession session, ApplicationUser instructor, bool approved = true)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();
 
             if (sessionInstructor != null)
@@ -312,6 +326,8 @@ namespace ClubScansub.Service
 
         public async Task RetractSessionInstructor(CourseSession session, ApplicationUser instructor)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             var sessionInstructor = context.CourseSessionInstructors.Where(x => x.InstructorId == instructor.Id && x.CourseSessionId == session.Id).FirstOrDefault();  //new CourseSessionInstructor { CourseSessionId = session.Id, InstructorId = instructor.Id, InstructorApproved = true, InstructorRetracted = false };
             if (sessionInstructor != null)
             {
@@ -339,12 +355,16 @@ namespace ClubScansub.Service
         // Template functions
         public async Task<IList<CourseTemplate>> GetTemplatesAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             var data = context.CourseTemplates.Include(x => x.Sessions);
             return await data.ToListAsync();   
         }
 
         public async Task<CourseTemplate> AddTemplateAsync(CourseTemplate template)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             context.Entry(template).State = Microsoft.EntityFrameworkCore.EntityState.Added;
 
             if (template.InstructorCertificate != null)
@@ -363,12 +383,16 @@ namespace ClubScansub.Service
 
         public async Task DeleteTemplateAsync(CourseTemplate template)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             context.Remove(template);
             await context.SaveChangesAsync();
         }
 
         public async Task<CourseTemplate> UpdateCourseTemplateAsync(CourseTemplate template)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             context.Update(template);
             await context.SaveChangesAsync();
             return template;
