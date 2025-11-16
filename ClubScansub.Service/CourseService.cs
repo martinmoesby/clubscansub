@@ -11,6 +11,17 @@ using Microsoft.Extensions.Options;
 
 namespace ClubScansub.Service
 {
+    /// <summary>
+    /// Provides operations for managing courses, course sessions, instructors, and course templates within the
+    /// application. Supports asynchronous creation, retrieval, updating, and deletion of course-related entities, as
+    /// well as instructor assignment workflows.
+    /// </summary>
+    /// <remarks>CourseService implements ICourseService and extends ServiceBase to offer a comprehensive set
+    /// of methods for handling course lifecycles, session scheduling, instructor approvals, and template management.
+    /// Methods are designed for asynchronous usage and interact with the application's data context. This service is
+    /// intended to be used by application logic that requires access to course and session management features,
+    /// including instructor notifications via email and SMS. Thread safety is not guaranteed; instances should not be
+    /// shared across concurrent operations.</remarks>
     public class CourseService : ServiceBase, ICourseService
     {
         private ISmsSender smsSender;
@@ -20,12 +31,27 @@ namespace ClubScansub.Service
 
             this.smsSender = smsSender;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Item"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public Task<Course> AddAsync(Course Item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously adds the specified collection of courses to the database.
+        /// </summary>
+        /// <remarks>All courses in the provided list are added in a single database operation. Changes
+        /// are saved immediately. This method does not update existing courses; all items are treated as new entities.
+        /// Thread safety is not guaranteed; do not share the same context instance across threads.</remarks>
+        /// <param name="Items">The list of <see cref="Course"/> objects to add. Cannot be null. Each course will be tracked and inserted as
+        /// a new entity.</param>
+        /// <returns>A list containing the added <see cref="Course"/> objects. The returned list is the same instance as the
+        /// input parameter.</returns>
         public async Task<IList<Course>> AddAsync(IList<Course> Items)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -44,6 +70,11 @@ namespace ClubScansub.Service
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Items"></param>
+        /// <returns></returns>
         public Task<IList<Course>> AddAsync(params Course[] Items)
         {
             return AddAsync(Items.ToList());
@@ -56,7 +87,15 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
 
         }
-
+        /// <summary>
+        /// Asynchronously retrieves all courses that have not yet ended, including their associated sessions and
+        /// participants.
+        /// </summary>
+        /// <remarks>The returned courses include related CourseSessions and Participants, with each
+        /// participant's associated ApplicationUser loaded. Only courses with an end date and time later than the
+        /// current UTC time are included.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of courses with their
+        /// related sessions and participants. The list will be empty if no active courses are found.</returns>
         public async Task<IList<Course>> GetAllAsync()
         {
             using var context = new ApplicationDbContext(dbContextOptions);
