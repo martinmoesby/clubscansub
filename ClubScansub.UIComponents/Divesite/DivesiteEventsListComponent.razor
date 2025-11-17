@@ -42,7 +42,10 @@
                     <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(context.EventType)" />
                     <RadzenText Text="@context.Title" TextStyle="TextStyle.Body1" />
                 </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start">
                     <SeatComponent Event="context" ShowText="false" Text="Occupancy" Size="Utility.Enums.IconSizeEnum.Small" />
+                        <CopyToClipboardComponent Text="@($"{linkString}{context.DeeplinkId.ToString()}")" IsTextVisible="true" IsTextReadOnly="false" />
+                </RadzenStack>
                 </RadzenStack>
             </Template>
 
@@ -94,6 +97,9 @@
     [Inject]
     public EventService eventService { get; set; }
 
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+
     [Parameter]
     public bool ActiveEventsOnly { get; set; } = true;
 
@@ -101,6 +107,7 @@
     public bool CompletedEventsOnly { get; set; } = false;
 
 
+    private string linkString = string.Empty;
 
     private IList<Event> allEvents = new List<Event>();
     private IList<Event> filteredEvents = new List<Event>();
@@ -119,6 +126,9 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            var rootUri = navigationManager.BaseUri;
+            var rootLink = rootUri.EndsWith("/") ? rootUri : rootUri + "/";
+            linkString = $"{rootLink}?eventId=";
             allEvents = await eventService.GetAllAsync();
 
             setFilter(InitialFilters);

@@ -96,9 +96,14 @@ namespace ClubScansub.Service
 
         }
 
-        public Task<Event> GetAsync(Guid Id)
+        public async Task<Event> GetAsync(Guid Id)
         {
-            throw new NotImplementedException();
+            using var context = new ApplicationDbContext(dbContextOptions);
+            var data = await context.Events.Include(x => x.Participants).Include(x => x.Divelocation).ThenInclude(x => x.Image).Where(x => x.DeeplinkId == Id).FirstOrDefaultAsync();
+            if (data == null)
+                throw new Exception($"Event with Id '{Id}' could nor be retrieved.");
+
+            return data;
         }
 
         public async Task<IList<Event>> GetCompletedEventsByDivesiteId(int divesiteId)

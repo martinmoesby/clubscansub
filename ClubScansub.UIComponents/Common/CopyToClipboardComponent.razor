@@ -1,0 +1,39 @@
+﻿@inject IJSRuntime JSRuntime
+
+<RadzenStack Orientation="Orientation.Horizontal" class="form-inline" AlignItems="AlignItems.Center">
+    
+    <RadzenTextBox Value="@Text" Visible="@(IsTextVisible && !IsTextReadOnly)" />
+    <RadzenText Text="@Text" Visible="@(IsTextVisible && IsTextReadOnly)" TextStyle="@TextStyle" />
+    <RadzenButton Icon="content_copy" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Click="CopyTextToClipboard" Text="@ButtonText" Variant="@ButtonVariant" />
+
+</RadzenStack>
+
+<script>
+        window.clipboardCopy = {
+        copyText: function(text) {
+            navigator.clipboard.writeText(text).then(function () {
+                alert(`Copied '${text}' to clipboard!`);
+            })
+            .catch(function (error) {
+                alert(error);
+            });
+        }
+    };
+</script>
+
+@code {
+
+    [Parameter] public string Text { get; set; } = "Text to Copy";
+    [Parameter] public string ButtonText { get; set; } = "Copy";
+    [Parameter] public bool IsTextVisible { get; set; } = false;
+    [Parameter] public bool IsTextReadOnly { get; set; } = true;
+    [Parameter] public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Info;
+    [Parameter] public ButtonSize ButtonSize { get; set; } = ButtonSize.ExtraSmall;
+    [Parameter] public Variant ButtonVariant { get; set; } = Variant.Text;
+    [Parameter] public TextStyle TextStyle { get; set; } = TextStyle.Caption;
+
+    private async Task CopyTextToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", Text);
+    }
+}
