@@ -27,6 +27,11 @@ namespace ClubScansub.BlazorApp.Pages
         [Inject]
         protected EventService eventService { get; set; }
 
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        private Guid linkId { get; set; }
+
         private RadzenScheduler<ICalendarEvent> scheduler { get; set; }
 
         private IList<Event> events = new List<Event>();
@@ -56,6 +61,17 @@ namespace ClubScansub.BlazorApp.Pages
 
         private bool showAllEvents { get; set; } = false;
         private bool showAllCourses { get; set; } = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("eventId", out var param))
+            {
+                linkId = new Guid(param);
+                if (linkId != Guid.Empty)
+                    await gotoEvent();
+            }
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -429,6 +445,26 @@ namespace ClubScansub.BlazorApp.Pages
 
         }
 
+     
+        private async Task gotoEvent()
+        {
+            var selectedEvent = await eventService.GetAsync(linkId);
+            scheduler.CurrentDate = selectedEvent.StartDateAndTime;
+            await scheduler.Reload();
+            await Dialogservice.OpenAsync<EventComponent>(selectedEvent.Title, new Dictionary<string, object>()
+                {
+                    { "EventId", selectedEvent.Id },
+                    { "EventStatusChanged", EventCallback.Factory.Create<Event>(this, updateEventStatus) }
+                }, new DialogOptions()
+                {
+                    Width = "800px",
+                    Height = "80%",
+                    CloseDialogOnOverlayClick = true,
+                    ShowClose = true,
+                });
+
+        }
+        
         private void updateEventStatus(Event item)
         {
             var e = events.FirstOrDefault(x => x.Id == item.Id);
