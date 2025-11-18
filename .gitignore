@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/ClubScansub.BlazorApp/appsettings.Development.json
+/ClubScansub.BlazorApp/appsettings.Test.json
