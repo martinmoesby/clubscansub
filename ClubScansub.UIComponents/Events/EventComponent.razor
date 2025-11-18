@@ -118,10 +118,13 @@ else
                 <SeatComponent Event="@Event" ShowText="false" Text="Signup status" Size="Utility.Enums.IconSizeEnum.Large" />
 
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Normal">
-                    <AuthorizeView Roles="Administrator">
-                        <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
-                        <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
-                    </AuthorizeView>
+                    @if (Event.StartDateAndTime > DateTime.Now) 
+                    {
+                        <AuthorizeView Roles="Administrator">
+                            <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
+                            <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
+                        </AuthorizeView>
+                    }
 
                 </RadzenStack>
 
@@ -137,9 +140,12 @@ else
                     </RadzenTabsItem>
                     <AuthorizeView Roles="Administrator, Owner, Divepro">
                         <RadzenTabsItem Text="Tilmeldte" Icon="@IconsTextsAndColors.Icons.ENROLLED">
-                            <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
-                                <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
-                            </AuthorizeView>
+                            @if (Event.StartDateAndTime > DateTime.Now)
+                            {
+                                <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
+                                    <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
+                                </AuthorizeView>
+                            }
                             <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent" OnReleaseSpot="releaseReservedSpot" Event="Event" />
                         </RadzenTabsItem>
                     </AuthorizeView>

@@ -1,20 +1,20 @@
 ﻿@using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@Alignment" AlignItems="AlignItems.Center" Style="width:100%" Gap="5">
-    @Start
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Bådtur)" ToggleShade="Shade.Dark"    ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)" Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Klubture)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Stranddyk)" ToggleShade="Shade.Light"   ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" class="rz-mr-2" />
-
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Other)" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Rejse)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Liveaboard)" ToggleShade="Shade.Light"   ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" class="rz-mr-2" />
-
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.NotAnEvent)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
-
+    @Start    
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Bådture"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Bådtur)" ToggleShade="Shade.Dark"    ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BOAT" Value="getEventFilter(EventTypeEnum.Bådtur)" Change="@((args) => setEventFilter(EventTypeEnum.Bådtur))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Klubture"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Klubture)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_CLUB" Value="getEventFilter(EventTypeEnum.Klubture)" Change="@((args) => setEventFilter(EventTypeEnum.Klubture))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args, "Strandture - for alle"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Stranddyk)" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BEACH" Value="getEventFilter(EventTypeEnum.Stranddyk)" Change="@((args) => setEventFilter(EventTypeEnum.Stranddyk))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Dykkerrejser"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Rejse)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TRAVEL" Value="getEventFilter(EventTypeEnum.Rejse)" Change="@((args) => setEventFilter(EventTypeEnum.Rejse))" class="rz-mr-2" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args, "Dykkerrejser til Liveaboards"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Liveaboard)" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_LIVEABOARD" Value="getEventFilter(EventTypeEnum.Liveaboard)" Change="@((args) => setEventFilter(EventTypeEnum.Liveaboard))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Andet"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.Other)" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Info" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_OTHER" Value="getEventFilter(EventTypeEnum.Other)" Change="@((args) => setEventFilter(EventTypeEnum.Other))" class="rz-mr-2" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Ikke en event"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@isActive(EventTypeEnum.NotAnEvent)" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_NOT_EVENT" Value="getEventFilter(EventTypeEnum.NotAnEvent)" Change="@((args) => setEventFilter(EventTypeEnum.NotAnEvent))" />
     @End
 </RadzenStack>
 
 @code {
+    [Inject] 
+    TooltipService tooltipService { get; set; }
+
     [Parameter]
     public bool SingleSelect { get; set; } = false;
 
@@ -29,10 +29,10 @@
             {    EventTypeEnum.Klubture, true },
             {    EventTypeEnum.Stranddyk, true },
             {    EventTypeEnum.Bådtur, true },
-            {    EventTypeEnum.Liveaboard, false },
             {    EventTypeEnum.Rejse, false },
-            {    EventTypeEnum.Other, false },
-            {    EventTypeEnum.NotAnEvent, false }
+            {    EventTypeEnum.Liveaboard, false },
+            {    EventTypeEnum.Other, false }
+//            {    EventTypeEnum.NotAnEvent, false }
         };
 
     [Parameter]
@@ -63,6 +63,23 @@
         if (typeExisits)
             InitialFilters[type] = !InitialFilters[type];
         OnFilter.InvokeAsync(InitialFilters);
+    }
+
+    private void showTooltip(ElementReference elementReference, string message = "Hello")
+    {
+        TooltipOptions options = new TooltipOptions()
+            {
+                Delay = 200,
+                Duration = 2000,
+                CloseTooltipOnDocumentClick = true,
+                CssClass = "rz-background-color-info-darker"
+            };
+        tooltipService.Open(elementReference, message, options);
+    }
+
+    private void hideTooltip()
+    {
+        tooltipService.Close();        
     }
 
     private bool isActive(EventTypeEnum type)

@@ -1,10 +1,10 @@
 ﻿@using ClubScansub.Utility
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@Alignment" AlignItems="AlignItems.Center" Style="width:100%" Gap="5">
     @Start
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.BaseCourse))" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.SpecialtyCourse))" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.TechCourse))" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))" />
-    <RadzenToggleButton Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.ProCourse))" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Grundkurser"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.BaseCourse))" ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.BaseCourse))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Specialer"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.SpecialtyCourse))" ToggleShade="Shade.Default" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_SPEC_COURSE" Value="getCourseFilter(CourseTypeEnum.SpecialtyCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.SpecialtyCourse))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Tekniske dykkerkurser"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.TechCourse))" ToggleShade="Shade.Dark" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_TECH_COURSE" Value="getCourseFilter(CourseTypeEnum.TechCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.TechCourse))" />
+    <RadzenToggleButton MouseEnter="@(args => showTooltip(args,"Divepro kurser"))" MouseLeave="hideTooltip" Size="ButtonSize.Small" Visible="@(isActive(CourseTypeEnum.ProCourse))" ToggleShade="Shade.Darker" ToggleButtonStyle="ButtonStyle.Warning" ButtonStyle="ButtonStyle.Light" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_PRO_COURSE" Value="getCourseFilter(CourseTypeEnum.ProCourse)" Change="@((args) => setCourseFilter(CourseTypeEnum.ProCourse))" />
 
     @*  
     <RadzenToggleButton ToggleShade="Shade.Light" ToggleButtonStyle="ButtonStyle.Danger" ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Icon="@IconsTextsAndColors.Icons.EVENTTYPE_BASE_COURSE" Value="getCourseFilter(CourseTypeEnum.BaseCourse)" Change="@(() => setCourseFilter(CourseTypeEnum.BaseCourse))" />
@@ -17,6 +17,8 @@
 </RadzenStack>
 
 @code {
+    [Inject]
+    TooltipService tooltipService { get; set; }
     [Parameter]
     public bool SingleSelect { get; set; } = false;
 
@@ -69,4 +71,22 @@
     {
         return InitialFilters.Any(x => x.Key == type);
     }
+
+    private void showTooltip(ElementReference elementReference, string message = "Hello")
+    {
+        TooltipOptions options = new TooltipOptions()
+        {
+            Delay = 200,
+            Duration = 2000,
+            CloseTooltipOnDocumentClick = true,
+            CssClass = "rz-background-color-info-darker"
+        };
+        tooltipService.Open(elementReference, message, options);
+    }
+
+    private void hideTooltip()
+    {
+        tooltipService.Close();
+    }
+
 }

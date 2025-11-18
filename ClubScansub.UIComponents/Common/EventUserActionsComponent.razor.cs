@@ -30,27 +30,25 @@ namespace ClubScansub.Blazor.UIComponents.Common
 
         private string selectedUser;
         private IList<ApplicationUser> members;
-        private IList<ApplicationUser> filteredUsers;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                members = await memberService.GetAllAsync();
-                filteredUsers = members;
-                await InvokeAsync(StateHasChanged);
+                members = await memberService.GetAllAsync(false);
+                StateHasChanged();
             }
 
         }
 
-        private void onLoadExistingUsers(LoadDataArgs args)
-        {
-            if (!string.IsNullOrEmpty(args.Filter))
-            {
-                filteredUsers = memberService.FindAll(args.Filter);
-                InvokeAsync(StateHasChanged);
-            }
-        }
+        //private void onLoadExistingUsers(LoadDataArgs args)
+        //{
+        //    if (!string.IsNullOrEmpty(args.Filter))
+        //    {
+        //        filteredUsers = memberService.FindAll(args.Filter);
+        //        InvokeAsync(StateHasChanged);
+        //    }
+        //}
 
         private async Task addNewUser_Click()
         {
@@ -80,7 +78,7 @@ namespace ClubScansub.Blazor.UIComponents.Common
         private void enrollExistingUserCallback()
         {
             AddExistingUser.InvokeAsync(selectedUser);
-            filteredUsers = members;
+            //filteredUsers = members;
             selectedUser = string.Empty;
         }
 
@@ -92,7 +90,7 @@ namespace ClubScansub.Blazor.UIComponents.Common
         private void addNewUserCallback(RegisterUserResult registerdUser)
         {
             AddNewUser.InvokeAsync(registerdUser);
-            filteredUsers = members;
+            //filteredUsers = members;
             selectedUser = string.Empty;
         }
     }

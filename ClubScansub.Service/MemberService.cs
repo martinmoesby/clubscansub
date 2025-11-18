@@ -224,5 +224,16 @@ namespace ClubScansub.Service
             var membersInRole = await userManager.GetUsersInRoleAsync(role);
             return membersInRole.Any(x => x.Id == user.Id);
         }
+
+        public async Task<IList<ApplicationUser>> GetAllAsync(bool includeRoles)
+        {
+            if (includeRoles)
+            {
+                return await GetAllAsync();
+            }
+            using var context = new ApplicationDbContext(dbContextOptions);
+            var members = await context.ApplicationUsers.AsNoTracking().ToListAsync();
+            return members;
+        }
     }
 }

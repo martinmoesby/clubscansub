@@ -9,7 +9,7 @@
                         AllowClear="true"
                         AllowSelectAll="false"
                         
-                        Data="@filteredUsers"
+                        Data="@members"
                         @bind-Value="@selectedUser"
                         TextProperty="@nameof(ApplicationUser.Name)"
                         ValueProperty="@nameof(ApplicationUser.Id)"
@@ -18,7 +18,6 @@
                         FilterOperator="StringFilterOperator.Contains"
                         FilterPlaceholder="Search for name.."
                         ClearSearchAfterSelection
-                        AllowVirtualization
                         Style="flex:3;width:100%; white-space:nowrap"
                         PopupStyle="width:100%; height:120px; white-space:nowrap"
                         ></RadzenDropDown>

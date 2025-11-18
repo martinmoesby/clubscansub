@@ -46,9 +46,9 @@ namespace ClubScansub.BlazorApp.Pages
             { EventTypeEnum.Bådtur, true },
             { EventTypeEnum.Stranddyk, true },
             { EventTypeEnum.Klubture, true },
-            { EventTypeEnum.Other, false },
+            { EventTypeEnum.Rejse, true },
             { EventTypeEnum.Liveaboard, false },
-            { EventTypeEnum.Rejse, false },
+            { EventTypeEnum.Other, false },
             //{ EventTypeEnum.NotAnEvent, false }
         };
 
