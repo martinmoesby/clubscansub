@@ -42,6 +42,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         IList<EventUser> enrolledUsers = new List<EventUser>();
         private bool isUserSignedUp = false;
         private bool isUserPremium = false;
+        private bool isUserDivepro = false;
         private bool isLoading = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -56,6 +57,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                         var user = await memberService.GetAsync(authState.User.GetIdentityId());
                         currentUser = user;
                         isUserPremium = await memberService.IsUserInRole(user, Userroles.Member);
+                        isUserDivepro = await memberService.IsUserInRole(user, Userroles.Divepro);
                     }
                 }
                 var item = await eventService.GetAsync(EventId.ToString());
@@ -105,7 +107,11 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 if (selectedUser != currentUser.Id)
                 {
 
-                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?"));
+                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?", new ConfirmOptions()
+                    {
+                        OkButtonText = "Yes",
+                        CancelButtonText = "No"
+                    }));
                     doPayForTrip = confirm.Value;
                     notificationMessage = $"User added to this for the event";
                 }

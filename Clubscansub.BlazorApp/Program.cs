@@ -65,7 +65,9 @@ builder.Services.Configure<ServiceOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents(); 
+
 builder.Services.AddRadzenComponents();
 
 builder.Services.AddServerSideBlazor().AddHubOptions(o =>
@@ -140,10 +142,15 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseAntiforgery();
+
 app.UseMiddleware<BlazorLoginMiddleware<ApplicationUser>>();
 
 app.MapControllers();
 app.MapBlazorHub();
+//app.MapRazorComponents<App>()
+//    .AddInteractiveServerRenderMode();
+
 app.MapFallbackToPage("/_Host");
 
 app.Run();

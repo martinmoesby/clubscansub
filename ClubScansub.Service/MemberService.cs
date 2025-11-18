@@ -13,14 +13,13 @@ namespace ClubScansub.Service
 {
     public class MemberService : ServiceBase, IMemberService
     {
-        private readonly ApplicationDbContext context;
+
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IUserStore<ApplicationUser> userStore;
 
         public MemberService(IOptions<ServiceOptions> options, IEmailSender emailSender, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore)
             : base(options, emailSender)
         {
-            context = new ApplicationDbContext(dbContextOptions);
             this.userManager = userManager;
             this.userStore = userStore;
         }
@@ -42,6 +41,7 @@ namespace ClubScansub.Service
 
         public async Task DeleteAsync(ApplicationUser Item)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             context.Attach(Item);
             context.Entry(Item).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await context.SaveChangesAsync();
@@ -50,6 +50,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<ApplicationUser>> GetAllAsync()
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var members = await context.ApplicationUsers.Include(x=>x.AccountTransactions).AsNoTracking().ToListAsync();
 
             foreach (var item in members)
@@ -69,12 +70,14 @@ namespace ClubScansub.Service
                 users.AddRange(roleUsers);
                 users = users.Distinct().ToList(); ;
             }
+            using var context = new ApplicationDbContext(dbContextOptions); 
             var members = await context.ApplicationUsers.Include(x => x.AccountTransactions).Where(x=> users.Contains(x)).AsNoTracking().ToListAsync();
             return members;
         }
 
         public async Task<ApplicationUser> GetAsync(string Id)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var user = await context.ApplicationUsers.Include(x=>x.AccountTransactions).Include(x=>x.Certificates).ThenInclude(x=>x.Certificate).Where(x => x.Id == Id).FirstOrDefaultAsync();
             if (user == null)
                 throw new UserNotFoundException($"User with Id {Id} was not found.");
@@ -149,6 +152,7 @@ namespace ClubScansub.Service
             //    return member;
             member.LockoutEnd = member.LockoutEnd == DateTime.MaxValue ? DateTime.Now : DateTime.MaxValue;
             member.LockoutEnabled = true;
+            using var context = new ApplicationDbContext(dbContextOptions); 
             context.ApplicationUsers.Update(member);
             await context.SaveChangesAsync();
 
@@ -158,6 +162,7 @@ namespace ClubScansub.Service
 
         public async Task<ApplicationUser> AddTransactionAsync(ApplicationUser member, ApplicationUserAccountEntry transaction)
         {
+            using var context = new ApplicationDbContext(dbContextOptions); 
             var user = await context.ApplicationUsers.Include(x => x.AccountTransactions).FirstOrDefaultAsync(x => x.Id == member.Id);
 
             if (user == null)
@@ -173,6 +178,7 @@ namespace ClubScansub.Service
         public IList<ApplicationUser> FindAll(string filter)
         {
             filter = filter.ToLower();
+            using var context = new ApplicationDbContext(dbContextOptions); 
             var users = context.ApplicationUsers.AsQueryable();
             users = users.Where(x=>x.Firstname.ToLower().Contains(filter) || x.Lastname.ToLower().Contains(filter) || x.AccountNumber.Contains(filter));
             return users.ToList();
@@ -180,6 +186,7 @@ namespace ClubScansub.Service
 
         public async Task<IList<Certificate>> GetAvailableCertificatesAsync(bool inclProCertificates)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
             var data = context.Certificates.AsQueryable();
             if (inclProCertificates)
                 return await data.ToListAsync();
@@ -189,6 +196,8 @@ namespace ClubScansub.Service
 
         public async Task CreateUpdateUserCertificate(UserCertificat uc)
         {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
             if (uc.Id != 0)
             {
                 context.Attach(uc);
