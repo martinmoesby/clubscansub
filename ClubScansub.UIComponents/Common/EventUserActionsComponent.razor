@@ -8,6 +8,7 @@
         <RadzenDropDown AllowFiltering="true"
                         AllowClear="true"
                         AllowSelectAll="false"
+                        
                         Data="@filteredUsers"
                         @bind-Value="@selectedUser"
                         TextProperty="@nameof(ApplicationUser.Name)"
@@ -19,7 +20,7 @@
                         ClearSearchAfterSelection
                         AllowVirtualization
                         Style="flex:3;width:100%; white-space:nowrap"
-                        PopupStyle="width:100%; white-space:nowrap"
+                        PopupStyle="width:100%; height:120px; white-space:nowrap"
                         ></RadzenDropDown>
 
 

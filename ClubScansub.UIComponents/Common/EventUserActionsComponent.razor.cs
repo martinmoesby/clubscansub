@@ -80,7 +80,7 @@ namespace ClubScansub.Blazor.UIComponents.Common
         private void enrollExistingUserCallback()
         {
             AddExistingUser.InvokeAsync(selectedUser);
-            filteredUsers = new List<ApplicationUser>();
+            filteredUsers = members;
             selectedUser = string.Empty;
         }
 
@@ -92,6 +92,8 @@ namespace ClubScansub.Blazor.UIComponents.Common
         private void addNewUserCallback(RegisterUserResult registerdUser)
         {
             AddNewUser.InvokeAsync(registerdUser);
+            filteredUsers = members;
+            selectedUser = string.Empty;
         }
     }
 }

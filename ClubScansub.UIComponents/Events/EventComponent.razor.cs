@@ -107,7 +107,11 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 if (selectedUser != currentUser.Id)
                 {
 
-                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?"));
+                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?", new ConfirmOptions()
+                    {
+                        OkButtonText = "Yes",
+                        CancelButtonText = "No"
+                    }));
                     doPayForTrip = confirm.Value;
                     notificationMessage = $"User added to this for the event";
                 }
