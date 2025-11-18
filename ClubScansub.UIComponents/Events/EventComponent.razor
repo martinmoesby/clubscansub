@@ -113,29 +113,33 @@ else
 
             </RadzenStack>
 
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+            <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
                 <SeatComponent Event="@Event" ShowText="false" />
+
+
             </RadzenStack>
 
         </RadzenStack>
 
     </RadzenStack>
 
-    <RadzenStack Gap="0">
-        <RadzenTabs RenderMode="TabRenderMode.Client" SelectedIndex="0" TabPosition="TabPosition.Top">
+    <RadzenStack Gap="5">
+        @* -- THIS DOES WORK --*@
+@*         <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
+            <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
+        </AuthorizeView> *@
+        <RadzenTabs RenderMode="TabRenderMode.Server" SelectedIndex="0" TabPosition="TabPosition.Top">
             <Tabs>
                 <RadzenTabsItem Text="Description" Icon="@IconsTextsAndColors.Icons.INFORMATION">
                     <RadzenText TextStyle="TextStyle.Body2">@(Event?.Divelocation?.Description)</RadzenText>
                 </RadzenTabsItem>
                 <AuthorizeView Roles="Administrator, Owner, Divepro">
                     <RadzenTabsItem Text="Tilmeldte" Icon="@IconsTextsAndColors.Icons.ENROLLED">
-
+                        @* -- THIS DOES NOT WORK --*@
                         <AuthorizeView Roles="Administrator, Owner" Context="action_buttons">
                             <EventUserActionsComponent AddExistingUser="enrollExistingUser" ShowAddNewUser="false" Visible="Event.FreeSpots > 0 && !Event.IsCancelled" />
                         </AuthorizeView>
-
                         <EventUserListComponent EventUsers="@enrolledUsers" OnRemoveUser="removeUserFromEvent"  OnReleaseSpot="releaseReservedSpot" Event="Event"/>
-
                     </RadzenTabsItem>
                 </AuthorizeView>
             </Tabs>

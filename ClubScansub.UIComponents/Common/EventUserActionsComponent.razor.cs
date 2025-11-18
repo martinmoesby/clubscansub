@@ -29,7 +29,19 @@ namespace ClubScansub.Blazor.UIComponents.Common
 
 
         private string selectedUser;
+        private IList<ApplicationUser> members;
         private IList<ApplicationUser> filteredUsers;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                members = await memberService.GetAllAsync();
+                filteredUsers = members;
+                await InvokeAsync(StateHasChanged);
+            }
+
+        }
 
         private void onLoadExistingUsers(LoadDataArgs args)
         {
