@@ -42,6 +42,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         IList<EventUser> enrolledUsers = new List<EventUser>();
         private bool isUserSignedUp = false;
         private bool isUserPremium = false;
+        private bool isUserDivepro = false;
         private bool isLoading = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -56,6 +57,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                         var user = await memberService.GetAsync(authState.User.GetIdentityId());
                         currentUser = user;
                         isUserPremium = await memberService.IsUserInRole(user, Userroles.Member);
+                        isUserDivepro = await memberService.IsUserInRole(user, Userroles.Divepro);
                     }
                 }
                 var item = await eventService.GetAsync(EventId.ToString());

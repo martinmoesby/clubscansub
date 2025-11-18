@@ -14,6 +14,8 @@
                         ValueProperty="@nameof(ApplicationUser.Id)"
                         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         FilterAutoCompleteType="AutoCompleteType.Name"
+                        FilterOperator="StringFilterOperator.Contains"
+                        FilterPlaceholder="Search for name.."
                         ClearSearchAfterSelection
                         AllowVirtualization
                         Style="flex:3;width:100%; white-space:nowrap"
@@ -29,15 +31,3 @@
     <RadzenButton Text="Create..." Size="ButtonSize.Small"  ButtonStyle="ButtonStyle.Success" Shade="Shade.Light" Variant="Variant.Text" Icon="@IconsTextsAndColors.Icons.USER_ADD" Click="addNewUser_Click" Visible="ShowAddNewUser" />
 
 </RadzenStack>
-<style>
-    #popup-UsersDropdown rz-dropdown-panel {
-        width: 400px !important; /* Set desired width */
-    }
-
-    #popup-UsersDropdown {
-        width: 400px !important;
-    }
-    #popup-UsersDropdown rz-dropdown-item {
-        white-space: nowrap;
-    }
-</style>
