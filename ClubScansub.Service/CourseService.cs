@@ -525,7 +525,7 @@ namespace ClubScansub.Service
         {
             using var context = new ApplicationDbContext(dbContextOptions);
 
-            var data = context.CourseTemplates.Include(x => x.Sessions);
+            var data = context.CourseTemplates.Include(x => x.Sessions).ThenInclude(x=>x.Address);
             return await data.ToListAsync();   
         }
 

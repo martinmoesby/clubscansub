@@ -14,6 +14,9 @@
     AllowAlternatingRows="true" 
     AllowRowSelectOnRowClick="true" 
     RowDoubleClick="editEvent">
+    <EmptyTemplate>
+        <BusyLoading isLoading="@isLoading" Message="Loading events..." NoDataMessage="No events with the current filter" />
+    </EmptyTemplate>
     <Template Context="e">
         <EventUserActionsComponent ShowAddNewUser="false" Visible="@(e.EndDateAndTime > DateTime.Now && e.FreeSpots > 0 && !e.IsCancelled)" AddExistingUser="@((args) => enrollUser(e, args))" />
         <EventUserListComponent Event="e" EventUsers="@e.Participants.ToList()" OnRemoveUser="@((args) => removeUser(e, args))" OnReleaseSpot="@(() => releaseSpot(e))" />
@@ -108,7 +111,7 @@
 
 
     private string linkString = string.Empty;
-
+    private bool isLoading = true;
     private IList<Event> allEvents = new List<Event>();
     private IList<Event> filteredEvents = new List<Event>();
 
@@ -130,7 +133,7 @@
             var rootLink = rootUri.EndsWith("/") ? rootUri : rootUri + "/";
             linkString = $"{rootLink}?eventId=";
             allEvents = await eventService.GetAllAsync();
-
+            isLoading = false;
             setFilter(InitialFilters);
             StateHasChanged();
         }
