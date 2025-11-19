@@ -189,18 +189,18 @@
     SiteService siteService { get; set; }
 
     [Parameter]
-    public CourseTemplate Template { get; set; }
+    public CourseTemplate Template { get; set; } 
 
     [Parameter]
     public EventCallback<CourseTemplate> OnSave { get; set; }
 
-    private RadzenDropDown<CourseTypeEnum> courseTypeDropdown;
+    private RadzenDropDown<CourseTypeEnum>? courseTypeDropdown;
 
     private IList<Certificate> instructorCertificates = new List<Certificate>();
     private IList<Address> addresses = new List<Address>();
 
-    private CourseTemplate originialTemplate;
-    private IList<CourseSessionTemplate> originalSessions;
+    private CourseTemplate? originialTemplate;
+    private IList<CourseSessionTemplate>? originalSessions;
 
     private string selectedSessionNumber = "1";
 

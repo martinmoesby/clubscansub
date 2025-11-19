@@ -28,8 +28,11 @@
                 RowDoubleClick="@onRowDblCLick"
                 CellContextMenu="@onCellContextMenu">
     <LoadingTemplate>
-        <RadzenProgressBarCircular />
+        <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
     </LoadingTemplate>
+    <EmptyTemplate>
+        <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
+    </EmptyTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="120px" Pickable="false" TextAlign="TextAlign.Left" Sortable="false">
             <Template Context="location">
@@ -100,7 +103,7 @@
 
     private IList<Divelocation> sites = new List<Divelocation>();
     IList<Divelocation> selectedSites = new List<Divelocation>();
-    private bool isLoading = false;
+    private bool isLoading = true;
     private DiveTypeEnum[] typeFilter = [DiveTypeEnum.TechDive, DiveTypeEnum.NatureDive, DiveTypeEnum.WreckDive];
     private string searchFilter = "";
     private RadzenDataGrid<Divelocation> grid { get; set; }
@@ -125,6 +128,7 @@
         if (firstRender)
         {
             await getSitesByTypeFilter();
+            isLoading = false;
             StateHasChanged();
         }
 
@@ -196,7 +200,6 @@
                 showEditDialog(selectedSites.FirstOrDefault());
                 break;
             default:
-                Console.WriteLine($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, SiteName: {args.Data.Name}");
                 break;
         }
     }

@@ -203,7 +203,6 @@
 
     private async void saveEditedTemplate(CourseTemplate template)
     {
-        Console.WriteLine(template.TemplateName);
         await courseService.UpdateCourseTemplateAsync(template);
         dialogService.Close();
     }

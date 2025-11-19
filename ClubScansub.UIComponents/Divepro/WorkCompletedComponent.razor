@@ -1,18 +1,20 @@
 ﻿@using ClubScansub.Service
 
-<RadzenDataGrid 
-AllowGrouping 
-AllowSorting
-Data="@instructorWork" 
-TItem="InstructorWork" 
-AllowFiltering 
-AllowAlternatingRows="false"
-Render="OnRender" 
-FilterMode="FilterMode.CheckBoxList" 
-HideGroupedColumn="true" 
-AllGroupsExpanded="false" 
-Style="flex:1" 
->
+
+<RadzenDataGrid AllowSorting
+                AllowMultiColumnSorting="true"
+                Data="@instructorWork"
+                TItem="InstructorWork"
+                AllowFiltering
+                AllowAlternatingRows="false"
+                Render="OnRender"
+                FilterMode="FilterMode.CheckBoxList"
+                AllowGrouping 
+                HideGroupedColumn="false"
+                AllGroupsExpanded="false"
+                Style="flex:1">
+
+
 
     <GroupHeaderTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
@@ -22,7 +24,9 @@ Style="flex:1"
             <RadzenText Text="@($"Total hours: {GetTotal(context).ToString("N2")}")" TextStyle="TextStyle.Body2" />
         </RadzenStack>
     </GroupHeaderTemplate>
-
+    <EmptyTemplate>
+        <BusyLoading isLoading="@isLoading" Message="Loading completed work data..." NoDataMessage="No workdata found" />
+    </EmptyTemplate>
     <Columns>
         @if (!SingleUserResult)
         {
@@ -32,10 +36,11 @@ Style="flex:1"
                 </Template>
                 <GroupFooterTemplate>
                     @context.Data.Key - total:<b>@(String.Format("{0:n2}", context.Data.Items.Cast<InstructorWork>().Sum(x => x.Hours)))</b>
-                </GroupFooterTemplate>
+                </GroupFooterTemplate> 
 
             </RadzenDataGridColumn>
-        }
+        } 
+
 
         <RadzenDataGridColumn Title="Year" GroupProperty="@nameof(InstructorWork.Year)" Width="100px" Filterable FilterProperty="@nameof(InstructorWork.Year)" Property="@nameof(InstructorWork.Year)">
             <Template Context="item">
@@ -43,7 +48,7 @@ Style="flex:1"
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Title="Month" GroupProperty="@nameof(InstructorWork.Month)" Width="140px" SortProperty="@nameof(InstructorWork.MonthNumber)" Filterable Property="@nameof(InstructorWork.Month)">
+        <RadzenDataGridColumn Title="Month" GroupProperty="@nameof(InstructorWork.Month)" Width="140px" Sortable SortProperty="@nameof(InstructorWork.MonthNumber)" Filterable Property="@nameof(InstructorWork.Month)">
             <Template Context="item">
                 <RadzenText Text="@item.Month" />
             </Template>
@@ -89,33 +94,18 @@ Style="flex:1"
     [Parameter]
     public ApplicationUser? User { get; set; } = null;
 
-    private IEnumerable<InstructorWork> instructorWork;
+    private IList<InstructorWork> instructorWork;
 
     private bool isLoading = true;
     private int count = 0;
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        // Console.WriteLine("OnInitializedAsync:" + (instructorWork == null).ToString());
-        // var data = await courseService.GetCourseSessionInstructorAsync();
-        // instructorWork = data.Select(x => new InstructorWork()
-        //     {
-        //         CourseId = x.CourseSession.Course.Id,
-        //         CourseName = x.CourseSession.Course.CourseName,
-        //         SessionId = x.CourseSessionId,
-        //         SessionName = x.CourseSession.SessionName,
-        //         InstructorId = x.InstructorId,
-        //         InstructorName = x.Instructor.Name,
-        //         StartDate = x.CourseSession.StartDateAndTime,
-        //         EndDate = x.CourseSession.EndDateAndTime,
-        //         Duration = x.CourseSession.Duration
-        //     }).AsQueryable();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        Console.WriteLine("OnAfterRenderAsync:" + (instructorWork == null).ToString());
         if (firstRender)
         {
             var data = await courseService.GetCourseSessionInstructorAsync();
@@ -135,8 +125,8 @@ Style="flex:1"
                     StartDate = x.CourseSession.StartDateAndTime,
                     EndDate = x.CourseSession.EndDateAndTime,
                     Duration = x.CourseSession.Duration
-                }).AsQueryable().Where(x=>x.Participants != 0);
-
+                }).AsQueryable().Where(x=>x.Participants != 0).ToList();
+            isLoading = false;
             StateHasChanged();
         }
     }
@@ -169,7 +159,6 @@ Style="flex:1"
     {
         try
         {
-            Console.WriteLine("Current Level:" + group.Level + ", Current Descriptor:" + group.GroupDescriptor.GetTitle());
             var data = group.Data.Items.Cast<InstructorWork>();
             return data.Sum(x => x.Hours);
             // return 0;
@@ -177,9 +166,6 @@ Style="flex:1"
         }
         catch (Exception ex)
         {
-            Console.WriteLine(group.Data.Key);
-            Console.WriteLine(group.Data.Items.Cast<InstructorWork>().Count().ToString());
-            Console.WriteLine(ex.Message);
             return 0;
         }
     }
