@@ -1,0 +1,33 @@
+﻿@if (isLoading)
+{
+    <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="true" Style="width:100%;">
+        <Template>
+            <RadzenText TextStyle="TextStyle.Caption">@Message</RadzenText>
+        </Template>
+    </RadzenProgressBarCircular>
+}
+else
+{
+    <RadzenStack>
+@*         <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" />
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" />
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" />
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center" />
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Overline" TextAlign="TextAlign.Center" />
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Button" TextAlign="TextAlign.Center" />
+ *@
+        <RadzenText Text="@NoDataMessage" TextStyle="TextStyle.Caption" TextAlign="TextAlign.Center" />
+    </RadzenStack>
+}
+
+@code {
+
+    [Parameter]
+    public bool isLoading { get; set; }
+
+    [Parameter]
+    public string? Message { get; set; } = "Loading...";
+
+    [Parameter]
+    public string NoDataMessage { get; set; } = "No Data Found";
+}
