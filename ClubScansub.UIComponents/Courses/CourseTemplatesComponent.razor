@@ -9,6 +9,9 @@
 </RadzenStack>
 
 <RadzenDataGrid Data="@filteredTemplates" TItem="CourseTemplate" AllowAlternatingRows="false" RowDoubleClick="onEdit" @ref=grid>
+    <EmptyTemplate>
+        <BusyLoading isLoading="@isLoading" Message="Loading course templates..." NoDataMessage="No course templates found with the selected filters." />
+    </EmptyTemplate>
     <Template Context="sessiondetails">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText Text="Course sessions" TextStyle="TextStyle.Subtitle1"></RadzenText>
@@ -108,6 +111,7 @@
     private IList<CourseTemplate> templates = new List<CourseTemplate>();
     private IList<CourseTemplate> filteredTemplates = new List<CourseTemplate>();
     private CourseTypeEnum selectedCourseType = CourseTypeEnum.BaseCourse;
+    private bool isLoading = true;
 
     private Dictionary<CourseTypeEnum, bool> initialFilters = new Dictionary<CourseTypeEnum, bool>()
     {
@@ -123,6 +127,7 @@
         if (firstRender)
         {
             templates = await courseService.GetTemplatesAsync();
+            isLoading = false;
             applyTemplateFilter(initialFilters);
         }
     }

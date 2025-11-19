@@ -17,6 +17,9 @@
 <RadzenStack>
 
     <RadzenDataGrid Data="@filteredCourses.OrderBy(x=>x.StartDateAndTime)" TItem="Course" AllowSorting PageSize="14" AllowPaging AllowAlternatingRows="false">
+        <EmptyTemplate>
+            <BusyLoading isLoading="@isLoading" Message="Loading Courses..." NoDataMessage="No courses found with the current filter"/>
+        </EmptyTemplate>
 
         <Template Context="course">
             <RadzenTabs>
@@ -136,7 +139,7 @@
     private IList<Course> filteredCourses = new List<Course>();
     private bool showOnlyExecutedCourses = true;
     private string completedFilterString = "";
-
+    private bool isLoading = true;
     private Dictionary<CourseTypeEnum, bool> completedCourseTypeFilters = new Dictionary<CourseTypeEnum, bool>
             {
             {    CourseTypeEnum.BaseCourse, true },
@@ -152,6 +155,8 @@
         {
             await reloadCourses();
             applyFilter();
+            isLoading = false;
+            StateHasChanged();
         }
     }
 
