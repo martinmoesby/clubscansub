@@ -4,16 +4,16 @@
     <NotAuthorized>
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
-            <RadzenButton Icon="login" Size=ButtonSize.Medium ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Click="OnLoginClick" />
-            <RadzenButton Icon="person_add" Size=ButtonSize.Medium ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" Click="OnRegisterClick" />
+            <RadzenButton Icon="login" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Base" Shade="Shade.Lighter" Click="OnLoginClick" Variant="Variant.Text" />
+            <RadzenButton Icon="person_add" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Base" Shade="Shade.Lighter" Click="OnRegisterClick" Variant="Variant.Text" />
         </RadzenStack>
 
     </NotAuthorized>
     <Authorized>
         <form method="post" action="/Account/LogOut">
             <RadzenStack Orientation="Orientation.Horizontal" Gap="10" AlignItems="AlignItems.Stretch">
-                <RadzenButton Text="@userName" Click="OnManageClick" Size=ButtonSize.Medium ButtonStyle="ButtonStyle.Info" Shade="Shade.Dark" Icon="person" Variant="Variant.Text" />
-                <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Size=ButtonSize.Medium ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter" />
+                <RadzenButton Text="@userName" Click="OnManageClick" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Base" Icon="person" Variant="Variant.Text" />
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="logout" Size=ButtonSize.Small ButtonStyle="ButtonStyle.Base"  Variant="Variant.Text" />
             </RadzenStack>
         </form>
     </Authorized>

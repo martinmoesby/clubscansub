@@ -30,17 +30,20 @@ namespace ClubScansub.BlazorApp.Shared
         private ThemeService themeService { get; set; }
 
         private MenuItemDisplayStyle menuItemDisplayStyle;
-        private string[] menuWidths = ["0px;","80px", "160px"];
+        private string[] menuWidths = ["0px;","50px", "130px"];
         private string selectedMenuWidth = string.Empty;
 
         string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
-        private MenuState menuState;
+        //private MenuState menuState;
 
         private bool sidebarExpanded = false;
-
+        private string menuCollapseIcon = "chevron";
         protected override void OnInitialized()
         {
-            setMenuState();
+            //setMenuState();
+            selectedMenuWidth = "160px";
+            menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
+            themeService.SetTheme("standard");
         }
 
 
@@ -52,20 +55,21 @@ namespace ClubScansub.BlazorApp.Shared
 
         void SidebarToggleClick()
         {
-            menuState++;
-            if ((int)menuState > 2)
-                menuState = 0;
-            setMenuState();
+            sidebarExpanded = !sidebarExpanded;
+            //menuState++;
+            //if ((int)menuState > 2)
+            //    menuState = 0;
+            //setMenuState();
         }
 
         private string logoFilename = "";
         private bool isDarkTheme = false;
-        internal enum MenuState
-        {
-            Hidden,
-            IconAndText,
-            IconOnly
-        }
+        //internal enum MenuState
+        //{
+        //    Hidden,
+        //    IconAndText,
+        //    IconOnly
+        //}
         protected override async Task OnInitializedAsync()
         {
 
@@ -105,25 +109,9 @@ namespace ClubScansub.BlazorApp.Shared
 
         private void setMenuState()
         {
-            switch (menuState)
-            {
-                case MenuState.Hidden:
-                    selectedMenuWidth = menuWidths[0];
-                    sidebarExpanded = false;
-                    break;
-                case MenuState.IconOnly:
-                    menuItemDisplayStyle = MenuItemDisplayStyle.Icon;
-                    selectedMenuWidth = menuWidths[1];
-                    sidebarExpanded = true;
-                    break;
-                case MenuState.IconAndText:
-                    selectedMenuWidth = menuWidths[2];
-                    menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
-                    sidebarExpanded = true;
-                    break;
-                default:
-                    break;
-            }
+            selectedMenuWidth = menuItemDisplayStyle == MenuItemDisplayStyle.Icon ? menuWidths[2] : menuWidths[1];
+            menuItemDisplayStyle = menuItemDisplayStyle == MenuItemDisplayStyle.Icon ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon;
+
         }
     }
 }
