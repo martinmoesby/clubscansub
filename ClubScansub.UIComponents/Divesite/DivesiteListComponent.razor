@@ -1,93 +1,172 @@
 ﻿@using ClubScansub.Service
+<RadzenStack Gap="5">
 
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
+        <RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Style="flex:1" AlignItems="AlignItems.Center" Gap="5">
+                <RadzenToggleButton Size="ButtonSize.Small" title="Show pool/confined water locations" Change="getSitesByTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.PoolDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.PoolDive)" />
+                <RadzenToggleButton Size="ButtonSize.Small" title="Show nature/muck dive locations " Change="getSitesByTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.NatureDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.NatureDive)" />
+                <RadzenToggleButton Size="ButtonSize.Small" title="Show wreck dive locations" Change="getSitesByTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.WreckDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.WreckDive)" />
+                <RadzenToggleButton Size="ButtonSize.Small" title="Show Technical dive locations" Change="getSitesByTypeFilter" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" @bind-Value="diveTypeFilter[DiveTypeEnum.TechDive]" Icon="@IconsTextsAndColors.GetDiveTypeIcon(DiveTypeEnum.TechDive)" />
+            </RadzenStack>
+        </RadzenStack>
+        <SearchComponent Reset="@resetFilter" Search="@applySearch" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
+            <RadzenToggleButton Variant="Variant.Text" Icon="grid_view" ButtonStyle="ButtonStyle.Success" ToggleButtonStyle="ButtonStyle.Success" @bind-Value="@showAsCards" Size="ButtonSize.Small" ToggleShade="Shade.Darker" Shade="Shade.Lighter" Click="toggleView" />
+            <RadzenToggleButton Variant="Variant.Text" Icon="lists" ButtonStyle="ButtonStyle.Success" ToggleButtonStyle="ButtonStyle.Success" @bind-Value="@showAsList" Size="ButtonSize.Small" Shade="Shade.Lighter" ToggleShade="Shade.Darker" Click="toggleView" />
 
-    <SearchComponent Reset="@resetFilter" Search="@applySearch" />
-    <RadzenButton Icon="add_location" Size="ButtonSize.ExtraSmall" Text="New divesite" Variant="Variant.Text" ButtonStyle="ButtonStyle.Success" />
+@*             <RadzenIcon Icon="lists" @onclick="toggleView" Visible="!showAsList" Style="cursor:pointer" />
+            <RadzenIcon Icon="grid_view" @onclick="toggleView" Visible="showAsList" Style="cursor:pointer" /> *@
+            <RadzenButton Icon="add_location" Size="ButtonSize.ExtraSmall" Text="New..." Variant="Variant.Text" ButtonStyle="ButtonStyle.Success" />
+        </RadzenStack>
+
+    </RadzenStack>
+    @if (showAsCards)
+    {
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal" Wrap="FlexWrap.Wrap" Gap="5">
+            @if (isLoading)
+            {
+                <BusyLoading Message="Getting divesites" NoDataMessage="No divesites available" isLoading />
+            }
+            else
+            {
+                if (sites.Count() == 0)
+                {
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenText TextStyle="TextStyle.Body1" Text="No divesites found" />
+                    </RadzenStack>
+                }
+                else
+                {
+
+                    @foreach (var item in sites)
+                    {
+                        <RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0" @ondblclick="() => showEditDialog(item)">
+                            <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+                                <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@(item.Name)</b></RadzenText>
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                                        <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(item.DiveType)" />
+                                        <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.DefaultEventType)" />
+                                    </RadzenStack>
+                                </RadzenStack>
+                                <RadzenStack Style="width:335px;height:180px;overflow:hidden">
+                                    <img src="@ImageUtils.GetImageSrc(item.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
+                                </RadzenStack>
+
+
+                                    <RadzenStack class="w-100" Style="height:100px;">
+                                        <RadzenText TextStyle="TextStyle.Caption" Style="text-overflow:ellipsis;overflow:scroll;"><b>@item.Description</b></RadzenText>
+                                    </RadzenStack>
+
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                }
+            }
+
+        </RadzenStack>
+    }
+
+    @if (showAsList)
+    {
+
+        <RadzenDataGrid Data="@sites"
+                        @ref=@grid
+                        @bind-Value=@selectedSites
+                        TItem="Divelocation"
+                        AllowVirtualization="true"
+                        AllowAlternatingRows=false
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowFiltering="false"
+                        AllowColumnPicking="false"
+                        ShowPagingSummary="true"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.Or"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                        PageSize="15"
+                        Style="flex:1;"
+                        SelectionMode="DataGridSelectionMode.Single"
+                        RowDoubleClick="@onRowDblCLick"
+                        CellContextMenu="@onCellContextMenu">
+            <LoadingTemplate>
+                <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
+            </LoadingTemplate>
+            <EmptyTemplate>
+                <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
+            </EmptyTemplate>
+            <Columns>
+                <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="120px" TextAlign="TextAlign.Left" Sortable="false">
+                    <Template Context="location">
+                        <RadzenStack Style="width:120px;height:60px;overflow:hidden">
+                            <img src="@ImageUtils.GetImageSrc(location.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Divelocation" Title="Name" MinWidth="100px" SortProperty="Name">
+                    <Template>
+                        <RadzenStack AlignItems="AlignItems.Start" Orientation="Orientation.Horizontal">
+                            <RadzenStack>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Subtitle1">@context.Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" Style="text-overflow:ellipsis;overflow:hidden;">
+                                    @context.Description
+                                </RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Divelocation" Title="Dive Type" Property="DiveType" Sortable SortProperty="@nameof(Divelocation.DiveType)" Width="80px">
+                    <Template>
+                        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+                            <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(context.DiveType)" Style="font-size:1.5rem;" IconColor="@Colors.SecondaryLight" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Divelocation" Title="Event type" Property="DefaultEventType" Width="80px">
+                    <Template>
+                        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+                            <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(context.DefaultEventType)" Style="font-size:1.5rem;" IconColor="@Colors.SecondaryLight" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Divelocation" Title="Meeting location" Property="MeetingLocation.Name" Width="140px"></RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Divelocation" Title="Depth" Width="120px" SortProperty="MinDepth">
+                    <Template Context="Location">
+                        <RadzenRow AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="vertical_align_top" IconStyle="IconStyle.Primary" />
+                            <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MinDepth} m.")</RadzenText>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="vertical_align_bottom" IconStyle="IconStyle.Primary" />
+                            <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MaxDepth} m.")</RadzenText>
+                        </RadzenRow>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Visible="false" Pickable="true" TItem="Divelocation" Title="Economics" Width="160px">
+                    <Template Context="location">
+                        <RadzenRow>
+                            <RadzenIcon Icon="payments" IconStyle="IconStyle.Primary" />
+                            <RadzenText Text="@location.Price.ToString("C2")" />
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">
+                            <RadzenIcon Icon="groups" IconStyle="IconStyle.Primary" />
+                            <RadzenText Text="@($"{location.MinParticipants.ToString()} - {location.MaxParticipants.ToString()}")" />
+                        </RadzenRow>
+                    </Template>
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+    }
 
 </RadzenStack>
-
-<RadzenDataGrid Data="@sites"
-                @ref=@grid
-                @bind-Value=@selectedSites
-                TItem="Divelocation"
-                AllowVirtualization="true"
-                AllowAlternatingRows=false
-                AllowPaging="true"
-                AllowSorting="true"
-                AllowFiltering="false"
-                AllowColumnPicking="false"
-                ShowPagingSummary="true"
-                FilterMode="FilterMode.Simple"
-                LogicalFilterOperator="LogicalFilterOperator.Or"
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                PageSize="8"
-                Style="width:100%;height:100%;"
-                SelectionMode="DataGridSelectionMode.Single"
-                RowDoubleClick="@onRowDblCLick"
-                CellContextMenu="@onCellContextMenu">
-    <LoadingTemplate>
-        <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
-    </LoadingTemplate>
-    <EmptyTemplate>
-        <BusyLoading isLoading="@isLoading" Message="Loading divesites..." NoDataMessage="No divesites with the current filter" />
-    </EmptyTemplate>
-    <Columns>
-        <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="120px" Pickable="false" TextAlign="TextAlign.Left" Sortable="false">
-            <Template Context="location">
-                <img src="@ImageUtils.GetImageSrc(location.Image?.ImageData)" height="0" class="img rounded w-100 h-100" />
-            </Template>
-        </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn TItem="Divelocation" Title="Name" MinWidth="100px" Frozen="true" Pickable="false" SortProperty="Name">
-            <Template Context="Location">
-                <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Stretch">
-                    <RadzenColumn Size="12">
-                        <RadzenText TextStyle="TextStyle.Subtitle1">@Location.Name</RadzenText>
-
-                    </RadzenColumn>
-                </RadzenRow>
-                <RadzenRow>
-                    <RadzenColumn Size="12">
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Style="text-overflow:ellipsis;overflow:hidden;">
-                            @Location.Description
-                        </RadzenText>
-                    </RadzenColumn>
-                </RadzenRow>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Divelocation" Title="Dive Type" Property="DiveType" Width="140px"></RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Divelocation" Title="Event type" Property="DefaultEventType" Width="140px"></RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Divelocation" Title="Meeting location" Property="MeetingLocation.Name" Width="140px"></RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Divelocation" Title="Depth" Width="120px" SortProperty="MinDepth">
-            <Template Context="Location">
-                <RadzenRow AlignItems="AlignItems.Start">
-                    <RadzenIcon Icon="vertical_align_top" IconStyle="IconStyle.Primary" />
-                    <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MinDepth} m.")</RadzenText>
-                </RadzenRow>
-                <RadzenRow AlignItems="AlignItems.Start">
-                    <RadzenIcon Icon="vertical_align_bottom" IconStyle="IconStyle.Primary" />
-                    <RadzenText TextStyle="TextStyle.Body2">@($"{Location.MaxDepth} m.")</RadzenText>
-                </RadzenRow>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Visible="false" Pickable="true" TItem="Divelocation" Title="Economics" Width="160px">
-            <Template Context="location">
-                <RadzenRow>
-                    <RadzenIcon Icon="payments" IconStyle="IconStyle.Primary" />
-                    <RadzenText Text="@location.Price.ToString("C2")" />
-                </RadzenRow>
-                <RadzenRow AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">
-                    <RadzenIcon Icon="groups" IconStyle="IconStyle.Primary" />
-                    <RadzenText Text="@($"{location.MinParticipants.ToString()} - {location.MaxParticipants.ToString()}")" />
-                </RadzenRow>
-            </Template>
-        </RadzenDataGridColumn>
-
-    </Columns>
-
-</RadzenDataGrid>
 
 @code {
     [Inject]
@@ -104,17 +183,27 @@
     private IList<Divelocation> sites = new List<Divelocation>();
     IList<Divelocation> selectedSites = new List<Divelocation>();
     private bool isLoading = true;
-    private DiveTypeEnum[] typeFilter = [DiveTypeEnum.TechDive, DiveTypeEnum.NatureDive, DiveTypeEnum.WreckDive];
+    private Dictionary<DiveTypeEnum, bool> diveTypeFilter = new Dictionary<DiveTypeEnum, bool>
+    {
+        { DiveTypeEnum.PoolDive, true },
+        { DiveTypeEnum.NatureDive, true },
+        { DiveTypeEnum.WreckDive, true },
+        { DiveTypeEnum.TechDive, false },
+    };
+
     private string searchFilter = "";
     private RadzenDataGrid<Divelocation> grid { get; set; }
 
+    private bool showAsList = false;
+    private bool showAsCards = true;
+
     private DialogOptions editDialogOptions = new DialogOptions()
-        {
-            Width = "800px",
-            Height = "600px",
-            AutoFocusFirstElement = true,
-            CloseDialogOnEsc = true,
-        };
+    {
+        Width = "800px",
+        Height = "600px",
+        AutoFocusFirstElement = true,
+        CloseDialogOnEsc = true,
+    };
 
 
     protected override async Task OnInitializedAsync()
@@ -137,11 +226,18 @@
     private async Task getSitesByTypeFilter()
     {
         isLoading = true;
+        var selectedDiveTYpes = diveTypeFilter.Where(x => x.Value == true).Select(x => x.Key);
 
-        sites = (await siteService.GetAllAsync()).Where(x => typeFilter.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
+        sites = (await siteService.GetAllAsync()).Where(x => selectedDiveTYpes.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
 
         isLoading = false;
         StateHasChanged();
+    }
+
+    private void toggleView()
+    {
+        showAsCards = !showAsCards;
+        showAsList = !showAsCards;
     }
 
     private async void applySearch(string filter)
@@ -230,11 +326,11 @@
             await siteService.UpdateAsync(site);
             dialogService.Close();
             notificationService.Notify(new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Success",
-                    Detail = $"Site '{site.Name}' has been updated"
-                }
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = $"Site '{site.Name}' has been updated"
+            }
             );
             await getSitesByTypeFilter();
 
@@ -256,11 +352,11 @@
             await siteService.DeleteAsync(site);
 
             notificationService.Notify(new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Success",
-                    Detail = $"Site '{siteName}' has been deleted"
-                }
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = $"Site '{siteName}' has been deleted"
+            }
             );
 
             await getSitesByTypeFilter();
