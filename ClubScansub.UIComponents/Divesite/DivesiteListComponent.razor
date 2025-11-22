@@ -12,8 +12,8 @@
         </RadzenStack>
         <SearchComponent Reset="@resetFilter" Search="@applySearch" />
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10">
-            <RadzenToggleButton Variant="Variant.Text" Icon="lists" ButtonStyle="ButtonStyle.Success" ToggleButtonStyle="ButtonStyle.Success" @bind-Value="@showAsList" Size="ButtonSize.Small" Shade="Shade.Lighter" ToggleShade="Shade.Darker" Click="toggleView" />
             <RadzenToggleButton Variant="Variant.Text" Icon="grid_view" ButtonStyle="ButtonStyle.Success" ToggleButtonStyle="ButtonStyle.Success" @bind-Value="@showAsCards" Size="ButtonSize.Small" ToggleShade="Shade.Darker" Shade="Shade.Lighter" Click="toggleView" />
+            <RadzenToggleButton Variant="Variant.Text" Icon="lists" ButtonStyle="ButtonStyle.Success" ToggleButtonStyle="ButtonStyle.Success" @bind-Value="@showAsList" Size="ButtonSize.Small" Shade="Shade.Lighter" ToggleShade="Shade.Darker" Click="toggleView" />
 
 @*             <RadzenIcon Icon="lists" @onclick="toggleView" Visible="!showAsList" Style="cursor:pointer" />
             <RadzenIcon Icon="grid_view" @onclick="toggleView" Visible="showAsList" Style="cursor:pointer" /> *@
@@ -44,18 +44,22 @@
                     {
                         <RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0" @ondblclick="() => showEditDialog(item)">
                             <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+                                <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@(item.Name)</b></RadzenText>
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                                        <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(item.DiveType)" />
+                                        <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(item.DefaultEventType)" />
+                                    </RadzenStack>
+                                </RadzenStack>
                                 <RadzenStack Style="width:335px;height:180px;overflow:hidden">
                                     <img src="@ImageUtils.GetImageSrc(item.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
                                 </RadzenStack>
-                                <RadzenStack Gap="5">
 
-                                    <RadzenText TextStyle="TextStyle.Body2"><b>@(item.Name)</b></RadzenText>
 
                                     <RadzenStack class="w-100" Style="height:100px;">
                                         <RadzenText TextStyle="TextStyle.Caption" Style="text-overflow:ellipsis;overflow:scroll;"><b>@item.Description</b></RadzenText>
                                     </RadzenStack>
 
-                                </RadzenStack>
                             </RadzenStack>
                         </RadzenCard>
                     }
@@ -83,7 +87,7 @@
                         LogicalFilterOperator="LogicalFilterOperator.Or"
                         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                        PageSize="8"
+                        PageSize="15"
                         Style="flex:1;"
                         SelectionMode="DataGridSelectionMode.Single"
                         RowDoubleClick="@onRowDblCLick"
@@ -190,8 +194,8 @@
     private string searchFilter = "";
     private RadzenDataGrid<Divelocation> grid { get; set; }
 
-    private bool showAsList = true;
-    private bool showAsCards = false;
+    private bool showAsList = false;
+    private bool showAsCards = true;
 
     private DialogOptions editDialogOptions = new DialogOptions()
     {
