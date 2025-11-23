@@ -317,7 +317,7 @@
 
     private async void requestEvent(Divelocation fordivesite)
     {
-        await dialogService.OpenAsync<RequestEventComponent>("Request Dive Trip", new Dictionary<string, object>
+        await dialogService.OpenAsync<RequestEventComponent>($"Suggest trip to {fordivesite.Name}", new Dictionary<string, object>
         {
             { "Divesite", fordivesite },
             {  "OnRequestSubmitted", EventCallback.Factory.Create<RequestEventDTO>(this, eventRequested)  }
