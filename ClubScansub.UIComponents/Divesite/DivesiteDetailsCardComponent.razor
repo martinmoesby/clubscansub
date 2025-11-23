@@ -1,0 +1,56 @@
+﻿<RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0" @ondblclick="() => OnEdit.InvokeAsync(Divesite)">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+        <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(Divesite.DiveType)" />
+                <RadzenText TextStyle="TextStyle.Body1" Style="text-overflow:ellipsis;overflow:hidden;width:200px;text-wrap:nowrap;">@(Divesite.Name)</RadzenText>
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(Divesite.DefaultEventType)" IconColor="@IconsTextsAndColors.GetEventColor(Divesite.DefaultEventType)" />
+                <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+            </RadzenStack>
+
+        </RadzenStack>
+        <RadzenStack Style="width:335px;height:180px;overflow:hidden">
+            <img src="@ImageUtils.GetImageSrc(Divesite.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
+        </RadzenStack>
+
+
+        <RadzenStack class="w-100" Style="height:100px;">
+            <RadzenText TextStyle="TextStyle.Caption" Style="text-overflow:ellipsis;overflow:scroll;">@Divesite.Description</RadzenText>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
+                <RadzenIcon Icon="location_on" IconStyle="IconStyle.Danger" />
+                <RadzenText TextStyle="TextStyle.Caption">@Divesite.MeetingLocation?.Name</RadzenText>
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2">
+                    <RadzenIcon Icon="vertical_align_top" IconStyle="IconStyle.Success" />
+                    <RadzenText TextStyle="TextStyle.Caption">@($"{Divesite.MinDepth} m.")</RadzenText>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2">
+                    <RadzenIcon Icon="vertical_align_bottom" IconStyle="IconStyle.Danger" />
+                    <RadzenText TextStyle="TextStyle.Caption">@($"{Divesite.MaxDepth} m.")</RadzenText>
+                </RadzenStack>
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenStack>
+</RadzenCard>
+@code {
+    [Parameter]
+    public Divelocation Divesite { get; set; }
+
+    [Parameter]
+    public EventCallback<Divelocation> OnEdit { get; set; }
+}
