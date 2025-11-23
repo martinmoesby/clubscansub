@@ -1,0 +1,74 @@
+﻿@using ClubScansub.Service
+@using System.Threading.Tasks
+<RadzenStack orientation="Orientation.Vertical" Style="width:100%;height:100%;">
+    <RadzenCard Style="width:100%;height:100%;">
+        <ChildContent>
+            <RadzenHeading Size="H3" Style="margin-bottom:10px;">Request trip to @Divesite.Name</RadzenHeading>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="10px">
+                <RadzenText TextStyle="TextStyle.Body1">Select proposed dates for the event:</RadzenText>
+                <RadzenDatePicker @bind-Value="proposedDates" Multiple="true" Style="width:100%;" Placeholder="Select proposed dates..." />
+                <RadzenText TextStyle="TextStyle.Body1">Select divers to invite:</RadzenText>
+                <RadzenDropDown @bind-Value="selectedDivers" Data="@diverSelections" TextProperty="Name" ValueProperty="Id" Multiple AllowFiltering FilterAutoCompleteType="AutoCompleteType.On">
+
+                </RadzenDropDown>
+            </RadzenStack>
+            <RadzenButton Text="Submit Request" Icon="send" Style="margin-top:10px;" Click="@OnSubmitRequest" />
+        </ChildContent>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+        [Inject]
+        private UserService UserService { get; set; }
+
+        [Parameter]
+        public Divelocation Divesite { get; set; }
+
+        [Parameter]
+        public EventCallback<Models.DTO.RequestEventDTO> OnRequestSubmitted { get; set; }
+
+    private Models.DTO.RequestEventDTO requestEvent;
+
+    private IEnumerable<DiverSelection> diverSelections = [];
+
+    private class DiverSelection
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+
+    private async Task<IEnumerable<DiverSelection>> GetDivers()
+    {
+        // Fetch divers from the UserService
+        var users =await UserService.GetUsersByRolesAsync(Userroles.Member);
+        return users.Select(x=> new DiverSelection
+        {
+            Id = x.Id,
+            Name = x.Name
+        }).ToList().AsEnumerable();
+    }
+
+    private List<string> selectedDivers = new List<string>();
+    private string[] divers = [];
+    private DateOnly[] proposedDates = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            diverSelections = await GetDivers();
+            StateHasChanged();
+        }
+    }
+
+
+    private void OnSubmitRequest()
+    {
+        divers = selectedDivers.ToArray();
+        requestEvent = new Models.DTO.RequestEventDTO(Divesite.Id,proposedDates, divers);
+        // Logic to handle the event request submission
+        OnRequestSubmitted.InvokeAsync(requestEvent);
+    }
+
+}

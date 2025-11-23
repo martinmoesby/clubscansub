@@ -1,4 +1,5 @@
-﻿@using ClubScansub.Service
+﻿@using ClubScansub.Models.DTO
+@using ClubScansub.Service
 <RadzenStack Gap="5">
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
@@ -314,17 +315,26 @@
 
     }
 
-    private void requestEvent(Divelocation fordivesite)
+    private async void requestEvent(Divelocation fordivesite)
     {
+        await dialogService.OpenAsync<RequestEventComponent>("Request Dive Trip", new Dictionary<string, object>
+        {
+            { "Divesite", fordivesite },
+            {  "OnRequestSubmitted", EventCallback.Factory.Create<RequestEventDTO>(this, eventRequested)  }
+        });
+
         //TODO: Create a dialog for entering specific information about the request: 
         // No of people wanting this trip
         // Names opf divers wanting this trip
         // Specific dates
-        dialogService.Alert($"I would like to request a divetrip for this location:{fordivesite.Name}", "Event request");
     }
 
-    private void closeDialog()
+    private async void eventRequested(RequestEventDTO requestedEvent)
     {
+        var requestedEventLocation = sites.FirstOrDefault(x => x.Id == requestedEvent.DivelocationId);
+
+        await dialogService.Alert($"Request for a divetrip to divelocation '{requestedEventLocation.Name.ToString()}' has been submitted", "Event request");
         dialogService.Close();
     }
+
 }
