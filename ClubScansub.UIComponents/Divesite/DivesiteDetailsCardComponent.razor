@@ -1,4 +1,4 @@
-﻿<RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0" @ondblclick="() => OnEdit.InvokeAsync(Divesite)">
+﻿<RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0">
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
         <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
 
@@ -9,7 +9,12 @@
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
                 <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(Divesite.DefaultEventType)" IconColor="@IconsTextsAndColors.GetEventColor(Divesite.DefaultEventType)" />
-                <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                <AuthorizeView Roles="@Userroles.Administrator">
+                    <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                </AuthorizeView>
+                <AuthorizeView Roles="@Userroles.Member">
+                    <RadzenButton Icon="person_raised_hand" Click="@(() => OnRequestEvent.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                </AuthorizeView>
             </RadzenStack>
 
         </RadzenStack>
@@ -53,4 +58,7 @@
 
     [Parameter]
     public EventCallback<Divelocation> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<Divelocation> OnRequestEvent { get; set; }
 }

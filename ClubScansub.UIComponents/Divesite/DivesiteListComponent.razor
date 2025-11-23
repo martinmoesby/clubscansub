@@ -41,7 +41,7 @@
 
                     @foreach (var item in filteredSites)
                     {
-                        <DivesiteDetailsCardComponent Divesite="item" OnEdit="showEditDialog" />
+                        <DivesiteDetailsCardComponent Divesite="item" OnEdit="showEditDialog" OnRequestEvent="requestEvent" />
                     }
                 }
             }
@@ -114,13 +114,16 @@
                 <RadzenDataGridColumn TItem="Divelocation" Title="Name" Width="200px" Property="@nameof(Divelocation.Name)" SortProperty="Name" TextAlign="TextAlign.Start">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Divelocation" Title="Description" Property="@nameof(Divelocation.Description)"></RadzenDataGridColumn>
-                <AuthorizeView Roles="@Userroles.Administrator">
                     <RadzenDataGridColumn TItem="Divelocation" Width="80px" TextAlign="TextAlign.Center" >
                         <Template Context="editItem">
-                            <RadzenButton Variant="Variant.Text" Click="@(() => showEditDialog(editItem))" Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            <AuthorizeView Roles="@Userroles.Administrator">
+                                <RadzenButton Variant="Variant.Text" Click="@(() => showEditDialog(editItem))" Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            </AuthorizeView>
+                            <AuthorizeView Roles="@Userroles.Member">
+                                <RadzenButton Variant="Variant.Text" Click="@(() => requestEvent(editItem))" Icon="person_raised_hand" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            </AuthorizeView>
                         </Template>
                     </RadzenDataGridColumn>
-                </AuthorizeView>
             </Columns>
 
         </RadzenDataGrid>
@@ -310,6 +313,16 @@
         }
 
     }
+
+    private void requestEvent(Divelocation fordivesite)
+    {
+        //TODO: Create a dialog for entering specific information about the request: 
+        // No of people wanting this trip
+        // Names opf divers wanting this trip
+        // Specific dates
+        dialogService.Alert($"I would like to request a divetrip for this location:{fordivesite.Name}", "Event request");
+    }
+
     private void closeDialog()
     {
         dialogService.Close();
