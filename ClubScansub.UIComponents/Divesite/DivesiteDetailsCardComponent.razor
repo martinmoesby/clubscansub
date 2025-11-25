@@ -1,19 +1,30 @@
-﻿<RadzenCard Variant="Variant.Filled" Style="max-width:360px;" class="p-0 m-0" @ondblclick="() => OnEdit.InvokeAsync(Divesite)">
+﻿@using ClubScansub.Service
+<RadzenCard Variant="Variant.Filled" Style="max-width:360px;position:relative" class="p-0">
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
         <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
                 <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(Divesite.DiveType)" />
+                <AuthorizeView Roles="@Userroles.Administrator">
+                </AuthorizeView>
+                <RadzenBadge Text="@($"Requests waiting {eventRequestCount.ToString()}")" IsPill Style="position:absolute;right:8px; top:43px;cursor:pointer" Shade="Shade.Default" BadgeStyle="BadgeStyle.Danger" Variant="Variant.Filled" Visible="@(hasRequests)" @onclick="@showRequests" />
                 <RadzenText TextStyle="TextStyle.Body1" Style="text-overflow:ellipsis;overflow:hidden;width:200px;text-wrap:nowrap;">@(Divesite.Name)</RadzenText>
             </RadzenStack>
 
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
                 <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(Divesite.DefaultEventType)" IconColor="@IconsTextsAndColors.GetEventColor(Divesite.DefaultEventType)" />
-                <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                <AuthorizeView Roles="@Userroles.Administrator">
+                    <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                </AuthorizeView>
+                <AuthorizeView Roles="@Userroles.Member">
+                    <RadzenButton Icon="pinboard" Click="@(() => OnRequestEvent.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                </AuthorizeView>
             </RadzenStack>
 
         </RadzenStack>
-        <RadzenStack Style="width:335px;height:180px;overflow:hidden">
+
+        
+        <RadzenStack Style="width:100%;height:150px;overflow:hidden">
             <img src="@ImageUtils.GetImageSrc(Divesite.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
         </RadzenStack>
 
@@ -26,7 +37,7 @@
 
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
                 <RadzenIcon Icon="location_on" IconStyle="IconStyle.Danger" />
-                <RadzenText TextStyle="TextStyle.Caption">@Divesite.MeetingLocation?.Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">@Divesite.MeetingLocation?.Name @Divesite.Id</RadzenText>
             </RadzenStack>
 
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
@@ -48,9 +59,60 @@
     </RadzenStack>
 </RadzenCard>
 @code {
+    [Inject]
+    DialogService dialogService { get; set; }
+
     [Parameter]
     public Divelocation Divesite { get; set; }
 
     [Parameter]
     public EventCallback<Divelocation> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<Divelocation> OnRequestEvent { get; set; }
+
+    private int eventRequestCount = 0;
+    private bool hasRequests = false;
+
+    protected override void OnParametersSet()
+    {
+        if (Divesite.EventRequests != null && Divesite.EventRequests.Any())
+        {
+            eventRequestCount = Divesite.EventRequests.Count(er => er.RequestProcessed == false);
+            hasRequests = eventRequestCount > 0;
+        }
+        else
+        {
+            eventRequestCount = 0;
+            hasRequests = false;
+        }
+    }
+
+    private async void showRequests()
+    {
+        await dialogService.OpenAsync<RequestEventListComponent>($"Requests for '{Divesite.Name}'", new Dictionary<string, object>() { 
+            { "DivesiteId", Divesite.Id },
+            { "OnProcessedComplete", EventCallback.Factory.Create<List<EventRequest>>(this, reloadRequests)}
+        },
+        new DialogOptions() { Width="800px" });
+
+
+    }
+
+    private async void reloadRequests(List<EventRequest> updatedRequests)
+    {
+        if (Divesite.EventRequests != null && Divesite.EventRequests.Any())
+        {
+
+            eventRequestCount = updatedRequests.Count(er => er.RequestProcessed == false);
+            hasRequests = eventRequestCount > 0;
+        }
+        else
+        {
+            eventRequestCount = 0;
+            hasRequests = false;
+        }
+        StateHasChanged();
+        dialogService.Close();
+    }
 }

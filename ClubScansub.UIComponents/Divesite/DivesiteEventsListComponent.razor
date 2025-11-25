@@ -2,7 +2,13 @@
 @using System.Threading.Tasks
 
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
-    <EventTypeToggleButtonsComponent OnFilter="setFilter" InitialFilters="InitialFilters" SingleSelect="!ActiveEventsOnly" />
+    @if (!ActiveEventsOnly) 
+    {
+        <EventTypeToggleButtonsComponent OnFilter="setFilter" InitialFilters="InitialSingleFilters" SingleSelect="true" />
+    } else
+    {
+        <EventTypeToggleButtonsComponent OnFilter="setFilter" InitialFilters="InitialFilters" SingleSelect="false"  />
+    }
     <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Eventsplanner..." Icon="add_circle" Shade="Shade.Light" Variant="Variant.Text" Visible="ActiveEventsOnly" Click="addNewEvents" />
 </RadzenStack>
 
@@ -47,7 +53,7 @@
                 </RadzenStack>
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start">
                     <SeatComponent Event="context" ShowText="false" Text="Occupancy" Size="Utility.Enums.IconSizeEnum.Small" />
-                        <CopyToClipboardComponent Text="@($"{linkString}{context.DeeplinkId.ToString()}")" IsTextVisible="true" IsTextReadOnly="false" />
+                        <CopyToClipboardComponent Text="@($"{linkString}{context.DeeplinkId.ToString()}")" IsTextVisible="false" IsTextReadOnly="true" ButtonText="Copy deeplink" />
                 </RadzenStack>
                 </RadzenStack>
             </Template>
@@ -75,12 +81,13 @@
                 @if (context.IsCancelled)
                 {
                     <RadzenButton Click="@(() => reactivateEvent(context))" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Icon="refresh" Variant="Variant.Text" />
-                    <RadzenButton Click="@(() => removeEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="delete" />
+
                 }
                 else
                 {
-                    <RadzenButton Click="@(() => cancelEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="cancel" />
+                    <RadzenButton Click="@(() => cancelEvent(context))" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Light" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="cancel" title="Cancel/Deactivate event" />
                 }
+                <RadzenButton Click="@(() => removeEvent(context))" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Icon="delete" title="Delete event completely - only if no divers are signed up for the event" Disabled="@(context.Participants.Count != 0)" />
             </Template>
         </RadzenDataGridColumn>
 
@@ -98,7 +105,13 @@
     DialogService dialogService { get; set; }
 
     [Inject]
-    public EventService eventService { get; set; }
+    EventService eventService { get; set; }
+
+    [Inject]
+    EventUserService eventUserService { get; set; }
+
+    [Inject]
+    UserService userService { get; set; }
 
     [Inject]
     NavigationManager navigationManager { get; set; }
@@ -114,6 +127,15 @@
     private bool isLoading = true;
     private IList<Event> allEvents = new List<Event>();
     private IList<Event> filteredEvents = new List<Event>();
+
+    private Dictionary<EventTypeEnum, bool> InitialSingleFilters { get; set; } = new Dictionary<EventTypeEnum, bool>() {
+            {    EventTypeEnum.Klubture, false },
+            {    EventTypeEnum.Stranddyk, false },
+            {    EventTypeEnum.Bådtur, true },
+            {    EventTypeEnum.Liveaboard, false },
+            {    EventTypeEnum.Rejse, false },
+            {    EventTypeEnum.Other, false },
+        };
 
     private Dictionary<EventTypeEnum, bool> InitialFilters { get; set; } = new Dictionary<EventTypeEnum, bool>() {
             {    EventTypeEnum.Klubture, true },
@@ -133,9 +155,9 @@
             var rootLink = rootUri.EndsWith("/") ? rootUri : rootUri + "/";
             linkString = $"{rootLink}?eventId=";
             allEvents = await eventService.GetAllAsync();
-            isLoading = false;
             setFilter(InitialFilters);
             StateHasChanged();
+            isLoading = false;
         }
     }
 
@@ -156,27 +178,33 @@
 
     private async void enrollUser(Event e, string userId)
     {
+
         var evnt = allEvents.Where(x => x.Id == e.Id).FirstOrDefault();
+        var user = await userService.GetUserAsync(Guid.Parse(userId));
+
+        if (evnt == null || user == null)
+            return;
+
         if (userId == "scansub")
         {
-            if (e.FreeSpots > 0)
+            if (evnt.FreeSpots > 0)
             {
-                e.FixedParticipants++;
+                evnt.FixedParticipants++;
                 await eventService.UpdateAsync(e);
             }
         }
         else
         {
+
             var eu = new EventUser()
             {
-                EventId = e.Id,
-                ApplicationUserId = userId
+                Event = evnt,
+                ApplicationUser = user
             };
-
-            e.Participants.Add(eu);
-
-            await eventService.AddedUserToEvent(userId, e);
-
+            evnt.Participants.Add(eu);
+            await eventService.AddedUserToEvent(userId, evnt);
+            reloadEvents();
+            StateHasChanged();
         }
     }
 
@@ -291,19 +319,31 @@
     private async Task updateEvent(Event item)
     {
         await eventService.UpdateAsync(item);
-        allEvents = await eventService.GetAllAsync();
-        setFilter(InitialFilters);
+        reloadEvents();
         StateHasChanged();
 
     }
 
     private async void removeUser(Event e, ApplicationUser user)
     {
-        var eu = e.Participants.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+        var ev = allEvents.Where(x => x.Id == e.Id).FirstOrDefault();
+        if (ev == null)
+            return;
+
+        var eu = ev.Participants.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
         if (eu != null)
         {
-            e.Participants.Remove(eu);
-            await eventService.UpdateAsync(e);
+            ev.Participants.Remove(eu);
+            await eventUserService.RemoveUserFromEvent(user.Id, e.Id);
+            reloadEvents();
+            StateHasChanged();
+
         }
+    }
+
+    private async void reloadEvents()
+    {
+        allEvents = await eventService.GetAllAsync();
+        setFilter(InitialFilters);
     }
 }

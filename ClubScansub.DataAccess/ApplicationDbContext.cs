@@ -34,6 +34,8 @@ namespace ClubScansub.Data
         public DbSet<CourseSessionInstructor> CourseSessionInstructors { get; set; }
         public DbSet<ClubSettings> ClubSettings { get; set; }
         public DbSet<CourseSignup> CourseSignups { get; set; }
+        public DbSet<EventRequest> EventRequests { get; set; }
+
         //public DbSet<Site> Divesites { get; set; }
         //public DbSet<medlemsdata> medlemsdata { get; private set; }
         //public DbSet<kursistdata> kursistdata { get; private set; }

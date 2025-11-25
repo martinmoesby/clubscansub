@@ -1,0 +1,150 @@
+﻿<RadzenStack orientation="Orientation.Vertical" Style="width:100%;height:100%;">
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
+
+        <RadzenStack Style="width:50%">
+            <RadzenLabel Component="date ">Select proposed dates for the event:</RadzenLabel>
+            <RadzenDatePicker 
+                Value="@DateTime.Now.AddDays(21)"
+                Min="@DateTime.Now.AddDays(21)"
+                Name="date"
+                TValue="DateTime" 
+                Style="width:100%;" 
+                Placeholder="Propose date..." 
+                ShowTime="false" 
+                DateFormat="dd. MMMM yyyy"
+                Change="@((args) => addProposedDate(args))" />
+        </RadzenStack>
+
+        <RadzenStack Style="width:50%">
+
+            <RadzenLabel Component="diverList">Select divers to invite:</RadzenLabel>
+            <RadzenDropDown TValue="ApplicationUser"
+                            Data="@filteredUsers"
+                            Name="diverList"
+                            TextProperty="Name"
+                            ValueProperty="Id"
+                            SelectedItemChanged="@(args => addProposedDiver(args))"
+                            SearchTextChanged="loadDivers"
+                            FilterDelay="200"
+                            ClearSearchAfterSelection
+                            AllowFiltering
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            FilterAutoCompleteType="AutoCompleteType.On">
+            </RadzenDropDown>
+
+        </RadzenStack>
+
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+
+        <RadzenStack Style="width:50%">
+            <RadzenText TextStyle="TextStyle.Caption" Text="Proposed dates:" />
+            <RadzenListBox Data="proposedDates" TValue="DateOnly" Style="height:100px;" AllowClear RemoveChipTitle="x" />
+        </RadzenStack>
+
+        <RadzenStack Style="width:50%">
+            <RadzenText TextStyle="TextStyle.Caption" Text="Divers:" />
+            <RadzenListBox Data="selectedUsers" TValue="ApplicationUser" ValueProperty="Id" TextProperty="Name" Style="height:100px;" AllowClear RemoveChipTitle="x" />
+        </RadzenStack>
+
+    </RadzenStack>
+
+    <RadzenStack>
+        <RadzenLabel Component="note" Text="Give a reason" />
+        <RadzenTextArea Rows="5" @bind-Value="requestEvent.Note" MaxLength="200" Name="note" Style="min-height:100px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="Send Request" Icon="send" Style="margin-top:10px;" Click="@onSubmitRequest" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+</RadzenStack>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Inject]
+    private UserService UserService { get; set; }
+
+    [Parameter]
+    public Divelocation Divesite { get; set; }
+
+    [Parameter]
+    public EventCallback<Models.DTO.RequestEventDTO> OnRequestSubmitted { get; set; }
+
+    private Models.DTO.RequestEventDTO requestEvent = new();
+    private ApplicationUser currentUser;
+    private List<ApplicationUser> appUsers = [];
+    private IEnumerable<ApplicationUser> filteredUsers = [];
+    private List<ApplicationUser> selectedUsers = [];
+    private List<DateOnly> proposedDates = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+        if (user != null && user.Identity.IsAuthenticated)
+        {
+            var userId = user.GetIdentityId();
+            currentUser = await UserService.GetUserAsync(new Guid(userId));
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            appUsers = (await UserService.GetUsersByRolesAsync(Userroles.User, Userroles.Member, Userroles.Student)).ToList();
+            StateHasChanged();
+        }
+    }
+
+    private void onSubmitRequest()
+    {
+
+        var divers = selectedUsers.Select(x=>x.Id).ToArray();
+        requestEvent = new Models.DTO.RequestEventDTO(currentUser.Id, Divesite.Id, proposedDates.ToArray(), divers);
+        // Logic to handle the event request submission
+        OnRequestSubmitted.InvokeAsync(requestEvent);
+    }
+    private void addProposedDate(DateTime? date)
+    {
+        if (date != null)
+            proposedDates.Add(DateOnly.FromDateTime(date.Value));
+    }
+    private void addProposedDiver(object user)
+    {
+        //var user = filteredUsers.SingleOrDefault(x => x.Id == userId);
+        if (user is ApplicationUser && user != null)
+            selectedUsers.Add((ApplicationUser)user);
+
+    }
+    private void removeItemFromList(string listName, object item)
+    {
+
+    }
+
+    private void loadDivers(string searchText)
+    {
+        if (string.IsNullOrEmpty(searchText))
+        {
+            filteredUsers = appUsers.Take(10);
+        }
+        else
+        {
+            filteredUsers = appUsers
+                .Where(u => u.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                ;
+        }
+        StateHasChanged();
+    }
+
+    private class DiverSelection
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+}

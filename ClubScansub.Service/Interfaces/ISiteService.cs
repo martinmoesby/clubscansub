@@ -1,4 +1,5 @@
 ﻿using ClubScansub.Models;
+using ClubScansub.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace ClubScansub.Service.Interfaces
     {
         Task<List<Certificate>> GetCertificatesForEvents();
         Task<List<Address>> GetMeetingLocations();
+
+        Task RequestEventForDivesite(RequestEventDTO request);
     }
 }

@@ -1,0 +1,158 @@
+﻿<RadzenStack AlignItems="AlignItems.Stretch" Gap="5">
+
+    <RadzenDataGrid TItem="EventRequest" Data="@Requests" RowRender="onRowRender">
+        <Columns>
+
+            <RadzenDataGridColumn Title="Requested by" Width="240px;">
+                <Template>
+                    <RadzenText>@context.Requester?.Name</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <AuthorizeView Roles="@Userroles.Administrator" Context="adminsContext">
+                <RadzenDataGridColumn Title="with" Width="240px;">
+                    <Template>
+                        <RadzenListBox Data="@GetUsers(context).ToList()" TValue="ApplicationUser" TextProperty="@nameof(ApplicationUser.Name)" Style="height:80px;width:100%" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </AuthorizeView>
+
+            <RadzenDataGridColumn Title="Requested Dates" Width="140px">
+                <Template>
+                    <RadzenDropDown Data="@context.Dates" TValue="DateOnly" Value="@context.Dates.FirstOrDefault()" Change="@((args) => setSelectedDate(context.Id, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <AuthorizeView Roles="@Userroles.Administrator" Context="adminsContext">
+                <RadzenDataGridColumn Width="120px">
+                    <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenButton Variant="Variant.Text" Icon="thumb_up" IconColor="@Colors.Success" Click="@(() => processRequest(context, true))" />
+                            <RadzenButton Variant="Variant.Text" Icon="thumb_down" IconColor="@Colors.Danger" Click="@(() => processRequest(context, false))" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </AuthorizeView>
+
+            <AuthorizeView Roles="@Userroles.Member" Context="adminsContext">
+                <RadzenDataGridColumn Width="60px">
+                    <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenButton Variant="Variant.Text" Icon="@IconsTextsAndColors.Icons.USER_ADD" IconColor="@Colors.Primary" Click="@(() => signMeUp(context))" Visible="@(!context.AdditionalParticipants.Any(x=> x== currentUser.Id))" />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </AuthorizeView>
+        </Columns>
+
+    </RadzenDataGrid>
+
+    <RadzenButton Click="@(() => OnProcessedComplete.InvokeAsync(Requests))" Icon="close" ButtonStyle="ButtonStyle.Success" Text="Close" />
+
+</RadzenStack>
+@code {
+    [Inject]
+    UserService UserService { get; set; }
+
+    [Inject]
+    DialogService dialogService { get; set; }
+
+    [Inject]
+    EventService eventservice { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Parameter]
+    public int DivesiteId { get; set; }
+
+    [Parameter]
+    public EventCallback<List<EventRequest>> OnProcessedComplete { get; set; }
+
+    private Dictionary<int, DateOnly?> selectedDates = new Dictionary<int, DateOnly?>();
+    private List<EventRequest> Requests = [];
+    private ApplicationUser currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+        if (user != null && user.Identity.IsAuthenticated)
+        {
+            var userId = user.GetIdentityId();
+            currentUser = await UserService.GetUserAsync(new Guid(userId));
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+            selectedDates = Requests.ToDictionary(r => r.Id, r => (DateOnly?)null);
+            StateHasChanged();
+        }
+        
+    }
+
+    private DateOnly getSelectedDate(int requestId)
+    {
+        if (selectedDates.TryGetValue(requestId, out var date))
+        {
+            return date ?? default;
+        }
+        return default;
+    }
+
+    private void setSelectedDate(int requestId, object date)
+    {
+        if (date is DateOnly)
+            selectedDates[requestId] = (DateOnly)date;
+    }
+
+    private async void signMeUp(EventRequest request)
+    {
+        request.AdditionalParticipants.Add(currentUser.Id);
+        Requests =  await eventservice.UpdateEventRequestsAsync(request);
+        StateHasChanged();
+    }
+
+    private IEnumerable<ApplicationUser> GetUsers(EventRequest request)
+    {
+        foreach (var item in request.AdditionalParticipants)
+        {
+            yield return UserService.GetUser(Guid.Parse(item));
+        }
+
+    }
+
+    private void onRowRender(RowRenderEventArgs<EventRequest> args)
+    {
+        if (args.Data.Requester != null)
+        {
+            setSelectedDate(args.Data.Id, args.Data.Dates.FirstOrDefault());
+        }
+    }   
+
+    private async void processRequest(EventRequest request, bool approved)
+    {
+        if (approved)
+        {
+            DateOnly selectedDate = getSelectedDate(request.Id);
+            var @event = await eventservice.CreateEventFromRequest(request, selectedDate);
+            request.EventId = @event.Id;
+            await eventservice.ApproveEventRequest(request, @event);
+
+        }
+        else
+        {
+            await eventservice.DenyEventRequest(request);
+        }
+
+        Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+        selectedDates = Requests.ToDictionary(r => r.Id, r => (DateOnly?)null);
+        StateHasChanged();
+
+    }
+
+}

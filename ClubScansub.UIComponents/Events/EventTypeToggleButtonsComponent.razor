@@ -41,6 +41,11 @@
     [Parameter]
     public EventCallback<Dictionary<EventTypeEnum, bool>> OnFilter { get; set; }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
     private bool getEventFilter(EventTypeEnum type)
     {
         bool value = true;

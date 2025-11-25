@@ -1,5 +1,6 @@
 ﻿using ClubScansub.Data;
 using ClubScansub.Models;
+using ClubScansub.Models.DTO;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ClubScansub.Service
 {
-    public class SiteService: ServiceBase, ISiteService
+    public class SiteService : ServiceBase, ISiteService
     {
         private readonly ApplicationDbContext context;
 
@@ -46,6 +47,17 @@ namespace ClubScansub.Service
             var data = context.Divelocations.Include(x => x.MeetingLocation).Include(x => x.Image).Include(x=>x.Certificate);
             return await data.ToListAsync();
         }
+
+        public async Task<IList<Divelocation>> GetAllWithRequestsAsync()
+        {
+            var data = context.Divelocations
+                .Include(x => x.MeetingLocation)
+                .Include(x => x.Image)
+                .Include(x => x.Certificate)
+                .Include(x=>x.EventRequests);
+            return await data.ToListAsync();
+        }
+
 
         public Task<Divelocation> GetAsync(string Id)
         {
@@ -89,5 +101,22 @@ namespace ClubScansub.Service
             return await data.ToListAsync();
 
         }
+
+        public async Task RequestEventForDivesite(RequestEventDTO request)
+        {
+            EventRequest eventRequest = new EventRequest()
+            {
+                Requester = await context.ApplicationUsers.FindAsync(request.RequesterId),
+                Divelocation = await context.Divelocations.FindAsync(request.DivelocationId),
+                Dates = request.EventDates.ToList(),
+                AdditionalParticipants = request.Users.ToList(),
+                Notes = request.Note
+
+            };
+            await context.EventRequests.AddAsync(eventRequest);
+
+            await context.SaveChangesAsync();
+        }
+
     }
 }

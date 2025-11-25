@@ -4,6 +4,7 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124072337_changedEventRequestUsersToList")]
+    partial class changedEventRequestUsersToList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -619,17 +622,8 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int?>("DivelocationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EventId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("RequestApproved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RequestProcessed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("RequesterId")
                         .HasColumnType("nvarchar(450)");
@@ -637,8 +631,6 @@ namespace ClubScansub.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DivelocationId");
-
-                    b.HasIndex("EventId");
 
                     b.HasIndex("RequesterId");
 
@@ -1195,20 +1187,14 @@ namespace ClubScansub.Data.Migrations
             modelBuilder.Entity("ClubScansub.Models.EventRequest", b =>
                 {
                     b.HasOne("ClubScansub.Models.Divelocation", "Divelocation")
-                        .WithMany("EventRequests")
-                        .HasForeignKey("DivelocationId");
-
-                    b.HasOne("ClubScansub.Models.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("DivelocationId");
 
                     b.HasOne("ClubScansub.Models.ApplicationUser", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterId");
 
                     b.Navigation("Divelocation");
-
-                    b.Navigation("Event");
 
                     b.Navigation("Requester");
                 });
@@ -1334,8 +1320,6 @@ namespace ClubScansub.Data.Migrations
 
             modelBuilder.Entity("ClubScansub.Models.Divelocation", b =>
                 {
-                    b.Navigation("EventRequests");
-
                     b.Navigation("Events");
 
                     b.Navigation("Image");

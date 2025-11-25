@@ -78,5 +78,7 @@ namespace ClubScansub.Models
         [JsonIgnore]
         public virtual DivelocationImage Image { get; set; }
         //public virtual ICollection<CourseSession> CourseSessions { get; set; }
-    }
+        public virtual ICollection<EventRequest> EventRequests { get; set; }
+
+        }
 }

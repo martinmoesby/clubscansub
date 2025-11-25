@@ -1,4 +1,5 @@
-﻿@using ClubScansub.Service
+﻿@using ClubScansub.Models.DTO
+@using ClubScansub.Service
 <RadzenStack Gap="5">
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%;" Gap="5" AlignItems="AlignItems.Center">
@@ -41,7 +42,7 @@
 
                     @foreach (var item in filteredSites)
                     {
-                        <DivesiteDetailsCardComponent Divesite="item" OnEdit="showEditDialog" />
+                        <DivesiteDetailsCardComponent Divesite="item" OnEdit="showEditDialog" OnRequestEvent="requestEvent" />
                     }
                 }
             }
@@ -80,7 +81,8 @@
             <Columns>
                 <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="160px" TextAlign="TextAlign.Left" Sortable="false">
                     <Template Context="location">
-                        <RadzenStack Style="width:160px;height:80px;overflow:hidden">
+                        <RadzenStack Style="width:160px;height:80px;overflow:hidden;position:relative">
+                            <RadzenBadge Text="@($"Requests waiting {location.EventRequests?.Count.ToString()}")" IsPill Style="position:absolute; top:2px;cursor:pointer" Shade="Shade.Default" BadgeStyle="BadgeStyle.Danger" Variant="Variant.Filled" Visible="@(location.EventRequests?.Any(x=>x.RequestProcessed == false) ?? false)" @onclick="@(() => showRequests(location))" />
                             <img src="@ImageUtils.GetImageSrc(location.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
                         </RadzenStack>
                     </Template>
@@ -114,13 +116,16 @@
                 <RadzenDataGridColumn TItem="Divelocation" Title="Name" Width="200px" Property="@nameof(Divelocation.Name)" SortProperty="Name" TextAlign="TextAlign.Start">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Divelocation" Title="Description" Property="@nameof(Divelocation.Description)"></RadzenDataGridColumn>
-                <AuthorizeView Roles="@Userroles.Administrator">
                     <RadzenDataGridColumn TItem="Divelocation" Width="80px" TextAlign="TextAlign.Center" >
                         <Template Context="editItem">
-                            <RadzenButton Variant="Variant.Text" Click="@(() => showEditDialog(editItem))" Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            <AuthorizeView Roles="@Userroles.Administrator">
+                                <RadzenButton Variant="Variant.Text" Click="@(() => showEditDialog(editItem))" Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            </AuthorizeView>
+                            <AuthorizeView Roles="@Userroles.Member">
+                                <RadzenButton Variant="Variant.Text" Click="@(() => requestEvent(editItem))" Icon="person_raised_hand" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Success" />
+                            </AuthorizeView>
                         </Template>
                     </RadzenDataGridColumn>
-                </AuthorizeView>
             </Columns>
 
         </RadzenDataGrid>
@@ -143,6 +148,7 @@
     private IList<Divelocation> sites = new List<Divelocation>();
     IList<Divelocation> filteredSites = new List<Divelocation>();
     private IEnumerable<DiveTypeEnum> selectedDiveTypes = [];
+    private List<EventRequest> eventRequests = new List<EventRequest>();
 
     private bool isLoading = true;
     private Dictionary<DiveTypeEnum, bool> diveTypeFilter = new Dictionary<DiveTypeEnum, bool>
@@ -179,7 +185,7 @@
         if (firstRender)
         {
             selectedDiveTypes = diveTypeFilter.Where(x => x.Value == true).Select(x => x.Key);
-            sites = (await siteService.GetAllAsync()).ToList();
+            sites = (await siteService.GetAllWithRequestsAsync()).ToList();
             filteredSites = sites.Where(x => selectedDiveTypes.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
             isLoading = false;
             StateHasChanged();
@@ -310,8 +316,47 @@
         }
 
     }
-    private void closeDialog()
+
+    private async void requestEvent(Divelocation fordivesite)
     {
+        await dialogService.OpenAsync<RequestEventComponent>($"Suggest trip to {fordivesite.Name}", new Dictionary<string, object>
+        {
+            { "Divesite", fordivesite },
+            {  "OnRequestSubmitted", EventCallback.Factory.Create<RequestEventDTO>(this, eventRequested)  }
+        });
+
+        //TODO: Create a dialog for entering specific information about the request: 
+        // No of people wanting this trip
+        // Names opf divers wanting this trip
+        // Specific dates
+    }
+
+    private async void eventRequested(RequestEventDTO requestedEvent)
+    {
+        var requestedEventLocation = sites.FirstOrDefault(x => x.Id == requestedEvent.DivelocationId);
+
+        await siteService.RequestEventForDivesite(requestedEvent);
+        await dialogService.Alert($"Request for a divetrip to divelocation '{requestedEventLocation.Name.ToString()}' has been submitted", "Event request");
         dialogService.Close();
     }
+    private async void showRequests(Divelocation Divesite)
+    {
+        await dialogService.OpenAsync<RequestEventListComponent>($"Requests for '{Divesite.Name}'", new Dictionary<string, object>() {
+            { "DivesiteId", Divesite.Id },
+            { "OnProcessedComplete", EventCallback.Factory.Create<List<EventRequest>>(this, reload)}
+        },
+        new DialogOptions() { Width = "800px" });
+
+
+    }
+
+    private async void reload()
+    {
+        sites = (await siteService.GetAllWithRequestsAsync()).ToList();
+        filteredSites = sites.Where(x => selectedDiveTypes.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
+        isLoading = false;
+        StateHasChanged();
+        dialogService.Close();
+    }
+
 }

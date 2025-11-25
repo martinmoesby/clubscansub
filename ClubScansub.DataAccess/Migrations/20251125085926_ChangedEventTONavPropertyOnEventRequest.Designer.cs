@@ -4,6 +4,7 @@ using ClubScansub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClubScansub.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125085926_ChangedEventTONavPropertyOnEventRequest")]
+    partial class ChangedEventTONavPropertyOnEventRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -619,7 +622,7 @@ namespace ClubScansub.Data.Migrations
                     b.Property<int?>("DivelocationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EventId")
+                    b.Property<int>("EventId")
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
@@ -1200,7 +1203,9 @@ namespace ClubScansub.Data.Migrations
 
                     b.HasOne("ClubScansub.Models.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ClubScansub.Models.ApplicationUser", "Requester")
                         .WithMany()

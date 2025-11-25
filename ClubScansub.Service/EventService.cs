@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Options;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace ClubScansub.Service
 {
@@ -214,6 +215,112 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Creates a new event based on the specified event request and the selected proposed date.
+        /// </summary>
+        /// <remarks>The method marks the request as processed and approved, creates the event, adds
+        /// participants, and sends a notification email to the requester. The event is scheduled using the selected
+        /// proposed date and the default start time and duration from the dive location.</remarks>
+        /// <param name="request">The event request containing details such as the dive location, requester, proposed dates, and additional
+        /// participants. Cannot be null.</param>
+        /// <param name="proposedDateIndex">The zero-based index of the proposed date to use from the request's list of dates. Must be a valid index
+        /// within the range of available dates.</param>
+        /// <returns>A task that represents the asynchronous operation. The task completes when the event has been created and
+        /// related updates have been saved.</returns>
+        /// <exception cref="Exception">Thrown if the dive location specified in the request cannot be found.</exception>
+        public async Task<Event> CreateEventFromRequest(EventRequest request, DateOnly proposedDate)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+
+            var divelocation = await context.Divelocations
+                .Include(x=>x.MeetingLocation)
+                .Include(x=>x.Certificate)
+                .Where(x => x.Id == request.Divelocation.Id)
+                .FirstOrDefaultAsync();
+            
+            if (divelocation == null)
+                throw new Exception($"Could not create event from request #{request.Id} because divelocation with Id '{request.Divelocation.Id}' could not be found.");
+
+            var participants = await context.ApplicationUsers.Where(x => request.AdditionalParticipants.Contains(x.Id) || x.Id == request.Requester.Id).ToListAsync();
+
+            var date = new DateTime(proposedDate,TimeOnly.FromTimeSpan(divelocation.DefaultStartTime));
+            var endDate = date.AddHours(divelocation.DefaultDuration.Hours);
+
+            var @event = new Event
+            {
+                Title = $"Forespurgt tur til '{divelocation.Name}' ",
+                Details = request.Notes,
+                EventType = divelocation.DefaultEventType,
+                MinParticipants = divelocation.MinParticipants,
+                MaxParticipants = divelocation.MaxParticipants,
+                Price = divelocation.Price,
+                PremiumPrice = divelocation.DefaultEventType == EventTypeEnum.Klubture ? 0 : divelocation.Price,
+                StartDateAndTime = date,
+                EndDateAndTime = endDate,
+                Divelocation = divelocation,
+                FixedParticipants = 0,
+                //Participants = participants.Select(x => new EventUser { ApplicationUser = x }).ToList(),
+                DeeplinkId = Guid.NewGuid(),
+                Address = divelocation.MeetingLocation,
+                RequiredCertificate = divelocation.Certificate,
+
+            };
+
+            await context.Events.AddAsync(@event);
+            await context.SaveChangesAsync();
+
+            await AddedUserToEvent(request.Requester.Id, @event);
+            foreach (var participant in participants.Where(x => x.Id != request.Requester.Id))
+            {
+                await AddedUserToEvent(participant.Id, @event);
+            }
+
+            return @event;
+        }
+
+        /// <summary>
+        /// Denies the specified event request and notifies the requester by email.
+        /// </summary>
+        /// <remarks>After the request is denied, an email notification is sent to the requester. The
+        /// changes are saved to the database as part of this operation.</remarks>
+        /// <param name="request">The event request to be denied. Cannot be null. The request's status will be updated to indicate it has been
+        /// processed and denied.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task DenyEventRequest(EventRequest request)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            request.RequestProcessed = true;
+            request.RequestApproved = false;
+            context.Update(request);
+            await context.SaveChangesAsync();
+            if (request.Requester?.Email != null)
+            {
+                await emailSender.SendEmailAsync(request.Requester.Email!, "Requast has been denied", $"Your request for a trip to {request.Divelocation.Name} has been denied. Please contact us for more information.");
+            }
+
+        }
+
+        public async Task ApproveEventRequest(EventRequest request, Event @event)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            request.RequestProcessed = true;
+            request.RequestApproved = true;
+            context.Update(request);
+            await context.SaveChangesAsync();
+            if (request.Requester?.Email != null)
+            {
+                await emailSender.SendEmailAsync(request.Requester.Email!, "Requast has been approved", $"Your request for a trip to {request.Divelocation.Name} has been approved, and is scheduled to tkae place on {@event.StartDateAndTime.ToString()}");
+
+            }
+
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+
         public async Task CancelEventAsync(Event item)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -223,6 +330,14 @@ namespace ClubScansub.Service
             await context.SaveChangesAsync();
             await userService.RefundForCancelledEvent(item);
         }
+
+        /// <summary>
+        /// Reactivates a previously cancelled event asynchronously.
+        /// </summary>
+        /// <remarks>Call this method to mark an event as active after it has been cancelled. Changes are
+        /// persisted to the database upon completion of the operation.</remarks>
+        /// <param name="item">The event to be reactivated. The event's IsCancelled property will be set to false.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task ActivateEventAsync(Event item)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -231,6 +346,32 @@ namespace ClubScansub.Service
             context.Update(item);
             await context.SaveChangesAsync();
         }
-
+        public async Task<List<EventRequest>> GetEventRequestsForDivesite(int divelocationId)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            return await context.EventRequests
+                .Include(x => x.Divelocation)
+                .Include(x => x.Requester)
+                .Include(x => x.Event)
+                .Where(x => x.Divelocation.Id == divelocationId && !x.RequestProcessed)
+                .ToListAsync();
+        }
+        public async Task<List<EventRequest>> GetEventRequestsAsync()
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            var data = await context.EventRequests
+                .Include(x => x.Divelocation)
+                .Include(x => x.Requester)
+                .Where(x => !x.RequestProcessed)
+                .ToListAsync();
+            return data;
+        }
+        public async Task<List<EventRequest>> UpdateEventRequestsAsync(EventRequest request)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            context.Update(request);
+            await context.SaveChangesAsync();
+            return await GetEventRequestsForDivesite(request.Divelocation.Id);
+        }
     }
 }
