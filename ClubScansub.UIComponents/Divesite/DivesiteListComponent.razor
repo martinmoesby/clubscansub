@@ -81,7 +81,8 @@
             <Columns>
                 <RadzenDataGridColumn TItem="Divelocation" Title="Image" Width="160px" TextAlign="TextAlign.Left" Sortable="false">
                     <Template Context="location">
-                        <RadzenStack Style="width:160px;height:80px;overflow:hidden">
+                        <RadzenStack Style="width:160px;height:80px;overflow:hidden;position:relative">
+                            <RadzenBadge Text="@($"Requests waiting {location.EventRequests?.Count.ToString()}")" IsPill Style="position:absolute; top:2px;cursor:pointer" Shade="Shade.Default" BadgeStyle="BadgeStyle.Danger" Variant="Variant.Filled" Visible="@(location.EventRequests?.Any(x=>x.RequestProcessed == false) ?? false)" @onclick="@(() => showRequests(location))" />
                             <img src="@ImageUtils.GetImageSrc(location.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
                         </RadzenStack>
                     </Template>
@@ -147,6 +148,7 @@
     private IList<Divelocation> sites = new List<Divelocation>();
     IList<Divelocation> filteredSites = new List<Divelocation>();
     private IEnumerable<DiveTypeEnum> selectedDiveTypes = [];
+    private List<EventRequest> eventRequests = new List<EventRequest>();
 
     private bool isLoading = true;
     private Dictionary<DiveTypeEnum, bool> diveTypeFilter = new Dictionary<DiveTypeEnum, bool>
@@ -183,7 +185,7 @@
         if (firstRender)
         {
             selectedDiveTypes = diveTypeFilter.Where(x => x.Value == true).Select(x => x.Key);
-            sites = (await siteService.GetAllAsync()).ToList();
+            sites = (await siteService.GetAllWithRequestsAsync()).ToList();
             filteredSites = sites.Where(x => selectedDiveTypes.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
             isLoading = false;
             StateHasChanged();
@@ -333,7 +335,27 @@
     {
         var requestedEventLocation = sites.FirstOrDefault(x => x.Id == requestedEvent.DivelocationId);
 
+        await siteService.RequestEventForDivesite(requestedEvent);
         await dialogService.Alert($"Request for a divetrip to divelocation '{requestedEventLocation.Name.ToString()}' has been submitted", "Event request");
+        dialogService.Close();
+    }
+    private async void showRequests(Divelocation Divesite)
+    {
+        await dialogService.OpenAsync<RequestEventListComponent>($"Requests for '{Divesite.Name}'", new Dictionary<string, object>() {
+            { "DivesiteId", Divesite.Id },
+            { "OnProcessedComplete", EventCallback.Factory.Create<List<EventRequest>>(this, reload)}
+        },
+        new DialogOptions() { Width = "800px" });
+
+
+    }
+
+    private async void reload()
+    {
+        sites = (await siteService.GetAllWithRequestsAsync()).ToList();
+        filteredSites = sites.Where(x => selectedDiveTypes.Contains(x.DiveType) && x.Name.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).ToList();
+        isLoading = false;
+        StateHasChanged();
         dialogService.Close();
     }
 

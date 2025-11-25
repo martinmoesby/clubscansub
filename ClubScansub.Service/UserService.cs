@@ -1,4 +1,5 @@
-﻿using ClubScansub.Models;
+﻿using ClubScansub.Data;
+using ClubScansub.Models;
 using ClubScansub.Models.DTO;
 using ClubScansub.Service.Communication;
 using ClubScansub.Service.Exceptions;
@@ -72,15 +73,25 @@ namespace ClubScansub.Service
             throw new NotImplementedException();
         }
 
-        public Task<ApplicationUser> GetUserAsync(Guid Id)
+        public async Task<ApplicationUser> GetUserAsync(Guid Id)
         {
-            throw new NotImplementedException();
+            return await userManager.FindByIdAsync(Id.ToString());
             
         }
 
-        public Task<ApplicationUser> GetUserAsync(string username)
+        public ApplicationUser? GetUser(Guid Id)
         {
-            throw new NotImplementedException();
+            var user = userManager.FindByIdAsync(Id.ToString()).Result;
+            if (user != null)
+                return user;
+
+            return null;
+
+        }
+
+        public async Task<ApplicationUser> GetUserAsync(string username)
+        {
+            return await userManager.FindByNameAsync(username);
         }
 
         public async Task<SignInResult> LoginUserAsync(LoginUserDTO<ApplicationUser> model)

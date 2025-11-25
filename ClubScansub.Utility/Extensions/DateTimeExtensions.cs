@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace ClubScansub.Utility.Extensions
@@ -36,5 +37,10 @@ namespace ClubScansub.Utility.Extensions
 
             return new DateTime(y,m,1); 
         }
+
+        public static DateOnly OnlyDate(this DateTime date) => DateOnly.FromDateTime(date);
+
+        public static TimeOnly OnlyTime(this DateTime date) => TimeOnly.FromDateTime(date);
+
     }
 }

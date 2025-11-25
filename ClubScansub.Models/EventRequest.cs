@@ -13,7 +13,12 @@ namespace ClubScansub.Models
         public Divelocation Divelocation { get; set; }
         public ApplicationUser Requester { get; set; }
         public string Notes { get; set; }
-        public string AdditionalParticipants { get; set; }  
+        public List<string> AdditionalParticipants { get; set; }  
+        public bool RequestProcessed { get; set; }
+        public bool RequestApproved { get; set; }
+        public int? EventId { get; set; }
+
+        public virtual Event Event { get; set; } 
 
     }
 }
