@@ -34,13 +34,14 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (httpContext!=null)
-        {
-            var theme = httpContext.Request.Cookies["ClubScansubTheme"];
-            if (!string.IsNullOrEmpty(theme))
-            {
+        var theme = "software";
+        // if (httpContext!=null)
+        // {
+        //     var theme = httpContext.Request.Cookies["ClubScansubTheme"];
+        //     if (!string.IsNullOrEmpty(theme))
+        //     {
                 ThemeService.SetTheme(theme);
-            }
-        }
+        //     }
+        // }
     }
 }

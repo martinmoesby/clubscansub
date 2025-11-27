@@ -37,15 +37,6 @@ namespace ClubScansub.BlazorApp.Shared
         //private MenuState menuState;
 
         private bool sidebarExpanded = false;
-        private string menuCollapseIcon = "chevron";
-        protected override void OnInitialized()
-        {
-            //setMenuState();
-            selectedMenuWidth = "160px";
-            menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
-            themeService.SetTheme("standard");
-        }
-
 
         protected override void OnAfterRender(bool firstRender)
         {
@@ -72,11 +63,11 @@ namespace ClubScansub.BlazorApp.Shared
         //}
         protected override async Task OnInitializedAsync()
         {
-
-            sidebarExpanded = false;
+            menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
+            themeService.SetTheme("software");
             themeService.ThemeChanged += OnThemeChanged;
             setLogoFileName();
-            var authState = await authStateProvider.GetAuthenticationStateAsync();
+            sidebarExpanded = false;
 
         }
 

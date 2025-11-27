@@ -1,4 +1,5 @@
-﻿using ClubScansub.Extensions;
+﻿using ClubScansub.Blazor.UIComponents.RadzenDialogOptions;
+using ClubScansub.Extensions;
 using ClubScansub.Models;
 using ClubScansub.Models.Interface;
 using ClubScansub.Service;
@@ -107,11 +108,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 if (selectedUser != currentUser.Id)
                 {
 
-                    var confirm = (await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?", new ConfirmOptions()
-                    {
-                        OkButtonText = "Yes",
-                        CancelButtonText = "No"
-                    }));
+                    var confirm = await dialogService.Confirm($"Do you want the user to pay for this trip?", "Payment?", new YesNoConfirmOptions());
                     doPayForTrip = confirm.Value;
                     notificationMessage = $"User added to this for the event";
                 }
@@ -134,7 +131,7 @@ namespace ClubScansub.Blazor.UIComponents.Events
         }
         private async Task removeUserFromEvent(ApplicationUser user)
         {
-            var confirm = (await dialogService.Confirm($"Do you want to remove {user.Name} from this trip?", "Remove user"));
+            var confirm = await dialogService.Confirm($"Do you want to remove {user.Name} from this trip?", "Remove user", new YesNoConfirmOptions());
             if (confirm.Value)
             {
                 //TODO: Remove user from course and return any deposits made for the enrollment

@@ -1,5 +1,4 @@
-﻿@using ClubScansub.Service
-@using System.Threading.Tasks
+﻿
 
 <RadzenStack Orientation="Orientation.Horizontal" class="rz-mb-5" JustifyContent="JustifyContent.SpaceBetween" Style="width:100%">
     @if (!ActiveEventsOnly) 
@@ -180,9 +179,8 @@
     {
 
         var evnt = allEvents.Where(x => x.Id == e.Id).FirstOrDefault();
-        var user = await userService.GetUserAsync(Guid.Parse(userId));
 
-        if (evnt == null || user == null)
+        if (evnt == null )
             return;
 
         if (userId == "scansub")
@@ -195,6 +193,10 @@
         }
         else
         {
+
+            var user = await userService.GetUserAsync(Guid.Parse(userId));
+            if (user == null)
+                return;
 
             var eu = new EventUser()
             {
@@ -326,6 +328,11 @@
 
     private async void removeUser(Event e, ApplicationUser user)
     {
+
+        var confirmAnswer = await dialogService.Confirm($"Do you want to remove '{user.Name}' from '{e.Title}'?`", "Remove User?", new YesNoConfirmOptions());
+        if (confirmAnswer == null || !confirmAnswer.Value)
+            return;
+
         var ev = allEvents.Where(x => x.Id == e.Id).FirstOrDefault();
         if (ev == null)
             return;

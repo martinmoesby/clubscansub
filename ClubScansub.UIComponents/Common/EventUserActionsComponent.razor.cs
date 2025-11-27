@@ -4,6 +4,7 @@ using ClubScansub.Service.ServiceResults;
 using ClubScansub.Service;
 using Microsoft.AspNetCore.Components;
 using Radzen;
+using ClubScansub.Blazor.UIComponents.RadzenDialogOptions;
 
 namespace ClubScansub.Blazor.UIComponents.Common
 {
@@ -52,27 +53,13 @@ namespace ClubScansub.Blazor.UIComponents.Common
 
         private async Task addNewUser_Click()
         {
-            var sideDialogOptions = new SideDialogOptions()
-            {
-                Width = "800px",
-                Position = DialogPosition.Left,
-                ShowClose = true
-            };
-
-            var dialogOptions = new DialogOptions()
-            {
-                Width = "95%",
-                Height="95%",
-                ShowClose = true
-            };
-
             var dialogParameters = new Dictionary<string, object>()
             {
                 {"OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this, addNewUserCallback) },
                 {"ShowAlertOnError", false }
             };
 
-            await dialogService.OpenAsync<RegisterUserComponent>("Create new User", dialogParameters, dialogOptions);
+            await dialogService.OpenAsync<RegisterUserComponent>("Create new User", dialogParameters, new FullScreenDialogOptions());
         }
 
         private void enrollExistingUserCallback()
