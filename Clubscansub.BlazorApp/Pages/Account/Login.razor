@@ -3,35 +3,29 @@
 @using ClubScansub.Models.DTO
 
 <PageTitle>Club Scansub Login </PageTitle>
-<RadzenStack Gap="0" Class="rz-my-auto rz-mx-auto rz-border-radius-1 rz-shadow-1" Style="width: 480px;">
-    <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-p-6" style="text-align: center;">
+
+<RadzenStack Gap="20" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:100%">
+    <RadzenCard Class="rz-shadow-1 rz-border-radius-6 rz-p-6">
+
         <RadzenText TextStyle="TextStyle.DisplayH4">Login</RadzenText>
-    
-        <RadzenTemplateForm Data=@("LoginUserDTO") >
-            <RadzenLogin  
-                FormFieldVariant="Variant.Outlined" 
-                Login="@(args => onLogin(args))" 
 
+        <RadzenTemplateForm Data=@("LoginUserDTO")>
+            <RadzenLogin FormFieldVariant="Variant.Outlined"
+                         Login="@(args => onLogin(args))"
+                         Register="@onRegister"
+                         AllowResetPassword="false"
+                         ResetPassword="@onRegister"
+                         ResetPasswordText="Forgot your password??"
+                         AllowRememberMe="true"
+                         RememberMe="false"
+                         RememberMeText="Remember me"
+                         AllowRegister="true"
+                         RegisterText="Create membership request"
+                         RegisterMessageText="Not member yet? - create member request here..."
+                         AutoComplete="false">
 
-                Register="@onRegister" 
-                
-                AllowResetPassword="false" 
-                ResetPassword="@onRegister"
-                ResetPasswordText="Forgot your password??"
-
-                
-                AllowRememberMe="true" 
-                RememberMe = "false"
-                RememberMeText="Remember me"
-                 
-                AllowRegister="false" 
-                RegisterText="Create account"
-                RegisterMessageText="No Account yet - create one here?"
-                AutoComplete = "false"
-                >
-                
             </RadzenLogin>
-                
+
         </RadzenTemplateForm>
 
     </RadzenCard>

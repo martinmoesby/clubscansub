@@ -78,9 +78,11 @@ namespace ClubScansub.BlazorApp.Pages.Account
             await dialogService.OpenAsync<RegisterUserComponent>("Register new account",
                 new Dictionary<string, object>()
                 {
-                    { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this,onRegistered) }
+                    { "OnRegisterSuccess", EventCallback.Factory.Create<RegisterUserResult>(this,onRegistered) },
+                    { "ShowRoles", false },
+                    { "ShowAccountNumber", false }
                 },
-                new DialogOptions() { Width = "960px", CloseDialogOnOverlayClick = true, CloseDialogOnEsc = true }
+                new DialogOptions() { Width = "780px", CloseDialogOnOverlayClick = true, CloseDialogOnEsc = true }
                 );
         }
 

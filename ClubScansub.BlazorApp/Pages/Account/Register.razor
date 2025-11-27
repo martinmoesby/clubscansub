@@ -1,0 +1,58 @@
+﻿@page "/account/register"
+@using ClubScansub.Service.ServiceResults
+
+<h3>Register</h3>
+<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RegisterUserComponent OnRegisterSuccess="onRegisterSuccess" ShowAlertOnError="false"  ShowRoles="false" ShowAccountNumber="false" />
+    </RadzenStack>
+
+</RadzenStack>
+@code {
+    [Inject]
+    NotificationService notificationService { get; set; }
+
+    [Inject]
+    DialogService dialogService { get; set; }
+
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+
+
+    private async void onRegisterSuccess(RegisterUserResult registerUserResult)
+    {
+        try
+        {
+            if (registerUserResult.IsSucceesfull)
+            {
+                notificationService.Notify(new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Duration = 2500,
+                    Summary = "New user created",
+                    Detail = $"Member '{registerUserResult.User.Name}' was created."
+                });
+
+                navigationManager.NavigateTo("account/login");
+            }
+            else
+            {
+                notificationService.Notify(new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Error,
+                    Duration = 2500,
+                    Summary = registerUserResult.Errors.FirstOrDefault(),
+                    Detail = string.Join(" - ", registerUserResult.Errors.ToArray())
+                });
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+            await dialogService.Alert($"An error occurred: {ex.Message}", "Registration error!", new AlertOptions() { OkButtonText = "OK" });
+        }
+    }
+
+}

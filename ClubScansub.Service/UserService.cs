@@ -224,7 +224,7 @@ namespace ClubScansub.Service
                     await emailSender.SendEmailAsync(userWM.Email, "Please confirm your email for clubscansub.dk",
                          $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>. For security reasons your password will be sendt in a seperate email");
 
-                    await emailSender.SendEmailAsync(userWM.Email, "Your password for ClubScnsub.dk",
+                    await emailSender.SendEmailAsync(userWM.Email, "Your password for ClubScansub.dk",
                         $"Please use this password to login to CLubscansub.dk : {randomPassword}. We STRONGLY suggest that you immediately login to the site and <a href='{HtmlEncoder.Default.Encode(changePasswordCallbackUrl)}'> change your password by clicking here</a>");
 
                     return new RegisterUserResult(user, requireConfirmedAccount);
