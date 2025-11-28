@@ -11,7 +11,7 @@
                 <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
 
                     <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-2" Orientation="Orientation.Horizontal">
-                        <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu"></RadzenSidebarToggle>
+                        <RadzenSidebarToggle Click="@SidebarToggleClick" Icon="menu" Style="width:62px; padding:17px;"></RadzenSidebarToggle>
                         <RadzenLink Path="/">
                             <RadzenImage Path="@logoFilename" Style="height:55px;margin-bottom:10px"></RadzenImage>
                         </RadzenLink>
@@ -41,64 +41,78 @@
     <RadzenBody>
         <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-0" Style="width: 100%;height:100%">
             <RadzenColumn Size="12">
-                <CascadingValue TValue="bool" Name="IsDarkTheme" Value="@isDarkTheme">
-                    @Body
-                </CascadingValue>
+               
+                @Body
             </RadzenColumn>
         </RadzenRow>
 
     </RadzenBody>
 
-    <RadzenSidebar @bind-Expanded=@sidebarExpanded Responsive=true ResponsiveMaxWidth="1024px" style="@($"z-index: 2; display: flex; flex-direction:column;width:{selectedMenuWidth}")" Position="SidebarPosition.Start">
-        @*                 ButtonStyle="ButtonStyle.Base" 
-                ToggleButtonStyle="ButtonStyle"
- *@
-        <RadzenPanelMenu DisplayStyle="@menuItemDisplayStyle" ShowArrow="false" >
-            <RadzenToggleButton 
-                Size="ButtonSize.ExtraSmall" 
-                Click="setMenuState" 
-                Variant="Variant.Text" 
-                Icon="chevron_left" 
-                                ToggleIcon="chevron_right"
-                Style="width:100%;text-align:end" />
+    <RadzenSidebar @bind-Expanded=@sidebarExpanded Responsive=true ResponsiveMaxWidth="1024px" style="width: max-content; z-index: 2; display: flex; flex-direction:column" Position="SidebarPosition.Start" class="rz-border rz-border-shadow-20">
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="20" Style="flex:1">
+            <RadzenStack>
 
-            <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
-            <AuthorizeView Roles="@Userroles.Member">
-                <RadzenPanelMenuItem Text="Divesites" Path="/divesites/" Icon="globe" />
-                <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person" />
-            </AuthorizeView>
+                <RadzenPanelMenu DisplayStyle="@menuItemDisplayStyle" ShowArrow="false" >
+            <RadzenToggleButton Size="ButtonSize.ExtraSmall"
+                                Click="setMenuState"
+                                Variant="Variant.Text"
+                                ToggleButtonStyle="ButtonStyle.Base"
+                                ButtonStyle="ButtonStyle.Base"
+                                Shade="Shade.Light"
+                                ToggleShade="Shade.Light"
+                                Icon="keyboard_double_arrow_left"
+                                        ToggleIcon="keyboard_double_arrow_right"
+                                Style="width:100%;text-align:end" />
 
-            <AuthorizeView Roles="@Userroles.Divepro">
-                <RadzenPanelMenuItem Text="Work" Path="/divepro/workcalendar" Icon="engineering" />
-            </AuthorizeView>
+                    <RadzenPanelMenuItem Text="Calendar" Path="" Icon="calendar_month" />
+                    <AuthorizeView Roles="@Userroles.Member">
+                        <RadzenPanelMenuItem Text="Divesites" Path="/divesites/" Icon="globe" />
+                        <RadzenPanelMenuItem Text="Profile" Path="/profile/" Icon="person" />
+                    </AuthorizeView>
 
-            <AuthorizeView Roles="@adminroles">
-                <RadzenPanelMenuItem Icon="admin_panel_settings" Text="Administration">
-                    <RadzenPanelMenuItem Icon="groups" Text="Members" Path="/admin/members" />
-                    <RadzenPanelMenuItem Icon="place" Text="Events" Path="/admin/events" />
-                    <RadzenPanelMenuItem Icon="school" Text="Courses" Path="/admin/courses" />
-                    <RadzenPanelMenuItem Icon="engineering" Text="Work" Path="/admin/work" />
-                </RadzenPanelMenuItem>
-            </AuthorizeView>
+                    <AuthorizeView Roles="@Userroles.Divepro">
+                        <RadzenPanelMenuItem Text="Work" Path="/divepro/workcalendar" Icon="engineering" />
+                    </AuthorizeView>
 
-        </RadzenPanelMenu>
+                    <AuthorizeView Roles="@adminroles">
+                        <RadzenPanelMenuItem Icon="admin_panel_settings" Text="Administration">
+                            <RadzenPanelMenuItem Icon="groups" Text="Members" Path="/admin/members" />
+                            <RadzenPanelMenuItem Icon="place" Text="Events" Path="/admin/events" />
+                            <RadzenPanelMenuItem Icon="school" Text="Courses" Path="/admin/courses" />
+                            <RadzenPanelMenuItem Icon="engineering" Text="Work" Path="/admin/work" />
+                        </RadzenPanelMenuItem>
+                    </AuthorizeView>
 
+                </RadzenPanelMenu>
+            </RadzenStack>
+
+            <RadzenStack JustifyContent="JustifyContent.End">
+
+                <RadzenText Visible="@(menuItemDisplayStyle == MenuItemDisplayStyle.Icon)" Text="" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);word-wrap:normal;" TextAlign="Radzen.TextAlign.Center">
+                    DCM <br/>@versionSmall
+                </RadzenText>
+                <RadzenText Visible="@(menuItemDisplayStyle == MenuItemDisplayStyle.IconAndText)" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);word-wrap:normal;" TextAlign="Radzen.TextAlign.Center" >
+                    Dive Club Manager<br />@versionFull
+                </RadzenText>
+
+            </RadzenStack>
+        </RadzenStack>
     </RadzenSidebar>
 
-
     <RadzenFooter>
-        <RadzenRow>
+                <RadzenText Text="©2023 Martin Moesby" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);" TextAlign="Radzen.TextAlign.Center" />
+@*         <RadzenRow>
             <RadzenColumn Size="2">
-                <RadzenText Text="Klub Scansub" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
+
             </RadzenColumn>
             <RadzenColumn Size="8">
 
             </RadzenColumn>
             <RadzenColumn Size="2">
-                <RadzenText Text="©2023 Martin Moesby" TextStyle="Radzen.Blazor.TextStyle.Caption" class="rz-mb-0" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
+
             </RadzenColumn>
         </RadzenRow>
-
+ *@
     </RadzenFooter>
 
 </RadzenLayout>

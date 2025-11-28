@@ -15,13 +15,14 @@ using Radzen.Blazor;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Reflection;
 
 namespace ClubScansub.BlazorApp.Shared
 {
     public partial class MainLayout : LayoutComponentBase
     {
-        [Inject]
-        CookieThemeService _cookieThemeService { get; set; }
+        //[Inject]
+        //CookieThemeService _cookieThemeService { get; set; }
 
         [Inject]
         AuthenticationStateProvider authStateProvider { get; set; }
@@ -30,8 +31,6 @@ namespace ClubScansub.BlazorApp.Shared
         private ThemeService themeService { get; set; }
 
         private MenuItemDisplayStyle menuItemDisplayStyle;
-        private string[] menuWidths = ["0px;","50px", "130px"];
-        private string selectedMenuWidth = string.Empty;
 
         string adminroles = $"{Userroles.Administrator},{Userroles.Owner}";
         //private MenuState menuState;
@@ -54,21 +53,25 @@ namespace ClubScansub.BlazorApp.Shared
         }
 
         private string logoFilename = "";
-        private bool isDarkTheme = false;
+
         //internal enum MenuState
         //{
         //    Hidden,
         //    IconAndText,
         //    IconOnly
         //}
+
+        private string versionFull = string.Empty;
+        private string versionSmall = string.Empty;
         protected override async Task OnInitializedAsync()
         {
             menuItemDisplayStyle = MenuItemDisplayStyle.IconAndText;
-            themeService.SetTheme("software");
             themeService.ThemeChanged += OnThemeChanged;
             setLogoFileName();
             sidebarExpanded = false;
-
+            //var V = Assembly.GetExecutingAssembly().GetName().Version;
+            //versionFull = $"V{V.Major}.{V.Minor}.{V.MajorRevision}";
+            //versionSmall = $"V{V.Major}.{V.Minor}";
         }
 
         private void OnThemeChanged()
@@ -88,19 +91,16 @@ namespace ClubScansub.BlazorApp.Shared
 
             if (themeService.Theme.Contains("dark"))
             {
-                isDarkTheme = true;
                 logoFilename = "images/logo_new_dark.png";
             }
             else
             {
-                isDarkTheme = false;
                 logoFilename = "images/logo_new.png";
             }
         }
 
         private void setMenuState()
         {
-            selectedMenuWidth = menuItemDisplayStyle == MenuItemDisplayStyle.Icon ? menuWidths[2] : menuWidths[1];
             menuItemDisplayStyle = menuItemDisplayStyle == MenuItemDisplayStyle.Icon ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon;
 
         }
