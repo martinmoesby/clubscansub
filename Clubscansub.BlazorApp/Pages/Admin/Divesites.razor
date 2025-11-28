@@ -10,7 +10,7 @@
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Stretch" Style="height:100%">
 
     <RadzenStack>
-        <RadzenText TextStyle="TextStyle.DisplayH6" Text="Divesite management" />
+        <RadzenText TextStyle="TextStyle.DisplayH6" Text="Events and Divesites management" />
     </RadzenStack>
 
     <RadzenTabs TabPosition="TabPosition.Top">
@@ -25,6 +25,9 @@
 
             <RadzenTabsItem Text="Divesites">
                 <DivesiteListComponent />
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Event requests">
+                <RequestEventListComponent  />
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>

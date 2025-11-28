@@ -360,7 +360,7 @@ namespace ClubScansub.Service
         {
             using var context = new ApplicationDbContext(dbContextOptions);
             var data = await context.EventRequests
-                .Include(x => x.Divelocation)
+                .Include(x => x.Divelocation).ThenInclude(x=>x.Image)
                 .Include(x => x.Requester)
                 .Where(x => !x.RequestProcessed)
                 .ToListAsync();

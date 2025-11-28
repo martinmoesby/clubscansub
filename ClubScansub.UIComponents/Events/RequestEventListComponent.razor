@@ -1,18 +1,35 @@
-﻿<RadzenStack AlignItems="AlignItems.Stretch" Gap="5">
+﻿<RadzenStack Gap="5">
 
     <RadzenDataGrid TItem="EventRequest" Data="@Requests" RowRender="onRowRender">
         <Columns>
 
-            <RadzenDataGridColumn Title="Requested by" Width="240px;">
+            <RadzenDataGridColumn Title="Divesite" Visible="@(DivesiteId == -1)" Width="360px;">
                 <Template>
-                    <RadzenText>@context.Requester?.Name</RadzenText>
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center">
+                        <RadzenStack Style="width:160px;height:80px;overflow:hidden;position:relative">
+                            <img src="@ImageUtils.GetImageSrc(context.Divelocation.Image?.ImageData)" class="img rounded h-100" style="object-fit:cover" />
+                        </RadzenStack>
+                    <RadzenText TextStyle="TextStyle.H6" Text="@context.Divelocation.Name" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Title="Request message">
+                <Template>
+                    <RadzenText TextStyle="TextStyle.Body1" Text="@context.Notes" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Title="Requested by" Width="180px;">
+                <Template>
+                    <RadzenText TextStyle="TextStyle.Caption">@context.Requester?.Name</RadzenText>
                 </Template>
             </RadzenDataGridColumn>
 
             <AuthorizeView Roles="@Userroles.Administrator" Context="adminsContext">
                 <RadzenDataGridColumn Title="with" Width="240px;">
                     <Template>
-                        <RadzenListBox Data="@GetUsers(context).ToList()" TValue="ApplicationUser" TextProperty="@nameof(ApplicationUser.Name)" Style="height:80px;width:100%" />
+                        <RadzenListBox PageSize="1" Data="@GetUsers(context).ToList()" TValue="ApplicationUser" TextProperty="@nameof(ApplicationUser.Name)" Style="width:100%" />
                     </Template>
                 </RadzenDataGridColumn>
             </AuthorizeView>
@@ -24,11 +41,11 @@
             </RadzenDataGridColumn>
 
             <AuthorizeView Roles="@Userroles.Administrator" Context="adminsContext">
-                <RadzenDataGridColumn Width="120px">
+                <RadzenDataGridColumn MaxWidth="80px" Width="80px">
                     <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                            <RadzenButton Variant="Variant.Text" Icon="thumb_up" IconColor="@Colors.Success" Click="@(() => processRequest(context, true))" />
-                            <RadzenButton Variant="Variant.Text" Icon="thumb_down" IconColor="@Colors.Danger" Click="@(() => processRequest(context, false))" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                            <RadzenButton Variant="Variant.Text" Icon="thumb_up" IconColor="@Colors.Success" Click="@(() => processRequest(context, true))"  Size="ButtonSize.Small"/>
+                            <RadzenButton Variant="Variant.Text" Icon="thumb_down" IconColor="@Colors.Danger" Click="@(() => processRequest(context, false))" Size="ButtonSize.Small" />
                         </RadzenStack>
                     </Template>
                 </RadzenDataGridColumn>
@@ -47,7 +64,7 @@
 
     </RadzenDataGrid>
 
-    <RadzenButton Click="@(() => OnProcessedComplete.InvokeAsync(Requests))" Icon="close" ButtonStyle="ButtonStyle.Success" Text="Close" />
+    <RadzenButton Click="@(() => OnProcessedComplete.InvokeAsync(Requests))" Icon="close" ButtonStyle="ButtonStyle.Success" Text="Close" Visible="@OnProcessedComplete.HasDelegate" />
 
 </RadzenStack>
 @code {
@@ -64,7 +81,7 @@
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     [Parameter]
-    public int DivesiteId { get; set; }
+    public int DivesiteId { get; set; } = -1;
 
     [Parameter]
     public EventCallback<List<EventRequest>> OnProcessedComplete { get; set; }
@@ -88,7 +105,12 @@
     {
         if (firstRender)
         {
-            Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+            if (DivesiteId != -1)
+
+                Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+            else
+                Requests = (await eventservice.GetEventRequestsAsync()).Where(x => x.RequestProcessed == false).ToList();
+
             selectedDates = Requests.ToDictionary(r => r.Id, r => (DateOnly?)null);
             StateHasChanged();
         }
