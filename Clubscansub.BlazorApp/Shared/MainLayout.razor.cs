@@ -21,6 +21,9 @@ namespace ClubScansub.BlazorApp.Shared
 {
     public partial class MainLayout : LayoutComponentBase
     {
+        [CascadingParameter]
+        public App thisApp { get; set; }
+
         //[Inject]
         //CookieThemeService _cookieThemeService { get; set; }
 
@@ -72,6 +75,11 @@ namespace ClubScansub.BlazorApp.Shared
             //var V = Assembly.GetExecutingAssembly().GetName().Version;
             //versionFull = $"V{V.Major}.{V.Minor}.{V.MajorRevision}";
             //versionSmall = $"V{V.Major}.{V.Minor}";
+        }
+
+        private void swithchToHorizonatalLayout()
+        {
+            thisApp.SetLayout(typeof(HorizontalLayout));
         }
 
         private void OnThemeChanged()

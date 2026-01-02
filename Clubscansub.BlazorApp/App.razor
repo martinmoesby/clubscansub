@@ -1,12 +1,16 @@
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
 <CascadingAuthenticationState>
 
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    <LoginDisplay />
-                </NotAuthorized>
-            </AuthorizeRouteView>
+            <CascadingValue Value="this">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@this.LayoutType">
+                    <NotAuthorized>
+                        <LoginDisplay />
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            </CascadingValue>
         </Found>
         <NotFound>
             @*<Redirect />*@
@@ -31,17 +35,50 @@
     [Inject]
     private ThemeService ThemeService { get; set; }
 
+    private Type LayoutType = typeof(MainLayout);
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
         var theme = "standard";
-        // if (httpContext!=null)
-        // {
-        //     var theme = httpContext.Request.Cookies["ClubScansubTheme"];
-        //     if (!string.IsNullOrEmpty(theme))
-        //     {
-                ThemeService.SetTheme(theme);
-        //     }
-        // }
+        ThemeService.SetTheme(theme);
     }
+
+    public async void SetLayout(Type layout)
+    {
+        if (layout != LayoutType)
+        {
+            this.LayoutType = layout;
+            StateHasChanged();
+        }
+    }
+
+
+    // private UserSettings settings = new();
+    // private string cookieName = "com.divemanager.ww.usersetting";
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     settings = (await BrowserStorage.GetAsync<UserSettings>(cookieName)).Value;
+    //     if (settings == null)
+    //     {
+    //         settings = new UserSettings();
+    //         settings.MyTheme = "standard";
+    //         settings.MyLayout = typeof(MainLayout);
+    //         settings.IsThemeFullScreen = true;
+    //         await BrowserStorage.SetAsync(cookieName, settings);
+    //     }
+    // }
+
+    // private void applySettings()
+    // {
+    //     ThemeService.SetTheme(settings.MyTheme);
+    //     SetLayout(settings.MyLayout);
+    // }
+
+    // private class UserSettings
+    // {
+    //     public string MyTheme { get; set; }
+    //     public Type MyLayout  { get; set; }
+    //     public bool IsThemeFullScreen { get; set; }
+    // }
 }

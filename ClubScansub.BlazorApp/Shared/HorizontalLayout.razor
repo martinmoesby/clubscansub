@@ -1,0 +1,162 @@
+﻿@using ClubScansub.Extensions
+@using ClubScansub.Service
+@using ClubScansub.Utility;
+@using Microsoft.AspNetCore.Identity
+@inherits LayoutComponentBase
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenSidebar Position="SidebarPosition.Start" Expanded="@(!isFullScreen)"  FullHeight Style="width:15vw;" class="rz-border-0">
+                
+    </RadzenSidebar>
+    <RadzenSidebar Position="SidebarPosition.End" Expanded="@(!isFullScreen)" FullHeight Style="width:15vw;" class="rz-border-0">
+        
+    </RadzenSidebar>
+    <RadzenHeader class="rz-p-2 rz-shadow-4">
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+
+            <RadzenStack JustifyContent="JustifyContent.Start" class="rz-pr-2" Orientation="Orientation.Horizontal">
+                <RadzenLink Path="/">
+                    <RadzenImage Path="@logoFilename" Style="height:55px;margin-bottom:10px"></RadzenImage>
+                </RadzenLink>
+                <RadzenMenu>
+                    <AuthorizeView Roles="@Userroles.Member">
+                        <RadzenMenuItem Text="Divesites" Path="/divesites/" Icon="globe" />
+                    </AuthorizeView>
+
+                    <AuthorizeView Roles="@Userroles.Divepro">
+                        <RadzenMenuItem Text="Work" Path="/divepro/workcalendar" Icon="engineering" />
+                    </AuthorizeView>
+
+                    <AuthorizeView Roles="@Userroles.Administrator">
+                        <RadzenMenuItem Icon="admin_panel_settings" Text="Administration">
+                            <RadzenMenuItem Icon="groups" Text="Members" Path="/admin/members" />
+                            <RadzenMenuItem Icon="place" Text="Events" Path="/admin/events" />
+                            <RadzenMenuItem Icon="school" Text="Courses" Path="/admin/courses" />
+                            <RadzenMenuItem Icon="engineering" Text="Work" Path="/admin/work" />
+                        </RadzenMenuItem>
+                    </AuthorizeView>
+
+                </RadzenMenu>
+            </RadzenStack>
+
+            <RadzenStack JustifyContent="JustifyContent.End" class="rz-pr-2" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10">
+
+
+                <AuthorizeView>
+                    <Authorized>
+                        <RadzenProfileMenu>
+                            <Template>
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+@*                                     <RadzenGravatar Email="@currentUser?.Email" /> *@
+                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER" />
+                                    <RadzenText TextStyle="TextStyle.Body2">
+                                        @userName
+                                    </RadzenText>
+                                </RadzenStack>
+                            </Template>
+                            <ChildContent>
+                                <RadzenProfileMenuItem Text="Profile" Path="/profile/" Icon="person" />
+                                <RadzenProfileMenuItem Text="Logout" Path="/Account/LogOut" Icon="logout" />
+                            </ChildContent>
+                        </RadzenProfileMenu>
+                    </Authorized>
+                    <NotAuthorized>
+                        <LoginDisplay />
+                    </NotAuthorized>
+                </AuthorizeView>
+                <RadzenAppearanceToggle ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" />
+                <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Icon="dashboard_2" Click="switchToMainLayout" />
+
+                <RadzenToggleButton @bind-Value="isFullScreen" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Icon="fullscreen" ToggleIcon="fullscreen_exit" Click="@(() => isFullScreen = !isFullScreen)" />
+            </RadzenStack>
+
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody>
+         @Body
+    </RadzenBody>
+
+    <RadzenFooter class="rz-shadow-8">
+        <RadzenText Text="©2023 Martin Moesby" TextStyle="Radzen.Blazor.TextStyle.Caption" style="color: var(--rz-text-disabled-color);" TextAlign="Radzen.TextAlign.Center" />
+    </RadzenFooter>
+
+</RadzenLayout>
+@code {
+    [CascadingParameter]
+    public App thisApp { get; set; }
+
+    [CascadingParameter(Name = "currentUser")]
+    ApplicationUser currentUser { get; set; } = new();
+
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+
+    [Inject]
+    private ThemeService themeService { get; set; }
+
+    [Inject]
+    MemberService memberService { get; set; }
+
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+
+    private string userName;
+
+    private string logoFilename = "";
+    private bool isFullScreen = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        themeService.ThemeChanged += OnThemeChanged;
+
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            currentUser = await memberService.GetAsync(authState?.User?.GetIdentityId());
+            userName = currentUser?.Name ?? authState?.User?.Identity?.Name ?? "";
+        }
+
+        setLogoFileName();
+        //var V = Assembly.GetExecutingAssembly().GetName().Version;
+        //versionFull = $"V{V.Major}.{V.Minor}.{V.MajorRevision}";
+        //versionSmall = $"V{V.Major}.{V.Minor}";
+    }
+
+
+    private void OnThemeChanged()
+    {
+
+        setLogoFileName();
+        StateHasChanged();
+    }
+
+    private async void logout()
+    {
+        navigationManager.NavigateTo("/Account/Logout");
+    }
+
+    private void changeTheme(string value)
+    {
+        themeService.SetTheme(value);
+    }
+    private void setLogoFileName()
+    {
+
+        if (themeService.Theme.Contains("dark"))
+        {
+            logoFilename = "images/logo_new_dark.png";
+        }
+        else
+        {
+            logoFilename = "images/logo_new.png";
+        }
+    }
+
+    private void switchToMainLayout()
+    {
+        thisApp.SetLayout(typeof(MainLayout));
+    }
+
+}
