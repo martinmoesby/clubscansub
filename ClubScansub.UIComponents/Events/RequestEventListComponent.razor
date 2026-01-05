@@ -107,7 +107,7 @@
         {
             if (DivesiteId != -1)
 
-                Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+                Requests = await eventservice.GetEventRequestsForDivesiteAsync(DivesiteId);
             else
                 Requests = (await eventservice.GetEventRequestsAsync()).Where(x => x.RequestProcessed == false).ToList();
 
@@ -171,7 +171,7 @@
             await eventservice.DenyEventRequest(request);
         }
 
-        Requests = await eventservice.GetEventRequestsForDivesite(DivesiteId);
+        Requests = await eventservice.GetEventRequestsForDivesiteAsync(DivesiteId);
         selectedDates = Requests.ToDictionary(r => r.Id, r => (DateOnly?)null);
         StateHasChanged();
 

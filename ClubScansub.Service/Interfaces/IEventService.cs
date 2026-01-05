@@ -13,6 +13,7 @@ namespace ClubScansub.Service.Interfaces
         Task<IList<Event>> GetAllByDateAsync(DateTime startDate, DateTime endDate);
         Task<IList<Event>> GetCompletedEventsByDivesiteId(int divesiteId);
         Task<List<EventRequest>> GetEventRequestsAsync();
-        Task<List<EventRequest>> GetEventRequestsForDivesite(int divelocationId);
+        Task<List<EventRequest>> GetEventRequestsForDivesiteAsync(int divelocationId);
+        Task<Certificate?> GetCertificateForEventLocationAsync(int EventId);
     }
 }

@@ -1,0 +1,75 @@
+﻿@using ClubScansub.Models.Interface
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal">
+
+    @if (Event.StartDateAndTime < DateTime.Now)
+    {
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="@IconsTextsAndColors.Icons.COMPLETED" Size="ButtonSize.Small" />
+    }
+    else
+    {
+        if (Event.IsCancelled)
+        {
+            <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="@IconsTextsAndColors.Icons.CANCELLED" Shade="Shade.Lighter" Text="Event cancelled" Disabled Size="ButtonSize.Small" />
+        }
+        else
+        {
+
+            if (currentUser != null)
+            {
+                if (isUserSignedUp)
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.ENROLLED" Text="Already signed up" Size="ButtonSize.Small" Disabled />
+
+                }
+                else if (currentUser.Balance >= Event.Price || (isUserPremium && currentUser.Balance >= Event.PremiumPrice) || (Event.EventType == EventTypeEnum.Klubture && isUserPremium) || (isUserDivepro && Event.IsFreeForDivepros))
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Success" Click=@(() => enrollExistingUser(currentUser.Id)) Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
+                }
+                else
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="@IconsTextsAndColors.Icons.AMOUNT" Shade="Shade.Default" Text="Low balance" Disabled Size="ButtonSize.Small" />
+                }
+
+            }
+            else
+            {
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Light" Variant="Variant.Outlined">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.LOGIN" IconColor="@Colors.Info" IconStyle="IconStyle.Info" />
+                        <RadzenText Text="Login to sign-up" TextStyle="TextStyle.Caption" class="rz-color-info" />
+                    </RadzenStack>
+                </RadzenBadge>
+            }
+        }
+    }
+
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Event Event { get; set; }
+
+    [Parameter]
+    public ApplicationUser currentUser { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> OnEnrollExistingUser { get; set; }
+
+    [Parameter]
+    public bool isUserSignedUp { get; set; }
+
+    [Parameter]
+    public bool isUserPremium { get; set; }
+
+    [Parameter]
+    public bool isUserDivepro { get; set; }
+
+    private async Task enrollExistingUser(string userId)
+    {
+        if (OnEnrollExistingUser.HasDelegate)
+        {
+            await OnEnrollExistingUser.InvokeAsync(userId);
+        }
+    }
+
+}
