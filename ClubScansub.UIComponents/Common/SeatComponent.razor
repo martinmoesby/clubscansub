@@ -1,10 +1,7 @@
 ﻿@using ClubScansub.Utility
-@if (ShowText)
-{
-    <RadzenText Text="@Text" TextStyle="TextStyle.Caption" Style="@sizeStyle" />
-}
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="5" >
-    <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Info" Variant="Variant.Filled" Shade="Shade.Lighter" Style="text-align:start;padding-top:7px;">
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal" Gap="1" >
+    <RadzenText Text="@Text" TextStyle="TextStyle.Subtitle2" Visible=@ShowText />
+    <RadzenBadge IsPill="false" BadgeStyle="BadgeStyle.Base" Variant="Variant.Text" Shade="Shade.Default" Style="text-align:start;">
 
 
         @for (int i = 0; i < Event.FixedParticipants; i++)

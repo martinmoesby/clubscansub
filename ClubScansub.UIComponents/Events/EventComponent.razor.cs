@@ -40,6 +40,8 @@ namespace ClubScansub.Blazor.UIComponents.Events
         private ApplicationUser currentUser;
 
         Event Event { get; set; } = new Event();
+        Certificate? Certificate { get; set; } = new();
+
         IList<EventUser> enrolledUsers = new List<EventUser>();
         private bool isUserSignedUp = false;
         private bool isUserPremium = false;
@@ -65,6 +67,8 @@ namespace ClubScansub.Blazor.UIComponents.Events
                 if (item != null) { 
                     Event = item;
                 }
+                Certificate = await eventService.GetCertificateForEventLocationAsync(EventId);
+
                 enrolledUsers = await eventUserService.GetUsersByEvent(EventId);
                 isUserSignedUp = enrolledUsers.Any(x => x.ApplicationUserId == currentUser?.Id);
                 isLoading = false;

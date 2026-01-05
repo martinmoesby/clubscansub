@@ -4,23 +4,25 @@
         <RadzenStack Gap="5" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
 
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(Divesite.DiveType)" />
                 <AuthorizeView Roles="@Userroles.Administrator">
-                </AuthorizeView>
-                <RadzenBadge Text="@($"Requests waiting {eventRequestCount.ToString()}")" IsPill Style="position:absolute;right:8px; top:43px;cursor:pointer" Shade="Shade.Default" BadgeStyle="BadgeStyle.Danger" Variant="Variant.Filled" Visible="@(hasRequests)" @onclick="@showRequests" />
+                    <RadzenBadge Text="@($"Requests waiting {eventRequestCount.ToString()}")" IsPill Style="position:absolute;right:8px; top:43px;cursor:pointer" Shade="Shade.Default" BadgeStyle="BadgeStyle.Danger" Variant="Variant.Filled" Visible="@(hasRequests)" @onclick="@showRequests" />
+                </AuthorizeView> 
                 <RadzenText TextStyle="TextStyle.Body1" Style="text-overflow:ellipsis;overflow:hidden;width:200px;text-wrap:nowrap;">@(Divesite.Name)</RadzenText>
             </RadzenStack>
+                <RadzenBadge IsPill="false" Variant="Variant.Text" Shade="Shade.Default" BadgeStyle="BadgeStyle.Info">
 
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
-                <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(Divesite.DefaultEventType)" IconColor="@IconsTextsAndColors.GetEventColor(Divesite.DefaultEventType)" />
-                <AuthorizeView Roles="@Userroles.Administrator">
-                    <RadzenButton Icon="edit" Click="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                <RadzenIcon Icon="@IconsTextsAndColors.GetDiveTypeIcon(Divesite.DiveType)" IconColor="@Colors.InfoDark" title="@Divesite.DiveType" />
+@*                 <RadzenIcon Icon="@IconsTextsAndColors.GetEventIcon(Divesite.DefaultEventType)" IconColor="@IconsTextsAndColors.GetEventColor(Divesite.DefaultEventType)" title="@Divesite.DefaultEventType" />
+ *@                <AuthorizeView Roles="@Userroles.Administrator">
+                    <RadzenIcon Icon="edit" @onclick="@(() => OnEdit.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" />
                 </AuthorizeView>
                 <AuthorizeView Roles="@Userroles.Member">
-                    <RadzenButton Icon="pinboard" Click="@(() => OnRequestEvent.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" Variant="Variant.Text" Size="ButtonSize.ExtraSmall" />
+                    <RadzenIcon Icon="pinboard" @onclick="@(() => OnRequestEvent.InvokeAsync(Divesite))" Style="cursor:pointer" IconColor="@Colors.SuccessLight" />
                 </AuthorizeView>
+                </RadzenBadge>
+@*             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
             </RadzenStack>
-
+ *@
         </RadzenStack>
 
         
@@ -36,19 +38,19 @@
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
 
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
-                <RadzenIcon Icon="location_on" IconStyle="IconStyle.Danger" />
-                <RadzenText TextStyle="TextStyle.Caption">@Divesite.MeetingLocation?.Name @Divesite.Id</RadzenText>
+                <RadzenIcon Icon="location_on" IconColor="@Colors.SuccessLight" />
+                <RadzenText TextStyle="TextStyle.Caption">@Divesite.MeetingLocation?.Name</RadzenText>
             </RadzenStack>
 
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5">
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2">
-                    <RadzenIcon Icon="vertical_align_top" IconStyle="IconStyle.Success" />
+                    <RadzenIcon Icon="vertical_align_top" IconColor="@Colors.InfoLight" />
                     <RadzenText TextStyle="TextStyle.Caption">@($"{Divesite.MinDepth} m.")</RadzenText>
                 </RadzenStack>
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2">
-                    <RadzenIcon Icon="vertical_align_bottom" IconStyle="IconStyle.Danger" />
+                    <RadzenIcon Icon="vertical_align_bottom" IconColor="@Colors.InfoDark" />
                     <RadzenText TextStyle="TextStyle.Caption">@($"{Divesite.MaxDepth} m.")</RadzenText>
                 </RadzenStack>
 

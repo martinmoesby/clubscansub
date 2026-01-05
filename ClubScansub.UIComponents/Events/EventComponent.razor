@@ -7,11 +7,9 @@
 }
 else
 {
-    <RadzenStack Gap="10">
+    <RadzenStack Gap="25" Style="height:500px;">
 
-
-        <RadzenText TextStyle="TextStyle.Body1">@(Event?.Details)</RadzenText>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="10">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="10" Style="flex:3">
             <RadzenStack Style="flex:1;">
                 @if (Event.Divelocation?.Image != null)
                 {
@@ -24,107 +22,70 @@ else
                 }
             </RadzenStack>
 
-            <RadzenStack Orientation="Orientation.Vertical" Style="flex:1.5;" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+            <RadzenStack Orientation="Orientation.Vertical" Style="flex:2;" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal" Gap="25">
+                <RadzenStack Gap="20">
 
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="" Gap="5">
 
-                    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Start">
+                        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
 
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" IconColor="@Colors.Success"></RadzenIcon>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.START_TIME" IconColor="@Colors.Success"></RadzenIcon>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.StartDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" IconColor="@Colors.Danger"></RadzenIcon>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                            </RadzenStack>
+
                         </RadzenStack>
 
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.END_TIME" IconColor="@Colors.Danger"></RadzenIcon>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" Text="@Event.EndDateAndTime.ToString("dd. MMMM yyyy kl. HH:mm")" />
+                        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start">
+
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                                <RadzenIcon Icon="vertical_align_top" IconColor="@Colors.InfoLight"></RadzenIcon>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@(Event.Divelocation?.MinDepth.ToString() + " meter")" />
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                                <RadzenIcon Icon="vertical_align_bottom" IconColor="@Colors.InfoDark"></RadzenIcon>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" Text="@(Event.Divelocation?.MaxDepth.ToString() + " meter")" />
+                            </RadzenStack>
+
                         </RadzenStack>
 
-                    </RadzenStack>
-
-                    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.End" Gap="5">
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Stretch">
-                            @if (isUserDivepro && Event.IsFreeForDivepros)
-                            {
-                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessDark"></RadzenIcon>
-                                <RadzenText TextStyle="TextStyle.Subtitle2">Free of Charge</RadzenText>
-                            }
-                            else if (isUserPremium)
-                            {
-                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessLight"></RadzenIcon>
-                                <RadzenText TextStyle="TextStyle.Subtitle2">@Event.PremiumPrice?.ToString("C2")</RadzenText>
-                            }
-                            else
-                            {
-                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessDarker"></RadzenIcon>
-                                <RadzenText TextStyle="TextStyle.Subtitle2">@Event.Price?.ToString("C2")</RadzenText>
-                            }
-                        </RadzenStack>
-
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
-                            <RadzenIcon Icon="@IconsTextsAndColors.Icons.ENROLLED"></RadzenIcon>
-                            <RadzenText TextStyle="TextStyle.Subtitle2">@Event.FreeSpots of @Event.MaxParticipants</RadzenText>
-                        </RadzenStack>
-
-                    </RadzenStack>
-                
-                </RadzenStack>
-
-                <RadzenStack JustifyContent="JustifyContent.End">
-
-                    @if (Event.StartDateAndTime < DateTime.Now)
-                    {
-                        <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Event completed" Disabled Icon="@IconsTextsAndColors.Icons.COMPLETED" Size="ButtonSize.Small" />
-                    }
-                    else
-                    {
-                        if (Event.IsCancelled)
-                        {
-                            <RadzenButton ButtonStyle="ButtonStyle.Base" Icon="@IconsTextsAndColors.Icons.CANCELLED" Shade="Shade.Lighter" Text="Event cancelled" Disabled Size="ButtonSize.Small" />
-                        }
-                        else
-                        {
-
-                            if (currentUser != null)
-                            {
-                                if (isUserSignedUp)
+                        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.End" AlignItems="AlignItems.End">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Stretch">
+                                @if (isUserDivepro && Event.IsFreeForDivepros)
                                 {
-                                    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="@IconsTextsAndColors.Icons.ENROLLED" Text="Already signed up" Size="ButtonSize.Small" Disabled />
-
+                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessDark"></RadzenIcon>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2">Free of Charge</RadzenText>
                                 }
-                                else if (currentUser.Balance >= Event.Price || (isUserPremium && currentUser.Balance >= Event.PremiumPrice) || (Event.EventType == EventTypeEnum.Klubture && isUserPremium) || (isUserDivepro && Event.IsFreeForDivepros))
+                                else if (isUserPremium)
                                 {
-                                    <RadzenButton ButtonStyle="ButtonStyle.Success" Click=@(() => enrollExistingUser(currentUser.Id)) Icon="@IconsTextsAndColors.Icons.USER_ADD" Text="Sign me up" Size="ButtonSize.Small" />
+                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessLight"></RadzenIcon>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2">@Event.PremiumPrice?.ToString("C2")</RadzenText>
                                 }
                                 else
                                 {
-                                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="@IconsTextsAndColors.Icons.AMOUNT" Shade="Shade.Default" Text="Low balance" Disabled Size="ButtonSize.Small" />
+                                    <RadzenIcon Icon="@IconsTextsAndColors.Icons.AMOUNT" IconColor="@Colors.SuccessDarker"></RadzenIcon>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2">@Event.Price?.ToString("C2")</RadzenText>
                                 }
+                            </RadzenStack>
 
-                            }
-                            else
-                            {
-                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Light" Variant="Variant.Outlined">
-                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
-                                        <RadzenIcon Icon="@IconsTextsAndColors.Icons.LOGIN" IconColor="@Colors.Info" IconStyle="IconStyle.Info" />
-                                        <RadzenText Text="Login to sign-up" TextStyle="TextStyle.Caption" class="rz-color-info" />
-                                    </RadzenStack>
-                                </RadzenBadge>
-                            }
-                        }
-                    }
-                </RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Normal">
+                                <RadzenIcon Icon="@IconsTextsAndColors.Icons.USER"></RadzenIcon>
+                                <RadzenText TextStyle="TextStyle.Subtitle2">@Event.FreeSpots of @Event.MaxParticipants</RadzenText>
+                            </RadzenStack>
 
-                <SeatComponent Event="@Event" ShowText="false" Text="Signup status" Size="Utility.Enums.IconSizeEnum.Large" />
+                        </RadzenStack>
+                    </RadzenStack>
 
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Normal">
-                    @if (Event.StartDateAndTime > DateTime.Now) 
-                    {
-                        <AuthorizeView Roles="Administrator">
-                            <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
-                            <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
-                        </AuthorizeView>
-                    }
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Normal">
+                        <SeatComponent Event="@Event" ShowText="true" Text="Seat status" Size="Utility.Enums.IconSizeEnum.Medium" />
+                        <EventCertificateStatusComponent Certificate="Certificate" currentUser="@currentUser" Event="@Event" />
+                    </RadzenStack>
 
                 </RadzenStack>
 
@@ -132,8 +93,8 @@ else
 
         </RadzenStack>
 
-        <RadzenStack Gap="5">
-            <RadzenTabs RenderMode="TabRenderMode.Server" SelectedIndex="0" TabPosition="TabPosition.Top">
+        <RadzenStack Style="flex:5" AlignItems="AlignItems.Start">
+            <RadzenTabs RenderMode="TabRenderMode.Server" SelectedIndex="0" TabPosition="TabPosition.Top" Style="width:100%;height:100%;">
                 <Tabs>
                     <RadzenTabsItem Text="Description" Icon="@IconsTextsAndColors.Icons.INFORMATION">
                         <RadzenText TextStyle="TextStyle.Body2">@(Event?.Divelocation?.Description)</RadzenText>
@@ -151,6 +112,20 @@ else
                     </AuthorizeView>
                 </Tabs>
             </RadzenTabs>
+        </RadzenStack>
+
+        <RadzenStack Style="flex:1;" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.End">
+            @if (Event.StartDateAndTime > DateTime.Now)
+            {
+                <AuthorizeView Roles="Administrator">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Click="cancelEvent" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="cancel" Text="Cancel Event" Visible="!Event.IsCancelled" />
+                        <RadzenButton Click="reactivateEvent" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark" Size="ButtonSize.Small" Icon="refresh" Text="Reactivate Event" Visible="Event.IsCancelled" />
+                    </RadzenStack>
+                </AuthorizeView>
+            }
+
+            <EventSignupButtons Event="@Event" currentUser="@currentUser" isUserDivepro=@isUserDivepro isUserPremium=@isUserPremium isUserSignedUp=@isUserSignedUp OnEnrollExistingUser="enrollExistingUser" />
         </RadzenStack>
     </RadzenStack>
 }

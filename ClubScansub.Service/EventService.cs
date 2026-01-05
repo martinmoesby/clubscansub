@@ -300,6 +300,14 @@ namespace ClubScansub.Service
 
         }
 
+        /// <summary>
+        /// Approves the specified event request and notifies the requester by email if possible.
+        /// </summary>
+        /// <remarks>If the requester has a valid email address, an approval notification is sent. The
+        /// method updates the request's status in the database and commits the changes asynchronously.</remarks>
+        /// <param name="request">The event request to approve. The request's status will be updated to indicate approval.</param>
+        /// <param name="event">The event associated with the request. Used to provide event details in the notification email.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task ApproveEventRequest(EventRequest request, Event @event)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
@@ -312,20 +320,17 @@ namespace ClubScansub.Service
                 await emailSender.SendEmailAsync(request.Requester.Email!, "Requast has been approved", $"Your request for a trip to {request.Divelocation.Name} has been approved, and is scheduled to tkae place on {@event.StartDateAndTime.ToString()}");
 
             }
-
-
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-
         public async Task CancelEventAsync(Event item)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
             item.IsCancelled = true;
-            // TODO: Refund users
             context.Update(item);
             await context.SaveChangesAsync();
             await userService.RefundForCancelledEvent(item);
@@ -346,7 +351,7 @@ namespace ClubScansub.Service
             context.Update(item);
             await context.SaveChangesAsync();
         }
-        public async Task<List<EventRequest>> GetEventRequestsForDivesite(int divelocationId)
+        public async Task<List<EventRequest>> GetEventRequestsForDivesiteAsync(int divelocationId)
         {
             using var context = new ApplicationDbContext(dbContextOptions);
             return await context.EventRequests
@@ -371,7 +376,18 @@ namespace ClubScansub.Service
             using var context = new ApplicationDbContext(dbContextOptions);
             context.Update(request);
             await context.SaveChangesAsync();
-            return await GetEventRequestsForDivesite(request.Divelocation.Id);
+            return await GetEventRequestsForDivesiteAsync(request.Divelocation.Id);
+        }
+
+        public async Task<Certificate?> GetCertificateForEventLocationAsync(int EventId)
+        {
+            using var context = new ApplicationDbContext(dbContextOptions);
+            var e=await context.Events.Include(x=>x.Divelocation).ThenInclude(x=>x.Certificate).FirstOrDefaultAsync(x=>x.Id == EventId);
+            if (e != null)
+            {
+                return e.Divelocation?.Certificate;
+            }
+            return null;
         }
     }
 }

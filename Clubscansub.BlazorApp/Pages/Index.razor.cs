@@ -87,7 +87,9 @@ namespace ClubScansub.BlazorApp.Pages
 
         private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<ICalendarEvent> args)
         {
-            string baseClassString = "rz-pl-3 rz-event-content";
+            args.Attributes["style"] = "min-height:35px;cursor:pointer;";
+
+            string baseClassString = "rz-p-2 rz-event-content";
             string bgClass = IconsTextsAndColors.ColorClasses.BG_DEFAULT;
             string fgClass = IconsTextsAndColors.ColorClasses.FG_DEFAULT;
             if (args.Data is Event)
@@ -137,7 +139,7 @@ namespace ClubScansub.BlazorApp.Pages
                 {
                     bgClass = "rz-background-color-secondary-lighter";
                     fgClass = "rz-color-base-500";
-                    args.Attributes["style"] = "text-decoration:line-through;cursor:not-allowed;";
+                    args.Attributes["style"] += "text-decoration:line-through;cursor:not-allowed;";
                 }
             }
 
@@ -168,6 +170,7 @@ namespace ClubScansub.BlazorApp.Pages
                 //}
             }
             args.Attributes["class"] = $"{baseClassString} {bgClass} {fgClass}";
+           
         }
 
         private async void OnAppointmentClick(SchedulerAppointmentSelectEventArgs<ICalendarEvent> args)
@@ -184,7 +187,7 @@ namespace ClubScansub.BlazorApp.Pages
             var dialogOptions = new DialogOptions()
             {
                 Width = "800px",
-                Height="80%",
+                Height="600px",
                 CloseDialogOnOverlayClick = true,
                 ShowClose = true,
             };
@@ -220,7 +223,7 @@ namespace ClubScansub.BlazorApp.Pages
             Tooltipservice.Open(
                 args.Element,
                 getToolTipText(args.Data),
-                new TooltipOptions { Delay = 500, Duration = 5000, Position = TooltipPosition.Top }
+                new TooltipOptions { Delay = 500, Duration = 5000, Position = TooltipPosition.Top, Style = "background: var(--rz-base-light); color: var(--rz-text-color)" }
             );
 
         }
@@ -371,23 +374,25 @@ namespace ClubScansub.BlazorApp.Pages
                 else
                 {
                     builder.AddMarkupContent(1, $@"
-                        <div style='min-width:100px;max-width:250px;display:flex;flex-direction:column' >
-                            <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis'>{item.Title}</h5>
-                            <div style='white-space: wrap;'>{item.Divelocation?.Description}</div>
-                            <div style='display:flex;justify-content:space-between'>
-                                <div>
-                                    Start: {item.StartDateAndTime.ToShortTimeString()}
+                        <div style='min-width:100px;max-width:250px;display:flex;flex-direction:column;height:300px;' >
+                            <h5 style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;flex:1'>{item.Title}</h5>
+                            <div style='white-space: wrap; overflow: hidden; text-overflow: ellipsis;flex:5'>{item.Divelocation?.Description}</div>
+                            <div style='flex:2;justify-content:end; align-content:end'>
+                                <div style='display:flex;justify-content:space-between;'>
+                                    <div>
+                                        Start: {item.StartDateAndTime.ToShortTimeString()}
+                                    </div>
+                                    <div>
+                                        End: {item.EndDateAndTime.ToShortTimeString()}
+                                    </div>
                                 </div>
-                                <div>
-                                    End: {item.EndDateAndTime.ToShortTimeString()}
-                                </div>
-                            </div>
-                            <div style='display:flex;justify-content:space-between'>
-                                <div>
-                                    Price: {item.Price:C2}
-                                </div>
-                                <div>
-                                    Free seats: {item.FreeSpots:N0}
+                                <div style='display:flex;justify-content:space-between'>
+                                    <div>
+                                        Price: {item.Price:C2}
+                                    </div>
+                                    <div>
+                                        Free seats: {item.FreeSpots:N0}
+                                    </div>
                                 </div>
                             </div>
                         </div>
